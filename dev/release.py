@@ -385,7 +385,6 @@ def set_package_version(version):
     # file name should include their access paths with respect to the source
     # directory
     filenames = ['configure.ac',
-                 'ctools.pc.in',
                  'README.md',
                  'sonar-project.properties',
                  'doc/Doxyfile',

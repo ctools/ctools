@@ -1,7 +1,7 @@
 /***************************************************************************
  *             ctobservation - Base class for observation tools            *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016 by Juergen Knoedlseder                              *
+ *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -88,15 +88,24 @@ public:
     virtual void save(void) = 0;
 
     // Public methods
+    void                 obs(const GObservations& obs);
     const GObservations& obs(void) const;
 
     // Make methods private in Python by prepending an underscore
     %rename(_first_unbinned_observation) first_unbinned_observation;
     %rename(_next_unbinned_observation)  next_unbinned_observation;
+    %rename(_write_ogip_keywords)        write_ogip_keywords;
+    %rename(_set_obs_statistic)          set_obs_statistic;
+    %rename(_save_events_fits)           save_events_fits;
+    %rename(_save_events_xml)            save_events_xml;
 
     // Protected methods
     GCTAObservation* first_unbinned_observation(void);
     GCTAObservation* next_unbinned_observation(void);
+    void             write_ogip_keywords(GFitsHDU* hdu) const;
+    void             set_obs_statistic(const std::string& statistic);
+    void             save_events_fits(void);
+    void             save_events_xml(void);
 };
 
 
@@ -141,19 +150,19 @@ public:
 # The function supports either an observation container, or an argument
 # list or no argument as "argv" parameter. The function also writes the
 # header in the log file and switches the date on for logging.
-def _init_csobservation(self, argv):
+def _init_csobservation(self, name, version, argv):
     if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
-        csobservation.__init__(self, self._name, self._version, argv[0])
+        csobservation.__init__(self, name, version, argv[0])
     elif len(argv) > 0:
-        csobservation.__init__(self, self._name, self._version, *argv)
+        csobservation.__init__(self, name, version, *argv)
     else:
-        csobservation.__init__(self, self._name, self._version)
+        csobservation.__init__(self, name, version)
     # Set logger properties
     self._log_header()
     self._log.date(True)
 csobservation._init_csobservation = _init_csobservation
 
-# Define an iterator over all observations
+# Define an iterator over all unbinned observations
 def _unbinned_observations(self):
     obs = self._first_unbinned_observation()
     while obs != None:
@@ -161,4 +170,12 @@ def _unbinned_observations(self):
         obs = self._next_unbinned_observation()
 ctool._unbinned_observations   = _unbinned_observations
 cscript._unbinned_observations = _unbinned_observations
+
+# Execute the script
+def _execute(self):
+    self.logFileOpen()
+    self._read_ahead(True)
+    self.run()
+    self.save()
+csobservation.execute = _execute
 %}

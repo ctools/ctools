@@ -1,8 +1,21 @@
-2017-08-08
+2017-11-28
 
         * Version 1.5.0 released
         ========================
 
+        Support On/Off analysis in cslightcrv and csphasecrv (#2273)
+        Add tutorial for classical analysis (#2267)
+        Fix chatter level handling in ctpsfcube (#2262)
+        Handle On/Off observations by cspull (#2260)
+        Add "statistic" parameter to all likelihood tools and scripts (#2237)
+        Rename ctlike "stat" parameter to "statistic" (#2237)
+        Enable handling of On/Off observations in csspec (#2231)
+        Add csphagen script (#2208)
+        Add RING background method to ctskymap (#2207)
+        Add keywords to sky maps produced by ctskymap (#2194)
+        Enhance efficiency of computations in ctmodel (#2189)
+        Add csmodelsois script (#2180)
+        Add "NODES" method to csspec to support non-CTA analysis (#1927)
         Use t-type parameters for all "tmin" and "tmax" parameters (#1864)
 
 

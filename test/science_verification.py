@@ -32,15 +32,15 @@ import csv
 import math
 import sys
 import gammalib
-import ctools
+#import ctools
 import cscripts
 
 
 # ========================== #
 # Generate pull distribution #
 # ========================== #
-def generate_pull_distribution(model, obs='NONE', trials=100, \
-                               caldb='prod2', irf='South_50h', \
+def generate_pull_distribution(model, obs='NONE', onsrc='NONE', onrad=0.2, \
+                               trials=100, caldb='prod2', irf='South_50h', \
                                deadc=0.98, edisp=False, \
                                ra=83.63, dec=22.01, rad=5.0, \
                                emin=0.1, emax=100.0, enumbins=0, \
@@ -57,6 +57,10 @@ def generate_pull_distribution(model, obs='NONE', trials=100, \
         Model XML filename (without .xml extension)
     obs : str, optional
         Input observation definition XML filename
+    onsrc : str, optional
+        Name of On source for On/Off analysis
+    onrad : float, optional
+        Radius of On region
     trials : int, optional
         Number of trials
     caldb : str, optional
@@ -100,7 +104,7 @@ def generate_pull_distribution(model, obs='NONE', trials=100, \
         Name of pull distribution output file
     """
     # Derive parameters
-    head, tail = os.path.split(model)
+    _, tail = os.path.split(model)
     inmodel    = model + '.xml'
     outfile    = 'cspull_' + tail + '.dat'
 
@@ -108,6 +112,8 @@ def generate_pull_distribution(model, obs='NONE', trials=100, \
     pull = cscripts.cspull()
     pull['inobs']    = obs
     pull['inmodel']  = inmodel
+    pull['onsrc']    = onsrc
+    pull['onrad']    = onrad
     pull['outfile']  = outfile
     pull['caldb']    = caldb
     pull['irf']      = irf
@@ -164,7 +170,6 @@ def analyse_pull_distribution(filename):
 
     # Read rows
     first   = True
-    index   = -1
     samples = 0.0
     for row in reader:
 
@@ -237,6 +242,7 @@ class sciver(gammalib.GPythonTestSuite):
         self.append(self.spec_plaw, 'Test power law model')
         self.append(self.spec_plaw_edisp, 'Test power law model with energy dispersion')
         self.append(self.spec_plaw_stacked, 'Test power law model with stacked analysis')
+        self.append(self.spec_plaw_onoff, 'Test power law model with On/Off analysis')
         self.append(self.spec_plaw2, 'Test power law 2 model')
         self.append(self.spec_smoothbplaw, 'Test smoothly broken power law model')
         self.append(self.spec_eplaw, 'Test exponentially cut off power law model')
@@ -263,7 +269,8 @@ class sciver(gammalib.GPythonTestSuite):
         return
 
     # Generate and analyse pull distributions
-    def pull(self, model, obs='NONE', trials=100, duration=1800.0,
+    def pull(self, model, obs='NONE', onsrc='NONE',
+             trials=100, duration=1800.0,
              ra=83.63, dec=22.01, rad=5.0,
              emin=0.1, emax=100.0, enumbins=0,
              edisp=False, debug=False):
@@ -276,6 +283,8 @@ class sciver(gammalib.GPythonTestSuite):
             Model XML filename (without .xml extension)
         obs : str, optional
             Input observation definition XML filename
+        onsrc : str, optional
+            Name of On source for On/Off analysis
         trials : int, optional
             Number of trials
         duration : float, optional
@@ -298,8 +307,8 @@ class sciver(gammalib.GPythonTestSuite):
             Enable debugging?
         """
         # Generate pull distribution
-        outfile = generate_pull_distribution(model, obs=obs, trials=trials,
-                                             duration=duration,
+        outfile = generate_pull_distribution(model, obs=obs, onsrc=onsrc,
+                                             trials=trials, duration=duration,
                                              ra=ra, dec=dec, rad=rad,
                                              emin=emin, emax=emax,
                                              enumbins=enumbins,
@@ -400,6 +409,20 @@ class sciver(gammalib.GPythonTestSuite):
         self.test('Pull_Crab_Index')
         self.test('Pull_BackgroundModel_Prefactor')
         self.test('Pull_BackgroundModel_Index')
+        return
+
+    # Test power law model with On/Off analysis
+    def spec_plaw_onoff(self):
+        """
+        Test power law model with On/Off analysis
+        """
+        self.pull('data/sciver/crab_plaw_onoff',
+                  obs='data/sciver/obs_onoff.xml', onsrc='Crab',
+                  emin=0.1, emax=100.0, enumbins=20)
+        self.test('Pull_Crab_Prefactor')
+        self.test('Pull_Crab_Index')
+        self.test('Pull_Background_Prefactor')
+        self.test('Pull_Background_Index')
         return
 
     # Test power law 2 model

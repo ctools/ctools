@@ -144,15 +144,17 @@ class Test(test):
 
         # Check fit result values
         self.test_value(models['Crab'][2].value(),
-                        5.71055e-16, 1.0e-5, 'Crab prefactor')
+                        5.65431687851392e-16, 1.0e-4 * 5.65431687851392e-16,
+                        'Check Crab prefactor')
         self.test_value(models['Crab'][3].value(),
-                        -2.463392, 1.0e-5, 'Crab index')
+                        -2.45753747320273, 1.0e-4 * 2.45753747320273,
+                        'Check Crab index')
         self.test_value(models['Background'][0].value(),
-                        3.008828, 1.0e-5, 'Background model sigma')
+                        1.0444753409474, 1.0e-4 * 1.0444753409474,
+                        'Check background model prefactor')
         self.test_value(models['Background'][1].value(),
-                        6.27131e-05, 1.0e-5, 'Background model prefactor')
-        self.test_value(models['Background'][2].value(),
-                        -1.833184, 1.0e-5, 'Background model index')
+                        0.0126628793551562, 1.0e-4 * 0.0126628793551562,
+                        'Check background model index')
 
         # Return
         return

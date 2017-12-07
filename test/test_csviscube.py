@@ -66,8 +66,8 @@ class Test(test):
         csviscube = self._script('csviscube')
 
         # Setup csviscube command
-        cmd = csviscube+' tmin=0.0 tmax=31557600.0 geolon=79.4041'+\
-                        ' geolat=-24.6272 binsz=3.0 outfile=csviscube_cmd1.fits'+\
+        cmd = csviscube+' tmin=0.0 tmax=10000.0 geolon=79.4041'+\
+                        ' geolat=-24.6272 binsz=10.0 outfile=csviscube_cmd1.fits'+\
                         ' logfile="csviscube_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -77,6 +77,9 @@ class Test(test):
         # Check if execution was successful
         self.test_assert(self._execute(cmd) == 0,
              'Check successful execution from command line')
+
+        # Check visibility cube
+        self._check_viscube('csviscube_cmd1.fits')
 
         # Check csviscube --help
         self._check_help(csviscube)
@@ -92,18 +95,46 @@ class Test(test):
         # Set-up csviscube
         viscube = cscripts.csviscube()
         viscube['tmin']    =  0.0
-        viscube['tmax']    =  31557600.0
+        viscube['tmax']    =  10000.0
         viscube['geolon']  =  79.4041
         viscube['geolat']  = -24.6272
-        viscube['binsz']   = 3.0
+        viscube['binsz']   = 10.0
         viscube['outfile'] = 'csviscube_py1.fits'
         viscube['logfile'] = 'csviscube_py1.log'
         viscube['chatter'] = 2
         viscube['publish'] = True
 
-        # Run script
+        # Execute script
         viscube.logFileOpen()   # Make sure we get a log file
-        viscube.run()
+        viscube.execute()
+
+        # Check visibility cube
+        self._check_viscube('csviscube_py1.fits')
+
+        # Return
+        return
+
+    # Check visibility cube
+    def _check_viscube(self, filename, nx=36, ny=18, nz=60):
+        """
+        Check visibility cube
+
+        Parameters
+        ----------
+        filename : str
+            Visibility cube file name
+        nx : int, optional
+            Number of X pixels
+        ny : int, optional
+            Number of Y pixels
+        """
+        # Open result file
+        viscube = gammalib.GSkyMap(filename)
+
+        # Check dimensions
+        self.test_value(viscube.nmaps(), nz, 'Check number of maps')
+        self.test_value(viscube.nx(), nx, 'Check for number of X pixels')
+        self.test_value(viscube.ny(), ny, 'Check for number of Y pixels')
 
         # Return
         return

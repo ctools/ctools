@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.5.0
 
-8 August 2017
+28 November 2017
 
 
 Introduction
@@ -24,56 +24,8 @@ Support model
 None
 
 
-ctobssim - CTA observation simulation
--------------------------------------
-Use t-type parameters for "tmin" and "tmax" to all specifying times in various
-formats (#1864).
-
-
-ctselect - CTA event selection
-------------------------------
-Use t-type parameters for "tmin" and "tmax" to all specifying times in various
-formats (#1864).
-
-
 ctbin - CTA event binning
 -------------------------
-None
-
-
-ctlike - Maximum likelihood fitting
------------------------------------
-None
-
-
-cttsmap - Generation of Test Statistic map
-------------------------------------------
-None
-
-
-ctskymap - CTA sky mapping
---------------------------
-None
-
-
-ctmodel - CTA counts cube modelling
------------------------------------
-Use t-type parameters for "tmin" and "tmax" to all specifying times in various
-formats (#1864).
-
-
-ctexpcube - CTA exposure cube generation
-----------------------------------------
-None
-
-
-ctpsfcube - CTA point spread function cube generation
------------------------------------------------------
-None
-
-
-ctedispcube - CTA energy dispersion cube generation
----------------------------------------------------
 None
 
 
@@ -82,9 +34,9 @@ ctbkgcube - CTA background cube generation
 None
 
 
-ctmapcube - CTA map cube generation
------------------------------------
-None
+ctbutterfly - Generate butterfly diagrams
+-----------------------------------------
+Add "statistic" parameter to allow setting of optimizer statistic (#2237).
 
 
 ctcubemask - CTA cube filtering
@@ -92,18 +44,50 @@ ctcubemask - CTA cube filtering
 None
 
 
-ctbutterfly - Generate butterfly diagrams
------------------------------------------
-None
-
-
-ctulimit - Compute upper limit
-------------------------------
+ctedispcube - CTA energy dispersion cube generation
+---------------------------------------------------
 None
 
 
 cterror - Likelihood profile error computation
 ----------------------------------------------
+Add "statistic" parameter to allow setting of optimizer statistic (#2237).
+
+
+ctexpcube - CTA exposure cube generation
+----------------------------------------
+None
+
+
+ctlike - Maximum likelihood fitting
+-----------------------------------
+Rename "stats" parameter to "statistic" (#2237).
+
+
+ctmapcube - CTA map cube generation
+-----------------------------------
+None
+
+
+ctmodel - CTA counts cube modelling
+-----------------------------------
+Use t-type parameters for "tmin" and "tmax" to all specifying times in various
+formats (#1864).
+
+The tool now also checks which models actually overlap with the RoI of a given
+observation and then only use these models to compute the model cube. The
+parallelization of the tool has also been optimised so that diffuse models are
+not loaded over and over again (#2189).
+
+
+ctobssim - CTA observation simulation
+-------------------------------------
+Use t-type parameters for "tmin" and "tmax" to all specifying times in various
+formats (#1864).
+
+
+ctphase - Event phase computation
+---------------------------------
 None
 
 
@@ -112,15 +96,245 @@ ctprob - Event probability computation
 None
 
 
-ctphase - Event phase computation
+ctpsfcube - CTA point spread function cube generation
+-----------------------------------------------------
+The chatter level is now correctly forwarded to the PSF cube fill method (#2262).
+
+
+ctselect - CTA event selection
+------------------------------
+Use t-type parameters for "tmin" and "tmax" to all specifying times in various
+formats (#1864).
+
+
+ctskymap - CTA sky mapping
+--------------------------
+Header keywords informing about the dates and times covered by the observations
+used to generate the skymap, as well as the event energy range, are now appended
+as header keywords to the FITS file (#2194).
+
+Add the RING background method, which is a classical analysis methods for IACT
+data analysis, for background subtraction (#2207).
+
+
+cttsmap - Generation of Test Statistic map
+------------------------------------------
+Add "statistic" parameter to allow setting of optimizer statistic (#2237).
+
+
+ctulimit - Compute upper limit
+------------------------------
+Add "statistic" parameter to allow setting of optimizer statistic (#2237).
+
+
+support - Support classes
+-------------------------
+Add ctobservation.obs() method to set an observation container.
+
+
+cscaldb - Inspect calibration database
+--------------------------------------
+None
+
+
+csebins - Generate energy boundaries
+------------------------------------
+None
+
+
+csfindobs - Find IACT observations
+----------------------------------
+None
+
+
+csiactcopy - Copy IACT observations
+-----------------------------------
+None
+
+
+csiactdata - Inspect IACT data store
+------------------------------------
+None
+
+
+csiactobs - Inspect IACT observation definition XML file
+--------------------------------------------------------
+None
+
+
+cslightcrv - Generate light curve
+---------------------------------
+The script now also supports the handling of On/Off observations. For that
+purpose parameters were added that are needed for the execution of the
+csphagen script (#2273).
+
+The script now derives from the csobservation base class. A "statistic"
+parameter was added to allow setting the optimizer statistic for the light
+curve generation (#2237).
+
+Use t-type parameters for "tmin" and "tmax" to all specifying times in various
+formats (#1864).
+
+
+csmodelinfo - Return model information
+--------------------------------------
+None
+
+
+csmodelmerge - Merge models
+---------------------------
+None
+
+
+csmodelselect - Select models
+-----------------------------
+None
+
+
+csmodelsois - Puts selected sources in diffuse model cube
+---------------------------------------------------------
+Add script that replaces selected models in a model container by a diffuse
+map cube (#2180).
+
+
+csobs2caldb - Generate calibration database entry for an IACT observation
+-------------------------------------------------------------------------
+None
+
+
+csobsdef - Generate observation definition XML file
+---------------------------------------------------
+None
+
+
+csobsinfo - Return observation definition information
+-----------------------------------------------------
+None
+
+
+csobsselect - Select observations
 ---------------------------------
 None
 
 
-cscripts
---------
+csphagen - Generate On/Off observations
+---------------------------------------
+The script was added to allow the generation of PHA, ARF and RMF datasets for classical On/Off IACT analysis (#2208).
+
+
+csphasecrv - Generate phase curve
+---------------------------------
+The script now also supports the handling of On/Off observations. For that
+purpose parameters were added that are needed for the execution of the
+csphagen script (#2273).
+
+The script now derives from the csobservation base class. A "statistic"
+parameter was added to allow setting the optimizer statistic for the light
+curve generation (#2237).
+
+
+cspull - Generate pull distributions
+------------------------------------
+The script now handles On/Off observation. The parameters "onsrc" and "onrad"
+were added to allow specifying the On region test source and On region radius
+(#2260).
+
+The script now derives from the csobservation base class. A "statistic"
+parameter was added to allow setting the optimizer statistic for the pull
+distribution generation (#2237).
+
 Use t-type parameters for "tmin" and "tmax" to all specifying times in various
 formats (#1864).
+
+
+csresmap - Generate residual map
+--------------------------------
+None
+
+
+csroot2caldb - Generates calibration database from ROOT file
+------------------------------------------------------------
+None
+
+
+cssens - Computes sensitivity curve
+-----------------------------------
+The script now derived from the csobservation base class. A "statistic"
+parameter was added to allow setting the optimizer statistic for the sensitivity
+computation (#2237).
+
+
+csspec - Generates Spectral Energy Distribution
+-----------------------------------------------
+The script now derives from the csobservation base class. A "statistic"
+parameter was added to allow setting the optimizer statistic for the spectrum
+generation (#2237).
+
+The script now can also handle On/Off spectra for SED generation (#2231).
+
+The script now can also handle non-CTA data. For that purpose a "method"
+parameter has been introduced that allows to selected between slicing of the data
+(method="SLICE"), which is only supported for CTA observations, and replacing of
+the spectral model by a node function (method="NODES"). If method="AUTO" the tool
+will use "SLICE" for observations containing only CTA data and "NODES" for observations
+containing other data (#1927).
+
+
+cssrcdetect - Detects sources in sky map
+----------------------------------------
+None
+
+
+cstsdist - Computes Test Statistic distribution
+-----------------------------------------------
+The script now derives from the csobservation base class. A "statistic"
+parameter was added to allow setting the optimizer statistic for the Test
+Statistic distribution generation (#2237).
+
+Use t-type parameters for "tmin" and "tmax" to all specifying times in various
+formats (#1864).
+
+
+cstsmapmerge - Merge Test Statistic maps
+----------------------------------------
+None
+
+
+cstsmapsplit - Prepare split Test Statistic computation
+-------------------------------------------------------
+A "statistic" parameter was added to allow setting the optimizer statistic for
+the TS map generation (#2237).
+
+
+csviscube - Generate visibility cube
+------------------------------------
+Use t-type parameters for "tmin" and "tmax" to all specifying times in various
+formats (#1864).
+
+
+csworkflow - Execute workflow
+-----------------------------
+None
+
+
+calutils - Calibration utilities
+--------------------------------
+None
+
+
+ioutils - Input/Output utilities
+--------------------------------
+None
+
+
+modutils - Model utilities
+--------------------------
+None
+
+
+obsutils - Observation utilities
+--------------------------------
+None
 
 
 Examples

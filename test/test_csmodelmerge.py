@@ -44,7 +44,7 @@ class Test(test):
 
         # Set members
         self._model1  = self._datadir + '/crab.xml'
-        self._model2  = self._datadir + '/model_cube_background.xml'
+        self._model2  = self._datadir + '/model_cube_background1.xml'
         self._model3  = self._datadir + '/model_cube_background*.xml'
         self._model4  = '@' + self._datadir + '/models.txt'
 
@@ -93,7 +93,7 @@ class Test(test):
         # Setup csmodelmerge command
         cmd = csmodelmerge+' inmodels="model_that_does_not_exist.xml"'+ \
                            ' outmodel="csmodelmerge_cmd2.xml"'+ \
-                           ' logfile="csmodelmerge_cmd2.log"'
+                           ' logfile="csmodelmerge_cmd2.log" debug=yes'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

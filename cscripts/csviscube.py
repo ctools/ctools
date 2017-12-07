@@ -48,15 +48,11 @@ class csviscube(ctools.cscript):
         TypeError
             An invalid number of command line arguments was provided.
         """
-        # Set name
-        self._name    = 'csviscube'
-        self._version = ctools.__version__
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise members
         self._cube = gammalib.GSkyMap()
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
 
         # Return
         return
@@ -499,7 +495,7 @@ class csviscube(ctools.cscript):
 
         # Set default name is user name is empty
         if not name:
-            user_name = self._name
+            user_name = self._name()
         else:
             user_name = name
 
@@ -508,25 +504,6 @@ class csviscube(ctools.cscript):
 
         # Publish cube
         self._cube.publish(user_name)
-
-        # Return
-        return
-
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-
-        # Save the cube
-        self.save()
 
         # Return
         return

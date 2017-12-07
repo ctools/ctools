@@ -64,3 +64,7 @@ PNG or PDF file after creating it interactively.
 .. _IRIS: http://cxc.cfa.harvard.edu/iris/
 .. _CASSIS: http://cassis.irap.omp.eu/
 .. _VOSpec: http://www.sciops.esa.int/index.php?project=SAT&page=vospec
+
+.. raw:: html
+
+   <iframe src="http://nbviewer.jupyter.org/github/davidchall/random-direction/blob/master/Generate_Beam_Directions.ipynb" width="100%" height="800"></iframe>

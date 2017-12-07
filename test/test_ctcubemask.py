@@ -93,7 +93,7 @@ class Test(test):
                          ' outcube="ctcubemask_cmd2.fits"'+ \
                          ' ra=83.63 dec=22.01 rad=2.0'+ \
                          ' emin=0.1 emax=100.0'+ \
-                         ' logfile="ctcubemask_cmd2.log" chatter=2'
+                         ' logfile="ctcubemask_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

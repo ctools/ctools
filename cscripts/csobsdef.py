@@ -84,17 +84,13 @@ class csobsdef(ctools.cscript):
             List of IRAF command line parameter strings of the form
             ``parameter=3``.
         """
-        # Set name and version
-        self._name    = 'csobsdef'
-        self._version = ctools.__version__
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise class members
         self._obs    = gammalib.GObservations()
         self._pntdef = gammalib.GCsv()
         self._tmin   = 0.0
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
 
         # Return
         return
@@ -119,7 +115,7 @@ class csobsdef(ctools.cscript):
         # Return
         return
 
-    def _set_response(self, obs, caldb, irf):
+    def _set_irf(self, obs, caldb, irf):
         """
         Set response for an observation
         
@@ -258,7 +254,7 @@ class csobsdef(ctools.cscript):
             else:
                 irf = self['irf'].string()
             if caldb != '' and irf != '':
-                obs = self._set_response(obs, caldb, irf)
+                obs = self._set_irf(obs, caldb, irf)
 
             # Set deadtime correction factor. If no information is provided
             # then use the user parameter value "deadc".
@@ -367,25 +363,6 @@ class csobsdef(ctools.cscript):
             # Save observation definition XML file
             self._obs.save(outobs)
         
-        # Return
-        return
-
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-
-        # Save observation definition file
-        self.save()
-
         # Return
         return
 

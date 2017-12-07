@@ -20,13 +20,14 @@
 import math
 import gammalib
 import ctools
+import cscripts
 
 
 # ===================== #
 # Simulate observations #
 # ===================== #
 def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
-        emin=None, emax=None, nbins=0, addbounds=False,
+        emin=None, emax=None, nbins=0, onsrc=None, onrad=0.2, addbounds=False,
         binsz=0.05, npix=200, proj='TAN', coord='GAL'):
     """
     Simulate events for all observations in the container
@@ -59,6 +60,10 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         Maximum energy of counts cube for binned (TeV)
     nbins : int, optional
         Number of energy bins (0=unbinned)
+    onsrc : str, optional
+        Name of source for On region (None if no On/Off obs. is used)
+    onrad : float, optional
+        Radius for On region (deg)
     addbounds : bool, optional
         Add boundaries at observation energies
     binsz : float, optional
@@ -76,21 +81,21 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         Observation container filled with simulated events
     """
     # Allocate ctobssim application and set parameters
-    sim = ctools.ctobssim(obs)
-    sim['seed']    = seed
-    sim['edisp']   = edisp
-    sim['chatter'] = chatter
-    sim['debug']   = debug
+    obssim = ctools.ctobssim(obs)
+    obssim['seed']    = seed
+    obssim['edisp']   = edisp
+    obssim['chatter'] = chatter
+    obssim['debug']   = debug
 
     # Optionally open the log file
     if log:
-        sim.logFileOpen()
+        obssim.logFileOpen()
 
     # Run ctobssim application. This will loop over all observations in the
     # container and simulation the events for each observation. Note that
     # events are not added together, they still apply to each observation
     # separately.
-    sim.run()
+    obssim.run()
 
     # Binned option?
     if nbins > 0:
@@ -101,75 +106,111 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         if emin == None or emax == None:
             emin = 1.0e30
             emax = 0.0
-            for run in sim.obs():
+            for run in obssim.obs():
                 emin = min(run.events().ebounds().emin().TeV(), emin)
                 emax = max(run.events().ebounds().emax().TeV(), emax)
 
-        # Allocate ctbin application and set parameters
-        bin = ctools.ctbin(sim.obs())
-        bin['ebinalg']  = 'LOG'
-        bin['emin']     = emin
-        bin['emax']     = emax
-        bin['enumbins'] = nbins
-        bin['usepnt']   = True # Use pointing for map centre
-        bin['nxpix']    = npix
-        bin['nypix']    = npix
-        bin['binsz']    = binsz
-        bin['coordsys'] = coord
-        bin['proj']     = proj
-        bin['chatter']  = chatter
-        bin['debug']    = debug
+        # If a On source is specified then create On/Off observations
+        if onsrc != None:
 
-        # Optionally open the log file
-        if log:
-            bin.logFileOpen()
+            # Extract source position from model
+            model = obssim.obs().models()[onsrc]
+            ra    = model['RA'].value()
+            dec   = model['DEC'].value()
 
-        # Run ctbin application. This will loop over all observations in
-        # the container and bin the events in counts maps
-        bin.run()
+            # Allocate csphagen application and set parameters
+            phagen = cscripts.csphagen(obssim.obs())
+            phagen['ebinalg']     = 'LOG'
+            phagen['emin']        = emin
+            phagen['emax']        = emax
+            phagen['enumbins']    = nbins
+            phagen['coordsys']    = 'CEL'
+            phagen['ra']          = ra
+            phagen['dec']         = dec
+            phagen['rad']         = onrad
+            phagen['stack']       = False
+            phagen['inexclusion'] = 'NONE'
 
-        # If we have multiple input observations then create stacked response
-        # cubes and append them to the observation
-        if len(sim.obs()) > 1:
+            # Optionally open the log file
+            if log:
+                phagen.logFileOpen()
 
-            # Get stacked response (use pointing for map centre)
-            response = get_stacked_response(sim.obs(), None, None,
-                                            binsz=binsz, nxpix=npix, nypix=npix,
-                                            emin=emin, emax=emax, enumbins=nbins,
-                                            edisp=edisp,
-                                            coordsys=coord, proj=proj,
-                                            addbounds=addbounds,
-                                            log=log, debug=debug,
-                                            chatter=chatter)
+            # Run csphagen application
+            phagen.run()
 
-            # Set stacked response
-            if edisp:
-                bin.obs()[0].response(response['expcube'],
-                                      response['psfcube'],
-                                      response['edispcube'],
-                                      response['bkgcube'])
-            else:
-                bin.obs()[0].response(response['expcube'],
-                                      response['psfcube'],
-                                      response['bkgcube'])
+            # Make a deep copy of the observation that will be returned
+            # (the csphagen object will go out of scope one the function is
+            # left)
+            obs = phagen.obs().copy()
 
-            # Set new models
-            bin.obs().models(response['models'])
+        # ... otherwise use binned observations
+        else:
 
-        # Make a deep copy of the observation that will be returned
-        # (the ctbin object will go out of scope one the function is
-        # left)
-        obs = bin.obs().copy()
+            # Allocate ctbin application and set parameters
+            binning = ctools.ctbin(obssim.obs())
+            binning['ebinalg']  = 'LOG'
+            binning['emin']     = emin
+            binning['emax']     = emax
+            binning['enumbins'] = nbins
+            binning['usepnt']   = True # Use pointing for map centre
+            binning['nxpix']    = npix
+            binning['nypix']    = npix
+            binning['binsz']    = binsz
+            binning['coordsys'] = coord
+            binning['proj']     = proj
+            binning['chatter']  = chatter
+            binning['debug']    = debug
+
+            # Optionally open the log file
+            if log:
+                binning.logFileOpen()
+
+            # Run ctbin application. This will loop over all observations in
+            # the container and bin the events in counts maps
+            binning.run()
+
+            # If we have multiple input observations then create stacked response
+            # cubes and append them to the observation
+            if len(obssim.obs()) > 1:
+
+                # Get stacked response (use pointing for map centre)
+                response = get_stacked_response(obssim.obs(), None, None,
+                                                binsz=binsz, nxpix=npix, nypix=npix,
+                                                emin=emin, emax=emax, enumbins=nbins,
+                                                edisp=edisp,
+                                                coordsys=coord, proj=proj,
+                                                addbounds=addbounds,
+                                                log=log, debug=debug,
+                                                chatter=chatter)
+
+                # Set stacked response
+                if edisp:
+                    binning.obs()[0].response(response['expcube'],
+                                             response['psfcube'],
+                                             response['edispcube'],
+                                             response['bkgcube'])
+                else:
+                    binning.obs()[0].response(response['expcube'],
+                                              response['psfcube'],
+                                              response['bkgcube'])
+
+                # Set new models
+                binning.obs().models(response['models'])
+
+            # Make a deep copy of the observation that will be returned
+            # (the ctbin object will go out of scope one the function is
+            # left)
+            obs = binning.obs().copy()
 
     else:
 
         # Make a deep copy of the observation that will be returned
         # (the ctobssim object will go out of scope one the function is
         # left)
-        obs = sim.obs().copy()
+        obs = obssim.obs().copy()
 
     # Delete the simulation
-    del sim
+    del obssim
 
     # Return observation container
     return obs
@@ -399,9 +440,10 @@ def set_obs_patterns(pattern, ra=83.6331, dec=22.0145, offset=1.5):
             pntdir.rotate_deg(phi, offset)
             obsdeflist.append({'ra': pntdir.ra_deg(), 'dec': pntdir.dec_deg()})
 
-    # ... otherwise we have an unknown pattern
+    # ... otherwise raise an exception since we have an unknown pattern
     else:
-        print('Warning: Observation pattern "'+str(pattern)+'" not recognized.')
+        msg = 'Observation pattern "%s" not recognized.' % (pattern)
+        raise RuntimeError(msg)
 
     # Return observation definition list
     return obsdeflist
@@ -635,7 +677,7 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     response['bkgcube'] = bkgcube.bkgcube().copy()
     response['models']  = bkgcube.models().copy()
     if edisp:
-        response['edispcube'] = edispcube.expcube().copy()
+        response['edispcube'] = edispcube.edispcube().copy()
 
     # Return response cubes
     return response
@@ -718,3 +760,71 @@ def get_stacked_obs(cls, obs):
 
     # Return new oberservation container
     return new_obs
+
+
+# ================================ #
+# Get On/Off observation container #
+# ================================ #
+def get_onoff_obs(cls, obs):
+    """
+    Create On/Off observations container from given observations
+
+    Parameters
+    ----------
+    cls : `~ctools.cscript`
+        cscript class
+    obs : `~gammalib.GObservations`
+        Observation container
+
+    Returns
+    -------
+    onoff_obs : `~gammalib.GObservations`
+        Observation container with On/Off observations
+    """
+    # Write header
+    if cls._logExplicit():
+        cls._log.header3('Creating On/Off observations')
+
+    # Create On/Off observations
+    phagen = cscripts.csphagen(obs)
+    phagen['inexclusion'] = cls['inexclusion'].value()
+    phagen['emin']        = cls['emin'].real()
+    phagen['emax']        = cls['emax'].real()
+    phagen['enumbins']    = cls['enumbins'].integer()
+    phagen['ebinalg']     = 'LOG'
+    phagen['srcshape']    = cls['srcshape'].string()
+    phagen['coordsys']    = cls['coordsys'].string()
+    if cls['coordsys'].string() == 'CEL':
+        phagen['ra']  = cls['xref'].real()
+        phagen['dec'] = cls['yref'].real()
+    elif cls['coordsys'].string() == 'GAL':
+        phagen['glon'] = cls['xref'].real()
+        phagen['glat'] = cls['yref'].real()
+    if cls['srcshape'].string() == 'CIRCLE':
+        phagen['rad'] = cls['rad'].real()
+    phagen['bkgmethod'] = cls['bkgmethod'].string()
+    if cls['bkgmethod'].string() == 'REFLECTED':
+        phagen['bkgregmin'] = cls['bkgregmin'].integer()
+    phagen['maxoffset'] = cls['maxoffset'].real()
+    phagen['stack']     = True
+    phagen['etruemin']  = cls['etruemin'].real()
+    phagen['etruemax']  = cls['etruemax'].real()
+    phagen['etruebins'] = cls['etruebins'].integer()
+    phagen['chatter']   = cls['chatter'].integer()
+    phagen['clobber']   = cls['clobber'].boolean()
+    phagen['debug']     = cls['debug'].boolean()
+    phagen.run()
+
+    # Clone resulting observation container
+    onoff_obs = phagen.obs().copy()
+
+    # On/Off observations are created with CSTAT as default statistic
+    # We will change this to the user choice
+    if cls['statistic'].string() == 'DEFAULT':
+        pass
+    else:
+        for observation in onoff_obs:
+            observation.statistic(cls['statistic'].string())
+
+    # Return On/Off oberservation container
+    return onoff_obs

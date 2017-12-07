@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import ctools
 from testing import test
@@ -90,7 +89,7 @@ class Test(test):
                           ' inmodel="'+self._model +'" srcname="Crab"'+ \
                           ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                           ' emin=0.1 emax=100.0'+ \
-                          ' logfile="ctbutterfly_cmd2.log" chatter=1'
+                          ' logfile="ctbutterfly_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -151,7 +150,7 @@ class Test(test):
         self._check_result_file('ctbutterfly_py2.dat')
 
         # Recover observation container
-        obs = butterfly.obs()
+        #obs = butterfly.obs()
 
         # TODO: Do someting test on observation container
 

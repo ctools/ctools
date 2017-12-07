@@ -48,12 +48,8 @@ class csroot2caldb(ctools.cscript):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'csroot2caldb'
-        self._version = ctools.__version__
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
         # Return
         return
@@ -1773,22 +1769,6 @@ class csroot2caldb(ctools.cscript):
 
         # Close calibration files
         self._close(irf, ds)
-
-        # Return
-        return
-
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
 
         # Return
         return

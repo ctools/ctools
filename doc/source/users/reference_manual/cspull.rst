@@ -40,31 +40,34 @@ General parameters
 
 ``inmodel [file]``
     Input model XML file.
- 	 	 
-``outfile [file]``
-    ASCII file containing the individual pull values.
- 	 	 
+
+``onsrc [string]``
+    Name of On source (only for On/Off analysis; specify ``NONE`` for other analyses).
+
+``onrad [real]``
+    Radius of On region (deg).
+
 ``caldb [string]``
     Calibration database.
- 	 	 
+
 ``irf [string]``
     Instrumental response function.
-
-``(deadc = 0.98) [real]``
-    Average deadtime correction factor.
 
 ``(edisp = no) [boolean]``
     Apply energy dispersion to response computation?
 
-``(profile = no) [boolean]``
-    Use likelihood profile method for errors?
+``(deadc = 0.98) [real]``
+    Average deadtime correction factor.
+
+``outfile [file]``
+    ASCII file containing the individual pull values.
 
 ``ntrials [integer]``
     Number of samples for generating the pull distribution.
- 	 	 
+
 ``ra [real]``
     Right Ascension of CTA pointing (J2000, in degrees).
- 	 	 
+
 ``dec [real]``
     Declination of CTA pointing (J2000, in degrees).
 
@@ -73,30 +76,44 @@ General parameters
 
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
- 	 	 
+
 ``proj <AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN> [string]``
     Projection method.
- 	 	 
+
 ``emin [real]``
     Lower energy limit of events (in TeV).
- 	 	 
+
 ``emax [real]``
     Upper energy limit of events (in TeV).
- 	 	 
+
 ``enumbins [integer]``
     Number of energy bins (0=unbinned).
- 	 	 
+
 ``tmin [time]``
     Start time (UTC string, JD, MJD or MET in seconds).
- 	 	 
+
 ``tmax [time]``
     Stop time (UTC string, JD, MJD or MET in seconds).
- 	 	 
+
 ``npix [integer]``
     Number of pixels for binned analysis.
- 	 	 
+
 ``binsz [real]``
     Pixel size for binned analysis.
+
+``(statistic = DEFAULT) <DEFAULT|CSTAT|WSTAT|CHI2> [string]``
+    Optimization statistic. ``DEFAULT`` uses the default statistic for all
+    observations, which is ``CSTAT`` or the statistic specified in the
+    observation definition XML file. ``CSTAT`` uses the C statistic for
+    all observations, ``WSTAT`` uses the W statistic for all On/Off
+    observations, and ``CHI2`` uses the Chi squared statistic for all
+    binned or stacked observations.
+
+``(profile = no) [boolean]``
+    Use likelihood profile method for errors?
+
+``(seed = 1) [integer]``
+    Initial random number generator seed.
 
 
 Standard parameters
@@ -105,22 +122,22 @@ Standard parameters
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether an existing output file should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file
     output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 

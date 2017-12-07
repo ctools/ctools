@@ -92,7 +92,7 @@ mkdir -p $PRODDIR
 # =============== #
 cd $SRCDIR
 if [ ! -d "$NCURSES" ]; then
-    wget https://ftp.gnu.org/pub/gnu/ncurses/$NCURSES.tar.gz
+    wget --no-check-certificate https://ftp.gnu.org/pub/gnu/ncurses/$NCURSES.tar.gz
     if [ "$?" -ne "0" ]; then
         echo "*** Unable to download $NCURSES.tar.gz"
         exit 1
@@ -113,7 +113,7 @@ make clean
 # ================ #
 cd $SRCDIR
 if [ ! -d "$READLINE" ]; then
-    wget https://ftp.gnu.org/pub/gnu/readline/$READLINE.tar.gz
+    wget --no-check-certificate https://ftp.gnu.org/pub/gnu/readline/$READLINE.tar.gz
     if [ "$?" -ne "0" ]; then
         echo "*** Unable to download $READLINE.tar.gz"
         exit 1

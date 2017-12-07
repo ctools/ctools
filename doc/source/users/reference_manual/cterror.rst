@@ -30,13 +30,13 @@ General parameters
 
 ``inobs [file]``
     Input event list, counts cube or observation definition XML file.
- 	 	 
+
 ``inmodel [file]``
     Input model XML file.
- 	 	 
+
 ``srcname [string]``
     Name of source model for which the parameter errors should be computed.
- 	 	 
+
 ``expcube [file]``
     Input exposure cube file.
 
@@ -51,22 +51,30 @@ General parameters
 
 ``caldb [string]``
     Calibration database.
- 	 	 
+
 ``irf [string]``
     Instrumental response function.
- 	 	 
+
 ``(edisp = no) [boolean]``
     Applies energy dispersion to response computation.
- 	 	 
+
 ``outmodel [file]``
     Output model XML file with updated error information.
- 	 	 
+
 ``(confidence = 0.68) [real]``
     Confidence level for error computation.
-    
+
 ``(tol = 1e-3) [real]``
     Computation tolerance.
-   
+
+``(statistic = DEFAULT) <DEFAULT|CSTAT|WSTAT|CHI2> [string]``
+    Optimization statistic. ``DEFAULT`` uses the default statistic for all
+    observations, which is ``CSTAT`` or the statistic specified in the
+    observation definition XML file. ``CSTAT`` uses the C statistic for
+    all observations, ``WSTAT`` uses the W statistic for all On/Off
+    observations, and ``CHI2`` uses the Chi squared statistic for all
+    binned or stacked observations.
+
 ``(max_iter = 50) [integer]``
     Maximum number of iterations before stopping the likelihood
     profil computations.

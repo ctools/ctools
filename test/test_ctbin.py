@@ -87,7 +87,7 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube('cntmap_cmd1.fits')
-        self._check_cube(evt, 5542)
+        self._check_cube(evt, 3105)
 
         # Setup ctbin command
         cmd = ctbin+' inobs="events_that_do_not_exist.fits"'+ \
@@ -95,7 +95,7 @@ class Test(test):
                     ' emin=0.1 emax=100.0 enumbins=10 ebinalg="LOG"'+ \
                     ' nxpix=40 nypix=40 binsz=0.1 coordsys="CEL"'+ \
                     ' xref=83.63 yref=22.01 proj="CAR"'+ \
-                    ' logfile="ctbin_cmd2.log" chatter=1'
+                    ' logfile="ctbin_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -115,7 +115,7 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube('cntmap_cmd3.fits')
-        self._check_cube(evt, 890)
+        self._check_cube(evt, 617)
 
         # Check ctbin --help
         self._check_help(ctbin)
@@ -129,60 +129,60 @@ class Test(test):
         Test ctbin from Python
         """
         # Allocate ctbin
-        bin = ctools.ctbin()
+        binning = ctools.ctbin()
 
         # Check that empty ctbin has an empty observation container and counts
         # cube
-        self.test_value(bin.obs().size(), 0,
+        self.test_value(binning.obs().size(), 0,
              'Check that empty ctbin has an empty observation container')
-        self.test_value(bin.cube().size(), 0,
+        self.test_value(binning.cube().size(), 0,
              'Check that empty ctbin has an empty counts cube')
 
         # Check that saving does not nothing
-        bin['logfile'] = 'ctbin_py0.log'
-        bin['outcube'] = 'ctbin_py0.fits'
-        bin.logFileOpen()
-        bin.save()
+        binning['logfile'] = 'ctbin_py0.log'
+        binning['outcube'] = 'ctbin_py0.fits'
+        binning.logFileOpen()
+        binning.save()
         self.test_assert(not os.path.isfile('ctbin_py0.fits'),
              'Check that no counts cube has been created')
 
         # Check that publishing does not lead to an exception or segfault
-        bin.publish()
+        binning.publish()
 
         # Check that clearing does not lead to an exception or segfault
-        bin.clear()
+        binning.clear()
 
         # Now set ctbin parameters
-        bin['inobs']    = self._events
-        bin['outcube']  = 'ctbin_py1.fits'
-        bin['ebinalg']  = 'LOG'
-        bin['emin']     = 0.1
-        bin['emax']     = 100.0
-        bin['enumbins'] = 10
-        bin['nxpix']    = 40
-        bin['nypix']    = 40
-        bin['binsz']    = 0.1
-        bin['coordsys'] = 'CEL'
-        bin['proj']     = 'CAR'
-        bin['xref']     = 83.63
-        bin['yref']     = 22.01
-        bin['logfile']  = 'ctbin_py1.log'
-        bin['chatter']  = 2
+        binning['inobs']    = self._events
+        binning['outcube']  = 'ctbin_py1.fits'
+        binning['ebinalg']  = 'LOG'
+        binning['emin']     = 0.1
+        binning['emax']     = 100.0
+        binning['enumbins'] = 10
+        binning['nxpix']    = 40
+        binning['nypix']    = 40
+        binning['binsz']    = 0.1
+        binning['coordsys'] = 'CEL'
+        binning['proj']     = 'CAR'
+        binning['xref']     = 83.63
+        binning['yref']     = 22.01
+        binning['logfile']  = 'ctbin_py1.log'
+        binning['chatter']  = 2
 
         # Run ctbin tool
-        bin.logFileOpen()
-        bin.run()
+        binning.logFileOpen()
+        binning.run()
 
         # Check content of observation container and counts cube
-        self._check_observation(bin, 5542)
-        self._check_cube(bin.cube(), 5542)
+        self._check_observation(binning, 3105)
+        self._check_cube(binning.cube(), 3105)
 
         # Copy ctbin tool
-        cpy_bin = bin.copy()
+        cpy_bin = binning.copy()
 
         # Check content of observation container and counts cube
-        self._check_observation(cpy_bin, 5542)
-        self._check_cube(cpy_bin.cube(), 5542)
+        self._check_observation(cpy_bin, 3105)
+        self._check_cube(cpy_bin.cube(), 3105)
 
         # Run copy of ctbin tool again
         cpy_bin['logfile'] = 'ctbin_py2.log'
@@ -197,20 +197,20 @@ class Test(test):
         self._check_cube(cpy_bin.cube(), 0)
 
         # Save counts cube
-        bin.save()
+        binning.save()
 
         # Load counts cube and check content
         evt = gammalib.GCTAEventCube('ctbin_py1.fits')
-        self._check_cube(evt, 5542)
+        self._check_cube(evt, 3105)
 
         # Now clear ctbin tool
-        bin.clear()
+        binning.clear()
 
         # Check that cleared ctbin has an empty observation container and
         # counts cube
-        self.test_value(bin.obs().size(), 0,
+        self.test_value(binning.obs().size(), 0,
              'Check that empty ctbin has an empty observation container')
-        self.test_value(bin.cube().size(), 0,
+        self.test_value(binning.cube().size(), 0,
              'Check that empty ctbin has an empty counts cube')
 
         # Prepare observation container for stacking of events into a
@@ -218,35 +218,35 @@ class Test(test):
         obs = self._obs_events()
 
         # Set-up ctbin using an observation container
-        bin = ctools.ctbin(obs)
-        bin['outcube']  = 'ctbin_py3.fits'
-        bin['ebinalg']  = 'LOG'
-        bin['emin']     = 0.1
-        bin['emax']     = 100.0
-        bin['enumbins'] = 10
-        bin['nxpix']    = 40
-        bin['nypix']    = 40
-        bin['binsz']    = 0.1
-        bin['coordsys'] = 'CEL'
-        bin['proj']     = 'CAR'
-        bin['xref']     = 83.63
-        bin['yref']     = 22.01
-        bin['publish']  = True
-        bin['logfile']  = 'ctbin_py3.log'
-        bin['chatter']  = 3
+        binning = ctools.ctbin(obs)
+        binning['outcube']  = 'ctbin_py3.fits'
+        binning['ebinalg']  = 'LOG'
+        binning['emin']     = 0.1
+        binning['emax']     = 100.0
+        binning['enumbins'] = 10
+        binning['nxpix']    = 40
+        binning['nypix']    = 40
+        binning['binsz']    = 0.1
+        binning['coordsys'] = 'CEL'
+        binning['proj']     = 'CAR'
+        binning['xref']     = 83.63
+        binning['yref']     = 22.01
+        binning['publish']  = True
+        binning['logfile']  = 'ctbin_py3.log'
+        binning['chatter']  = 3
 
         # Execute ctbin tool
-        bin.logFileOpen()
-        bin.execute()
+        binning.logFileOpen()
+        binning.execute()
 
         # Check content of observation and cube (need multiplier=3 since
         # three identical observations have been appended)
-        self._check_observation(bin, 5542, multiplier=3)
-        self._check_cube(bin.cube(), 5542, multiplier=3)
+        self._check_observation(binning, 3105, multiplier=3)
+        self._check_cube(binning.cube(), 3105, multiplier=3)
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube('ctbin_py3.fits')
-        self._check_cube(evt, 5542, multiplier=3)
+        self._check_cube(evt, 3105, multiplier=3)
 
         # And finally go for a fully Pythonic version with all parameters
         # being specified in a dictionary
@@ -255,14 +255,14 @@ class Test(test):
                 'binsz': 0.1, 'coordsys': 'CEL', 'proj': 'CAR',
                 'xref': 83.63, 'yref': 22.01, 'outcube': 'ctbin_py4.fits',
                 'logfile': 'ctbin_py4.log', 'chatter': 2}
-        bin = ctools.ctbin()
-        bin.pardict(pars)
-        bin.logFileOpen()
-        bin.execute()
+        binning = ctools.ctbin()
+        binning.pardict(pars)
+        binning.logFileOpen()
+        binning.execute()
 
         # Load counts cube and check content
         evt = gammalib.GCTAEventCube('ctbin_py4.fits')
-        self._check_cube(evt, 5542)
+        self._check_cube(evt, 3105)
 
         # Return
         return
@@ -288,13 +288,13 @@ class Test(test):
              'Check that there is one observation on the observation container')
         self.test_value(obs.instrument(), 'CTA',
              'Check that the one observation is a CTA observation')
-        self.test_value(obs.ontime(), 1800.0*multiplier, 1.0e-6,
+        self.test_value(obs.ontime(), 300.0*multiplier, 1.0e-6,
              'Check ontime of observation')
-        self.test_value(obs.livetime(), 1710.0*multiplier, 1.0e-6,
+        self.test_value(obs.livetime(), 294.0*multiplier, 1.0e-6,
              'Check livetime of observation')
         self.test_value(pnt.dir().ra_deg(), 83.63, 1.0e-6,
              'Check pointing Right Ascension of observation')
-        self.test_value(pnt.dir().dec_deg(), 22.01, 1.0e-6,
+        self.test_value(pnt.dir().dec_deg(), 22.51, 1.0e-6,
              'Check pointing Declination of observation')
 
         # Test event cube

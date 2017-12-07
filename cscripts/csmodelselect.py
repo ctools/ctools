@@ -26,7 +26,7 @@ import ctools
 # =================== #
 # csmodelselect class #
 # =================== #
-class csmodelselect(ctools.cscript):
+class csmodelselect(ctools.csobservation):
     """
     Selects model from a model definition XML file
     """
@@ -36,18 +36,12 @@ class csmodelselect(ctools.cscript):
         """
         Constructor
         """
+        # Initialise application by calling the appropriate class constructor
+        self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
         # Set name
-        self._name    = 'csmodelselect'
-        self._version = ctools.__version__
-
-        # Initialise observation container from constructor arguments
-        self._obs, argv = self._set_input_obs(argv)
 
         # Initialise class members
         self._models = gammalib.GModels()
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
 
         # Return
         return
@@ -77,8 +71,8 @@ class csmodelselect(ctools.cscript):
 
         # If there are no observations in container then get them from the
         # parameter file
-        if self._obs.size() == 0:
-            self._obs = self._get_observations(False)
+        if self.obs().size() == 0:
+            self.obs(self._get_observations(False))
 
         # Get models
         self._models = gammalib.GModels(self['inmodel'].filename())
@@ -237,10 +231,10 @@ class csmodelselect(ctools.cscript):
         models = gammalib.GModels()
 
         # Write input observation container into logger
-        self._log_observations(gammalib.NORMAL, self._obs, 'Input observation')
+        self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
         # Write input models into logger
-        self._log_models(gammalib.VERBOSE, self._models, 'Input model')
+        self._log_models(gammalib.NORMAL, self._models, 'Input model')
 
         # Write header
         self._log_header1(gammalib.NORMAL, 'Model selection')
@@ -250,7 +244,7 @@ class csmodelselect(ctools.cscript):
 
             # If model should be selected then set model parameters and append
             # model to the output container
-            if self._select_model(model, self._obs):
+            if self._select_model(model, self.obs()):
 
                 # Set model parameters
                 model = self._set_model_parameters(model)
@@ -262,7 +256,7 @@ class csmodelselect(ctools.cscript):
         self._models = models
 
         # Write selected models into logger
-        self._log_models(gammalib.VERBOSE, self._models, 'Selected model')
+        self._log_models(gammalib.NORMAL, self._models, 'Selected model')
 
         # Return
         return
@@ -294,25 +288,6 @@ class csmodelselect(ctools.cscript):
 
         # Return
         return
-
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-
-        # Save model file if required
-        self.save()
-
-        # Return
-        return    
 
 
 # ======================== #

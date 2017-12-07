@@ -35,22 +35,11 @@ class cscript_test(ctools.cscript):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'cscript_test'
-        self._version = ctools.__version__
-
-        # Initialise observation container from constructor arguments
-        self._obs, argv = self._set_input_obs(argv)
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
         # Return
         return
-
-    # Check is_valid_filename() method
-    def check_is_valid_filename(self, filename):
-        return self._is_valid_filename(gammalib.GFilename(filename))
 
     # Check setup_observations() method
     def check_setup_observations(self, filename, events=True, cube=True):
@@ -126,6 +115,23 @@ class cscript_test(ctools.cscript):
     def check_get_current_rss(self):
         return self._get_current_rss()
 
+    # Check is_valid_filename() method
+    def check_is_valid_filename(self, filename):
+        return self._is_valid_filename(gammalib.GFilename(filename))
+
+    # Check save_event_list() method
+    def check_save_event_list(self, infile, evtname, gtiname, outfile):
+        obs    = gammalib.GCTAObservation()
+        events = gammalib.GCTAEventList()
+        obs.events(events)
+        obs.save(infile, True)
+        self._save_event_list(obs, infile, evtname, gtiname, outfile)
+        return
+
+    # Check warn_xml_suffix() method
+    def check_warn_xml_suffix(self, filename):
+        return self._warn_xml_suffix(gammalib.GFilename(filename))
+
 
 # ======================== #
 # ctobservation_test class #
@@ -139,12 +145,8 @@ class ctobservation_test(ctools.csobservation):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'ctobservation_test'
-        self._version = ctools.__version__
-
         # Initialise application by calling the appropriate class constructor
-        self._init_csobservation(argv)
+        self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Return
         return
@@ -156,6 +158,37 @@ class ctobservation_test(ctools.csobservation):
     # Check next_unbinned_observation() method
     def check_next_unbinned_observation(self):
         return self._next_unbinned_observation()
+
+    # Check set_obs_statistic() method for unbinned observation
+    def check_set_obs_statistic_unbinned(self, statistic):
+        obs    = gammalib.GObservations()
+        events = gammalib.GCTAEventList()
+        cta    = gammalib.GCTAObservation()
+        cta.events(events)
+        obs.append(cta)
+        self.obs(obs)
+        self._set_obs_statistic(statistic)
+        return gammalib.toupper(self.obs()[0].statistic())
+
+    # Check set_obs_statistic() method for binned observation
+    def check_set_obs_statistic_binned(self, statistic):
+        obs  = gammalib.GObservations()
+        cube = gammalib.GCTAEventCube()
+        cta  = gammalib.GCTAObservation()
+        cta.events(cube)
+        obs.append(cta)
+        self.obs(obs)
+        self._set_obs_statistic(statistic)
+        return gammalib.toupper(self.obs()[0].statistic())
+
+    # Check set_obs_statistic() method for On/Off observation
+    def check_set_obs_statistic_onoff(self, statistic):
+        obs = gammalib.GObservations()
+        cta = gammalib.GCTAOnOffObservation()
+        obs.append(cta)
+        self.obs(obs)
+        self._set_obs_statistic(statistic)
+        return gammalib.toupper(self.obs()[0].statistic())
 
 
 # ======================= #
@@ -170,12 +203,8 @@ class ctlikelihood_test(ctools.cslikelihood):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'ctlikelihood_test'
-        self._version = ctools.__version__
-
         # Initialise application by calling the appropriate class constructor
-        self._init_cslikelihood(argv)
+        self._init_cslikelihood(self.__class__.__name__, ctools.__version__, argv)
 
         # Return
         return
@@ -276,13 +305,14 @@ class Test(test):
         # Allocate empty
         empty = cscript_test()
 
-        # Test is_valid_filename() method
-        self.test_assert(empty.check_is_valid_filename(self._model),
-                         'Check model definiton XML file')
-        self.test_assert(not empty.check_is_valid_filename(''),
-                         'Check empty filename')
-        self.test_assert(not empty.check_is_valid_filename('NONE'),
-                         'Check "NONE" filename')
+        # Test read_ahead() method
+        # TODO: implement
+
+        # Test time_reference() method
+        # TODO: implement
+
+        # Test get_observations() method
+        # TODO: implement
 
         # Test setup_observations() for invalid file name
         self.test_try('Check setup_observations() for "NONE"')
@@ -370,6 +400,15 @@ class Test(test):
         self.test_value(ebounds.emin().TeV(), 1.0, 'Check minimum energy')
         self.test_value(ebounds.emax().TeV(), 10.0, 'Check maximum energy')
 
+        # Test create_map() method
+        # TODO: implement
+
+        # Test create_cube() method
+        # TODO: implement
+
+        # Test create_cta_obs() method
+        # TODO: implement
+
         # Test require_inobs() method for invalid file name
         self.test_try('Check require_inobs() method for invalid file name')
         try:
@@ -398,31 +437,37 @@ class Test(test):
         roi = empty.check_get_roi()
         self.test_assert(not roi.is_valid(), 'Check get_roi() method')
 
+        # Test get_ebounds() method
+        # TODO: implement
+
+        # Test get_gti() method
+        # TODO: implement
+
+        # Test get_pointing() method
+        # TODO: implement
+
+        # Test get_skydir() method
+        # TODO: implement
+
+        # Test set_outfile_name() method
+        # TODO: implement
+
+        # Test is_stacked() method
+        # TODO: implement
+
+        # Test is_onoff() method
+        # TODO: implement
+
+        # Test set_response() method
+        # TODO: implement
+
+        # Test set_edisp() method
+        # TODO: implement
+
         # Test restore_edisp() method for invalid vector size
         self.test_try('Check restore_edisp() method for invalid vector size')
         try:
             empty.check_restore_edisp()
-            self.test_try_failure('Exception not thrown')
-        except ValueError:
-            self.test_try_success()
-
-        # Test set_obs_bounds() method
-        obs = empty.check_set_obs_bounds()
-        self.test_value(obs.size(), 1, 'Check number of observations')
-        self.test_value(obs[0].events().ebounds().size(), 1,
-                        'Check number of energy boundaries')
-        self.test_value(obs[0].events().ebounds().emin().TeV(), 1.0,
-                        'Check minimum energy')
-        self.test_value(obs[0].events().ebounds().emax().TeV(), 10.0,
-                        'Check maximum energy')
-        self.test_value(obs[0].events().roi().radius(), 1.0,
-                        'Check RoI radius')
-
-        # Test get_mean_pointing() method for empty observation container
-        self.test_try('Check get_mean_pointing() method for empty observation '
-                      'container')
-        try:
-            empty.check_get_mean_pointing()
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
@@ -446,8 +491,107 @@ class Test(test):
                                      self._datadir+'/crab_edispcube.fits',
                                      'yes')
 
+        # Test set_obs_bounds() method
+        obs = empty.check_set_obs_bounds()
+        self.test_value(obs.size(), 1, 'Check number of observations')
+        self.test_value(obs[0].events().ebounds().size(), 1,
+                        'Check number of energy boundaries')
+        self.test_value(obs[0].events().ebounds().emin().TeV(), 1.0,
+                        'Check minimum energy')
+        self.test_value(obs[0].events().ebounds().emax().TeV(), 10.0,
+                        'Check maximum energy')
+        self.test_value(obs[0].events().roi().radius(), 1.0,
+                        'Check RoI radius')
+
+        # Test get_mean_pointing() method for empty observation container
+        self.test_try('Check get_mean_pointing() method for empty observation '
+                      'container')
+        try:
+            empty.check_get_mean_pointing()
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
+
         # Test get_current_rss() method
         empty.check_get_current_rss()
+
+        # Test get_obs_header() method
+        # TODO: implement
+
+        # Test insert_energy_boundaries() method
+        # TODO: implement
+
+        # Test cube_layer_usage() method
+        # TODO: implement
+
+        # Test is_valid_filename() method
+        self.test_assert(empty.check_is_valid_filename(self._model),
+                         'Check model definiton XML file')
+        self.test_assert(not empty.check_is_valid_filename(''),
+                         'Check empty filename')
+        self.test_assert(not empty.check_is_valid_filename('NONE'),
+                         'Check "NONE" filename')
+
+        # Test get_gtiname() method
+        # TODO: implement
+
+        # Check save_event_list() method
+        empty.check_save_event_list('test_event_list_input1.fits', 'EVENTS',
+                                    'GTI', 'test_event_list_output1.fits')
+        self._test_cscript_save_event_list('test_event_list_output1.fits',
+                                           ['Primary','EVENTS','GTI'])
+        empty.check_save_event_list('test_event_list_input2.fits', 'EVENTS',
+                                    'GTI', 'test_event_list_output2.fits[EVT]')
+        self._test_cscript_save_event_list('test_event_list_output2.fits',
+                                           ['Primary','EVT','GTI'])
+        empty.check_save_event_list('test_event_list_input3.fits', 'EVENTS',
+                                    'GTI', 'test_event_list_output3.fits[EVT;TIME]')
+        self._test_cscript_save_event_list('test_event_list_output3.fits',
+                                           ['Primary','EVT','TIME'])
+        empty.check_save_event_list('test_event_list_input4.fits', 'EVENTS',
+                                    'GTI', 'test_event_list_output4.fits[EVT;]')
+        self._test_cscript_save_event_list('test_event_list_output4.fits',
+                                           ['Primary','EVT','GTI'])
+        empty.check_save_event_list('test_event_list_input5.fits', 'EVENTS',
+                                    'GTI', 'test_event_list_output5.fits[;TIME]')
+        self._test_cscript_save_event_list('test_event_list_output5.fits',
+                                           ['Primary','EVENTS','TIME'])
+        empty.check_save_event_list('test_event_list_input6.fits', 'XEVENTS',
+                                    'XGTI', 'test_event_list_output6.fits[EVT;TIME]')
+        self._test_cscript_save_event_list('test_event_list_output6.fits',
+                                           ['Primary','EVT','TIME','EVENTS','GTI'])
+
+        # Test warn_too_few_energies() method
+        # TODO: implement
+
+        # Test warn_xml_suffix() method
+        self.test_value(len(empty.check_warn_xml_suffix('test.xml')), 0,
+                        'Check xml suffix warning for "test.xml" file')
+        self.test_value(len(empty.check_warn_xml_suffix('test.fits')), 235,
+                        'Check xml suffix warning for "test.fits" file')
+
+        # Test provide_help() method
+        # TODO: implement
+
+        # Return
+        return
+
+    # Test check_save_event_list() method result
+    def _test_cscript_save_event_list(self, filename, hdunames):
+        """
+        Test check_save_event_list() method result
+        """
+        # Open FITS file
+        fits = gammalib.GFits(filename)
+
+        # Check number of HDUs
+        self.test_value(fits.size(), len(hdunames), 'save_event_list(): '
+                        'Check number of FITS HDUs in file %s' % filename)
+
+        # Check HDU extension names
+        for i, hdu in enumerate(fits):
+            self.test_value(hdu.extname(), hdunames[i], 'save_event_list(): '
+                            'Check FITS HDU extension name in file %s' % filename)
 
         # Return
         return
@@ -467,6 +611,48 @@ class Test(test):
         # Test next_unbinned_observation() method
         self.test_assert(empty.check_next_unbinned_observation() is None,
                          'Check next_unbinned_observation() method')
+
+        # Test set_obs_statistic() method for unbinned observation
+        self.test_value(empty.check_set_obs_statistic_unbinned('CSTAT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("CSTAT") for unbinned')
+        self.test_value(empty.check_set_obs_statistic_unbinned('WSTAT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("WSTAT") for unbinned')
+        self.test_value(empty.check_set_obs_statistic_unbinned('CHI2'),
+                        'CSTAT',
+                        'Check set_obs_statistic("CHI2") for unbinned')
+        self.test_value(empty.check_set_obs_statistic_unbinned('DEFAULT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("DEFAULT") for unbinned')
+
+        # Test set_obs_statistic() method for binned observation
+        self.test_value(empty.check_set_obs_statistic_binned('CSTAT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("CSTAT") for binned')
+        self.test_value(empty.check_set_obs_statistic_binned('WSTAT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("WSTAT") for binned')
+        self.test_value(empty.check_set_obs_statistic_binned('CHI2'),
+                        'CHI2',
+                        'Check set_obs_statistic("CHI2") for binned')
+        self.test_value(empty.check_set_obs_statistic_binned('DEFAULT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("DEFAULT") for binned')
+
+        # Test set_obs_statistic() method for On/Off observation
+        self.test_value(empty.check_set_obs_statistic_onoff('CSTAT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("CSTAT") for On/Off')
+        self.test_value(empty.check_set_obs_statistic_onoff('WSTAT'),
+                        'WSTAT',
+                        'Check set_obs_statistic("WSTAT") for On/Off')
+        self.test_value(empty.check_set_obs_statistic_onoff('CHI2'),
+                        'CSTAT',
+                        'Check set_obs_statistic("CHI2") for On/Off')
+        self.test_value(empty.check_set_obs_statistic_onoff('DEFAULT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("DEFAULT") for On/Off')
 
         # Return
         return

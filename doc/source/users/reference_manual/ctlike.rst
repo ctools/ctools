@@ -94,9 +94,14 @@ General parameters
 ``(outcovmat = NONE) [string]``
     Output FITS or CSV file to store covariance matrix.
 
-``(stat = POISSON) [string]``
-    Fitting statistics (POISSON or GAUSSIAN; only affects binned analysis).
- 	 	 
+``(statistic = DEFAULT) <DEFAULT|CSTAT|WSTAT|CHI2> [string]``
+    Optimization statistic. ``DEFAULT`` uses the default statistic for all
+    observations, which is ``CSTAT`` or the statistic specified in the
+    observation definition XML file. ``CSTAT`` uses the C statistic for
+    all observations, ``WSTAT`` uses the W statistic for all On/Off
+    observations, and ``CHI2`` uses the Chi squared statistic for all
+    binned or stacked observations.
+
 ``(refit = no) [boolean]``
     Perform refitting of solution after initial fit.
 

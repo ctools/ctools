@@ -51,16 +51,12 @@ class csworkflow(ctools.cscript):
         TypeError
             An invalid number of command line arguments was provided.
         """
-        # Set name and version
-        self._name    = 'csworkflow'
-        self._version = ctools.__version__
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
         # Set members
         self._workflow = gammalib.GXml()
         self._actors   = []
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
 
         # Return
         return
@@ -114,10 +110,10 @@ class csworkflow(ctools.cscript):
                 actor_inputs = actor.element('input')
                 num_inputs   = actor_inputs.elements('parameter')
                 for k in range(num_inputs):
-                    input       = actor_inputs.element('parameter', k)
-                    input_name  = input.attribute('name')
-                    input_value = input.attribute('value')
-                    input_actor = input.attribute('actor')
+                    input_par   = actor_inputs.element('parameter', k)
+                    input_name  = input_par.attribute('name')
+                    input_value = input_par.attribute('value')
+                    input_actor = input_par.attribute('actor')
                     parameter   = {'name': input_name, \
                                    'value': input_value, \
                                    'actor': input_actor}
@@ -131,10 +127,10 @@ class csworkflow(ctools.cscript):
                 actor_output = actor.element('output')
                 num_outputs  = actor_output.elements('parameter')
                 for k in range(num_outputs):
-                    output       = actor_output.element('parameter', k)
-                    output_name  = output.attribute('name')
-                    output_value = output.attribute('value')
-                    output_actor = output.attribute('actor')
+                    output_par   = actor_output.element('parameter', k)
+                    output_name  = output_par.attribute('name')
+                    output_value = output_par.attribute('value')
+                    output_actor = output_par.attribute('actor')
                     parameter    = {'name': output_name, \
                                     'value': output_value, \
                                     'actor': output_actor}
@@ -263,25 +259,25 @@ class csworkflow(ctools.cscript):
             return
 
         # Create actor tool object
-        object = eval(tool_eval)
+        tool = eval(tool_eval)
 
         # Set actor input parameters
         pars = actor['input_parameters']
         for par in pars:
-            app_par = object[par['name']]
+            app_par = tool[par['name']]
             app_par.value(self._get_parameter_value(par))
-            object[par['name']] = app_par
+            tool[par['name']] = app_par
 
         # Set actor output parameters
         pars = actor['output_parameters']
         for par in pars:
-            app_par = object[par['name']]
+            app_par = tool[par['name']]
             app_par.value(self._get_parameter_value(par))
-            object[par['name']] = app_par
+            tool[par['name']] = app_par
 
         # Execute actor
-        object.logFileOpen()
-        object.execute()
+        tool.logFileOpen()
+        tool.execute()
         
         # Return
         return
@@ -349,22 +345,6 @@ class csworkflow(ctools.cscript):
             self._log('\n')
             self._log.header1('Execute workflow')
         self._execute_workflow()
-
-        # Return
-        return
-
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
 
         # Return
         return

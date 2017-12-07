@@ -72,8 +72,8 @@ class Test(test):
         # Setup ctselect command
         cmd = ctselect+' inobs="'+self._events+'"'+ \
                        ' outobs="ctselect_cmd1.fits"'+ \
-                       ' ra=83.63 dec=22.01 rad=3.0'+ \
-                       ' tmin=500.0 tmax=1000.0'+ \
+                       ' ra=83.63 dec=22.01 rad=2.0'+ \
+                       ' tmin=2020-01-01T00:01:10 tmax=2020-01-01T00:03:40'+ \
                        ' emin=0.2 emax=80.0'+ \
                        ' logfile="ctselect_cmd1.log" chatter=1'
 
@@ -91,10 +91,10 @@ class Test(test):
         # Setup ctselect command
         cmd = ctselect+' inobs="event_file_that_does_not_exist.fits"'+ \
                        ' outobs="ctselect_cmd2.fits"'+ \
-                       ' ra=83.63 dec=22.01 rad=3.0'+ \
-                       ' tmin=500.0 tmax=1000.0'+ \
+                       ' ra=83.63 dec=22.01 rad=2.0'+ \
+                       ' tmin=2020-01-01T00:01:10 tmax=2020-01-01T00:03:40'+ \
                        ' emin=0.2 emax=80.0'+ \
-                       ' logfile="ctselect_cmd2.log" chatter=1'
+                       ' logfile="ctselect_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -132,9 +132,9 @@ class Test(test):
         select['inobs']   = self._events
         select['ra']      = 83.63
         select['dec']     = 22.01
-        select['rad']     = 3
-        select['tmin']    = 500.0
-        select['tmax']    = 1000.0
+        select['rad']     = 2.0
+        select['tmin']    = '2020-01-01T00:01:10'
+        select['tmax']    = '2020-01-01T00:03:40'
         select['emin']    = 0.2
         select['emax']    = 80.0
         select['outobs']  = 'ctselect_py1.fits'
@@ -181,7 +181,7 @@ class Test(test):
         # to valid event selections, but since the maximum values are still
         # 'NONE', no event selections should occur.
         cpy_select['usepnt']   = True
-        cpy_select['tmin']     = 500.0
+        cpy_select['tmin']     = '2020-01-01T00:01:10'
         cpy_select['emin']     = 0.2
         cpy_select['usethres'] = 'USER'
         cpy_select['outobs']   = 'ctselect_py3.fits'
@@ -213,9 +213,9 @@ class Test(test):
         select = ctools.ctselect(obs)
         select['ra']       = 83.63
         select['dec']      = 22.01
-        select['rad']      = 3.0
-        select['tmin']     = 500.0
-        select['tmax']     = 1000.0
+        select['rad']      = 2.0
+        select['tmin']     = '2020-01-01T00:01:10'
+        select['tmax']     = '2020-01-01T00:03:40'
         select['emin']     = 120.0
         select['emax']     = 130.0
         select['expr']     = 'DETX == 0'
@@ -236,9 +236,9 @@ class Test(test):
         select['inobs']   = self._invalid_events
         select['ra']      = 83.63
         select['dec']     = 22.01
-        select['rad']     = 3
-        select['tmin']    = 500.0
-        select['tmax']    = 1000.0
+        select['rad']     = 2.0
+        select['tmin']    = '2020-01-01T00:01:10'
+        select['tmax']    = '2020-01-01T00:03:40'
         select['emin']    = 0.2
         select['emax']    = 80.0
         select['outobs']  = 'ctselect_py5.fits'
@@ -260,9 +260,9 @@ class Test(test):
         select['inobs']   = self._events+'[EVENTS]'
         select['ra']      = 83.63
         select['dec']     = 22.01
-        select['rad']     = 3.0
-        select['tmin']    = 500.0
-        select['tmax']    = 1000.0
+        select['rad']     = 2.0
+        select['tmin']    = '2020-01-01T00:01:10'
+        select['tmax']    = '2020-01-01T00:03:40'
         select['emin']    = 0.2
         select['emax']    = 0.0     # Signals that "emax" should be ignored
         select['outobs']  = 'ctselect_py6.fits'
@@ -274,16 +274,16 @@ class Test(test):
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py6.fits', nevents=595)
+        self._check_result_file('ctselect_py6.fits')
 
         # Now ignore the "emin" value.
         select = ctools.ctselect()
         select['inobs']   = self._events+'[EVENTS]'
         select['ra']      = 83.63
         select['dec']     = 22.01
-        select['rad']     = 3.0
-        select['tmin']    = 500.0
-        select['tmax']    = 1000.0
+        select['rad']     = 2.0
+        select['tmin']    = '2020-01-01T00:01:10'
+        select['tmax']    = '2020-01-01T00:03:40'
         select['emin']    = 0.0     # Signals that "emin" should be ignored
         select['emax']    = 80.0
         select['outobs']  = 'ctselect_py7.fits'
@@ -295,7 +295,7 @@ class Test(test):
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py7.fits', nevents=1684)
+        self._check_result_file('ctselect_py7.fits', nevents=1460)
 
         # Now set "emin > emax"
         select['emin']    = 150.0
@@ -318,9 +318,9 @@ class Test(test):
         select['inobs']   = self._events
         select['ra']      = 83.63
         select['dec']     = 24.01
-        select['rad']     = 5.0
-        select['tmin']    = 500.0
-        select['tmax']    = 1000.0
+        select['rad']     = 3.0
+        select['tmin']    = '2020-01-01T00:01:10'
+        select['tmax']    = '2020-01-01T00:03:40'
         select['emin']    = 0.2
         select['emax']    = 80.0
         select['outobs']  = 'ctselect_py9.fits'
@@ -332,7 +332,8 @@ class Test(test):
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py9.fits', nevents=466, dec=24.01)
+        self._check_result_file('ctselect_py9.fits', nevents=240, dec=24.01,
+                                rad=1.5)
 
         # Now put the RoI outside the existing RoI. This should leave to
         # an empty event list.
@@ -348,14 +349,14 @@ class Test(test):
 
         # Check result file
         self._check_result_file('ctselect_py10.fits', nevents=0, dec=-22.01,
-                                rad=5.0)
+                                rad=3.0)
 
         # Now test phase cut
         select = ctools.ctselect()
         select['inobs']   = self._phased_events
         select['ra']      = 83.63
         select['dec']     = 22.01
-        select['rad']     = 5.0
+        select['rad']     = 2.0
         select['tmin']    = 'INDEF'
         select['tmax']    = 'INDEF'
         select['emin']    = 0.1
@@ -370,14 +371,14 @@ class Test(test):
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py11.fits', nevents=1909, rad=5.0)
+        self._check_result_file('ctselect_py11.fits', nevents=1909)
 
-        # Now test anoother phase cut
+        # Now test another phase cut
         select = ctools.ctselect()
         select['inobs']   = self._phased_events
         select['ra']      = 83.63
         select['dec']     = 22.01
-        select['rad']     = 5.0
+        select['rad']     = 2.0
         select['tmin']    = 'INDEF'
         select['tmax']    = 'INDEF'
         select['emin']    = 0.1
@@ -392,7 +393,7 @@ class Test(test):
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py12.fits', nevents=1995, rad=5.0)
+        self._check_result_file('ctselect_py12.fits', nevents=1995)
 
         # Test invalid minimum phase value
         self.test_try('Test invalid minimum phase value')
@@ -482,7 +483,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, nevents=591, dec=22.01, rad=3.0):
+    def _check_result_file(self, filename, nevents=719, dec=22.01, rad=2.0):
         """
         Check result file
 
@@ -507,7 +508,7 @@ class Test(test):
         return
 
     # Check observation and event list
-    def _check_obs(self, obs, nobs=1, nevents=591):
+    def _check_obs(self, obs, nobs=1, nevents=719):
         """
         Check observation and event list
 
@@ -532,7 +533,7 @@ class Test(test):
         return
 
     # Check events
-    def _check_events(self, events, nevents=591, dec=22.01, rad=3.0):
+    def _check_events(self, events, nevents=719, dec=22.01, rad=2.0):
         """
         Check event list
 

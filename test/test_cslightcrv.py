@@ -42,6 +42,10 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Add off-axis events for classical analysis
+        self._offaxis_events = self._datadir + '/crab_offaxis1.fits'
+        self._model_onoff    = self._datadir + '/crab_onoff.xml'
+
         # Return
         return
 
@@ -72,8 +76,9 @@ class Test(test):
         cmd = cslightcrv+' inobs="'+self._events+'"'+ \
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                         ' tbinalg="LIN" tmin="MJD 51544.50" tmax="MJD 51544.53"'+ \
-                         ' tbins=3 enumbins=0 emin=0.1 emax=100.0'+ \
+                         ' tbinalg=LIN '+ \
+                         ' tmin=2020-01-01T00:00:00 tmax=2020-01-01T00:05:00'+ \
+                         ' tbins=3 method=3D enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
                          ' logfile="cslightcrv_cmd1.log" chatter=1'
 
@@ -92,10 +97,11 @@ class Test(test):
         cmd = cslightcrv+' inobs="events_that_do_not_exist.fits"'+ \
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                         ' tbinalg="LIN" tmin="MJD 51544.50" tmax="MJD 51544.53"'+ \
-                         ' tbins=3 enumbins=0 emin=0.1 emax=100.0'+ \
+                         ' tbinalg=LIN '+ \
+                         ' tmin=2020-01-01T00:00:00 tmax=2020-01-01T00:05:00'+ \
+                         ' tbins=3 method=3D enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
-                         ' logfile="cslightcrv_cmd2.log"'
+                         ' logfile="cslightcrv_cmd2.log" debug=yes'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -120,9 +126,10 @@ class Test(test):
         lcrv['caldb']    = self._caldb
         lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'LIN'
-        lcrv['tmin']     = 'MJD 51544.50'
-        lcrv['tmax']     = 'MJD 51544.53'
+        lcrv['tmin']     = '2020-01-01T00:00:00'
+        lcrv['tmax']     = '2020-01-01T00:05:00'
         lcrv['tbins']    = 3
+        lcrv['method']   = '3D'
         lcrv['enumbins'] = 0
         lcrv['emin']     = 0.1
         lcrv['emax']     = 100.0
@@ -143,8 +150,8 @@ class Test(test):
         # create an ASCII file. We use now 6 time bins. The ASCII file
         # is saved into the file "lightcurve_py2.dat".
         csv    = gammalib.GCsv(2,2)
-        tmin   = 51544.50
-        tdelta = 0.01
+        tmin   = 58849.00
+        tdelta = 0.0017361
         for i in range(csv.nrows()):
             csv[i,0] = '%.5f' % (tmin +  i    * tdelta)
             csv[i,1] = '%.5f' % (tmin + (i+1) * tdelta)
@@ -159,6 +166,7 @@ class Test(test):
         lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'FILE'
         lcrv['tbinfile'] = 'cslightcrv_py2.dat'
+        lcrv['method']   = '3D'
         lcrv['enumbins'] = 0
         lcrv['emin']     = 0.1
         lcrv['emax']     = 100.0
@@ -188,6 +196,7 @@ class Test(test):
         lcrv['caldb']    = self._caldb
         lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'GTI'
+        lcrv['method']   = '3D'
         lcrv['enumbins'] = 0
         lcrv['emin']     = 0.1
         lcrv['emax']     = 100.0
@@ -201,7 +210,7 @@ class Test(test):
         # Check light curve
         self._check_light_curve('cslightcrv_py3.fits', 1)
 
-        # Finally we set-up a binned cslightcrv
+        # Binned cslightcrv
         lcrv = cscripts.cslightcrv()
         lcrv['inobs']    = self._events
         lcrv['inmodel']  = self._model
@@ -209,9 +218,10 @@ class Test(test):
         lcrv['caldb']    = self._caldb
         lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'LIN'
-        lcrv['tmin']     = 'MJD 51544.50'
-        lcrv['tmax']     = 'MJD 51544.53'
+        lcrv['tmin']     = '2020-01-01T00:00:00'
+        lcrv['tmax']     = '2020-01-01T00:05:00'
         lcrv['tbins']    = 2
+        lcrv['method']   = '3D'
         lcrv['emin']     = 0.1
         lcrv['emax']     = 100.0
         lcrv['enumbins'] = 10
@@ -232,11 +242,44 @@ class Test(test):
         # Check light curve
         self._check_light_curve('cslightcrv_py4.fits', 2)
 
+        # cslightcrv with classical analysis
+        lcrv = cscripts.cslightcrv()
+        lcrv['inobs']     = self._offaxis_events
+        lcrv['inmodel']   = self._model_onoff
+        lcrv['srcname']   = 'Crab'
+        lcrv['caldb']     = self._caldb
+        lcrv['irf']       = self._irf
+        lcrv['tbinalg']   = 'LIN'
+        lcrv['tmin']      = '2020-01-01T00:00:00'
+        lcrv['tmax']      = '2020-01-01T00:05:00'
+        lcrv['tbins']     = 2
+        lcrv['method']    = 'ONOFF'
+        lcrv['emin']      = 0.1
+        lcrv['emax']      = 100.0
+        lcrv['enumbins']  = 10
+        lcrv['coordsys']  = 'CEL'
+        lcrv['xref']      = 83.63
+        lcrv['yref']      = 22.01
+        lcrv['rad']       = 0.2
+        lcrv['etruemin']  = 0.05
+        lcrv['etruemax']  = 150.0
+        lcrv['etruebins'] = 5
+        lcrv['statistic'] = 'WSTAT'
+        lcrv['outfile']   = 'cslightcrv_py5.fits'
+        lcrv['logfile']   = 'cslightcrv_py5.log'
+        lcrv['chatter']   = 4
+
+        # Execute cslightcrv script
+        lcrv.execute()
+
+        # Check light curve
+        self._check_light_curve('cslightcrv_py5.fits', 2)
+
         # Return
         return
 
     # Check light curve result file
-    def _check_light_curve(self, filename, bins):
+    def _check_light_curve(self, filename, bins, prefactor=5.7e-16):
         """
         Check light curve file
         """
@@ -265,6 +308,11 @@ class Test(test):
         for col in cols:
             self.test_assert(table.contains(col),
                  'FITS file contains "'+col+'" column')
+
+        # Check that the Prefactor has the right order of magnitude
+        for s in range(table.nrows()):
+            self.test_value(table['Prefactor'][s], prefactor, 0.2*prefactor,
+                            'Check prefactor value')
 
         # Close FITS file
         fits.close()

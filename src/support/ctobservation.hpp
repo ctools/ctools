@@ -62,32 +62,57 @@ public:
     virtual void save(void) = 0;
 
     // Methods
+    void                 obs(const GObservations& obs);
     const GObservations& obs(void) const;
 
 #ifndef SWIG
 protected:
 #endif
-    // Iterator methods and members
+    // Protected methods
     GCTAObservation*       first_unbinned_observation(void);
     GCTAObservation*       next_unbinned_observation(void);
     const GCTAObservation* first_unbinned_observation(void) const;
     const GCTAObservation* next_unbinned_observation(void) const;
+    void                   write_ogip_keywords(GFitsHDU* hdu) const;
+    void                   set_obs_statistic(const std::string& statistic);
+    void                   save_events_fits(void);
+    void                   save_events_xml(void);
 
 protected:
     // Protected methods
     void init_members(void);
     void copy_members(const ctobservation& app);
     void free_members(void);
-    void save_events_fits(void);
-    void save_events_xml(void);
 
     // Protected members
-    GObservations m_obs;            //!< Observation container
+    GObservations       m_obs;            //!< Observation container
 
 private:
     // Private members
-    mutable int m_index_unbinned;   //!< Current index of unbinned observation
+    mutable std::string m_ogip_telescope; //!< Name of telescope
+    mutable GTime       m_ogip_tstart;    //!< Start time for OGIP keywords
+    mutable GTime       m_ogip_tstop;     //!< Stop time for OGIP keywords
+    mutable double      m_ogip_telapse;   //!< Elapsed time
+    mutable double      m_ogip_exposure;  //!< Exposure time
+    mutable double      m_ogip_ontime;    //!< Ontime for OGIP keywords
+    mutable double      m_ogip_livetime;  //!< Livetime for OGIP keywords
+    mutable int         m_index_unbinned; //!< Current index of unbinned observation
 };
+
+
+/***********************************************************************//**
+ * @brief Set observation container
+ *
+ * @param[in] obs Observation container.
+ *
+ * Set observation container.
+ ***************************************************************************/
+inline
+void ctobservation::obs(const GObservations& obs)
+{
+    m_obs = obs;
+    return;
+}
 
 
 /***********************************************************************//**

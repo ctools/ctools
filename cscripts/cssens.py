@@ -19,7 +19,6 @@
 #
 # ==========================================================================
 import sys
-import csv
 import math
 import gammalib
 import ctools
@@ -31,7 +30,7 @@ from cscripts import ioutils
 # ============ #
 # cssens class #
 # ============ #
-class cssens(ctools.cscript):
+class cssens(ctools.csobservation):
     """
     Computes the CTA sensitivity
 
@@ -48,9 +47,8 @@ class cssens(ctools.cscript):
         """
         Constructor.
         """
-        # Set name
-        self._name    = 'cssens'
-        self._version = ctools.__version__
+        # Initialise application by calling the appropriate class constructor
+        self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise class members
         self._ebounds     = gammalib.GEbounds()
@@ -59,12 +57,6 @@ class cssens(ctools.cscript):
         self._ra          = None
         self._dec         = None
         self._log_clients = False
-
-        # Initialise observation container from constructor arguments
-        self._obs, argv = self._set_input_obs(argv)
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
 
         # Return
         return
@@ -76,12 +68,15 @@ class cssens(ctools.cscript):
         Get user parameters from parfile
         """
         # Set observation if not done before
-        if self._obs.size() == 0:
-            self._obs = self._set_obs(self['emin'].real(), self['emax'].real())
+        if self.obs().size() == 0:
+            self.obs(self._set_obs(self['emin'].real(), self['emax'].real()))
+
+        # Set observation statistic
+        self._set_obs_statistic(gammalib.toupper(self['statistic'].string()))
 
         # Set models if we have none
-        if self._obs.models().size() == 0:
-            self._obs.models(self['inmodel'].filename())
+        if self.obs().models().size() == 0:
+            self.obs().models(self['inmodel'].filename())
 
         # Get source name
         self._srcname = self['srcname'].string()
@@ -187,7 +182,7 @@ class cssens(ctools.cscript):
             Maximum energy
         """
         # Loop over all observations in container
-        for i, obs in enumerate(self._obs):
+        for i, obs in enumerate(self.obs()):
 
             # Get energy boundaries of the observation
             obs_ebounds = self._obs_ebounds[i]
@@ -338,11 +333,11 @@ class cssens(ctools.cscript):
             models         = test_model.copy()
             crab_prefactor = models[self._srcname]['Prefactor'].value() * crab_unit
             models[self._srcname]['Prefactor'].value(crab_prefactor * test_crab_flux)
-            self._obs.models(models)
+            self.obs().models(models)
 
             # Simulate events for the models. "sim" holds an observation
             # container with observations containing the simulated events.
-            sim = obsutils.sim(self._obs, nbins=enumbins, seed=iterations,
+            sim = obsutils.sim(self.obs(), nbins=enumbins, seed=iterations,
                                binsz=binsz, npix=npix,
                                log=self._log_clients,
                                debug=self['debug'].boolean(),
@@ -386,9 +381,6 @@ class cssens(ctools.cscript):
             # and finally by "erg_mean" to convert to erg/cm2/s.
             energy      = gammalib.GEnergy(e_mean, 'TeV')
             sensitivity = source.spectral().eval(energy) * e_mean*erg_mean*1.0e6
-
-            # Assess quality based on a comparison between Npred and Nevents
-            quality = npred - nevents
 
             # Write fit results into logger
             name  = 'Iteration %d' % iterations
@@ -492,7 +484,7 @@ class cssens(ctools.cscript):
                 self._log_string(gammalib.TERSE, str(par))
 
         # Restore energy boundaries of observation container
-        for i, obs in enumerate(self._obs):
+        for i, obs in enumerate(self.obs()):
             obs.events().ebounds(self._obs_ebounds[i])
 
         # Store result
@@ -587,7 +579,7 @@ class cssens(ctools.cscript):
 
         # Loop over observations and store a deep copy of the energy
         # boundaries for later use
-        for obs in self._obs:
+        for obs in self.obs():
             self._obs_ebounds.append(obs.events().ebounds().copy())
 
         # Initialise script
@@ -597,14 +589,14 @@ class cssens(ctools.cscript):
         results  = []
 
         # Set test source model for this observation
-        models = modutils.test_source(self._obs.models(), self._srcname,
+        models = modutils.test_source(self.obs().models(), self._srcname,
                                       ra=self._ra, dec=self._dec)
 
         # Write observation into logger
-        self._log_observations(gammalib.NORMAL, self._obs, 'Observation')
+        self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
         # Write models into logger
-        self._log_models(gammalib.NORMAL, models, 'Model')
+        self._log_models(gammalib.NORMAL, models, 'Input model')
 
         # Get sensitivity type
         sensitivity_type = self['type'].string()
@@ -638,22 +630,6 @@ class cssens(ctools.cscript):
 
             # Append results
             results.append(result)
-
-        # Return
-        return
-
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
 
         # Return
         return

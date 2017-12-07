@@ -28,10 +28,12 @@ pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/csmodelinfo.py \
                 $(srcdir)/csmodelmerge.py \
                 $(srcdir)/csmodelselect.py \
+                $(srcdir)/csmodelsois.py \
                 $(srcdir)/csobs2caldb.py \
                 $(srcdir)/csobsdef.py \
                 $(srcdir)/csobsinfo.py \
                 $(srcdir)/csobsselect.py \
+                $(srcdir)/csphagen.py \
                 $(srcdir)/csphasecrv.py \
                 $(srcdir)/cspull.py \
                 $(srcdir)/csresmap.py \
@@ -60,10 +62,12 @@ parfiles = $(srcdir)/cscaldb.par \
            $(srcdir)/csmodelinfo.par \
            $(srcdir)/csmodelmerge.par \
            $(srcdir)/csmodelselect.par \
+           $(srcdir)/csmodelsois.par \
            $(srcdir)/csobs2caldb.par \
            $(srcdir)/csobsdef.par \
            $(srcdir)/csobsinfo.par \
            $(srcdir)/csobsselect.par \
+           $(srcdir)/csphagen.par \
            $(srcdir)/csphasecrv.par \
            $(srcdir)/cspull.par \
            $(srcdir)/csresmap.par \
@@ -89,10 +93,12 @@ linkscripts = cscaldb \
               csmodelinfo \
               csmodelmerge \
               csmodelselect \
+              csmodelsois \
               csobs2caldb \
               csobsdef \
               csobsinfo \
               csobsselect \
+              csphagen \
               csphasecrv \
               cspull \
               csresmap \
@@ -123,10 +129,12 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_csmodelinfo.py \
               $(top_srcdir)/test/test_csmodelmerge.py \
               $(top_srcdir)/test/test_csmodelselect.py \
+              $(top_srcdir)/test/test_csmodelsois.py \
               $(top_srcdir)/test/test_csobs2caldb.py \
               $(top_srcdir)/test/test_csobsdef.py \
               $(top_srcdir)/test/test_csobsinfo.py \
               $(top_srcdir)/test/test_csobsselect.py \
+              $(top_srcdir)/test/test_csphagen.py \
               $(top_srcdir)/test/test_csphasecrv.py \
               $(top_srcdir)/test/test_cspull.py \
               $(top_srcdir)/test/test_csresmap.py \
@@ -139,6 +147,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_cstsmapsplit.py \
               $(top_srcdir)/test/test_csviscube.py \
               $(top_srcdir)/test/test_csworkflow.py \
+              $(top_srcdir)/test/test_obsutils.py \
               $(top_srcdir)/test/test_csiactcopy.py \
               $(top_srcdir)/test/test_csiactdata.py \
               $(top_srcdir)/test/test_csiactobs.py
@@ -155,6 +164,10 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/crab_psfcube.fits.gz \
            $(top_srcdir)/test/data/crab_edispcube.fits.gz \
            $(top_srcdir)/test/data/crab_bkgcube.fits.gz \
+           $(top_srcdir)/test/data/crab_onoff.xml \
+           $(top_srcdir)/test/data/crab_offaxis1.fits.gz \
+           $(top_srcdir)/test/data/crab_offaxis2.fits.gz \
+           $(top_srcdir)/test/data/crab_exclusion.fits.gz \
            $(top_srcdir)/test/data/tsmap_0.fits \
            $(top_srcdir)/test/data/tsmap_1.fits \
            $(top_srcdir)/test/data/exclusion.reg \
@@ -162,7 +175,7 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/pntdef_maximal.dat \
            $(top_srcdir)/test/data/models.txt \
            $(top_srcdir)/test/data/tsmaps.txt \
-           $(top_srcdir)/test/data/model_cube_background.xml \
+           $(top_srcdir)/test/data/model_cube_background1.xml \
            $(top_srcdir)/test/data/model_cube_background2.xml \
            $(top_srcdir)/test/data/crab_bkgcube.xml \
            $(top_srcdir)/test/data/irf.root \
@@ -188,7 +201,25 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/iact_runlist_2.dat \
            $(top_srcdir)/test/data/model_temporal_phasecurve.xml \
            $(top_srcdir)/test/data/model_temporal_phasecurve.fits \
-           $(top_srcdir)/test/data/phased_events.fits.gz
+           $(top_srcdir)/test/data/phased_events.fits.gz \
+           $(top_srcdir)/test/data/onoff_arf.fits.gz \
+           $(top_srcdir)/test/data/onoff_arf1.fits.gz \
+           $(top_srcdir)/test/data/onoff_arf2.fits.gz \
+           $(top_srcdir)/test/data/onoff_model.xml \
+           $(top_srcdir)/test/data/onoff_obs.xml \
+           $(top_srcdir)/test/data/onoff_obs1.xml \
+           $(top_srcdir)/test/data/onoff_obs2.xml \
+           $(top_srcdir)/test/data/onoff_obs_stacked.xml \
+           $(top_srcdir)/test/data/onoff_pha_off.fits.gz \
+           $(top_srcdir)/test/data/onoff_pha_off1.fits.gz \
+           $(top_srcdir)/test/data/onoff_pha_off2.fits.gz \
+           $(top_srcdir)/test/data/onoff_pha_on.fits.gz \
+           $(top_srcdir)/test/data/onoff_pha_on1.fits.gz \
+           $(top_srcdir)/test/data/onoff_pha_on2.fits.gz \
+           $(top_srcdir)/test/data/onoff_rmf.fits.gz \
+           $(top_srcdir)/test/data/onoff_rmf1.fits.gz \
+           $(top_srcdir)/test/data/onoff_rmf2.fits.gz \
+           $(top_srcdir)/test/data/model_crab_radialacceptance.xml
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data/iactdata
 testiactdata = $(top_srcdir)/test/data/iactdata/hdu-index.fits.gz \

@@ -44,6 +44,8 @@ class Test(test):
 
         # Set test data
         self._phased_events  = self._datadir + '/phased_events.fits'
+        self._offaxis_events = self._datadir + '/crab_offaxis1.fits'
+        self._model_onoff    = self._datadir + '/crab_onoff.xml'
 
         # Return
         return
@@ -75,7 +77,7 @@ class Test(test):
         cmd = csphasecrv+' inobs="'+self._phased_events+'"'+ \
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                         ' phbinalg="LIN" phbins=5'+ \
+                         ' phbinalg="LIN" phbins=5 method="3D"'+ \
                          ' enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="csphasecrv_cmd1.fits"'+ \
                          ' logfile="csphasecrv_cmd1.log" chatter=1'
@@ -95,10 +97,10 @@ class Test(test):
         cmd = csphasecrv+' inobs="events_that_do_not_exist.fits"'+ \
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                         ' phbinalg="LIN" phbins=5'+ \
+                         ' phbinalg="LIN" phbins=5 method="3D"'+ \
                          ' enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="csphasecrv_cmd2.fits"'+ \
-                         ' logfile="csphasecrv_cmd2.log" chatter=1'
+                         ' logfile="csphasecrv_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -124,6 +126,7 @@ class Test(test):
         pcrv['irf']      = self._irf
         pcrv['phbinalg'] = 'LIN'
         pcrv['phbins']   = 5
+        pcrv['method']   = '3D'
         pcrv['enumbins'] = 0
         pcrv['emin']     = 0.1
         pcrv['emax']     = 100.0
@@ -160,6 +163,7 @@ class Test(test):
         pcrv['irf']       = self._irf
         pcrv['phbinalg']  = 'FILE'
         pcrv['phbinfile'] = 'csphasecrv_py2.dat'
+        pcrv['method']    = '3D'
         pcrv['enumbins']  = 0
         pcrv['emin']      = 0.1
         pcrv['emax']      = 100.0
@@ -190,6 +194,7 @@ class Test(test):
         pcrv['irf']      = self._irf
         pcrv['phbinalg'] = 'LIN'
         pcrv['phbins']   = 5
+        pcrv['method']   = '3D'
         pcrv['enumbins'] = 0
         pcrv['emin']     = 0.1
         pcrv['emax']     = 100.0
@@ -204,7 +209,7 @@ class Test(test):
         # Check phase curve
         self._check_phase_curve('csphasecrv_py3.fits', 5)
 
-        # Finally we set-up a binned csphasecrv
+        # Binned csphasecrv
         pcrv = cscripts.csphasecrv()
         pcrv['inobs']    = self._phased_events
         pcrv['inmodel']  = self._model
@@ -213,6 +218,7 @@ class Test(test):
         pcrv['irf']      = self._irf
         pcrv['phbinalg'] = 'LIN'
         pcrv['phbins']   = 2
+        pcrv['method']   = '3D'
         pcrv['emin']     = 0.1
         pcrv['emax']     = 100.0
         pcrv['enumbins'] = 10
@@ -233,6 +239,38 @@ class Test(test):
 
         # Check phase curve
         self._check_phase_curve('csphasecrv_py4.fits', 2)
+
+        # On/Off csphasecrv
+        pcrv = cscripts.csphasecrv()
+        pcrv['inobs']     = self._offaxis_events
+        pcrv['inmodel']   = self._model_onoff
+        pcrv['srcname']   = 'Crab'
+        pcrv['caldb']     = self._caldb
+        pcrv['irf']       = self._irf
+        pcrv['phbinalg']  = 'LIN'
+        pcrv['phbins']    = 2
+        pcrv['method']    = 'ONOFF'
+        pcrv['statistic'] = 'WSTAT'
+        pcrv['emin']      = 0.1
+        pcrv['emax']      = 100.0
+        pcrv['enumbins']  = 10
+        pcrv['coordsys']  = 'CEL'
+        pcrv['xref']      = 83.63
+        pcrv['yref']      = 22.01
+        pcrv['rad']       = 0.2
+        pcrv['etruemin']  = 0.05
+        pcrv['etruemax']  = 150.0
+        pcrv['etruebins'] = 5
+        pcrv['outfile']   = 'csphasecrv_py5.fits'
+        pcrv['logfile']   = 'csphasecrv_py5.log'
+        pcrv['chatter']   = 4
+
+        # Execute csphasecrv script
+        pcrv.logFileOpen()   # Make sure we get a log file
+        pcrv.execute()
+
+        # Check phase curve
+        self._check_phase_curve('csphasecrv_py5.fits', 2)
 
         # Return
         return
@@ -266,6 +304,12 @@ class Test(test):
         for col in cols:
             self.test_assert(table.contains(col),
                  'FITS file contains "'+col+'" column')
+
+        # Check that table has been filled
+        # Prefactor has right order of magnitude
+        for s in range(table.nrows()):
+            self.test_value(table['Prefactor'][s], 4.e-16, 3.e-16,
+                            'Check prefactor value')
 
         # Close FITS file
         fits.close()

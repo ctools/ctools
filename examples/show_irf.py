@@ -226,15 +226,13 @@ def plot_psf(sub, psf, emin=None, emax=None, tmin=None, tmax=None,
 # ====================== #
 # Plot energy dispersion #
 # ====================== #
-def plot_edisp(sub, edisp, emin=None, emax=None, tmin=None, tmax=None,
+def plot_edisp(edisp, emin=None, emax=None, tmin=None, tmax=None,
                nengs=100, nthetas=100):
     """
     Plot Background template
 
     Parameters
     ----------
-    sub : figure
-        Subplot
     edisp : `~gammalib.GCTAEdisp2D`
         Instrument Response Function
     emin : float, optional
@@ -296,8 +294,8 @@ def plot_edisp(sub, edisp, emin=None, emax=None, tmin=None, tmax=None,
         row_std  = []
 
         # Compute detx and dety
-        detx = theta*gammalib.deg2rad
-        dety = 0.0
+        #detx = theta*gammalib.deg2rad
+        #dety = 0.0
 
         # Loop over energies
         for logenergy in logenergies:
@@ -551,8 +549,8 @@ def plot_irf(irf, emin, emax, tmin, tmax, plotfile):
     plot_bkg(ax3, irf.background(), emin=emin, emax=emax, tmin=tmin, tmax=tmax)
 
     # Plot Edisp
-    ax4 = fig.add_subplot(234)
-    plot_edisp(ax4, irf.edisp(), emin=emin, emax=emax, tmin=tmin, tmax=tmax)
+    fig.add_subplot(234)
+    plot_edisp(irf.edisp(), emin=emin, emax=emax, tmin=tmin, tmax=tmax)
 
     # Show plots or save it into file
     if len(plotfile) > 0:

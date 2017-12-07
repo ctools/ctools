@@ -30,3 +30,4 @@ We also assume that you have read the section about
    first_fitting
    first_improving
    first_unbinned
+   classical_analysis

@@ -38,9 +38,10 @@ class csfindobs(ctools.cscript):
         """
         Constructor
         """
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
+
         # Set name
-        self._name         = 'csfindobs'
-        self._version      = ctools.__version__
         self._datapath     = os.getenv('VHEFITS','')
         self._prodname     = ''
         self._select_radec = True
@@ -49,9 +50,6 @@ class csfindobs(ctools.cscript):
         self._dec          = 0.0
         self._obs_index    = ''
         self._runs         = []
-        
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
 
         # Return
         return
@@ -231,25 +229,6 @@ class csfindobs(ctools.cscript):
         # Return
         return
     
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-    
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-        
-        # Save residual map
-        self.save()
-        
-        # Return
-        return
-
     def save(self):
         """
         Save runlist

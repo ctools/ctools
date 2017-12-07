@@ -28,7 +28,7 @@ import ctools
 # ================== #
 # cstsmapsplit class #
 # ================== #
-class cstsmapsplit(ctools.cscript):
+class cstsmapsplit(ctools.cslikelihood):
     """
     Generates commands to split TS map computation
     
@@ -44,10 +44,8 @@ class cstsmapsplit(ctools.cscript):
         """
         Constructor
         """
-
-        # Set name and version
-        self._name    = 'cstsmapsplit'
-        self._version = ctools.__version__
+        # Initialise application by calling the appropriate class constructor
+        self._init_cslikelihood(self.__class__.__name__, ctools.__version__, argv)
 
         # Set data members
         self._outmap       = gammalib.GFilename()
@@ -57,13 +55,6 @@ class cstsmapsplit(ctools.cscript):
         self._map          = gammalib.GSkyMap()
         self._cmd          = []
         self._srcname      = ''
-        
-        # Initialise observation container from constructor arguments.
-        self._obs, argv = self._set_input_obs(argv)
-
-        # Initialise application by calling the appropriate class
-        # constructor.
-        self._init_cscript(argv)
 
         # Return
         return
@@ -74,17 +65,16 @@ class cstsmapsplit(ctools.cscript):
         """
         Get parameters from parfile and setup the observation
         """
-         
         # If there are no observations in container then get some ...
-        if self._obs.size() == 0:
-            self._obs = self._get_observations()
+        if self.obs().size() == 0:
+            self.obs(self._get_observations())
             
         # Set models if we have none
-        if self._obs.models().size() == 0:
-            self._obs.models(self['inmodel'].filename())
+        if self.obs().models().size() == 0:
+            self.obs().models(self['inmodel'].filename())
         
         # Get TS map paramters
-        self._map     = self._create_map(self._obs)
+        self._map     = self._create_map(self.obs())
         self._srcname = self['srcname'].string()
         self._outmap  = self['outmap'].filename()
         
@@ -108,30 +98,29 @@ class cstsmapsplit(ctools.cscript):
         logl : float
             Log-likelihood of null hypothesis
         """
-        
         # Store original models  
-        models_orig = self._obs.models()
+        models_orig = self.obs().models()
         
         # Get models instance
-        models0 = self._obs.models() 
+        models0 = self.obs().models()
         
         # Remove test source   
         models0.remove(self._srcname)
         
         # Initialise optimizer
-        opt = gammalib.GOptimizerLM()        
+        #opt = gammalib.GOptimizerLM()
         
         # Set models for null hypothesis 
-        self._obs.models(models0)
+        self.obs().models(models0)
         
         # Optimise observation container
-        self._obs.optimize(opt)
+        self.obs().optimize(self.opt())
         
         # Set original models to container
-        self._obs.models(models_orig)
+        self.obs().models(models_orig)
               
         # Return optimised log-likelihood of null hypothesis
-        return -(opt.value())
+        return -(self.opt().value())
     
     
     # Public methods
@@ -147,12 +136,8 @@ class cstsmapsplit(ctools.cscript):
         self._get_parameters()
         
         # Write information into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Test source')
-            model = self._obs.models()[self._srcname]
-            self._log(str(model))
-            self._log('\n')
+        self._log_header1(gammalib.TERSE, 'Test source')
+        self._log_string(gammalib.TERSE, str(self.obs().models()[self._srcname]))
         
         # Set log-likelihood to zero
         logL0 = 0.0
@@ -161,9 +146,7 @@ class cstsmapsplit(ctools.cscript):
         if self._compute_null:
             
             # Write information into logger
-            if self._logTerse():
-                self._log('\n')
-                self._log.header1('Compute null hypothesis')
+            self._log_header1(gammalib.TERSE, 'Compute null hypothesis')
             
             # Compute null hypothesis
             logL0 = self._compute_null_hypothesis()
@@ -275,25 +258,6 @@ class cstsmapsplit(ctools.cscript):
         # Make file executable
         os.system('chmod +x %s' % filename)
 
-        # Return
-        return
-
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-        
-        # Save results
-        self.save()
-        
         # Return
         return
 

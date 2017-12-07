@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import ctools
 from testing import test
@@ -88,7 +87,7 @@ class Test(test):
                       ' inmodel="'+self._model+'" srcname="Crab"'+ \
                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' outmodel="cterror_cmd2.xml"'+ \
-                      ' logfile="cterror_cmd2.log" chatter=1'
+                      ' logfile="cterror_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -264,26 +263,30 @@ class Test(test):
 
         # If there are models in the container then check them
         if nmodels > 0:
-            self.test_value(models['Crab']['Prefactor'].value(), 1.58907e-16,
-                            1.0e-3, 'Check fitted Crab Prefactor')
-            self.test_value(models['Crab']['Prefactor'].error(), 0.0529105e-16,
-                            1.0e-3, 'Check Crab Prefactor error')
-            self.test_value(models['Crab']['Index'].value(), -2.43549,
-                            1.0e-3, 'Check fitted Crab Index')
-            self.test_value(models['Crab']['Index'].error(), 0.027804,
-                            1.0e-3, 'Check Crab Index error')
-            self.test_value(models['Background']['Prefactor'].value(), 61.6919e-6,
-                            1.0e-3, 'Check fitted background Prefactor')
-            self.test_value(models['Background']['Prefactor'].error(), 1.49438e-6,
-                            1.0e-3, 'Check background Prefactor error')
-            self.test_value(models['Background']['Index'].value(), -2.20535,
-                            1.0e-3, 'Check fitted background Index')
-            self.test_value(models['Background']['Index'].error(), 0.0113269,
-                            1.0e-3, 'Check background Index error')
-            self.test_value(models['Background']['Sigma'].value(), 3.04252,
-                            1.0e-3, 'Check fitted background Sigma')
-            self.test_value(models['Background']['Sigma'].error(), 0.0307008,
-                            1.0e-3, 'Check background Sigma error')
+            self.test_value(models['Crab']['Prefactor'].value(),
+                            5.6530206356786e-16, 1.0e-4 * 5.6530206356786e-16,
+                            'Check fitted Crab Prefactor')
+            self.test_value(models['Crab']['Prefactor'].error(),
+                            2.45970361827369e-17, 1.0e-3 * 2.45970361827369e-17,
+                            'Check Crab Prefactor error')
+            self.test_value(models['Crab']['Index'].value(),
+                            -2.45716228083265, 1.0e-4 * 2.45716228083265,
+                            'Check fitted Crab Index')
+            self.test_value(models['Crab']['Index'].error(),
+                            0.0366617454398694, 1.0e-3 * 0.0366617454398694,
+                            'Check Crab Index error')
+            self.test_value(models['Background']['Prefactor'].value(),
+                            1.01525433446138, 1.0e-4 * 1.01525433446138,
+                            'Check fitted background Prefactor')
+            self.test_value(models['Background']['Prefactor'].error(),
+                            0.0334412516391298, 1.0e-4 * 0.0334412516391298,
+                            'Check background Prefactor error')
+            self.test_value(models['Background']['Index'].value(),
+                            -0.005132848897274, 1.0e-3 * 0.005132848897274,
+                            'Check fitted background Index')
+            self.test_value(models['Background']['Index'].error(),
+                            0.0200624490548333, 1.0e-4 * 0.0200624490548333,
+                            'Check background Index error')
 
         # Return
         return

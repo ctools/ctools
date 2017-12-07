@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
+#import gammalib
 import cscripts
 from testing import test
 
@@ -85,7 +85,7 @@ class Test(test):
 
         # Setup csiactdata command
         cmd = csiactdata+' datapath="data_path_that_does_not_exist"'+ \
-                         ' logfile="csiactdata_cmd2.log"'
+                         ' logfile="csiactdata_cmd2.log" debug=yes'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

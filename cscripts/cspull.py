@@ -19,7 +19,6 @@
 #
 # ==========================================================================
 import sys
-import math
 import gammalib
 import ctools
 from cscripts import obsutils
@@ -29,7 +28,7 @@ from cscripts import ioutils
 # ============ #
 # cspull class #
 # ============ #
-class cspull(ctools.cscript):
+class cspull(ctools.csobservation):
     """
     Generates pull distributions for a model
     """
@@ -38,27 +37,8 @@ class cspull(ctools.cscript):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'cspull'
-        self._version = ctools.__version__
-
-        # Initialise some members
-        self._edisp       = False
-        self._coordsys    = 'CEL'
-        self._proj        = 'TAN'
-        self._log_clients = False  # Static parameter
-        self._ntrials     = 0
-        self._npix        = 0
-        self._binsz       = 0.0
-        self._enumbins    = 0
-        self._seed        = 1
-        self._chatter     = 2
-
-        # Initialise observation container from constructor arguments
-        self._obs, argv = self._set_input_obs(argv)
-
         # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
+        self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Return
         return
@@ -70,33 +50,40 @@ class cspull(ctools.cscript):
         Get parameters from parfile
         """
         # If there are no observations in container then get some ...
-        if self._obs.size() == 0:
-            self._obs = self._get_observations()
+        if self.obs().is_empty():
+            self.obs(self._get_observations())
 
         # ... otherwise add response information and energy boundaries
         # in case they are missing
         else:
-            self._setup_observations(self._obs)
+            self._setup_observations(self.obs())
+
+        # Set observation statistic
+        self._set_obs_statistic(gammalib.toupper(self['statistic'].string()))
 
         # Get number of energy bins
-        self._enumbins = self['enumbins'].integer()
+        enumbins = self['enumbins'].integer()
 
-        # Read parameters for binned if requested
-        if self._enumbins != 0:
-            self._npix     = self['npix'].integer()
-            self._binsz    = self['binsz'].real()
-            self._coordsys = self['coordsys'].string()
-            self._proj     = self['proj'].string()
+        # Query parameters for On/Off observation
+        if gammalib.toupper(self['onsrc'].string()) != 'NONE':
+            self['onrad'].real()
+
+        # Query parameters for binned if requested
+        elif enumbins > 0:
+            self['npix'].integer()
+            self['binsz'].real()
+            self['coordsys'].string()
+            self['proj'].string()
 
         # Set models if we have none
-        if self._obs.models().size() == 0:
-            self._obs.models(self['inmodel'].filename())
+        if self.obs().models().is_empty():
+            self.obs().models(self['inmodel'].filename())
 
-        # Read other parameters    
-        self._ntrials = self['ntrials'].integer()
-        self._edisp   = self['edisp'].boolean()
-        self._seed    = self['seed'].integer()
-        self._chatter = self['chatter'].integer()
+        # Query other parameters
+        self['ntrials'].integer()
+        self['edisp'].boolean()
+        self['seed'].integer()
+        self['chatter'].integer()
 
         # Query some parameters
         self['outfile'].filename()
@@ -123,14 +110,19 @@ class cspull(ctools.cscript):
             Summary string
         """
         # Extract information from observation
-        emin   = obs.events().ebounds().emin().TeV()
-        emax   = obs.events().ebounds().emax().TeV()
-        events = obs.events().number()
-        binned = (obs.events().classname() == 'GCTAEventCube')
-        if binned:
-            mode = 'binned'
+        if obs.classname() == 'GCTAOnOffObservation':
+            emin = obs.on_spec().ebounds().emin().TeV()
+            emax = obs.on_spec().ebounds().emax().TeV()
+            mode = 'On/Off'
         else:
-            mode = 'unbinned'
+            emin = obs.events().ebounds().emin().TeV()
+            emax = obs.events().ebounds().emax().TeV()
+            binned = (obs.events().classname() == 'GCTAEventCube')
+            if binned:
+                mode = 'binned'
+            else:
+                mode = 'unbinned'
+        events = obs.nobserved()
 
         # Compose summary string
         if events > 0:
@@ -156,42 +148,61 @@ class cspull(ctools.cscript):
             Dictionary of results
         """
         # Write header
-        if self._logNormal():
-            self._log.header2('Trial '+str(seed-self._seed+1))
+        self._log_header2(gammalib.NORMAL, 'Trial %d' %
+                          (seed-self['seed'].integer()+1))
 
-        # If we have a binned obeservation then specify the lower and
-        # upper energy limit in TeV
-        if self._enumbins > 0:
-            emin = self['emin'].real()
-            emax = self['emax'].real()
+        # Get number of energy bins and On source name and initialise
+        # some parameters
+        nbins     = self['enumbins'].integer()
+        onsrc     = self['onsrc'].string()
+        edisp     = self['edisp'].boolean()
+        statistic = self['statistic'].string()
+        emin      = None
+        emax      = None
+        binsz     = 0.0
+        npix      = 0
+        proj      = 'TAN'
+        coordsys  = 'CEL'
+
+        # If we have a On source name then set On region radius
+        if gammalib.toupper(onsrc) != 'NONE':
+            onrad = self['onrad'].real()
+            emin  = self['emin'].real()
+            emax  = self['emax'].real()
+            edisp = True   # Use always energy dispersion for On/Off
         else:
-            emin = None
-            emax = None
+
+            # Reset On region source name and radius
+            onrad = 0.0
+            onsrc = None
+
+            # If we have a binned obeservation then specify the lower and
+            # upper energy limit in TeV
+            if nbins > 0:
+                emin     = self['emin'].real()
+                emax     = self['emax'].real()
+                binsz    = self['binsz'].real()
+                npix     = self['npix'].integer()
+                proj     = self['proj'].string()
+                coordsys = self['coordsys'].string()
 
         # Simulate events
-        obs = obsutils.sim(self._obs,
-                           emin=emin,
-                           emax=emax,
-                           nbins=self._enumbins,
-                           addbounds=True,
-                           seed=seed,
-                           binsz=self._binsz,
-                           npix=self._npix,
-                           proj=self._proj,
-                           coord=self._coordsys,
-                           edisp=self._edisp,
-                           log=self._log_clients,
-                           debug=self._logDebug(),
-                           chatter=self._chatter)
+        obs = obsutils.sim(self.obs(),
+                           emin=emin, emax=emax, nbins=nbins,
+                           onsrc=onsrc, onrad=onrad,
+                           addbounds=True, seed=seed,
+                           binsz=binsz, npix=npix, proj=proj, coord=coordsys,
+                           edisp=edisp, log=False, debug=self._logDebug(),
+                           chatter=self['chatter'].integer())
 
         # Determine number of events in simulation
         nevents = 0.0
         for run in obs:
-            nevents += run.events().number()
+            nevents += run.nobserved()
 
         # Write simulation results
         self._log_header3(gammalib.NORMAL, 'Simulation')
-        for run in self._obs:
+        for run in self.obs():
             self._log_value(gammalib.NORMAL, 'Input observation %s' % run.id(),
                             self._obs_string(run))
         for run in obs:
@@ -201,19 +212,21 @@ class cspull(ctools.cscript):
 
         # Fit model
         if self['profile'].boolean():
-            models = self._obs.models()
+            models = self.obs().models()
             for model in models:
                 like = ctools.cterror(obs)
-                like['srcname'] = model.name()
-                like['edisp']   = self._edisp
-                like['debug']   = self._logDebug()
-                like['chatter'] = self._chatter
+                like['srcname']   = model.name()
+                like['edisp']     = edisp
+                like['statistic'] = statistic
+                like['debug']     = self._logDebug()
+                like['chatter']   = self['chatter'].integer()
                 like.run()
         else:
             like = ctools.ctlike(obs)
-            like['edisp']   = self._edisp
-            like['debug']   = self._logDebug()
-            like['chatter'] = self._chatter
+            like['edisp']     = edisp
+            like['statistic'] = statistic
+            like['debug']     = self._logDebug()
+            like['chatter']   = self['chatter'].integer()
             like.run()
 
         # Store results
@@ -222,8 +235,7 @@ class cspull(ctools.cscript):
         models = like.obs().models()
 
         # Write result header
-        if self._logNormal():
-            self._log.header3('Pulls')
+        self._log_header3(gammalib.NORMAL, 'Pulls')
 
         # Gather results in form of a list of result columns and a
         # dictionary containing the results. The result contains the
@@ -257,7 +269,7 @@ class cspull(ctools.cscript):
                     #               (fitted - true) / error
                     # In case that the error is 0 the pull is set to 99
                     fitted_value = par.value()
-                    real_value   = self._obs.models()[i][k].value()
+                    real_value   = self.obs().models()[i][k].value()
                     error        = par.error()
                     if error != 0.0:
                         pull = (fitted_value - real_value) / error
@@ -293,36 +305,20 @@ class cspull(ctools.cscript):
         self._get_parameters()
 
         # Write observation into logger
-        self._log_observations(gammalib.NORMAL, self._obs, 'Input observation')
+        self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
         # Write header
         self._log_header1(gammalib.TERSE, 'Generate pull distribution')
 
         # Loop over trials
-        for seed in range(self._ntrials):
+        for seed in range(self['ntrials'].integer()):
 
             # Make a trial and add initial seed
-            result = self._trial(seed + self._seed)
+            result = self._trial(seed + self['seed'].integer())
 
             # Write out trial result
             ioutils.write_csv_row(self['outfile'].filename().url(), seed,
                                   result['colnames'], result['values'])
-
-        # Return
-        return
-
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
 
         # Return
         return
@@ -337,7 +333,7 @@ class cspull(ctools.cscript):
             Set model container
         """
         # Set model container
-        self._obs.models(models)
+        self.obs().models(models)
 
         # Return
         return

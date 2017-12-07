@@ -37,6 +37,7 @@ eref,       r, h, 1.0,,, "Reference energy for differential limit (TeV)"
 emin,       r, h, 1.0,,, "Minimum energy for integral flux limit (TeV)"
 emax,       r, h, 100.0,,, "Maximum energy for integral flux limit (TeV)"
 tol,        r, h, 1e-5,,, "Computation tolerance"
+statistic,  s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statistic"
 max_iter,   i, h, 50,1,1000, "Maximum number of iterations"
 
 #

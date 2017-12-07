@@ -291,7 +291,7 @@ void ctlike::run(void)
     // Compute number of observed events in all observations
     double num_events = 0.0;
     for (int i = 0; i < m_obs.size(); ++i) {
-        double data = m_obs[i]->events()->number();
+        double data = m_obs[i]->nobserved();
         if (data >= 0.0) {
             num_events += data;
         }
@@ -378,34 +378,15 @@ void ctlike::save(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * Get all required task parameters from the parameter file or (if specified)
- * by querying the user. Observation dependent parameters will only be read
- * if the observation container is actually empty. Observation dependent
- * parameters are:
- * "stat" (statistics to be used for observation),
- * "caldb" (calibration database),
- * "irf" (instrument response function), and
- * "infile" (input file name).
- * The model will only be loaded if no model components exist in the
- * observation container.
- *
- * This method handles both loading of FITS files and of handling XML
- * observation definition files.
+ * Get all required task parameters from the parameter file.
  ***************************************************************************/
 void ctlike::get_parameters(void)
 {
     // Setup observations from "inobs" parameter
     setup_observations(m_obs);
 
-    // If only single observation is used, read statistics parameter
-    if (!m_use_xml) {
-
-        // Get other task parameters
-        std::string statistics = gammalib::toupper((*this)["stat"].string());
-
-        // Set statistics
-        (*m_obs[0]).statistics(statistics);
-    }
+    // Set observation statistic
+    set_obs_statistic(gammalib::toupper((*this)["statistic"].string()));
 
     // If there is are no models associated with the observations then
     // load now the model definition

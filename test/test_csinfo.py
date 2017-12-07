@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csinfo script.
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
-import cscripts
+#import gammalib
+#import cscripts
 from testing import test
 
 

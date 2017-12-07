@@ -22,12 +22,13 @@ import sys
 import gammalib
 import ctools
 from cscripts import obsutils
+from cscripts import ioutils
 
 
 # ================ #
 # csphasecrv class #
 # ================ #
-class csphasecrv(ctools.cscript):
+class csphasecrv(ctools.csobservation):
     """
     Generates spectra in phase bins
 
@@ -55,22 +56,17 @@ class csphasecrv(ctools.cscript):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'csphasecrv'
-        self._version = ctools.__version__
+        # Initialise application by calling the appropriate class constructor
+        self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise some members. Phases are stored in a nested list
         # [[ph1min,ph1max], [ph2min,ph2max],..]
-        self._srcname = ''
-        self._phbins  = [[0.0,1.0]]
-        self._stacked = False
-        self._fits    = gammalib.GFits()
-
-        # Initialise observation container from constructor arguments.
-        self._obs, argv = self._set_input_obs(argv)
-
-        # Initialise script by calling the appropriate class constructor.
-        self._init_cscript(argv)
+        self._srcname   = ''
+        self._phbins    = [[0.0,1.0]]
+        self._onoff     = False
+        self._stacked   = False
+        self._fits      = gammalib.GFits()
+        self._fitmodels = {}
 
         # Return
         return
@@ -82,11 +78,14 @@ class csphasecrv(ctools.cscript):
         """
         # Setup observations (require response and allow event list, don't
         # allow counts cube)
-        self._setup_observations(self._obs, True, True, False)
+        self._setup_observations(self.obs(), True, True, False)
+
+        # Set observation statistic
+        self._set_obs_statistic(gammalib.toupper(self['statistic'].string()))
 
         # Set models if there are none in the container
-        if self._obs.models().size() == 0:
-            self._obs.models(self['inmodel'].filename())
+        if self.obs().models().size() == 0:
+            self.obs().models(self['inmodel'].filename())
 
         # Get source name
         self._srcname = self['srcname'].string()
@@ -94,12 +93,17 @@ class csphasecrv(ctools.cscript):
         # Get phase boundaries
         self._phbins = self._create_tbounds()
 
+        # Set On/Off analysis flag and query relevant user parameters
+        self._onoff = self._is_onoff()
+
+        # If cube analysis is selected
         # Set stacked analysis flag and query relevant user parameters
-        self._stacked = self._is_stacked()
+        if not self._onoff:
+            self._stacked = self._is_stacked()
 
         # Query the hidden parameters, just in case
         self['edisp'].boolean()
-        
+
         # Read ahead output parameters
         if self._read_ahead():
             self['outfile'].filename()
@@ -174,7 +178,7 @@ class csphasecrv(ctools.cscript):
         names = []
 
         # Collect list of free parameter names
-        for par in self._obs.models()[self._srcname]:
+        for par in self.obs().models()[self._srcname]:
             if par.is_free():
                 names.append(par.name())
 
@@ -183,7 +187,7 @@ class csphasecrv(ctools.cscript):
 
     def _create_fits_table(self, results):
         """
-        Creates FITS binary table containing light curve results
+        Creates FITS binary table containing phase curve results
 
         Parameters
         ----------
@@ -193,7 +197,7 @@ class csphasecrv(ctools.cscript):
         Returns
         -------
         table : `~gammalib.GFitsBinTable`
-            FITS binary table containing light curve
+            FITS binary table containing phase curve
         """
         # Determine number of rows in FITS table
         nrows = len(results)
@@ -202,29 +206,13 @@ class csphasecrv(ctools.cscript):
         table = gammalib.GFitsBinTable(nrows)
         table.extname('PHASECURVE')
 
-        # Append phase columns "PHASE_MIN" and "PHASE_MAX"
-        phmin = gammalib.GFitsTableDoubleCol('PHASE_MIN', nrows)
-        phmax = gammalib.GFitsTableDoubleCol('PHASE_MAX', nrows)
-        for i, result in enumerate(results):
-            phmin[i] = result['phmin']
-            phmax[i] = result['phmax']
-        table.append(phmin)
-        table.append(phmax)
+        # Append phase columns
+        ioutils.append_result_column(table, results, 'PHASE_MIN', '', 'phmin')
+        ioutils.append_result_column(table, results, 'PHASE_MAX', '', 'phmax')
 
-        # Create parameter columns
-        for par in self._obs.models()[self._srcname]:
-            if par.is_free():
-                name   = par.name()
-                e_name = 'e_'+par.name()
-                col    = gammalib.GFitsTableDoubleCol(name, nrows)
-                e_col  = gammalib.GFitsTableDoubleCol(e_name, nrows)
-                col.unit(par.unit())
-                e_col.unit(par.unit())
-                for i, result in enumerate(results):
-                    col[i]   = result['values'][name]
-                    e_col[i] = result['values'][e_name]
-                table.append(col)
-                table.append(e_col)
+        # Append parameter columns
+        ioutils.append_model_par_column(table, self.obs().models()[self._srcname],
+                                        results)
 
         # Return table
         return table
@@ -254,11 +242,20 @@ class csphasecrv(ctools.cscript):
             
             # Store fit results
             phname = str(phmin)+'-'+str(phmax)
-            source = self._fitmodels[phname][self._srcname]
-            for par in pars:
-                result['values'][par]      = source[par].value()
-                result['values']['e_'+par] = source[par].error()
-            
+
+            # If the model contains the source of interest fill results
+            try:
+                source = self._fitmodels[phname][self._srcname]
+                for par in pars:
+                    result['values'][par]      = source[par].value()
+                    result['values']['e_'+par] = source[par].error()
+
+            # ... otherwise fills with zeros
+            except:
+                for par in pars:
+                    result['values'][par]      = 0.
+                    result['values']['e_'+par] = 0.
+
             # Append result to list of dictionaries
             results.append(result)
             
@@ -337,10 +334,10 @@ class csphasecrv(ctools.cscript):
         self._get_parameters()
 
         # Write observation into logger
-        self._log_observations(gammalib.NORMAL, self._obs, 'Observation')
+        self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
         
         # Store and clear observations to split them into phase bins
-        orig_obs = self._obs.copy()
+        orig_obs = self.obs().copy()
         
         # Dictionary to save phase fitted models
         self._fitmodels = {}
@@ -352,8 +349,8 @@ class csphasecrv(ctools.cscript):
         for phbin in self._phbins:
 
             # Write time bin into header
-            if self._logTerse():
-                self._log.header2('PHASE '+str(phbin[0])+'-'+str(phbin[1]))
+            self._log_header2(gammalib.TERSE, 'PHASE %f - %f' %
+                              (phbin[0], phbin[1]))
 
             # Select events
             select = ctools.ctselect(orig_obs)
@@ -366,63 +363,64 @@ class csphasecrv(ctools.cscript):
             select['dec']  = 'UNDEFINED'
             select['expr'] = 'PHASE>'+str(phbin[0])+' && PHASE<'+str(phbin[1])
             select.run()
-            
+
+            # Set phase string
+            phstr = str(phbin[0]) + '-' + str(phbin[1])
+
             # Add phase to observation id
             for i in range(0,select.obs().size()):
                 oldid = select.obs()[i].id()
-                select.obs()[i].id(oldid+'_'+str(phbin[0])+'-'+str(phbin[1]))
+                select.obs()[i].id(oldid+'_'+phstr)
             obs = select.obs()
             
-            # If a stacked analysis is requested then bin the events
-            # and compute the stacked response functions and setup
+            # If an On/Off analysis is requested generate the On/Off observations
+            if self._onoff:
+                obs = obsutils.get_onoff_obs(self, select.obs())
+
+            # ... otherwise, if stacked analysis is requested then bin the
+            # events and compute the stacked response functions and setup
             # an observation container with a single stacked observation.
-            if self._stacked:
-                #obs = self._bin_observation(select.obs())
+            elif self._stacked:
                 obs = obsutils.get_stacked_obs(self, select.obs())
-    
+
             # Header
-            if self._logExplicit():
-                self._log.header3('Fitting the data')
-    
-            # Do maximum likelihood model fitting
-            like = ctools.ctlike(obs)
-            like['edisp'] = self['edisp'].boolean()
-            like.run()
-            
-            # Renormalize models to phase selection
-            # TODO move the scaling from the temporal to the spectral component
-            for model in like.obs().models():
-                scaled_norm = model['Normalization'].value()/(phbin[1] - phbin[0])
-                model['Normalization'].value(scaled_norm)
-            
-            # Store fit model
-            self._fitmodels[str(phbin[0])+'-'+str(phbin[1])] = like.obs().models().copy()
+            self._log_header3(gammalib.EXPLICIT, 'Fitting the data')
+
+            # The On/Off analysis can produce empty observation containers,
+            # e.g., when on-axis observations are used. To avoid ctlike asking
+            # for a new observation container (or hang, if in interactive mode)
+            # we'll run ctlike only if the size is >0
+            if obs.size() > 0:
+
+                # Do maximum likelihood model fitting
+                like = ctools.ctlike(obs)
+                like['edisp'] = self['edisp'].boolean()
+                like.run()
+
+                # Renormalize models to phase selection
+                # TODO move the scaling from the temporal to the spectral component
+                for model in like.obs().models():
+                    scaled_norm = model['Normalization'].value()/(phbin[1]-phbin[0])
+                    model['Normalization'].value(scaled_norm)
+
+                # Store fit model
+                self._fitmodels[phstr] = like.obs().models().copy()
+
+            # ... otherwise we set an empty model container
+            else:
+                self._log_string(gammalib.TERSE,
+                                 'PHASE %f - %f: no observations available'
+                                 ' for fitting' %(phbin[0], phbin[1]))
+
+                # Set empty models container
+                self._fitmodels[phstr] = gammalib.GModels()
 
         # Create FITS file
         self._create_fits()
 
-        # Optionally publish light curve
+        # Optionally publish phase curve
         if self['publish'].boolean():
             self.publish()
-
-        # Return
-        return
-
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-
-        # Save fitted models
-        self.save()
 
         # Return
         return
@@ -452,12 +450,12 @@ class csphasecrv(ctools.cscript):
         # Write header
         self._log_header1(gammalib.TERSE, 'Publish phase curve')
 
-        # Continue only if light curve is valid
+        # Continue only if phase curve is valid
         if self._fits.contains('PHASECURVE'):
 
             # Set default name is user name is empty
             if not name:
-                user_name = self._name
+                user_name = self._name()
             else:
                 user_name = name
 

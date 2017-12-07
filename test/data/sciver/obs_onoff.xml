@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<observation_list title="observation list">
+  <observation name="Crab" id="0001" instrument="CTA" statistic="cstat">
+    <parameter name="Pointing" ra="83.63" dec="22.51" />
+    <parameter name="GoodTimeIntervals" tmin="0" tmax="900" />
+    <parameter name="TimeReference" mjdrefi="51544" mjdreff="0.5" timeunit="s" timesys="TT" timeref="LOCAL" />
+    <parameter name="Deadtime" deadc="0.98" />
+    <parameter name="Calibration" database="Prod2" response="South_0.5h" />
+  </observation>
+  <observation name="Crab" id="0002" instrument="CTA" statistic="cstat">
+    <parameter name="Pointing" ra="83.63" dec="21.51" />
+    <parameter name="GoodTimeIntervals" tmin="900" tmax="1800" />
+    <parameter name="TimeReference" mjdrefi="51544" mjdreff="0.5" timeunit="s" timesys="TT" timeref="LOCAL" />
+    <parameter name="Deadtime" deadc="0.98" />
+    <parameter name="Calibration" database="Prod2" response="South_0.5h" />
+  </observation>
+</observation_list>
+

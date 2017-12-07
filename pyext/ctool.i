@@ -100,6 +100,7 @@ public:
     %rename(_get_skydir)               get_skydir;
     %rename(_set_outfile_name)         set_outfile_name;
     %rename(_is_stacked)               is_stacked;
+    %rename(_is_onoff)                 is_onoff;
     %rename(_set_response)             set_response;
     %rename(_set_edisp)                set_edisp;
     %rename(_restore_edisp)            restore_edisp;
@@ -146,6 +147,7 @@ public:
 
     // Protected methods that query user parameters
     bool              is_stacked(void);
+    bool              is_onoff(void);
 
     // Protected support methods
     void              set_response(GObservations& obs);
@@ -242,11 +244,11 @@ def _set_input_obs(self, argv):
 cscript._set_input_obs = _set_input_obs 
 
 # Initialise application by calling the appropriate class constructor
-def _init_cscript(self, argv):
+def _init_cscript(self, name, version, argv):
     if len(argv) == 0:
-        cscript.__init__(self, self._name, self._version)
+        cscript.__init__(self, name, version)
     elif len(argv) == 1:
-        cscript.__init__(self, self._name, self._version, *argv)
+        cscript.__init__(self, name, version, *argv)
     else:
         raise TypeError('Invalid number of arguments given.')
     # Set logger properties
@@ -294,6 +296,14 @@ def _pardict(self, *args):
             self[key] = args[0][key]
     else:
         raise TypeError('pardict() takes 0 or 1 arguments (%d given)' % len(args))
-ctool.pardict = _pardict
+ctool.pardict   = _pardict
 cscript.pardict = _pardict
+
+# Execute the script
+def _execute(self):
+    self.logFileOpen()
+    self._read_ahead(True)
+    self.run()
+    self.save()
+cscript.execute = _execute
 %}

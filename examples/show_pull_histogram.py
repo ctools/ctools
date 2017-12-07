@@ -2,7 +2,7 @@
 # ==========================================================================
 # Shows the pull histogram
 #
-# Copyright (C) 2011-2016 Juergen Knoedlseder
+# Copyright (C) 2011-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 #
 # ==========================================================================
 import sys
-import csv
 import cscripts
 try:
     import matplotlib.pyplot as plt
@@ -58,8 +57,8 @@ def plot_pull_histogram(filename, parname, nbins, plotfile):
     values = np.array(cscripts.ioutils.read_pull_values(filename, parname))
 
     # Create histogram
-    n, bins, patches = plt.hist(values, nbins, range=[-4.0,4.0],
-                                normed=True, facecolor='green')
+    _, bins, _ = plt.hist(values, nbins, range=[-4.0,4.0],
+                          normed=True, facecolor='green')
 
     # Create expected distribution
     y = mlab.normpdf(bins, 0.0, 1.0)

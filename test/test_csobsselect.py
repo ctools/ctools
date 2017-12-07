@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import cscripts
 from testing import test
@@ -92,7 +91,7 @@ class Test(test):
                           ' outobs="csobsselect_cmd2.xml"'+ \
                           ' pntselect="CIRCLE" coordsys="CEL" ra=83.63'+ \
                           ' dec=22.01 rad=5.0'+ \
-                          ' logfile="csobsselect_cmd2.log" chatter=2'
+                          ' logfile="csobsselect_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

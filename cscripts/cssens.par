@@ -28,18 +28,19 @@ outfile, f, h, sensitivity.dat,,, "Output sensitivity ASCII file"
 #
 # Script parameters
 #==================
-offset,   r, h, 0.0,,, "Source offset angle (deg)"
-duration, r, a, 180000.0,,, "Effective exposure time (s)"
-rad,      r, a, 5.0,,, "Radius of ROI (deg)"
-emin,     r, a, 0.03163,,, "Lower energy limit (TeV)"
-emax,     r, a, 125.8925,,, "Upper energy limit (TeV)"
-bins,     i, a, 18,,, "Number of energy bins for differential sensitivity computation"
-enumbins, i, h, 0,,, "Number of energy bins for binned analysis (0=unbinned)"
-npix,     i, h, 200,,, "Number of pixels for binned analysis"
-binsz,    r, h, 0.05,,, "Pixel size for binned analysis (deg/pixel)"
-type,     s, h, Differential,Differential|Integral,, "Sensitivity type"
-sigma,    r, h, 5.0,,, "Significance threshold (Gaussian sigma)"
-max_iter, i, h, 50,,, "Maximum number of iterations"
+offset,    r, h, 0.0,,, "Source offset angle (deg)"
+duration,  r, a, 180000.0,,, "Effective exposure time (s)"
+rad,       r, a, 5.0,,, "Radius of ROI (deg)"
+emin,      r, a, 0.03163,,, "Lower energy limit (TeV)"
+emax,      r, a, 125.8925,,, "Upper energy limit (TeV)"
+bins,      i, a, 18,,, "Number of energy bins for differential sensitivity computation"
+enumbins,  i, h, 0,,, "Number of energy bins for binned analysis (0=unbinned)"
+npix,      i, h, 200,,, "Number of pixels for binned analysis"
+binsz,     r, h, 0.05,,, "Pixel size for binned analysis (deg/pixel)"
+type,      s, h, Differential,Differential|Integral,, "Sensitivity type"
+sigma,     r, h, 5.0,,, "Significance threshold (Gaussian sigma)"
+max_iter,  i, h, 50,,, "Maximum number of iterations"
+statistic, s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statistic"
 
 #
 # Standard parameters

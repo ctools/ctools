@@ -1,7 +1,7 @@
 # ==========================================================================
 # Utility functions for input and output
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 import csv
 import sys
 import gammalib
-import ctools
+#import ctools
 
 
 # ========================= #
@@ -193,3 +193,89 @@ def get_args_options(options, usage):
 
     # Return arguments and options
     return args, options
+
+
+# =========================================== #
+# Append model parameter column to FITS table #
+# =========================================== #
+def append_result_column(table, results, name, unit, key):
+    """
+    Append result column to FITS table
+
+    Parameters
+    ----------
+    table : `~gammalib.GFitsTable`
+        FITS table
+    results : list of dict
+        Parameter values
+    name : str
+        Column name
+    unit : str
+        Column unit
+    key : str
+        Result key
+    """
+    # Determine number of rows in FITS table
+    nrows = len(results)
+
+    # Allocate double precision column and set units
+    col = gammalib.GFitsTableDoubleCol(name, nrows)
+    col.unit(unit)
+
+    # Fill results in columns
+    for i, result in enumerate(results):
+        col[i] = result[key]
+
+    # Append column to table
+    table.append(col)
+
+    # Return
+    return
+
+
+# =========================================== #
+# Append model parameter column to FITS table #
+# =========================================== #
+def append_model_par_column(table, model, results):
+    """
+    Append model parameter column to FITS table
+
+    Parameters
+    ----------
+    table : `~gammalib.GFitsTable`
+        FITS table
+    model : `~gammalib.GModel`
+        Model
+    results : list of dict
+        Parameter values
+    """
+    # Determine number of rows in FITS table
+    nrows = len(results)
+
+    # Loop over all parameters in model
+    for par in model:
+
+        # Append parameter column only if model parameter is free
+        if par.is_free():
+
+            # Set column names
+            name   = par.name()
+            e_name = 'e_'+par.name()
+
+            # Allocate double precision columns and set units
+            col    = gammalib.GFitsTableDoubleCol(name, nrows)
+            e_col  = gammalib.GFitsTableDoubleCol(e_name, nrows)
+            col.unit(par.unit())
+            e_col.unit(par.unit())
+
+            # Fill results in columns
+            for i, result in enumerate(results):
+                col[i]   = result['values'][name]
+                e_col[i] = result['values'][e_name]
+
+            # Append columns to table
+            table.append(col)
+            table.append(e_col)
+
+    # Return
+    return

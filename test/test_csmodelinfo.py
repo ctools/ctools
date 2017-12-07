@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
+#import gammalib
 import cscripts
 from testing import test
 
@@ -91,7 +91,7 @@ class Test(test):
         # Setup csmodelinfo command
         cmd = csmodelinfo+' inmodel="model_that_does_not_exist.xml"'+ \
                           ' outds9file="csmodelinfo_cmd2.reg"'+ \
-                          ' logfile="csmodelinfo_cmd2.log"'
+                          ' logfile="csmodelinfo_cmd2.log" debug=yes'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

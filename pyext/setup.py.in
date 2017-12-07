@@ -1,7 +1,7 @@
 #############################################################################
 # Disutils setup file for ctools Python extension module                    #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2016 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -84,9 +84,9 @@ if os.path.exists(prefix+'/lib'):
 # in the src directory. Once we added the ctools script we had to
 # add an explicit filter to avoid appending those.
 dirs = glob.glob('@top_srcdir@/src/ct*')
-for dir in dirs:
-    if len(dir) > 0 and 'ctools' not in dir:
-        path = os.path.abspath(dir)
+for d in dirs:
+    if len(d) > 0 and 'ctools' not in d:
+        path = os.path.abspath(d)
         include_dirs.append(path)
 include_dirs.append(os.path.abspath('@top_srcdir@/src/support'))
 
@@ -100,18 +100,18 @@ for extra_lib in extra_libs:
 extra_lib_paths = ('@LDFLAGS@').split(' ')
 for extra_lib_path in extra_lib_paths:
     if extra_lib_path.lstrip().find('-L') == 0:
-        dir = extra_lib_path.lstrip().lstrip('-L')
-        if len(dir) > 0:
-            library_dirs.append(dir)
-            runtime_library_dirs.append(dir)
+        d = extra_lib_path.lstrip().lstrip('-L')
+        if len(d) > 0:
+            library_dirs.append(d)
+            runtime_library_dirs.append(d)
 
 # Get extra include directories
 extra_include_dirs = ('@CPPFLAGS@').split(' ')
 for extra_include_dir in extra_include_dirs:
     if extra_include_dir.lstrip().find('-I') == 0:
-        dir = extra_include_dir.lstrip().lstrip('-I')
-        if len(dir) > 0:
-            include_dirs.append(dir)
+        d = extra_include_dir.lstrip().lstrip('-I')
+        if len(d) > 0:
+            include_dirs.append(d)
 
 # Set data files to install.
 data_files=[(prefix+'/share/ctools/swig', install_files)]

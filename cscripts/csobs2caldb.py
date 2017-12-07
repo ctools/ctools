@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # ==========================================================================
-# Creates a calibration database entry for an IACT observation.
+# Creates a calibration database entry for an IACT observation
 #
 # Copyright (C) 2015-2017 Michael Mayer
 #
@@ -29,7 +29,7 @@ from cscripts import calutils
 # ================= #
 # csobs2caldb class #
 # ================= #
-class csobs2caldb(ctools.cscript):
+class csobs2caldb(ctools.csobservation):
     """
     Creates a calibration database entry for an IACT observation.
     
@@ -46,9 +46,8 @@ class csobs2caldb(ctools.cscript):
         """
         Constructor
         """
-        # Set name and version
-        self._name    = 'csobs2caldb'
-        self._version = ctools.__version__
+        # Initialise application by calling the appropriate class constructor
+        self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise members
         self._observation = gammalib.GCTAObservation()
@@ -60,12 +59,6 @@ class csobs2caldb(ctools.cscript):
         self._rsp_dir     = ''
         self._caldb_inx   = gammalib.GFits()
         self._irf_fits    = gammalib.GFits()
-
-        # Initialise observation container from constructor arguments.
-        self._obs, argv = self._set_input_obs(argv)
-        
-        # Initialise script by calling the appropriate class constructor.
-        self._init_cscript(argv)
 
         # Return
         return
@@ -81,11 +74,11 @@ class csobs2caldb(ctools.cscript):
         """
         # Load observation container from "inobs" parameter in case that
         # the observation container is still empty.
-        if self._obs.is_empty():
-            self._obs = gammalib.GObservations(self['inobs'].filename())
+        if self.obs().is_empty():
+            self.obs(gammalib.GObservations(self['inobs'].filename()))
 
         # Raise an exception if the observation container is empty
-        if self._obs.is_empty():
+        if self.obs().is_empty():
             raise ValueError('No or empty observation provided for '
                              'parameter "inobs".')
         
@@ -93,12 +86,12 @@ class csobs2caldb(ctools.cscript):
         index = self['index'].integer()
 
         # Raise an exception if the index is not valid
-        if index < 0 or index >= self._obs.size():
+        if index < 0 or index >= self.obs().size():
             raise IndexError('Parameter "index=%d" outside the validity '
-                             'range [0,%d].' % (index, self._obs.size()))
+                             'range [0,%d].' % (index, self.obs().size()))
         
         # Get observation
-        self._observation = self._obs[index]
+        self._observation = self.obs()[index]
 
         # Make sure we have a CTA observation
         if not self._observation.classname() == 'GCTAObservation':
@@ -390,25 +383,6 @@ class csobs2caldb(ctools.cscript):
         # Save response file
         self._irf_fits.saveto(filename, self._clobber())
         
-        # Return
-        return
-        
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-
-        # Save to disk
-        self.save()
-
         # Return
         return
 

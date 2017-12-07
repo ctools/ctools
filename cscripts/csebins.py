@@ -27,7 +27,7 @@ import ctools
 # ============= #
 # csebins class #
 # ============= #
-class csebins(ctools.cscript):
+class csebins(ctools.csobservation):
     """
     Generates energy boundaries for stacked analysis
     """
@@ -37,18 +37,11 @@ class csebins(ctools.cscript):
         """
         Constructor
         """
-        # Set name and version
-        self._name    = 'csebins'
-        self._version = ctools.__version__
+        # Initialise application by calling the appropriate class constructor
+        self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Set members
         self._ebounds = gammalib.GEbounds()
-
-        # Initialise observation container from constructor arguments.
-        self._obs, argv = self._set_input_obs(argv)
-
-        # Initialise script by calling the appropriate class constructor.
-        self._init_cscript(argv)
 
         # Return
         return
@@ -60,7 +53,7 @@ class csebins(ctools.cscript):
         Get parameters from parfile
         """
         # Initialise observation container if it is currently empty
-        if self._obs.size() == 0:
+        if self.obs().size() == 0:
 
             # Query "inobs" parameter
             filename = self['inobs'].filename()
@@ -68,13 +61,13 @@ class csebins(ctools.cscript):
             # If an observation definition file was provided then load it,
             # otherwise build a single observation with response information
             if self._is_valid_filename(filename):
-                self._obs = gammalib.GObservations(filename)
+                self.obs(gammalib.GObservations(filename))
             else:
                 cta   = gammalib.GCTAObservation()
                 caldb = gammalib.GCaldb('cta', self['caldb'].string())
                 rsp   = gammalib.GCTAResponseIrf(self['irf'].string(), caldb)
                 cta.response(rsp)
-                self._obs.append(cta)
+                self.obs().append(cta)
 
         # Query input parameters
         self['emin'].real()
@@ -260,13 +253,13 @@ class csebins(ctools.cscript):
         self._get_parameters()
 
         # Write observation into logger
-        self._log_observations(gammalib.NORMAL, self._obs, 'Input observation')
+        self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
         # Write header
         self._log_header1(gammalib.TERSE, 'Define energy boundaries')
 
         # Define energy boundaries for observation container
-        self._set_ebounds(self._obs)
+        self._set_ebounds(self.obs())
 
         # Return
         return
@@ -301,25 +294,6 @@ class csebins(ctools.cscript):
         """
         # Return
         return self._ebounds
-
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the scrip
-        self.run()
-
-        # Save energy boundaries
-        self.save()
-
-        # Return
-        return
 
 
 # ======================== #

@@ -33,7 +33,7 @@ class Test(test):
     This test class makes unit tests for the cspull script by using it
     from the command line and from Python.
     """
-    
+
     # Constructor
     def __init__(self):
         """
@@ -43,6 +43,7 @@ class Test(test):
         test.__init__(self)
 
         # Set members
+        self._model         = self._datadir + '/model_crab_radialacceptance.xml'
         self._inobs         = self._datadir + '/obs_stacked.xml'
         self._inobs_two     = self._datadir + '/obs_stacked_two.xml'
         self._stacked_model = self._datadir + '/crab_bkgcube.xml'
@@ -74,7 +75,7 @@ class Test(test):
         cspull = self._script('cspull')
 
         # Setup cspull command
-        cmd = cspull+' inmodel="'+self._model+'"'+ \
+        cmd = cspull+' inmodel="'+self._model+'" onsrc="NONE"'+ \
                      ' outfile="cspull_cmd1.dat"'+ \
                      ' ntrials=2'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
@@ -95,14 +96,14 @@ class Test(test):
         self._check_pull_file('cspull_cmd1.dat')
 
         # Setup cspull command
-        cmd = cspull+' inmodel="model_that_does_not_exist.xml"'+ \
+        cmd = cspull+' inmodel="model_that_does_not_exist.xml" onsrc="NONE"'+ \
                      ' outfile="cspull_cmd1.dat"'+ \
                      ' ntrials=2'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ra=83.6331 dec=22.0145 emin=0.1 emax=100.0'+ \
                      ' enumbins=0 tmin=0.0 tmax=100.0 deadc=0.98 rad=5.0'+ \
                      ' npix=200 binsz=0.05'+ \
-                     ' logfile="cspull_cmd2.log"'
+                     ' logfile="cspull_cmd2.log" debug=yes'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -122,6 +123,7 @@ class Test(test):
         # Set-up unbinned cspull
         pull = cscripts.cspull()
         pull['inmodel']  = self._model
+        pull['onsrc']    = 'NONE'
         pull['outfile']  = 'cspull_py1.dat'
         pull['ntrials']  = 2
         pull['caldb']    = self._caldb
@@ -149,6 +151,7 @@ class Test(test):
         # Set-up binned cspull
         pull = cscripts.cspull()
         pull['inmodel']  = self._model
+        pull['onsrc']    = 'NONE'
         pull['outfile']  = 'cspull_py2.dat'
         pull['ntrials']  = 1
         pull['caldb']    = self._caldb
@@ -178,6 +181,7 @@ class Test(test):
         # Set-up cspull from event list
         pull = cscripts.cspull()
         pull['inobs']    = self._events
+        pull['onsrc']    = 'NONE'
         pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py3.dat'
         pull['ntrials']  = 1
@@ -201,6 +205,7 @@ class Test(test):
         # Set-up cspull from observation container with unbinned observation
         pull = cscripts.cspull(obs)
         pull['inmodel']  = self._model
+        pull['onsrc']    = 'NONE'
         pull['outfile']  = 'cspull_py4.dat'
         pull['ntrials']  = 1
         pull['caldb']    = self._caldb
@@ -220,6 +225,7 @@ class Test(test):
         pull = cscripts.cspull()
         pull['inobs']    = self._inobs
         pull['inmodel']  = self._stacked_model
+        pull['onsrc']    = 'NONE'
         pull['outfile']  = 'cspull_py5.dat'
         pull['ntrials']  = 1
         pull['enumbins'] = 0
@@ -239,6 +245,7 @@ class Test(test):
         pull = cscripts.cspull()
         pull['inobs']    = self._inobs_two
         pull['inmodel']  = self._model
+        pull['onsrc']    = 'NONE'
         pull['outfile']  = 'cspull_py6.dat'
         pull['ntrials']  = 1
         pull['emin']     = 0.02

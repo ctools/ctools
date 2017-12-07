@@ -89,7 +89,7 @@ class Test(test):
                      ' inmodel='+self._model+ \
                      ' caldb='+self._caldb+' irf='+self._irf+ \
                      ' edisp=no'+ \
-                     ' logfile="ctprob_cmd2.log" chatter=1'
+                     ' logfile="ctprob_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -202,7 +202,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, nevents=6141):
+    def _check_result_file(self, filename, nevents=3736):
         """
         Check result file
 
@@ -232,7 +232,7 @@ class Test(test):
         return
 
     # Check observation and event list
-    def _check_obs(self, obs, nobs=1, nevents=6141):
+    def _check_obs(self, obs, nobs=1, nevents=22220):
         """
         Check observation and event list
 
@@ -257,7 +257,7 @@ class Test(test):
         return
 
     # Check events
-    def _check_events(self, events, nevents=6141):
+    def _check_events(self, events, nevents=22220):
         """
         Check event list
 

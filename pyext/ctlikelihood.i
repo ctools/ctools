@@ -1,7 +1,7 @@
 /***************************************************************************
  *              ctlikelihood - Base class for likelihood tools             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016 by Juergen Knoedlseder                              *
+ *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -90,7 +90,7 @@ public:
     // Methods
     const GOptimizer* opt(void) const;
 
-    // Make methods private in Python by prepending an underscore
+    // Make methods protected in Python by prepending an underscore
     %rename(_evaluate) evaluate;
 
     // Protected methods
@@ -139,15 +139,23 @@ public:
 # The function supports either an observation container, or an argument
 # list or no argument as "argv" parameter. The function also writes the
 # header in the log file and switches the date on for logging.
-def _init_cslikelihood(self, argv):
+def _init_cslikelihood(self, name, version, argv):
     if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
-        cslikelihood.__init__(self, self._name, self._version, argv[0])
+        cslikelihood.__init__(self, name, version, argv[0])
     elif len(argv) > 0:
-        cslikelihood.__init__(self, self._name, self._version, *argv)
+        cslikelihood.__init__(self, name, version, *argv)
     else:
-        cslikelihood.__init__(self, self._name, self._version)
+        cslikelihood.__init__(self, name, version)
     # Set logger properties
     self._log_header()
     self._log.date(True)
 cslikelihood._init_cslikelihood = _init_cslikelihood
+
+# Execute the script
+def _execute(self):
+    self.logFileOpen()
+    self._read_ahead(True)
+    self.run()
+    self.save()
+cslikelihood.execute = _execute
 %}

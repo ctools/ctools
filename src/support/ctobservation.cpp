@@ -195,53 +195,9 @@ ctobservation& ctobservation::operator=(const ctobservation& app)
 
 /*==========================================================================
  =                                                                         =
- =                             Private methods                             =
+ =                   Protected methods exposed in Python                   =
  =                                                                         =
  ==========================================================================*/
-
-/***********************************************************************//**
- * @brief Initialise class members
- ***************************************************************************/
-void ctobservation::init_members(void)
-{
-    // Initialise protected members
-    m_obs.clear();
-
-    // Initialise private members
-    m_index_unbinned = 0;
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Copy class members
- *
- * @param[in] app Observation tool.
- ***************************************************************************/
-void ctobservation::copy_members(const ctobservation& app)
-{
-    // Copy protected members
-    m_obs = app.m_obs;
-
-    // Copy private members
-    m_index_unbinned = app.m_index_unbinned;
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Delete class members
- ***************************************************************************/
-void ctobservation::free_members(void)
-{
-    // Return
-    return;
-}
-
 
 /***********************************************************************//**
  * @brief Return first unbinned CTA observation (const version)
@@ -257,6 +213,15 @@ const GCTAObservation* ctobservation::first_unbinned_observation(void) const
 {
     // Initialise index
     m_index_unbinned = 0;
+
+    // Initialise OGIP members
+    m_ogip_telescope.clear();
+    m_ogip_tstart.clear();
+    m_ogip_tstop.clear();
+    m_ogip_telapse  = 0.0;
+    m_ogip_exposure = 0.0;
+    m_ogip_ontime   = 0.0;
+    m_ogip_livetime = 0.0;
 
     // Get next unbinned CTA observation
     const GCTAObservation* obs = next_unbinned_observation();
@@ -323,8 +288,137 @@ const GCTAObservation* ctobservation::next_unbinned_observation(void) const
 
     } // endfor: looped over all observation
 
+    // Update OGIP members
+    if (obs != NULL) {
+        if (m_ogip_telapse == 0.0) {
+            m_ogip_telescope = obs->instrument();
+            m_ogip_tstart    = obs->gti().tstart();
+            m_ogip_tstop     = obs->gti().tstop();
+            m_ogip_telapse   = obs->gti().telapse();
+            m_ogip_exposure  = obs->ontime();
+            m_ogip_ontime    = obs->ontime();
+            m_ogip_livetime  = obs->livetime();
+        }
+        else {
+            if (obs->gti().tstart() < m_ogip_tstart) {
+                m_ogip_tstart = obs->gti().tstart();
+            }
+            if (obs->gti().tstop() > m_ogip_tstop) {
+                m_ogip_tstop = obs->gti().tstop();
+            }
+            m_ogip_telapse  += obs->gti().telapse();
+            m_ogip_exposure += obs->ontime();
+            m_ogip_ontime   += obs->ontime();
+            m_ogip_livetime += obs->livetime();
+        }
+    }
+
     // Return next CTA observation
     return obs;
+}
+
+
+/***********************************************************************//**
+ * @brief Write OGIP keywords in FITS HDU
+ *
+ * @param[in,out] hdu Pointer to FITS HDU.
+ *
+ * Writes OGIP keywords in FITS HDU.
+ ***************************************************************************/
+void ctobservation::write_ogip_keywords(GFitsHDU* hdu) const
+{
+    // Continue only if pointer is valid
+    if (hdu != NULL) {
+
+        // Set creator
+        std::string creator = this->name() + " v" + this->version();
+
+        // Compute times
+        std::string utc_obs  = m_ogip_tstart.utc();
+        std::string utc_end  = m_ogip_tstop.utc();
+        std::string date_obs = utc_obs.substr(0, 10);
+        std::string time_obs = utc_obs.substr(11, 8);
+        std::string date_end = utc_end.substr(0, 10);
+        std::string time_end = utc_end.substr(11, 8);
+
+        // Compute deadtime correction
+        double deadc = (m_ogip_ontime > 0.0) ? m_ogip_livetime / m_ogip_ontime : 1.0;
+
+        // Set observation information
+        hdu->card("CREATOR",  creator,          "Program which created the file");
+        hdu->card("TELESCOP", m_ogip_telescope, "Telescope");
+
+        // Set observation time information
+        hdu->card("DATE_OBS", date_obs,        "Observation start date");
+        hdu->card("TIME_OBS", time_obs,        "Observation start time");
+        hdu->card("DATE_END", date_end,        "Observation end date");
+        hdu->card("TIME_END", time_end,        "Observation end time");
+        hdu->card("TELAPSE",  m_ogip_telapse,  "[s] Elapsed time");
+        hdu->card("ONTIME",   m_ogip_ontime,   "[s] Total good time including deadtime");
+        hdu->card("LIVETIME", m_ogip_livetime, "[s] Total livetime");
+        hdu->card("EXPOSURE", m_ogip_exposure, "[s] Exposure time");
+        hdu->card("DEADC",    deadc,           "Deadtime correction factor");
+
+    } // endif: pointer was valid
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Set fit statistic for CTA observations
+ *
+ * @param[in] statistic Requested fit statistic.
+ *
+ * Sets the fit statistic for all CTA observations. The method handles
+ * regular CTA observations as well as On/Off observations.
+ *
+ * For regular CTA observations of type GCTAObservation the fit statistic is
+ * only set for binned or stacked observations. Possible values are
+ * @c POISSON, @c GAUSSIAN or @c CHI2 (case insensitive).
+ *
+ * For On/Off CTA observations of type GCTAOnOffObservation the fit statistic
+ * is always set. Possible values are @c POISSON, @c CSTAT or @c WSTAT (case
+ * insensitive).
+ *
+ * If @p statistic is any other string the fit statistic of the observations
+ * will not be modified.
+ ***************************************************************************/
+void ctobservation::set_obs_statistic(const std::string& statistic)
+{
+    // Convert statistic to upper case
+    std::string ustatistic = gammalib::toupper(statistic);
+
+    // Flag which observation types are handled
+    bool handle_cta   = ((ustatistic == "POISSON")  ||
+                         (ustatistic == "GAUSSIAN") ||
+                         (ustatistic == "CHI2"));
+    bool handle_onoff = ((ustatistic == "POISSON") ||
+                         (ustatistic == "CSTAT")   ||
+                         (ustatistic == "WSTAT"));
+
+    // Loop over all observation in container
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // For regular CTA observations only set statistic for binned or
+        // stacked observations
+        if ((m_obs[i]->classname() == "GCTAObservation") && handle_cta) {
+            if (m_obs[i]->events()->classname() == "GCTAEventCube") {
+                m_obs[i]->statistic(statistic);
+            }
+        }
+
+        // For On/Off CTA observations always set statistic
+        else if ((m_obs[i]->classname() == "GCTAOnOffObservation") &&
+                 handle_onoff) {
+            m_obs[i]->statistic(statistic);
+        }
+
+    } // endfor: looped over all observations
+
+    // Return
+    return;
 }
 
 
@@ -443,6 +537,70 @@ void ctobservation::save_events_xml(void)
     // Save observations in XML file
     m_obs.save(outobs);
 
+    // Return
+    return;
+}
+
+
+/*==========================================================================
+ =                                                                         =
+ =                           Protected methods                             =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Initialise class members
+ ***************************************************************************/
+void ctobservation::init_members(void)
+{
+    // Initialise protected members
+    m_obs.clear();
+
+    // Initialise private members
+    m_ogip_telescope.clear();
+    m_ogip_tstart.clear();
+    m_ogip_tstop.clear();
+    m_ogip_telapse   = 0.0;
+    m_ogip_exposure  = 0.0;
+    m_ogip_ontime    = 0.0;
+    m_ogip_livetime  = 0.0;
+    m_index_unbinned = 0;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Copy class members
+ *
+ * @param[in] app Observation tool.
+ ***************************************************************************/
+void ctobservation::copy_members(const ctobservation& app)
+{
+    // Copy protected members
+    m_obs = app.m_obs;
+
+    // Copy private members
+    m_ogip_telescope = app.m_ogip_telescope;
+    m_ogip_tstart    = app.m_ogip_tstart;
+    m_ogip_tstop     = app.m_ogip_tstop;
+    m_ogip_telapse   = app.m_ogip_telapse;
+    m_ogip_exposure  = app.m_ogip_exposure;
+    m_ogip_ontime    = app.m_ogip_ontime;
+    m_ogip_livetime  = app.m_ogip_livetime;
+    m_index_unbinned = app.m_index_unbinned;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Delete class members
+ ***************************************************************************/
+void ctobservation::free_members(void)
+{
     // Return
     return;
 }

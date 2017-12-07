@@ -32,10 +32,12 @@ import test_cslightcrv
 import test_csmodelinfo
 import test_csmodelmerge
 import test_csmodelselect
+import test_csmodelsois
 import test_csobs2caldb
 import test_csobsdef
 import test_csobsinfo
 import test_csobsselect
+import test_csphagen
 import test_csphasecrv
 import test_cspull
 import test_csresmap
@@ -48,6 +50,7 @@ import test_cstsmapmerge
 import test_cstsmapsplit
 import test_csviscube
 import test_csworkflow
+import test_obsutils
 import test_csiactcopy
 import test_csiactdata
 import test_csiactobs
@@ -121,10 +124,12 @@ def test(installed=False, debug=False):
              test_csmodelinfo.Test(),
              test_csmodelmerge.Test(),
              test_csmodelselect.Test(),
+             test_csmodelsois.Test(),
              test_csobs2caldb.Test(),
              test_csobsdef.Test(),
              test_csobsinfo.Test(),
              test_csobsselect.Test(),
+             test_csphagen.Test(),
              test_csphasecrv.Test(),
              test_cspull.Test(),
              test_csresmap.Test(),
@@ -136,7 +141,8 @@ def test(installed=False, debug=False):
              test_cstsmapmerge.Test(),
              test_cstsmapsplit.Test(),
              test_csviscube.Test(),
-             test_csworkflow.Test()]
+             test_csworkflow.Test(),
+             test_obsutils.Test()]
 
     # Append tests for Python 2.6+ (the IACT cscripts depend on the json
     # module which is only available since Python 2.6+)
@@ -145,7 +151,7 @@ def test(installed=False, debug=False):
 
         # Check for VHEFITS environment variable
         if 'VHEFITS' in os.environ:
-            
+
             # If the environment variable exists then unset it for the test
             # cases. Since Python is executed in a subprocess this will not
             # impact the environment variable in the parent shell.

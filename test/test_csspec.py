@@ -43,11 +43,14 @@ class Test(test):
         test.__init__(self)
 
         # Set members
-        self._inobs     = self._datadir + '/crab_cntmap_small.fits'
-        self._expcube   = self._datadir + '/crab_expcube.fits'
-        self._psfcube   = self._datadir + '/crab_psfcube.fits'
-        self._edispcube = self._datadir + '/crab_edispcube.fits'
-        self._bkgcube   = self._datadir + '/crab_bkgcube.fits'
+        self._inobs       = self._datadir + '/crab_cntmap_small.fits'
+        self._inonoff     = self._datadir + '/onoff_obs.xml'
+        self._expcube     = self._datadir + '/crab_expcube.fits'
+        self._psfcube     = self._datadir + '/crab_psfcube.fits'
+        self._edispcube   = self._datadir + '/crab_edispcube.fits'
+        self._bkgcube     = self._datadir + '/crab_bkgcube.fits'
+        self._bkgmodel    = self._datadir + '/crab_bkgcube.xml'
+        self._onoff_model = self._datadir + '/onoff_model.xml'
 
         # Return
         return
@@ -78,7 +81,7 @@ class Test(test):
         # Setup csspec command
         cmd = csspec+' inobs="'+self._events+'"'+ \
                      ' inmodel="'+self._model+'"'+ \
-                     ' srcname="Crab"'+ \
+                     ' srcname="Crab" method="AUTO"'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ebinalg="LOG" enumbins=5 emin=0.1 emax=100.0'+ \
                      ' outfile="csspec_cmd1.fits"'+ \
@@ -98,11 +101,11 @@ class Test(test):
         # Setup csspec command
         cmd = csspec+' inobs="input_file_that_does_not_exist.fits"'+ \
                      ' inmodel="'+self._model+'"'+ \
-                     ' srcname="Crab"'+ \
+                     ' srcname="Crab" method="AUTO"'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ebinalg="LOG" enumbins=5 emin=0.1 emax=100.0'+ \
                      ' outfile="csspec_cmd2.fits"'+ \
-                     ' logfile="csspec_cmd2.log" chatter=1'
+                     ' logfile="csspec_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -126,11 +129,12 @@ class Test(test):
         spec['srcname']  = 'Crab'
         spec['caldb']    = self._caldb
         spec['irf']      = self._irf
-        spec['outfile']  = 'csspec_py1.fits'
+        spec['method']   = 'AUTO'
         spec['ebinalg']  = 'LOG'
         spec['enumbins'] = 5
         spec['emin']     = 0.1
         spec['emax']     = 100.0
+        spec['outfile']  = 'csspec_py1.fits'
         spec['logfile']  = 'csspec_py1.log'
         spec['chatter']  = 2
         spec['publish']  = True
@@ -140,23 +144,24 @@ class Test(test):
         spec.run()
         spec.save()
 
-        # Check pull distribution file
+        # Check result file
         self._check_result_file('csspec_py1.fits', 5)
 
-        # Set-up binned csspec
+        # Set-up stacked csspec
         spec = cscripts.csspec()
         spec['inobs']     = self._inobs
         spec['expcube']   = self._expcube
         spec['psfcube']   = self._psfcube
         spec['edispcube'] = self._edispcube
         spec['bkgcube']   = self._bkgcube
-        spec['inmodel']   = self._model
+        spec['inmodel']   = self._bkgmodel
         spec['srcname']   = 'Crab'
-        spec['outfile']   = 'csspec_py2.fits'
+        spec['method']    = 'AUTO'
         spec['ebinalg']   = 'LOG'
         spec['enumbins']  = 2
         spec['emin']      = 0.1
         spec['emax']      = 100.0
+        spec['outfile']   = 'csspec_py2.fits'
         spec['logfile']   = 'csspec_py2.log'
         spec['chatter']   = 3
         spec['publish']   = False
@@ -164,8 +169,71 @@ class Test(test):
         # Execute csspec script
         spec.execute()
 
-        # Check pull distribution file
+        # Check result file
         self._check_result_file('csspec_py2.fits', 2)
+
+        # Set-up On/Off csspec
+        spec = cscripts.csspec()
+        spec['inobs']    = self._inonoff
+        spec['inmodel']  = self._onoff_model
+        spec['srcname']  = 'Crab'
+        spec['method']   = 'AUTO'
+        spec['ebinalg']  = 'LOG'
+        spec['enumbins'] = 10
+        spec['emin']     = 0.1
+        spec['emax']     = 10.0
+        spec['outfile']  = 'csspec_py3.fits'
+        spec['logfile']  = 'csspec_py3.log'
+        spec['chatter']  = 4
+        spec['publish']  = False
+
+        # Execute csspec script
+        spec.execute()
+
+        # Check result file
+        self._check_result_file('csspec_py3.fits', 10)
+
+        # Set-up On/Off csspec with NODES method
+        spec = cscripts.csspec()
+        spec['inobs']    = self._inonoff
+        spec['inmodel']  = self._onoff_model
+        spec['srcname']  = 'Crab'
+        spec['method']   = 'NODES'
+        spec['ebinalg']  = 'LOG'
+        spec['enumbins'] = 10
+        spec['emin']     = 0.1
+        spec['emax']     = 10.0
+        spec['outfile']  = 'csspec_py4.fits'
+        spec['logfile']  = 'csspec_py4.log'
+        spec['chatter']  = 4
+        spec['publish']  = False
+
+        # Execute csspec script
+        spec.execute()
+
+        # Check result file
+        self._check_result_file('csspec_py4.fits', 10)
+
+        # Set-up On/Off csspec using WSTAT
+        spec = cscripts.csspec()
+        spec['inobs']     = self._inonoff
+        spec['inmodel']   = self._onoff_model
+        spec['srcname']   = 'Crab'
+        spec['method']    = 'AUTO'
+        spec['statistic'] = 'WSTAT'
+        spec['ebinalg']   = 'LOG'
+        spec['enumbins']  = 10
+        spec['emin']      = 0.1
+        spec['emax']      = 10.0
+        spec['outfile']   = 'csspec_py5.fits'
+        spec['logfile']   = 'csspec_py5.log'
+        spec['chatter']   = 2
+
+        # Execute csspec script
+        spec.execute()
+
+        # Check result file
+        self._check_result_file('csspec_py5.fits', 10)
 
         # Return
         return

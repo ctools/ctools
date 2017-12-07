@@ -1,0 +1,27 @@
+package:
+  name: ctools
+  version: "@VERSION@"
+
+source:
+  fn: ctools-@VERSION@.tar.gz
+  url: http://cta.irap.omp.eu/ctools/releases/ctools/ctools-@VERSION@.tar.gz
+  #md5: a2751da55f7b97d48db57156e8096792
+
+build:
+  number: 1 
+  binary_relocation: True
+  detect_binary_files_with_prefix: True
+
+requirements:
+  build:
+    - python  
+    - setuptools
+    - swig
+    - gammalib ==1.5.0.dev1
+  run:
+    - python
+    - gammalib ==1.5.0.dev1
+
+about:
+  home: http://cta.irap.omp.eu/ctools
+  license: GPL3

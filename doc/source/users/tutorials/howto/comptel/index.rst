@@ -22,3 +22,4 @@ In this tutorial you will learn how to do that with a simple analysis.
    howto_comptel_spectrum
    howto_comptel_tsmap
    howto_comptel_ulimit
+   howto_comptel_dri

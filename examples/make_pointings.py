@@ -301,7 +301,7 @@ def set_irf(site, obs, caldb, lst=True):
         # Compute Right Ascension and Declination of pointing
         pnt = gammalib.GSkyDir()
         pnt.lb_deg(obs['lon'], obs['lat'])
-        ra  = pnt.ra_deg()
+        #ra  = pnt.ra_deg()
         dec = pnt.dec_deg()
 
         # Set geographic latitude of array
@@ -576,13 +576,13 @@ def write_obsdef(filename, obsdef, idstart):
         First identifier of observation definition file
     """
     # Open file
-    file = open(filename, 'w')
+    f = open(filename, 'w')
 
     # Write header
-    file.write('id,ra,dec,tmin,duration,caldb,irf,emin,emax\n')
+    f.write('id,ra,dec,tmin,duration,caldb,irf,emin,emax\n')
 
     # Initialise identifier
-    id = idstart
+    obsid = idstart
 
     # Loop over pointings
     for obs in obsdef:
@@ -591,10 +591,10 @@ def write_obsdef(filename, obsdef, idstart):
         if 'lon' in obs and 'lat' in obs:
             lon = obs['lon']
             lat = obs['lat']
-            dir = gammalib.GSkyDir()
-            dir.lb_deg(lon,lat)
-            ra  = dir.ra_deg()
-            dec = dir.dec_deg()
+            pnt = gammalib.GSkyDir()
+            pnt.lb_deg(lon,lat)
+            ra  = pnt.ra_deg()
+            dec = pnt.dec_deg()
         else:
             ra  = obs['ra']
             dec = obs['dec']
@@ -608,15 +608,15 @@ def write_obsdef(filename, obsdef, idstart):
             emax = 50.0
 
         # Write information
-        file.write('%6.6d,%8.4f,%8.4f,%.4f,%.4f,%s,%s,%.3f,%.1f\n' %
-                   (id, ra, dec, obs['tmin'], obs['duration'], obs['caldb'], \
-                    obs['irf'], emin, emax))
+        f.write('%6.6d,%8.4f,%8.4f,%.4f,%.4f,%s,%s,%.3f,%.1f\n' %
+                (obsid, ra, dec, obs['tmin'], obs['duration'], obs['caldb'], \
+                 obs['irf'], emin, emax))
 
         # Increment identifier
-        id += 1
+        obsid += 1
 
     # Close file
-    file.close()
+    f.close()
 
     # Return
     return

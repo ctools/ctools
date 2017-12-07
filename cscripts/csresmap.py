@@ -27,7 +27,7 @@ import ctools
 # ============== #
 # csresmap class #
 # ============== #
-class csresmap(ctools.cscript):
+class csresmap(ctools.csobservation):
     """
     Generates a residual map
     """
@@ -37,20 +37,13 @@ class csresmap(ctools.cscript):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'csresmap'
-        self._version = ctools.__version__
+        # Initialise application by calling the appropriate class constructor
+        self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise class members
         self._resmap       = None
         self._use_maps     = False
         self._skip_binning = False
-
-        # Initialise observation container from constructor arguments
-        self._obs, argv = self._set_input_obs(argv)
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
 
         # Return
         return
@@ -69,7 +62,7 @@ class csresmap(ctools.cscript):
         # if the "inobs" parameter is a counts cube. If the "inobs" parameter
         # represents a FITS file and if this FITS file is a counts cube then
         # set self._skip_binning=True
-        if self._obs.size() == 0 and self['inobs'].filename() != 'NONE':
+        if self.obs().size() == 0 and self['inobs'].filename() != 'NONE':
             filename = gammalib.GFilename(self['inobs'].filename())
             if filename.is_fits():
                 cta = gammalib.GCTAObservation()
@@ -88,20 +81,20 @@ class csresmap(ctools.cscript):
         if not self._use_maps:
 
             # Set observation if not done before
-            if self._obs.size() == 0:
+            if self.obs().size() == 0:
                 self._require_inobs('csresmap.get_parameters()')
-                self._obs = self._get_observations()
+                self.obs(self._get_observations())
 
             # If we have exactly one binned CTA observation then signal that
             # the binning can be skipped
-            if self._obs.size()         == 1 and \
-               self._obs[0].classname() == 'GCTAObservation' and \
-               self._obs[0].eventtype() == 'CountsCube':
+            if self.obs().size()         == 1 and \
+               self.obs()[0].classname() == 'GCTAObservation' and \
+               self.obs()[0].eventtype() == 'CountsCube':
                 self._skip_binning = True
 
             # Set models if we have none
-            if self._obs.models().size() == 0:
-                self._obs.models(self['inmodel'].filename())
+            if self.obs().models().size() == 0:
+                self.obs().models(self['inmodel'].filename())
 
             # If no binning is provided in the observation then query now
             # the counts cube binning parameters
@@ -153,7 +146,7 @@ class csresmap(ctools.cscript):
         self._get_parameters()
 
         # Write observation into logger
-        self._log_observations(gammalib.NORMAL, self._obs, 'Observation')
+        self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
 
         # If a counts and model cube are specified then load them as sky map
         if self._use_maps:
@@ -166,7 +159,7 @@ class csresmap(ctools.cscript):
             # Do not build counts cube if we have already one in the observation
             # container
             if self._skip_binning:
-                cta_counts_cube = gammalib.GCTAEventCube(self._obs[0].events())
+                cta_counts_cube = gammalib.GCTAEventCube(self.obs()[0].events())
 
             # ... otherwise generate one now from the event list
             else:
@@ -175,28 +168,28 @@ class csresmap(ctools.cscript):
                 self._log_header1(gammalib.TERSE, 'Generate binned map (ctbin)')
 
                 # Create countsmap
-                bin = ctools.ctbin(self._obs)
-                bin['xref']     = self['xref'].real()
-                bin['yref']     = self['yref'].real()
-                bin['proj']     = self['proj'].string()
-                bin['coordsys'] = self['coordsys'].string()
-                bin['ebinalg']  = self['ebinalg'].string()
-                bin['nxpix']    = self['nxpix'].integer()
-                bin['nypix']    = self['nypix'].integer()
-                bin['binsz']    = self['binsz'].real()
-                if self['ebinalg'].string() == "FILE":
-                    bin['ebinfile'] = self['ebinfile'].filename().file()
+                binning = ctools.ctbin(self.obs())
+                binning['xref']     = self['xref'].real()
+                binning['yref']     = self['yref'].real()
+                binning['proj']     = self['proj'].string()
+                binning['coordsys'] = self['coordsys'].string()
+                binning['ebinalg']  = self['ebinalg'].string()
+                binning['nxpix']    = self['nxpix'].integer()
+                binning['nypix']    = self['nypix'].integer()
+                binning['binsz']    = self['binsz'].real()
+                if self['ebinalg'].string() == 'FILE':
+                    binning['ebinfile'] = self['ebinfile'].filename().file()
                 else:
-                    bin['enumbins'] = self['enumbins'].integer()
-                    bin['emin']     = self['emin'].real()
-                    bin['emax']     = self['emax'].real()
-                bin['chatter']  = self['chatter'].integer()
-                bin['clobber']  = self['clobber'].boolean()
-                bin['debug']    = self['debug'].boolean()
-                bin.run()
+                    binning['enumbins'] = self['enumbins'].integer()
+                    binning['emin']     = self['emin'].real()
+                    binning['emax']     = self['emax'].real()
+                binning['chatter']  = self['chatter'].integer()
+                binning['clobber']  = self['clobber'].boolean()
+                binning['debug']    = self['debug'].boolean()
+                binning.run()
 
                 # Retrieve counts cube
-                cta_counts_cube = bin.cube()
+                cta_counts_cube = binning.cube()
 
             # Assign GCTAEventCube to skymap
             countmap = cta_counts_cube.counts()
@@ -205,7 +198,7 @@ class csresmap(ctools.cscript):
             self._log_header1(gammalib.TERSE, 'Generate model map (ctmodel)')
 
             # Create model map
-            model = ctools.ctmodel(self._obs)
+            model = ctools.ctmodel(self.obs())
             model.cube(cta_counts_cube)
             model['chatter'] = self['chatter'].integer()
             model['clobber'] = self['clobber'].boolean()
@@ -218,7 +211,7 @@ class csresmap(ctools.cscript):
 
         # Store counts map as residual map. Note that we need a special
         # construct here to avoid memory leaks. This seems to be a SWIG feature
-        # as SWIG creates a new object when calling bin.cube()
+        # as SWIG creates a new object when calling binning.cube()
         self._resmap = countmap.copy()
         self._resmap.stack_maps()
         modelmap.stack_maps()
@@ -285,25 +278,6 @@ class csresmap(ctools.cscript):
         # Return
         return
 
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-
-        # Save residual map
-        self.save()
-
-        # Return
-        return
-
     def save(self):
         """
         Save residual map
@@ -343,7 +317,7 @@ class csresmap(ctools.cscript):
         
             # Set default name is user name is empty
             if not name:
-                user_name = self._name
+                user_name = self._name()
             else:
                 user_name = name
 
@@ -361,7 +335,7 @@ class csresmap(ctools.cscript):
         Set model
         """
         # Copy models
-        self._obs.models(models)
+        self.obs().models(models)
 
         # Return
         return

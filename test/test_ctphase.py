@@ -90,7 +90,7 @@ class Test(test):
         cmd = ctphase+' inobs="event_file_that_does_not_exist.fits"'+ \
                       ' outobs="ctphase_cmd2.fits"'+ \
                       ' inmodel="'+self._model_file+'" srcname="Crab"'+ \
-                      ' logfile="ctphase_cmd2.log" chatter=1'
+                      ' logfile="ctphase_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -149,7 +149,7 @@ class Test(test):
         phase['inobs']   = self._events
         phase['inmodel'] = 'NONE'
         phase['srcname'] = 'NONE'
-        phase['mjd']     = 51544.5
+        phase['mjd']     = 58849.0
         phase['phase']   = 0.0
         phase['f0']      = 1.0
         phase['f1']      = 0.1
@@ -187,7 +187,7 @@ class Test(test):
         phase['inobs']   = self._events
         phase['inmodel'] = 'NONE'
         phase['srcname'] = 'NONE'
-        phase['mjd']     = 51500.0
+        phase['mjd']     = 58860.0
         phase['phase']   = 0.0
         phase['f0']      = 1.0
         phase['f1']      = 0.1
@@ -206,14 +206,14 @@ class Test(test):
         # Test invalid source name
         self.test_try('Test ctphase with invalid source name')
         try:
-            test = ctools.ctphase()
-            test['inobs']   = self._events
-            test['inmodel'] = self._model_file
-            test['srcname'] = 'Venus'
-            test['outobs']  = 'ctphase_py5.fits'
-            test['logfile'] = 'ctphase_py5.log'
-            test.logFileOpen()
-            test.execute()
+            phase = ctools.ctphase()
+            phase['inobs']   = self._events
+            phase['inmodel'] = self._model_file
+            phase['srcname'] = 'Venus'
+            phase['outobs']  = 'ctphase_py5.fits'
+            phase['logfile'] = 'ctphase_py5.log'
+            phase.logFileOpen()
+            phase.execute()
             self.test_try_failure('Exception not thrown')
         except (ValueError):
             self.test_try_success()
@@ -221,14 +221,14 @@ class Test(test):
         # Test invalid model type
         self.test_try('Test ctphase with invalid model')
         try:
-            test = ctools.ctphase()
-            test['inobs']   = self._events
-            test['inmodel'] = self._model
-            test['srcname'] = 'Background'
-            test['outobs']  = 'ctphase_py6.fits'
-            test['logfile'] = 'ctphase_py6.log'
-            test.logFileOpen()
-            test.execute()
+            phase = ctools.ctphase()
+            phase['inobs']   = self._events
+            phase['inmodel'] = self._model
+            phase['srcname'] = 'Background'
+            phase['outobs']  = 'ctphase_py6.fits'
+            phase['logfile'] = 'ctphase_py6.log'
+            phase.logFileOpen()
+            phase.execute()
             self.test_try_failure('Exception not thrown')
         except (ValueError):
             self.test_try_success()
@@ -236,14 +236,14 @@ class Test(test):
         # Test invalid model without temporal phase curve model
         self.test_try('Test ctphase with invalid model')
         try:
-            test = ctools.ctphase()
-            test['inobs']   = self._events
-            test['inmodel'] = self._model
-            test['srcname'] = 'Crab'
-            test['outobs']  = 'ctphase_py7.fits'
-            test['logfile'] = 'ctphase_py7.log'
-            test.logFileOpen()
-            test.execute()
+            phase = ctools.ctphase()
+            phase['inobs']   = self._events
+            phase['inmodel'] = self._model
+            phase['srcname'] = 'Crab'
+            phase['outobs']  = 'ctphase_py7.fits'
+            phase['logfile'] = 'ctphase_py7.log'
+            phase.logFileOpen()
+            phase.execute()
             self.test_try_failure('Exception not thrown')
         except (ValueError):
             self.test_try_success()
@@ -252,7 +252,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, nevents=6141):
+    def _check_result_file(self, filename, nevents=3736):
         """
         Check result file
 

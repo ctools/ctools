@@ -196,7 +196,65 @@ ctlikelihood& ctlikelihood::operator=(const ctlikelihood& app)
 
 /*==========================================================================
  =                                                                         =
- =                             Private methods                             =
+ =                   Protected methods exposed in Python                   =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Evaluates the log-likelihood function
+ *
+ * @param[in] par Model parameter
+ * @param[in] value Model parameter factor value
+ * @return Log-likelihood function
+ *
+ * Evaluates the log-likelihood function at a given @p value.
+ ***************************************************************************/
+double ctlikelihood::evaluate(GModelPar& par, const double& value)
+{
+    // Initialise log-likelihood value
+    double logL = 0.0;
+
+    // Throw an exception if the parameter is below the minimum boundary
+    if (par.has_min() && value < par.factor_min()) {
+        std::string msg = "Parameter \""+par.name()+"\" value"+
+                          gammalib::str(value)+" is below its minimum boundary "+
+                          gammalib::str(par.factor_min())+". To omit this "
+                          "error please lower the minimum parameter boundary.";
+        throw GException::invalid_value(G_EVALUATE, msg);
+    }
+
+    // Throw an exception if the parameter is above the maximum boundary
+    if (par.has_max() && value > par.factor_max()) {
+        std::string msg = "Parameter \""+par.name()+"\" value"+
+                          gammalib::str(value)+" is above its maximum boundary "+
+                          gammalib::str(par.factor_max())+". To omit this "
+                          "error please raise the maximum parameter boundary.";
+        throw GException::invalid_value(G_EVALUATE, msg);
+    }
+
+    // Change parameter factor
+    par.factor_value(value);
+
+    // Fix parameter
+    par.fix();
+
+    // Re-optimize log-likelihood
+    m_obs.optimize(m_opt);
+
+    // Free parameter
+    par.free();
+
+    // Retrieve log-likelihood
+    logL = m_obs.logL();
+
+    // Return log-likelihood
+    return logL;
+}
+
+
+/*==========================================================================
+ =                                                                         =
+ =                            Protected methods                            =
  =                                                                         =
  ==========================================================================*/
 
@@ -235,56 +293,4 @@ void ctlikelihood::free_members(void)
 {
     // Return
     return;
-}
-
-
-/***********************************************************************//**
- * @brief Evaluates the log-likelihood function
- *
- * @param[in] par Model parameter
- * @param[in] value Model parameter factor value
- * @return Log-likelihood function
- *
- * Evaluates the log-likelihood function at a given @p value.
- ***************************************************************************/
-double ctlikelihood::evaluate(GModelPar& par, const double& value)
-{
-    // Initialise log-likelihood value
-    double logL = 0.0;
-
-    // Throw an exception if the parameter is below the minimum boundary
-    if (par.has_min() && value < par.factor_min()) {
-        std::string msg = "Value "+gammalib::str(value)+" of parameter \""+
-                          par.name()+"\" is below its minimum boundary "+
-                          gammalib::str(par.factor_min())+". To omit this "
-                          "error please lower the minimum parameter boundary.";
-        throw GException::invalid_value(G_EVALUATE, msg);
-    }
-
-    // Throw an exception if the parameter is above the maximum boundary
-    if (par.has_max() && value > par.factor_max()) {
-        std::string msg = "Value "+gammalib::str(value)+" of parameter \""+
-                          par.name()+"\" is above its maximum boundary "+
-                          gammalib::str(par.factor_max())+". To omit this "
-                          "error please raise the maximum parameter boundary.";
-        throw GException::invalid_value(G_EVALUATE, msg);
-    }
-
-    // Change parameter factor
-    par.factor_value(value);
-
-    // Fix parameter
-    par.fix();
-
-    // Re-optimize log-likelihood
-    m_obs.optimize(m_opt);
-
-    // Free parameter
-    par.free();
-
-    // Retrieve log-likelihood
-    logL = m_obs.logL();
-
-    // Return log-likelihood
-    return logL;
 }

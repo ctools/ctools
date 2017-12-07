@@ -10,23 +10,59 @@ ctools 1.5 is a major release that adds significant functionality.
 
 In particular, this release provides:
 
+* Support of classical IACT analysis
 * Specifcation of times in various formats (UTC, MJD, JD, MET)
 
 
 Bug fixes
 ---------
 
-* TBW
+* [`2262 <https://cta-redmine.irap.omp.eu/issues/2262>`_] -
+  Fix chatter level handling in :ref:`ctpsfcube`
 
 
 Improvements
 ------------
 
-* TBW
+* [`2273 <https://cta-redmine.irap.omp.eu/issues/2273>`_] -
+  Support On/Off analysis in :ref:`cslightcrv` and :ref:`csphasecrv`
+* [`2267 <https://cta-redmine.irap.omp.eu/issues/2267>`_] -
+  Add tutorial for classical analysis
+* [`2260 <https://cta-redmine.irap.omp.eu/issues/2260>`_] -
+  Handle On/Off observations by :ref:`cspull`
+* [`2237 <https://cta-redmine.irap.omp.eu/issues/2237>`_] -
+  Add ``statistic`` parameters to :ref:`ctbutterfly`, :ref:`cterror`,
+  :ref:`cttsmap`, :ref:`ctulimit`, :ref:`cslightcrv`, :ref:`csphasecrv`,
+  :ref:`cspull`, :ref:`cssens`, :ref:`csspec`, :ref:`cstsdist` and
+  :ref:`cstsmapsplit`
+* [`2231 <https://cta-redmine.irap.omp.eu/issues/2231>`_] -
+  Enable handling of On/Off observations in :ref:`csspec`
+* [`2207 <https://cta-redmine.irap.omp.eu/issues/2207>`_] -
+  Add ``RING`` background method to :ref:`ctskymap`
+* [`2194 <https://cta-redmine.irap.omp.eu/issues/2194>`_] -
+  Add keywords to sky maps produced by :ref:`ctskymap`
+* [`2189 <https://cta-redmine.irap.omp.eu/issues/2189>`_] -
+  Enhance efficiency of computations in :ref:`ctmodel`
+* [`1927 <https://cta-redmine.irap.omp.eu/issues/1927>`_] -
+  Add ``NODES`` method to :ref:`csspec` to support non-CTA analysis
 
 
 New features
 ------------
 
+* [`2208 <https://cta-redmine.irap.omp.eu/issues/2208>`_] -
+  Add :ref:`csphagen` script
+* [`2180 <https://cta-redmine.irap.omp.eu/issues/2180>`_] -
+  Add :ref:`csmodelsois` script
 * [`1864 <https://cta-redmine.irap.omp.eu/issues/1864>`_] -
   Use t-type parameters for all ``tmin`` and ``tmax`` parameters
+
+Clean up
+--------
+
+* [`2237 <https://cta-redmine.irap.omp.eu/issues/2237>`_] -
+  Rename :ref:`ctlike` ``stat`` parameter to ``statistic``
+* [`2237 <https://cta-redmine.irap.omp.eu/issues/2237>`_] -
+  Derive :ref:`cslightcrv`, :ref:`csphasecrv`, :ref:`cspull`, :ref:`cssens`,
+  :ref:`csspec` and :ref:`cstsdist` scripts from ``cslikelihood`` base
+  class
