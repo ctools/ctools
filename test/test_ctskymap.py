@@ -68,8 +68,8 @@ class Test(test):
         # Setup ctskymap command
         cmd = ctskymap+' inobs="'+self._events+'"'+\
                        ' outmap="ctskymap_cmd1.fits"'+ \
-                       ' emin=0.1 emax=100.0 nxpix=200 nypix=200'+ \
-                       ' binsz=0.02 coordsys="CEL" proj="CAR"'+ \
+                       ' emin=0.1 emax=100.0 nxpix=20 nypix=20'+ \
+                       ' binsz=0.2 coordsys="CEL" proj="CAR"'+ \
                        ' xref=83.63 yref=22.01 bkgsubtract="NONE"'+ \
                        ' logfile="ctskymap_cmd1.log" chatter=1'
 
@@ -87,8 +87,8 @@ class Test(test):
         # Setup ctskymap command
         cmd = ctskymap+' inobs="event_file_that_does_not_exist.fits"'+\
                        ' outmap="ctskymap_cmd2.fits"'+ \
-                       ' emin=0.1 emax=100.0 nxpix=200 nypix=200'+ \
-                       ' binsz=0.02 coordsys="CEL" proj="CAR"'+ \
+                       ' emin=0.1 emax=100.0 nxpix=20 nypix=20'+ \
+                       ' binsz=0.2 coordsys="CEL" proj="CAR"'+ \
                        ' xref=83.63 yref=22.01 bkgsubtract="NONE"'+ \
                        ' logfile="ctskymap_cmd2.log" debug=yes chatter=2'
 
@@ -128,9 +128,9 @@ class Test(test):
         skymap['inobs']       = self._events
         skymap['emin']        = 0.1
         skymap['emax']        = 100
-        skymap['nxpix']       = 200
-        skymap['nypix']       = 200
-        skymap['binsz']       = 0.02
+        skymap['nxpix']       = 20
+        skymap['nypix']       = 20
+        skymap['binsz']       = 0.2
         skymap['coordsys']    = 'CEL'
         skymap['proj']        = 'CAR'
         skymap['xref']        = 83.63
@@ -184,9 +184,9 @@ class Test(test):
         skymap = ctools.ctskymap(obs)
         skymap['emin']        = 0.1
         skymap['emax']        = 100
-        skymap['nxpix']       = 200
-        skymap['nypix']       = 200
-        skymap['binsz']       = 0.02
+        skymap['nxpix']       = 20
+        skymap['nypix']       = 20
+        skymap['binsz']       = 0.2
         skymap['coordsys']    = 'GAL'
         skymap['proj']        = 'CAR'
         skymap['xref']        = 184.5575
@@ -214,9 +214,9 @@ class Test(test):
         skymap = ctools.ctskymap(obs)
         skymap['emin']        = 0.1
         skymap['emax']        = 100
-        skymap['nxpix']       = 200
-        skymap['nypix']       = 200
-        skymap['binsz']       = 0.02
+        skymap['nxpix']       = 20
+        skymap['nypix']       = 20
+        skymap['binsz']       = 0.2
         skymap['coordsys']    = 'GAL'
         skymap['proj']        = 'CAR'
         skymap['xref']        = 184.5575
@@ -241,9 +241,9 @@ class Test(test):
         skymap = ctools.ctskymap(obs)
         skymap['emin']        = 0.1
         skymap['emax']        = 100
-        skymap['nxpix']       = 100  # Make region smaller since the 'RING'
-        skymap['nypix']       = 100  # method takes longer to run than 'IRF'
-        skymap['binsz']       = 0.02
+        skymap['nxpix']       = 10  # Make region smaller since the 'RING'
+        skymap['nypix']       = 10  # method takes longer to run than 'IRF'
+        skymap['binsz']       = 0.2
         skymap['coordsys']    = 'CEL'
         skymap['proj']        = 'CAR'
         skymap['xref']        = 83.63
@@ -264,15 +264,15 @@ class Test(test):
         skymap.execute()
 
         # Check result file
-        self._check_result_file('ctskymap_py5.fits', 100, 100)
-        self._check_result_file('ctskymap_py5.fits[BACKGROUND]', 100, 100)
-        self._check_result_file('ctskymap_py5.fits[SIGNIFICANCE]', 100, 100)
+        self._check_result_file('ctskymap_py5.fits', 10, 10)
+        self._check_result_file('ctskymap_py5.fits[BACKGROUND]', 10, 10)
+        self._check_result_file('ctskymap_py5.fits[SIGNIFICANCE]', 10, 10)
 
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename, nx=200, ny=200):
+    def _check_result_file(self, filename, nx=20, ny=20):
         """
         Check result file
 
@@ -295,7 +295,7 @@ class Test(test):
         return
 
     # Check sky map
-    def _check_map(self, skymap, nx=200, ny=200):
+    def _check_map(self, skymap, nx=20, ny=20):
         """
         Check sky map
 

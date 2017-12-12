@@ -80,7 +80,7 @@ class Test(gammalib.GPythonTestSuite):
         rad_sim              =   10.0
         rad_select           =    3.0
         tstart               =    0.0
-        tstop                = 1800.0
+        tstop                =  300.0
         emin                 =    0.1
         emax                 =  100.0
 
@@ -135,7 +135,7 @@ class Test(gammalib.GPythonTestSuite):
         rad_sim    =   10.0
         rad_select =    3.0
         tstart     =    0.0
-        tstop      = 1800.0
+        tstop      =  300.0
         emin       =    0.1
         emax       =  100.0
 

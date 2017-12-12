@@ -74,9 +74,9 @@ class Test(test):
         cmd = ctobssim+' inmodel="'+self._model+'" '+ \
                        ' outevents="ctobssim_cmd1.fits"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'" '+ \
-                       ' ra=83.63 dec=22.01 rad=10.0'+ \
+                       ' ra=83.63 dec=22.01 rad=3.0'+ \
                        ' tmin="2020-01-01T00:00:00"'+ \
-                       ' tmax="2020-01-01T00:30:00"'+ \
+                       ' tmax="2020-01-01T00:05:00"'+ \
                        ' emin=0.1 emax=100.0'+ \
                        ' logfile="ctobssim_cmd1.log" chatter=1'
 
@@ -90,15 +90,15 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventList('ctobssim_cmd1.fits')
-        self._test_list(evt, 23822)
+        self._test_list(evt, 3776)
 
         # Setup ctobssim command
         cmd = ctobssim+' inmodel="model_that_does_not_exist.xml"'+ \
                        ' outevents="ctobssim_cmd2.fits"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'" '+ \
-                       ' ra=83.63 dec=22.01 rad=10.0'+ \
+                       ' ra=83.63 dec=22.01 rad=3.0'+ \
                        ' tmin="2020-01-01T00:00:00"'+ \
-                       ' tmax="2020-01-01T00:30:00"'+ \
+                       ' tmax="2020-01-01T00:05:00"'+ \
                        ' emin=0.1 emax=100.0'+ \
                        ' logfile="ctobssim_cmd2.log" debug=yes chatter=1'
 
@@ -141,9 +141,9 @@ class Test(test):
         sim['irf']       = self._irf
         sim['ra']        = 83.63
         sim['dec']       = 22.01
-        sim['rad']       = 10.0
+        sim['rad']       = 3.0
         sim['tmin']      = '2020-01-01T00:00:00'
-        sim['tmax']      = '2020-01-01T00:30:00'
+        sim['tmax']      = '2020-01-01T00:05:00'
         sim['emin']      = 0.1
         sim['emax']      = 100.0
         sim['outevents'] = 'ctobssim_py1.fits'
@@ -156,33 +156,52 @@ class Test(test):
 
         # Check content of observation
         self._test_observation(sim)
-        self._test_list(sim.obs()[0].events(), 23822)
+        self._test_list(sim.obs()[0].events(), 3776)
 
         # Save events
         sim.save()
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventList('ctobssim_py1.fits')
-        self._test_list(evt, 23822)
+        self._test_list(evt, 3776)
+
+        # Copy ctobssim tool
+        cpy_sim = sim.copy()
+
+        # Retrieve observation and check content of copy
+        self._test_observation(cpy_sim)
+        self._test_list(cpy_sim.obs()[0].events(), 3776)
+
+        # Execute copy of ctobssim tool again, now with a higher chatter
+        # level than before
+        cpy_sim['outevents'] = 'ctobssim_py2.fits'
+        cpy_sim['logfile']   = 'ctobssim_py2.log'
+        cpy_sim['chatter']   = 3
+        cpy_sim['publish']   = True
+        cpy_sim.logFileOpen()  # Needed to get a new log file
+        cpy_sim.execute()
+
+        # Load counts cube and check content.
+        evt = gammalib.GCTAEventList('ctobssim_py2.fits')
+        self._test_list(evt, 3776)
 
         # Set-up observation container
         pnts = [{'ra': 83.63, 'dec': 21.01},
-                {'ra': 84.63, 'dec': 22.01},
-                {'ra': 83.63, 'dec': 23.01},
-                {'ra': 82.63, 'dec': 22.01}]
-        obs = obsutils.set_obs_list(pnts, caldb=self._caldb, irf=self._irf)
+                {'ra': 84.63, 'dec': 22.01}]
+        obs = obsutils.set_obs_list(pnts, caldb=self._caldb, irf=self._irf,
+                                    duration=300.0, rad=3.0)
 
         # Set-up ctobssim tool from observation container
         sim = ctools.ctobssim(obs)
         sim['inmodel']   = self._model
-        sim['outevents'] = 'ctobssim_py2.xml'
-        sim['logfile']   = 'ctobssim_py2.log'
+        sim['outevents'] = 'ctobssim_py3.xml'
+        sim['logfile']   = 'ctobssim_py3.log'
         sim['chatter']   = 3
 
         # Double maximum event range
         max_rate = sim.max_rate()
-        sim.max_rate(2*max_rate)
-        self.test_value(sim.max_rate(), 2*max_rate, 1.0e-3,
+        sim.max_rate(2.0*max_rate)
+        self.test_value(sim.max_rate(), 2.0*max_rate, 1.0e-3,
                         'Check setting of maximum event rate')
 
         # Run ctobssim tool
@@ -190,57 +209,27 @@ class Test(test):
         sim.run()
 
         # Retrieve observation and check content
-        self._test_observation(sim, nobs=4, pnts=pnts)
-        self._test_list(sim.obs()[0].events(), 22904)
-        self._test_list(sim.obs()[1].events(), 23130)
-        self._test_list(sim.obs()[2].events(), 22672)
-        self._test_list(sim.obs()[3].events(), 22549)
+        self._test_observation(sim, nobs=2, pnts=pnts)
+        self._test_list(sim.obs()[0].events(), 3569)
+        self._test_list(sim.obs()[1].events(), 3515)
 
         # Save events
         sim.save()
 
         # Load events
-        obs = gammalib.GObservations('ctobssim_py2.xml')
+        obs = gammalib.GObservations('ctobssim_py3.xml')
 
         # Retrieve observation and check content
-        self._test_list(obs[0].events(), 22904)
-        self._test_list(obs[1].events(), 23130)
-        self._test_list(obs[2].events(), 22672)
-        self._test_list(obs[3].events(), 22549)
-
-        # Copy ctobssim tool
-        cpy_sim = sim.copy()
-
-        # Retrieve observation and check content of copy
-        self._test_observation(cpy_sim, nobs=4, pnts=pnts)
-        self._test_list(cpy_sim.obs()[0].events(), 22904)
-        self._test_list(cpy_sim.obs()[1].events(), 23130)
-        self._test_list(cpy_sim.obs()[2].events(), 22672)
-        self._test_list(cpy_sim.obs()[3].events(), 22549)
-
-        # Execute copy of ctobssim tool again, now with a higher chatter
-        # level than before
-        cpy_sim['outevents'] = 'ctobssim_py3.xml'
-        cpy_sim['logfile']   = 'ctobssim_py3.log'
-        cpy_sim['chatter']   = 4
-        cpy_sim['publish']   = True
-        cpy_sim.logFileOpen()  # Needed to get a new log file
-        cpy_sim.execute()
-
-        # Check result file
-        obs = gammalib.GObservations('ctobssim_py3.xml')
-        self.test_value(obs.size(), 4, 'Check for number of observations')
-        self._test_list(obs[0].events(), 22904)
-        self._test_list(obs[1].events(), 23130)
-        self._test_list(obs[2].events(), 22672)
-        self._test_list(obs[3].events(), 22549)
+        self._test_list(obs[0].events(), 3569)
+        self._test_list(obs[1].events(), 3515)
 
         # Return
         return
 
     # Check observation
     def _test_observation(self, obssim, nobs=1,
-                          pnts=[{'ra': 83.63, 'dec': 22.01}]):
+                          pnts=[{'ra': 83.63, 'dec': 22.01}],
+                          ontime=300.0, livetime=294.0):
         """
         Test content of an observation
         
@@ -255,20 +244,21 @@ class Test(test):
         """
         # Test observation container
         self.test_value(obssim.obs().size(), nobs,
-             'There is one observation')
-        for i in range(obssim.obs().size()):
-            obs = gammalib.GCTAObservation(obssim.obs()[i])
-            pnt = obs.pointing()
+                        'Check number of observations')
+        for i, obs in enumerate(obssim.obs()):
+            pnt = obs.pointing().dir()
+            ra  = pnts[i]['ra']
+            dec = pnts[i]['dec']
             self.test_assert(obs.instrument() == 'CTA',
-                 'Observation is CTA observation')
-            self.test_value(obs.ontime(), 1800.0, 1.0e-6,
-                 'Ontime is 1800 sec')
-            self.test_value(obs.livetime(), 1764.0, 1.0e-6,
-                 'Livetime is 1764 sec')
-            self.test_value(pnt.dir().ra_deg(), pnts[i]['ra'], 1.0e-6,
-                 'Pointing Right Ascension is '+str(pnts[i]['ra'])+' deg')
-            self.test_value(pnt.dir().dec_deg(), pnts[i]['dec'], 1.0e-6,
-                 'Pointing Declination is '+str(pnts[i]['dec'])+' deg')
+                 'Check if observation is CTA observation')
+            self.test_value(obs.ontime(), ontime, 1.0e-6,
+                 'Check if ontime is %f sec' % ontime)
+            self.test_value(obs.livetime(), livetime, 1.0e-6,
+                 'Check if livetime is %f sec' % livetime)
+            self.test_value(pnt.ra_deg(), ra, 1.0e-6,
+                 'Check if pointing Right Ascension is %f deg' % ra)
+            self.test_value(pnt.dec_deg(), dec, 1.0e-6,
+                 'Check if pointing Declination is %f deg' % dec)
 
         # Return
         return

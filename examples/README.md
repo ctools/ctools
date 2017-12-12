@@ -4,46 +4,11 @@ ctools examples
 This folder contains Python example scripts that illustrate the usage of
 the ctools.
 
-`generate_prod3_irfs.py`
->  Generates Prod3 Instrument Response Functions from FITS files.
-
 `make_pointings.py`
 >  Creates pointings for CTA surveys. For the moment the Galactic Plane
 >  Survey (gps), the Extragalactic Survey (extgal), the Galactic Centre
 >  Survey (gc) and the LMC survey (lmc) are implemented. The script outputs
 >  and ASCII file that can be used by csobsdef.
-
-`make_spectrum.py`
->  Simulates events and generates a spectrum from the using csspec.
-
-`make_ts_distributions.py`
->  Creates TS distributions as function of energy for an OFF observaition
->  of 50 hours effective observing time. If the Python processing module is
->  installed the script can make use of multiple cores and runs in parallel.
-
-`pipeline_binned_disk.py`
->  Example pipeline for simulating events and performing a binned analysis
->  by saving intermediate results to disk.
-
-`pipeline_binned_mem.py`
->  Example pipeline for simulating events and performing a binned analysis
->  in memory. No files will be written to disk.
-
-`pipeline_stacked_disk.py`
->  Example pipeline for simulating events and performing a stacked analysis
->  by saving intermediate results to disk.
-
-`pipeline_stacked_mem.py`
->  Example pipeline for simulating events and performing a stacked analysis
->  in memory. No files will be written to disk.
-
-`pipeline_unbinned_disk.py`
->  Example pipeline for simulating events and performing an unbinned analysis
->  by saving intermediate results to disk.
-
-`pipeline_unbinned_mem.py`
->  Example pipeline for simulating events and performing an unbinned analysis
->  in memory. No files will be written to disk.
 
 `show_butterfly.py`
 >  Displays a butterfly generated using the ctbutterfly tool.

@@ -264,28 +264,28 @@ class Test(test):
         # If there are models in the container then check them
         if nmodels > 0:
             self.test_value(models['Crab']['Prefactor'].value(),
-                            5.767533e-16, 1.0e-4 * 5.767533e-16,
+                            5.6530206356786e-16, 1.0e-4 * 5.6530206356786e-16,
                             'Check fitted Crab Prefactor')
             self.test_value(models['Crab']['Prefactor'].error(),
-                            1.011887e-17, 1.0e-4 * 1.011887e-17,
+                            2.45970361827369e-17, 1.0e-3 * 2.45970361827369e-17,
                             'Check Crab Prefactor error')
             self.test_value(models['Crab']['Index'].value(),
-                            -2.462279, 1.0e-4 * 2.462279,
+                            -2.45716228083265, 1.0e-4 * 2.45716228083265,
                             'Check fitted Crab Index')
             self.test_value(models['Crab']['Index'].error(),
-                            0.0148518, 1.0e-4 * 0.0148518,
+                            0.0366617454398694, 1.0e-3 * 0.0366617454398694,
                             'Check Crab Index error')
-            self.test_value(models['CTABackgroundModel']['Prefactor'].value(),
-                            1.0197698, 1.0e-4 * 1.0197698,
+            self.test_value(models['Background']['Prefactor'].value(),
+                            1.01525433446138, 1.0e-4 * 1.01525433446138,
                             'Check fitted background Prefactor')
-            self.test_value(models['CTABackgroundModel']['Prefactor'].error(),
-                            0.013578, 1.0e-4 * 0.013578,
+            self.test_value(models['Background']['Prefactor'].error(),
+                            0.0334412516391298, 1.0e-4 * 0.0334412516391298,
                             'Check background Prefactor error')
-            self.test_value(models['CTABackgroundModel']['Index'].value(),
-                            0.00836407, 1.0e-4 * 0.00836407,
+            self.test_value(models['Background']['Index'].value(),
+                            -0.005132848897274, 1.0e-3 * 0.005132848897274,
                             'Check fitted background Index')
-            self.test_value(models['CTABackgroundModel']['Index'].error(),
-                            0.00811674, 1.0e-4 * 0.00811674,
+            self.test_value(models['Background']['Index'].error(),
+                            0.0200624490548333, 1.0e-4 * 0.0200624490548333,
                             'Check background Index error')
 
         # Return

@@ -45,7 +45,7 @@ class Test(test):
         # Set test data
         self._phased_events  = self._datadir + '/phased_events.fits'
         self._offaxis_events = self._datadir + '/crab_offaxis1.fits'
-        self._model_onoff = self._datadir + '/crab_onoff.xml'
+        self._model_onoff    = self._datadir + '/crab_onoff.xml'
 
         # Return
         return
@@ -258,6 +258,9 @@ class Test(test):
         pcrv['xref']      = 83.63
         pcrv['yref']      = 22.01
         pcrv['rad']       = 0.2
+        pcrv['etruemin']  = 0.05
+        pcrv['etruemax']  = 150.0
+        pcrv['etruebins'] = 5
         pcrv['outfile']   = 'csphasecrv_py5.fits'
         pcrv['logfile']   = 'csphasecrv_py5.log'
         pcrv['chatter']   = 4
