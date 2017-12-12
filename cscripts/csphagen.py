@@ -67,50 +67,109 @@ class csphagen(ctools.csobservation):
         # Set energy bounds
         self._ebounds = self._create_ebounds()
 
-        # Initialise source position/region querying relevant parameters
-        self._src_dir = gammalib.GSkyDir()
-        self._src_reg = gammalib.GSkyRegions()
-        coordsys = self['coordsys'].string()
-        if coordsys == 'CEL':
-            ra  = self['ra'].real()
-            dec = self['dec'].real()
-            self._src_dir.radec_deg(ra, dec)
-        elif coordsys == 'GAL':
-            glon = self['glon'].real()
-            glat = self['glat'].real()
-            self._src_dir.lb_deg(glon, glat)
-        self._srcshape = self['srcshape'].string()
-        if self._srcshape == 'CIRCLE':
-            self._rad = self['rad'].real()
-            self._src_reg.append(gammalib.GSkyRegionCircle(self._src_dir, self._rad))
-
         # Query background estimation method and parameters
         bkgmethod = self['bkgmethod'].string()
         if bkgmethod == 'REFLECTED':
+
+            # Initialise source position/region querying relevant parameters
+            self._src_dir = gammalib.GSkyDir()
+            self._src_reg = gammalib.GSkyRegions()
+            coordsys = self['coordsys'].string()
+            if coordsys == 'CEL':
+                ra  = self['ra'].real()
+                dec = self['dec'].real()
+                self._src_dir.radec_deg(ra, dec)
+            elif coordsys == 'GAL':
+                glon = self['glon'].real()
+                glat = self['glat'].real()
+                self._src_dir.lb_deg(glon, glat)
+            self._srcshape = self['srcshape'].string()
+            if self._srcshape == 'CIRCLE':
+                self._rad = self['rad'].real()
+                self._src_reg.append(gammalib.GSkyRegionCircle(self._src_dir, self._rad))
+
             self['bkgregmin'].integer()
-        elif bkgmethod == 'LOAD':
-            # Extract filepaths to region files from observation definition XML
-            obsfile = self['inobs'].filename()
 
-            # open XML
-            xml = gammalib.GXml()
-            xml.load(obsfile)
+        elif bkgmethod == 'CUSTOM':
 
-            # Go through elements in <observationlist>
-            for elem in xml[0]:
+            obsfile    = self['inobs'].filename()
+            srcregfile = gammalib.GFilename()
 
-                # Get observation id from <observation> header
-                obsid          = elem.attribute('id')
+            # obs def XML: look for region files
+            if obsfile.file()[-3:] == 'xml':
+                # open and load XML obs definition file
+                xml = gammalib.GXml()
+                xml.load(obsfile)
 
-                # Get region file path from <observation> body
-                offregionsfile = ''
-                for entry in elem:
+                # Go through elements in <observationlist>
+                for elem in xml[0]:
 
-                    # <parameter name="OffRegions" file=".."/> contains region file
-                    if entry.attribute('name') == 'OffRegions':
-                        offregionsfile = entry.attribute('file')
+                    # Get observation id from <observation> header
+                    obsid          = elem.attribute('id')
 
-                self._bkgregfiles[obsid] = gammalib.GFilename(offregionsfile)
+                    # Get region file path from <observation> body
+                    offregionsfile = ''
+                    onregionfile   = ''
+                    for entry in elem:
+
+                        # <parameter name="OffRegions" file=".."/> contains region file
+                        if entry.attribute('name') == 'OffRegions':
+                            offregionsfile = entry.attribute('file')
+
+                        # <parameter name="OnRegion" file=".."/> contains region file
+                        if entry.attribute('name') == 'OnRegion':
+                            onregionfile = entry.attribute('file')
+
+                    # Store file paths
+                    self._bkgregfiles[obsid] = gammalib.GFilename(offregionsfile)
+
+                    if onregionfile != '':
+                        srcregfile     = gammalib.GFilename(onregionfile)
+
+                    # Not existing bkg region files are set to None (for every obs)
+                    if not self._bkgregfiles[obsid].exists():
+                        self._bkgregfiles[obsid] = None
+
+                # Not existing src region files are set to None (one time)
+                if not srcregfile.exists():
+                    srcregfile = None
+
+            else:
+                # event FITS files: query later 1 bkg & 1 src region file
+                self._bkgregfiles = {0:None}
+                srcregfile  = None
+
+            # Query bkg region file
+            if len([True for x in self._bkgregfiles if self._bkgregfiles[x] is None]) > 0:
+                if len(self._bkgregfiles) > 1:
+                    # Querying of multiple regions not supported
+                    raise RuntimeError('Please specify all bkg region files in obs definition XML.')
+                else:
+                    # Query bkg region file for single observation
+                    self._bkgregfiles[self._bkgregfiles.keys()[0]] = self['bkgreg'].filename()
+
+            # Query src region file
+            if srcregfile is None:
+                srcregfile  = self['srcreg'].filename()
+
+            # Set up src (=On) region. Only 1 region is allowed
+            self._src_reg = gammalib.GSkyRegions(srcregfile)
+
+            if len(self._src_reg) > 1:
+                raise RuntimeError('Only 1 On-region is allowed.')
+
+            onRegion = self._src_reg[0]
+            if isinstance(onRegion, gammalib.GSkyRegionCircle):
+                self._srcshape = 'CIRCLE'
+                self._src_dir  = onRegion.centre()
+                self._rad      = onRegion.radius()
+            elif isinstance(onRegion, gammalib.GSkyRegionMap):
+                self._srcshape = 'MAP'
+                raise RuntimeError('On region is MAP. Src direction can not be determined. Use CIRCLE!')
+            else:
+                raise RuntimeError('On region is unknown. Src direction can not be determined. Use CIRCLE!')
+
+            # END if bkgmethod=='CUSTOM'
 
         self['maxoffset'].real()
 
@@ -206,88 +265,52 @@ class csphagen(ctools.csobservation):
 
     def _regions_from_file(self, obs, filePath):
         """
-        Read list of reflected regions for a single observation (pointing) from file
+        Read list of reflected regions for a single observation (pointing) from file.
 
         Parameters
         ----------
         obs : `~gammalib.GCTAObservation()`
             CTA observation
         filePath: `~gammalib.GFilename()`
-            File path to region file containing off regions.
+            File path to file containing off regions.
 
         Returns
         -------
         regions : `~gammalib.GSkyRegions`
             List of reflected regions
         """
-        # Initialise list of reflected regions
-        regions = gammalib.GSkyRegions()
 
-        # Get offset angle of source
-        pnt_dir = obs.pointing().dir()
-        offset  = pnt_dir.dist_deg(self._src_dir)
+        # Load regions from ds9 file of FITS WCS map
+        regions = gammalib.GSkyRegions( filePath )
 
-        # Access region file
-        with open(filePath.url(), 'r') as ds9file:
+        # Prepare parameters for comparison
+        pnt_dir  = obs.pointing().dir()
+        offsetOn = pnt_dir.dist_deg(self._src_dir)
+        radiusOn = self._src_reg[0].radius()
 
-            # Read every line from file
-            for line in ds9file:
+        # Do some tests
+        for region in regions:
 
-                # Skip comment and empty lines
-                if line.startswith('#') or len(line)<2:
-                    continue
+            offsetOff = pnt_dir.dist_deg(region.centre())
+            radiusOff = region.radius()
 
-                # Handle multi-lines separated with semicolon
-                for elem in line.split(';'):
+            # Warn: different radius
+            if radiusOff != radiusOn:
+                self._log_string(gammalib.EXPLICIT, 'Off region radius differs from on'
+                                 'region radius: %.2f vs %.2f' % ((radiusOff, radiusOn)))
 
-                    # Skip fk5 statement
-                    if elem=='fk5':
-                        continue
+            # Warn: offset is too small or too large
+            if offsetOff <= self._rad or offsetOff >= self['maxoffset'].real():
+                self._log_string(gammalib.EXPLICIT, 'Region offset invalid for observation '
+                                 '%s (%.3f deg) ' % ((obs.id(), offsetOff)))
 
-                    # Process region circle
-                    if elem.startswith('circle'):
-
-                        # Separate arguments in shape definition
-                        try:
-                            args           = elem[ elem.find('(')+1 : elem.find(')') ]
-                            ra,dec,radius  = args.split(',')
-
-                            ra  = float( ra )
-                            dec = float( dec )
-                        except:
-                            self._log_string(gammalib.EXPLICIT, 'Region file line %s not readable.'
-                                             % (elem))
-
-                            # handle next element
-                            continue
-
-                        # Set up position of region
-                        offdir = gammalib.GSkyDir()
-                        offdir.radec_deg(ra, dec)
-
-                        # Calculate offset to pointing direction
-                        regionOffset = pnt_dir.dist_deg(offdir)
-
-                        # Skip and show message in case region is invalid
-                        if regionOffset <= self._rad or regionOffset >= self['maxoffset'].real():
-                            self._log_string(gammalib.EXPLICIT, 'Observation %s pointed at %.3f '
-                                             'deg from source' % ((obs.id(), offset)))
-
-                        # .. otherwise push back region
-                        else:
-                            # Warn if off region has not equal offset like on region
-                            if regionOffset != offset:
-                                self._log_string(gammalib.EXPLICIT, 'Off region offset differs '
-                                                 '%.3f deg from on region offset' % (regionOffset-offset))
-
-                            # Create region
-                            circleRegion = gammalib.GSkyRegionCircle(offdir, self._rad)
-
-                            # Push back in regions list
-                            regions.append(circleRegion)
+            # Warn: offset of off and on region differ
+            if offsetOff != offsetOn:
+                self._log_string(gammalib.EXPLICIT, 'Off region offset differs '
+                                 '%.3f deg from on region offset' % (offsetOff-offsetOn))
 
         # Inform user how many regions were loaded
-        self._log_string(gammalib.NORMAL, 'Read %i circle shaped regions from file %s.' % (regions.size(), filePath.url()))
+        self._log_string(gammalib.NORMAL, 'Read %i regions from file %s.' % (regions.size(), filePath.url()))
 
         # return list of regions
         return regions
@@ -399,6 +422,9 @@ class csphagen(ctools.csobservation):
         # Loop through observations and generate pha, arf, rmf files
         for obs in self.obs():
 
+            # Log current observation
+            self._log_string(gammalib.NORMAL, 'Process Observation %s' % (obs.id()))
+
             # Initialise background regions for this observation
             bkg_reg = gammalib.GSkyRegions()
 
@@ -406,19 +432,16 @@ class csphagen(ctools.csobservation):
             # background regions
             if self['bkgmethod'].string() == 'REFLECTED':
                 bkg_reg = self._reflected_regions(obs)
-            elif self['bkgmethod'].string() == 'LOAD':
+            elif self['bkgmethod'].string() == 'CUSTOM':
                 # Get file path of bkg region file from dictionary
-                bkgregfile = self._bkgregfiles[obs.id()]
+                if len(self._bkgregfiles) > 1:
+                    bkgregfile = self._bkgregfiles[obs.id()]
+                else:
+                    # for inobs==event list no obs id is set.
+                    bkgregfile = self._bkgregfiles[self._bkgregfiles.keys()[0]]
 
                 # If file is valid load. Else warn and use reflected method.
-                if bkgregfile.exists():
-                    bkg_reg = self._regions_from_file(obs, bkgregfile)
-                else:
-                    self._log_string(gammalib.NORMAL, 'Background method LOAD'
-                                     ' specified but for observation %s no '
-                                     'region file found. Use reflected region '
-                                     'background instead.' % (obs.id()))
-                    bkg_reg = self._reflected_regions(obs)
+                bkg_reg = self._regions_from_file(obs, bkgregfile)
 
 
             # If there are reflected regions then create On/Off observation
