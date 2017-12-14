@@ -20,6 +20,7 @@
 # ==========================================================================
 import gammalib
 import ctools
+from cscripts import obsutils
 
 
 # =============== #
@@ -40,9 +41,9 @@ class csresspec(ctools.csobservation):
                                  argv)
 
         # Initialise class members
-        self._components = False
         self._use_maps = False
         self._stack = False
+        self._mask = False
 
         # Return
         return
@@ -52,10 +53,9 @@ class csresspec(ctools.csobservation):
         """
         Get parameters from parfile and setup the observation
         """
-        # Set observation if not done before
-        if self.obs().is_empty():
-            self._require_inobs('csresspec._get_parameters()')
-            self.obs(self._get_observations())
+        # Setup observations (require response and allow event list as well as
+        # counts cube)
+        self._setup_observations(self.obs(), True, True, True)
 
         # Set observation statistic
         self._set_obs_statistic(gammalib.toupper(self['statistic'].string()))
@@ -76,25 +76,25 @@ class csresspec(ctools.csobservation):
         n_cta = n_unbinned + n_binned + n_onoff
         n_other = self.obs().size() - n_cta
 
+        # Log census of input observations
+        self._log_value(gammalib.TERSE, 'Unbinned CTA observations', n_unbinned)
+        self._log_value(gammalib.TERSE, 'Binned CTA observations', n_binned)
+        self._log_value(gammalib.TERSE, 'On/off CTA observations', n_onoff)
+        self._log_value(gammalib.TERSE, 'Other observations', n_other)
+        self._log_string(gammalib.TERSE, '\nWARNING: Only CTA observation '
+                                         'can be handled, all '
+                                         'non-CTA observation will be ignored.\n')
+
         # Query wether to compute model for individual components
-        self._components = self['components'].boolean()
+        components = self['components'].boolean()
 
         # If there is only one binned observation and no model for individual
         # components is required, query for precomputed model file and set
         # use_maps to True
-        if self.obs().size() == 1 and n_binned == 1 and not self._components:
+        if self.obs().size() == 1 and n_binned == 1 and not components:
             modcube = self['modcube'].filename()
             if modcube != 'NONE':
                 self._use_maps = True
-
-        # If we are not using a precomputed model query input XML model file
-        if not self._use_maps:
-            modxml = self['inmodel'].filename()
-            # if None check whether models are provided in observation
-            # container, otherwise throw exception and stop here
-            if modxml == 'NONE' and self.obs().models().is_empty():
-                msg = 'No model provided. Please specify an input XML model file'
-                raise RuntimeError(msg)
 
         # If there are unbinned observations query the energy binning parameters
         if n_unbinned != 0:
@@ -105,12 +105,50 @@ class csresspec(ctools.csobservation):
                 self['emin'].real()
                 self['emax'].real()
                 self['enumbins'].integer()
+            msg = 'User defined energy binning will be used for %s unbinned observations.' % n_unbinned
+            self._log_value(gammalib.TERSE, msg)
+            if n_cta > n_unbinned:
+                n_notunbin = n_cta - n_unbinned
+                msg = 'The intrinsic binning will be used for the remaining %s observations.' % (
+                n_notunbin)
+                self._log_value(gammalib.TERSE, msg)
 
-        # If there is more than one observation, and observations are unbinned
-        # or onoff query user to know if they wish stacked results
+        # If there is more than one observation, and observations are all
+        # unbinned or all onoff query user to know if they wish stacked results
         if self.obs().size() > 1 and (
                         n_unbinned == self.obs().size() or n_onoff == self.obs().size()):
-            self['stack'].boolean()
+            self._stack = self['stack'].boolean()
+            # If we are to stack event lists query parameters for cube creation
+            if n_unbinned == self.obs().size():
+                self['coordsys'].string()
+                self['proj'].string()
+                self['xref'].real()
+                self['yref'].real()
+                self['nxpix'].real()
+                self['nypix'].real()
+                self['binsz'].real()
+
+        # If we are not using a precomputed model query input XML model file
+        if not self._use_maps:
+            modxml = self['inmodel'].filename()
+            # If None check whether models are provided in observation
+            # container, otherwise throw exception and stop here
+            if modxml == 'NONE' and self.obs().models().is_empty():
+                msg = 'No model provided. Please specify an input XML model file'
+                raise RuntimeError(msg)
+            # Otherwise set the input model
+            else:
+                self.obs().models(modxml)
+
+        # Unless all observations are On/Off query for mask definition
+        if n_onoff == n_cta:
+            pass
+        else:
+            self._mask = self['mask'].boolean()
+            if self._mask:
+                self['ra'].real()
+                self['dec'].real()
+                self['rad'].real()
 
         # Apply energy dispersion
         self['edisp'].boolean()
@@ -122,11 +160,56 @@ class csresspec(ctools.csobservation):
         # Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
 
-        # Log census of input observations
-        self._log_value(gammalib.TERSE, 'Unbinned CTA observations', n_unbinned)
-        self._log_value(gammalib.TERSE, 'Binned CTA observations', n_binned)
-        self._log_value(gammalib.TERSE, 'On/off CTA observations', n_onoff)
-        self._log_value(gammalib.TERSE, 'Other observations', n_other)
+        # Return
+        return
+
+    def _stack_observations(self):
+        # Use first observation to determine the type and apply the
+        # approptiate stacking method
+
+        # If On/Off use the GCTAOnOffObservation constructor
+        if self.obs()[0].classname() == 'GCTAOnOffObservation':
+            msg = 'Stacking %s On/Off observations.'%(self.obs().size())
+            self._log_value(gammalib.TERSE, msg)
+            stacked_obs = gammalib.GCTAOnOffObservation(self.obs)
+            # reset observation container
+            self.obs = gammalib.GObservations()
+            # and append the new stacked observation
+            self.obs.append(stacked_obs)
+
+        # If event list then bin observations
+        elif self.obs()[0].classname() == 'GCTAObservation':
+            msg = 'Stacking %s event lists.' % (self.obs().size())
+            self._log_value(gammalib.TERSE, msg)
+            stacked_obs = obsutils.get_stacked_obs(self, self.obs)
+            self.obs = stacked_obs
 
         # Return
         return
+
+    # Public methods
+    def run(self):
+        """
+        Run the script
+        """
+        # Switch screen logging on in debug mode
+        if self._logDebug():
+            self._log.cout(True)
+
+        # Get parameters
+        self._get_parameters()
+
+        # Write observation into logger
+        self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
+
+        # Stack observations if requested
+        if self._stack:
+            self._stack_observations()
+
+        # Loop over observations and calculate residuals
+        for obs in self.obs():
+            
+
+
+
+
