@@ -13,8 +13,9 @@ Synopsis
 This script can be used to derive from an observation or a set of observations
 the count spectra in a source region and in background regions, as well as the
 detector response (effective area, energy redistribution matrix), that can be
-used to perform a classical 1D spectral analysis. The output files are saved in
-the OGIP format normally used in X-ray astronomy (PHA, ARF, RMF).
+used to perform a classical 1D spectral analysis. Regions can be placed
+automatically or by hand. The output files are saved in the OGIP format normally
+used in X-ray astronomy (PHA, ARF, RMF).
 `See here <https://heasarc.gsfc.nasa.gov/docs/heasarc/ofwg/docs/spectra/ogip_92_007/node5.html>`__.
 
 The outputs are:
@@ -94,6 +95,12 @@ General parameters
     Method for background estimation.
     ``REFLECTED:`` background evaluated in regions with the same shape as
     source region reflected w.r.t. pointing direction for each observation.
+    ``CUSTOM:`` background evaluated in regions specified by user.
+    For event list or single obs in an obs definition XML: region files can
+    be queried.
+    For multiple observations: those have to be specified in the obs def XML.
+    Here use parameters name="OnRegion" and name="OffRegions" (per observation)
+    with appropriate <file> entry. Files can be ds9 regions or FITS WCS maps.
 
 ``(bkgregmin = 2) [integer]``
     Minimum number of background regions that are required for an observation.
@@ -116,6 +123,12 @@ General parameters
 
 ``(etruebins = 30) [integer]``
     Number of bins per decade for true energy bins.
+
+``(bkgreg = bkg.reg) [file]``
+    Background regions file (ds9 or FITS WCS map).
+
+``(srcreg = on.reg) [file]``
+    Source region file (ds9 or FITS WCS map).
 
 
 Standard parameters
