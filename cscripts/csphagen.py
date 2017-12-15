@@ -67,22 +67,23 @@ class csphagen(ctools.csobservation):
         # Set energy bounds
         self._ebounds = self._create_ebounds()
 
+        # Initialise source position/region querying relevant parameters
+        self._src_dir = gammalib.GSkyDir()
+        self._src_reg = gammalib.GSkyRegions()
+        coordsys = self['coordsys'].string()
+        if coordsys == 'CEL':
+            ra  = self['ra'].real()
+            dec = self['dec'].real()
+            self._src_dir.radec_deg(ra, dec)
+        elif coordsys == 'GAL':
+            glon = self['glon'].real()
+            glat = self['glat'].real()
+            self._src_dir.lb_deg(glon, glat)
+
         # Query background estimation method and parameters
         bkgmethod = self['bkgmethod'].string()
         if bkgmethod == 'REFLECTED':
 
-            # Initialise source position/region querying relevant parameters
-            self._src_dir = gammalib.GSkyDir()
-            self._src_reg = gammalib.GSkyRegions()
-            coordsys = self['coordsys'].string()
-            if coordsys == 'CEL':
-                ra  = self['ra'].real()
-                dec = self['dec'].real()
-                self._src_dir.radec_deg(ra, dec)
-            elif coordsys == 'GAL':
-                glon = self['glon'].real()
-                glat = self['glat'].real()
-                self._src_dir.lb_deg(glon, glat)
             self._srcshape = self['srcshape'].string()
             if self._srcshape == 'CIRCLE':
                 self._rad = self['rad'].real()
@@ -116,7 +117,7 @@ class csphagen(ctools.csobservation):
                         if entry.attribute('name') == 'OffRegions':
                             offregionsfile = entry.attribute('file')
 
-                        # <parameter name="OnRegion" file=".."/> contains region file
+                        # <parameter name="OnRegion" file=".."/> contains region file.
                         if entry.attribute('name') == 'OnRegion':
                             onregionfile = entry.attribute('file')
 
@@ -139,16 +140,17 @@ class csphagen(ctools.csobservation):
                 self._bkgregfiles = {0:None}
                 srcregfile  = None
 
-            # Query bkg region file
+            # Query missing bkg region file
             if len([True for x in self._bkgregfiles if self._bkgregfiles[x] is None]) > 0:
                 if len(self._bkgregfiles) > 1:
                     # Querying of multiple regions not supported
-                    raise RuntimeError('Please specify all bkg region files in obs definition XML.')
+                    raise RuntimeError('There are missing bkg region files in the obs definition'
+                                       +' XML. Please specify all bkg region files!')
                 else:
                     # Query bkg region file for single observation
                     self._bkgregfiles[self._bkgregfiles.keys()[0]] = self['bkgreg'].filename()
 
-            # Query src region file
+            # Query missing src region file
             if srcregfile is None:
                 srcregfile  = self['srcreg'].filename()
 
@@ -156,20 +158,7 @@ class csphagen(ctools.csobservation):
             self._src_reg = gammalib.GSkyRegions(srcregfile)
 
             if len(self._src_reg) > 1:
-                raise RuntimeError('Only 1 On-region is allowed.')
-
-            onRegion = self._src_reg[0]
-            if isinstance(onRegion, gammalib.GSkyRegionCircle):
-                self._srcshape = 'CIRCLE'
-                self._src_dir  = onRegion.centre()
-                self._rad      = onRegion.radius()
-            elif isinstance(onRegion, gammalib.GSkyRegionMap):
-                self._srcshape = 'MAP'
-                raise RuntimeError('On region is MAP. Src direction can not be determined. Use CIRCLE!')
-            else:
-                raise RuntimeError('On region is unknown. Src direction can not be determined. Use CIRCLE!')
-
-            # END if bkgmethod=='CUSTOM'
+                raise RuntimeError('Only 1 ON region is allowed.')
 
         self['maxoffset'].real()
 
@@ -281,33 +270,45 @@ class csphagen(ctools.csobservation):
         """
 
         # Load regions from ds9 file of FITS WCS map
-        regions = gammalib.GSkyRegions( filePath )
+        regions  = gammalib.GSkyRegions( filePath )
 
-        # Prepare parameters for comparison
-        pnt_dir  = obs.pointing().dir()
-        offsetOn = pnt_dir.dist_deg(self._src_dir)
-        radiusOn = self._src_reg[0].radius()
+        # Do region tests only for circle shaped on-region. Else simply return list.
+        onRegion = self._src_reg[0]
+        if isinstance(onRegion, gammalib.GSkyRegionCircle):
 
-        # Do some tests
-        for region in regions:
+            # Prepare parameters for comparison
+            pnt_dir  = obs.pointing().dir()
+            offsetOn = pnt_dir.dist_deg(self._src_dir)
+            radiusOn = onRegion.radius()
 
-            offsetOff = pnt_dir.dist_deg(region.centre())
-            radiusOff = region.radius()
+            # Do some tests
+            for region in regions:
 
-            # Warn: different radius
-            if radiusOff != radiusOn:
-                self._log_string(gammalib.EXPLICIT, 'Off region radius differs from on'
-                                 'region radius: %.2f vs %.2f' % ((radiusOff, radiusOn)))
+                # Do region tests only for circle shaped off-regions
+                if isinstance(region, gammalib.GSkyRegionCircle):
 
-            # Warn: offset is too small or too large
-            if offsetOff <= self._rad or offsetOff >= self['maxoffset'].real():
-                self._log_string(gammalib.EXPLICIT, 'Region offset invalid for observation '
-                                 '%s (%.3f deg) ' % ((obs.id(), offsetOff)))
+                    # Gather parameters
+                    offsetOff = pnt_dir.dist_deg(region.centre())
+                    radiusOff = region.radius()
 
-            # Warn: offset of off and on region differ
-            if offsetOff != offsetOn:
-                self._log_string(gammalib.EXPLICIT, 'Off region offset differs '
-                                 '%.3f deg from on region offset' % (offsetOff-offsetOn))
+                    # Warn: different radius
+                    if radiusOff != radiusOn:
+                        self._log_string(gammalib.EXPLICIT, 'Off region radius differs from on'
+                                         'region radius: %.2f vs %.2f' % ((radiusOff, radiusOn)))
+
+                    # Warn: offset is too small or too large
+                    if offsetOff <= radiusOn or offsetOff >= self['maxoffset'].real():
+                        self._log_string(gammalib.EXPLICIT, 'Region offset invalid for observation '
+                                         '%s (%.3f deg) ' % ((obs.id(), offsetOff)))
+
+                    # Warn: offset of off and on region differ
+                    if offsetOff != offsetOn:
+                        self._log_string(gammalib.EXPLICIT, 'Off region offset differs '
+                                         '%.3f deg from on region offset' % (offsetOff-offsetOn))
+
+                    # end: off-regions test for circle shaped regions
+                # end: for loop iterating over off regions
+            # end: do region tests only if on-region is circle shaped
 
         # Inform user how many regions were loaded
         self._log_string(gammalib.NORMAL, 'Read %i regions from file %s.' % (regions.size(), filePath.url()))
