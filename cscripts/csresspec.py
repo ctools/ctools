@@ -81,9 +81,10 @@ class csresspec(ctools.csobservation):
         self._log_value(gammalib.TERSE, 'Binned CTA observations', n_binned)
         self._log_value(gammalib.TERSE, 'On/off CTA observations', n_onoff)
         self._log_value(gammalib.TERSE, 'Other observations', n_other)
-        self._log_string(gammalib.TERSE, '\nWARNING: Only CTA observation '
-                                         'can be handled, all '
-                                         'non-CTA observation will be ignored.\n')
+        if n_other > 0:
+            msg = 'WARNING: Only CTA observation can be handled, all non-CTA ' \
+                  + 'observations will be ignored.\n'
+            self._log_string(gammalib.TERSE, msg)
 
         # Query wether to compute model for individual components
         components = self['components'].boolean()
@@ -109,8 +110,8 @@ class csresspec(ctools.csobservation):
             self._log_value(gammalib.TERSE, msg)
             if n_cta > n_unbinned:
                 n_notunbin = n_cta - n_unbinned
-                msg = 'The intrinsic binning will be used for the remaining %s observations.' % (
-                n_notunbin)
+                msg = 'The intrinsic binning will be used for the remaining %s CTA observations.' % (
+                    n_notunbin)
                 self._log_value(gammalib.TERSE, msg)
 
         # If there is more than one observation, and observations are all
@@ -150,8 +151,17 @@ class csresspec(ctools.csobservation):
                 self['dec'].real()
                 self['rad'].real()
 
-        # Apply energy dispersion
-        self['edisp'].boolean()
+        # Unless all observations are On/Off, or we are using precomputed model
+        # maps query whether to use energy dispersion
+        if n_onoff == n_cta or self._use_maps:
+            msg = 'Energy dispersion is applied based on the input data/model ' \
+                  + 'and not according to the edisp parameter'
+            self._log_value(gammalib.TERSE, msg)
+        else:
+            self['edisp'].boolean()
+
+        # Query algorithm for residual computation
+        self['algorithm'].string()
 
         # Read ahead output parameters
         if self._read_ahead():
@@ -164,28 +174,118 @@ class csresspec(ctools.csobservation):
         return
 
     def _stack_observations(self):
+        """
+        Stack multiple observations and replace observation container
+        with single stacked observation
+
+        :return: stacked_obs container with a single stacked observation
+        """
         # Use first observation to determine the type and apply the
-        # approptiate stacking method
+        # appropriate stacking method
 
         # If On/Off use the GCTAOnOffObservation constructor
         if self.obs()[0].classname() == 'GCTAOnOffObservation':
-            msg = 'Stacking %s On/Off observations.'%(self.obs().size())
+            msg = 'Stacking %s On/Off observations.' % (self.obs().size())
             self._log_value(gammalib.TERSE, msg)
-            stacked_obs = gammalib.GCTAOnOffObservation(self.obs)
-            # reset observation container
-            self.obs = gammalib.GObservations()
-            # and append the new stacked observation
-            self.obs.append(stacked_obs)
+            stacked_obs = gammalib.GCTAOnOffObservation(self.obs())
 
         # If event list then bin observations
         elif self.obs()[0].classname() == 'GCTAObservation':
             msg = 'Stacking %s event lists.' % (self.obs().size())
             self._log_value(gammalib.TERSE, msg)
-            stacked_obs = obsutils.get_stacked_obs(self, self.obs)
-            self.obs = stacked_obs
+            stacked_obs = obsutils.get_stacked_obs(self, self.obs())
 
         # Return
-        return
+        return stacked_obs
+
+    def _bin_evlist(self, obs):
+        """
+        Turn single event list into counts cube
+        :param   obs: observation container with single event list
+        :return: binned_obs: binned observation container
+                 ra: RA of ROI centre
+                 dec: Dec of ROI centre
+                 rad: ROI radius
+        """
+        # Retrieve information about ROI in event list
+        roi = obs[0].roi()
+        ra = roi.centre().dir().ra_deg()
+        dec = roi.centre().dir().dec_deg()
+        rad = roi.radius()
+
+        # We will cover the whole ROI with 0.02 deg binning
+        npix = int(2 * rad / 0.02) + 1
+
+        # Bin events
+        cntcube = ctools.ctbin(obs)
+        cntcube['xref'] = ra
+        cntcube['yref'] = dec
+        cntcube['binsz'] = 0.02
+        cntcube['nxpix'] = npix
+        cntcube['nypix'] = npix
+        cntcube['proj'] = 'CAR'
+        cntcube['coordsys'] = 'CEL'
+        cntcube['ebinalg'] = self['ebinalg'].string()
+        if self['ebinalg'].string() == 'FILE'
+            cntcube['ebinfile'] = self['ebinfile'].filename()
+        else:
+            cntcube['enumbins'] = self['enumbins'].integer()
+            cntcube['emin'] = self['emin'].real()
+            cntcube['emax'] = self['emax'].real()
+        cntcube.run()
+
+        # Retrieve a new oberservation container
+        binned_obs = cntcube.obs().copy()
+
+        # Retrieve models
+        models = obs.models()
+
+        # Set models for new oberservation container
+        binned_obs.models(models)
+
+        # Return new oberservation container
+        return binned_obs, ra, dec, rad
+
+    def _add_binned_response(self, obs):
+        """
+        Add response to binned observation
+        :param obs: observation container
+        :return: obs: observation container with response
+        """
+
+        # use counts cube to extract geometry
+        cube = obs[0].events()
+        proj = cube.counts().projection()
+
+        response = obsutils.get_stacked_response(obs,
+                                                 proj.crval(0),
+                                                 proj.crval(1),
+                                                 binsz=max(abs(proj.cdelt(0)),
+                                                           abs(proj.cdelt(1))),
+                                                 # always ensures coverage of whole cube
+                                                 nxpix=cube.nx(),
+                                                 nypix=cube.ny(),
+                                                 coordsys=proj.coordsys(),
+                                                 proj=proj.code(),
+                                                 emin=cube.emin().TeV(),
+                                                 emax=cube.emax().TeV(),
+                                                 edisp=self['edisp'].boolean())
+
+        if self['edisp'].boolean():
+            obs[0].response(response['expcube'], response['psfcube'],
+                            response['edispcube'], response['bkgcube'])
+        else:
+            obs[0].response(response['expcube'], response['psfcube'],
+                            response['bkgcube'])
+
+        # Get new models
+        models = response['models']
+
+        # Set models for observation container
+        obs.models(models)
+
+        # Return observation container
+        return obs
 
     # Public methods
     def run(self):
@@ -204,12 +304,68 @@ class csresspec(ctools.csobservation):
 
         # Stack observations if requested
         if self._stack:
-            self._stack_observations()
+            self.obs(self._stack_observations())
 
         # Loop over observations and calculate residuals
         for obs in self.obs():
-            
+
+            # Turn into observation container and assign models
+            obs = gammalib.GObservations(obs)
+            obs.models(self.obs().models())
+
+            # if 3D observations
+            if obs[0].classname() == 'GCTAObservation':
+
+                ## Prepare Observations
+
+                ## If already binned pass
+                was_list = False
+                if obs[0].eventtype() == 'CountsCube':
+                    pass
+                ## Otherwise bin now
+                else:
+                    # we remember if we binned an event list
+                    # so that we can mask only the ROI for residual calculation
+                    was_list = True
+                    obs, ev_ra, ev_dec, ev_rad = self._bin_evlist(obs)
+
+                ## If binned response is present or model cube provided pass
+                if obs[0].has_response() or self._use_maps:
+                    pass
+                ## Otherwise calculate binned response now
+                else:
+                    obs = self._add_binned_response(obs)
+
+                ## Calculate Model and residuals
+
+                ## If model cube is provided load it
+                if self._use_maps:
+                    modcube = gammalib.GCTAEventCube(self['inmodel'].filename())
+                ## Otherwise calculate it now
+                else:
+                    modelcube = ctools.ctmodel(obs)
+                    modelcube.run()
+                    modcube = modelcube.cube().copy()
+
+                ## Extract cntcube for residual computation
+                cntcube = obs[0].events().copy()
+
+                ## If we started from event list mask the ROI only
+                ## for residual computation
+                if was_list:
+                    for cube in [cntcube,modcube]:
+                        pass
+                else:
+                    pass
 
 
+                ## Calculate models of individual components if requested
 
+            # otherwise, if On/Off
+            elif obs[0].classname() == 'GCTAOnOffObservation':
 
+                ## Calculate Model and residuals
+
+                ## Calculate models of individual components if requested
+
+                pass

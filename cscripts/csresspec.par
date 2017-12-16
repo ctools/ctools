@@ -51,6 +51,7 @@ ra,        r, a, 83.63,0,360, "RA for ROI centre (degrees)"
 dec,       r, a, 22.01,-90,90, "Dec for ROI centre (degrees)"
 rad,       r, a, 3.0,0,180, "Radius of ROI (degrees)"
 regfile,   f, a, "NONE",,, "Input exclusion region file in ds9 format"
+algorithm, s, a, SIGNIFICANCE,SUB|SUBDIV|SUBDIVSQRT|SIGNIFICANCE,, "Residuals computation algorithm"
 
 #
 # Standard parameters
