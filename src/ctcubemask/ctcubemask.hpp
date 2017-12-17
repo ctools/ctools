@@ -33,6 +33,7 @@
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
 #include "ctobservation.hpp"
+#include "GCTAEventCube.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTCUBEMASK_NAME "ctcubemask"
@@ -61,6 +62,7 @@ public:
     void run(void);
     void save(void);
     void publish(const std::string& name = "");
+    GCTAEventCube* cube(void) const;
 
 protected:
     // Protected methods
@@ -87,5 +89,19 @@ protected:
     bool                     m_select_energy; //!< Perform energy selection
 };
 
+/***********************************************************************//**
+ * @brief Return events cube
+ *
+ * @return Reference to events cube correspoding to ith observation
+ *
+ * Returns a reference to the events cube.
+ ***************************************************************************/
+inline
+GCTAEventCube* ctcubemask::cube(void) const
+{
+
+  return dynamic_cast<GCTAEventCube*>(const_cast<GEvents*>(m_obs[0]->events()));
+  
+}
 
 #endif /* CTCUBEMASK_HPP */
