@@ -50,7 +50,7 @@ class csphagen(ctools.csobservation):
         self._has_exclusion = False
         self._srcshape      = ''
         self._rad           = 0.0
-        self._bkgregfiles   = {}
+        self._bkg_reg_files = {}     # dictionary: bkg region file per observation {obsid:filepath, ..}
 
         # Return
         return
@@ -59,6 +59,11 @@ class csphagen(ctools.csobservation):
     def _get_parameters(self):
         """
         Get parameters from parfile and setup observations
+
+        Raises
+        ------
+        RuntimeError
+            Multiple On-Regions in on region file or missing Off-Regions files.
         """
         # Setup observations (require response and allow event list, don't
         # allow counts cube)
@@ -93,69 +98,69 @@ class csphagen(ctools.csobservation):
 
         elif bkgmethod == 'CUSTOM':
 
-            obsfile    = self['inobs'].filename()
-            srcregfile = gammalib.GFilename()
+            obs_file     = self['inobs'].filename()
+            src_reg_file = gammalib.GFilename()
 
             # obs def XML: look for region files
-            if obsfile.file()[-3:] == 'xml':
+            if obs_file.file()[-3:] == 'xml':
                 # open and load XML obs definition file
                 xml = gammalib.GXml()
-                xml.load(obsfile)
+                xml.load(obs_file)
 
                 # Go through elements in <observationlist>
                 for elem in xml[0]:
 
                     # Get observation id from <observation> header
-                    obsid          = elem.attribute('id')
+                    obs_id = elem.attribute('id')
 
                     # Get region file path from <observation> body
-                    offregionsfile = ''
-                    onregionfile   = ''
+                    off_regions_file = ''
+                    on_region_file   = ''
                     for entry in elem:
 
                         # <parameter name="OffRegions" file=".."/> contains region file
                         if entry.attribute('name') == 'OffRegions':
-                            offregionsfile = entry.attribute('file')
+                            off_regions_file = entry.attribute('file')
 
                         # <parameter name="OnRegion" file=".."/> contains region file.
                         if entry.attribute('name') == 'OnRegion':
-                            onregionfile = entry.attribute('file')
+                            on_region_file = entry.attribute('file')
 
                     # Store file paths
-                    self._bkgregfiles[obsid] = gammalib.GFilename(offregionsfile)
+                    self._bkg_reg_files[obs_id] = gammalib.GFilename(off_regions_file)
 
-                    if onregionfile != '':
-                        srcregfile     = gammalib.GFilename(onregionfile)
+                    if on_region_file != '':
+                        src_reg_file = gammalib.GFilename(on_region_file)
 
                     # Not existing bkg region files are set to None (for every obs)
-                    if not self._bkgregfiles[obsid].exists():
-                        self._bkgregfiles[obsid] = None
+                    if not self._bkg_reg_files[obs_id].exists():
+                        self._bkg_reg_files[obs_id] = None
 
                 # Not existing src region files are set to None (one time)
-                if not srcregfile.exists():
-                    srcregfile = None
+                if not src_reg_file.exists():
+                    src_reg_file = None
 
             else:
                 # event FITS files: query later 1 bkg & 1 src region file
-                self._bkgregfiles = {0:None}
-                srcregfile  = None
+                self._bkg_reg_files = {0:None}
+                src_reg_file  = None
 
             # Query missing bkg region file
-            if len([True for x in self._bkgregfiles if self._bkgregfiles[x] is None]) > 0:
-                if len(self._bkgregfiles) > 1:
+            if len([True for x in self._bkg_reg_files if self._bkg_reg_files[x] is None]) > 0:
+                if len(self._bkg_reg_files) > 1:
                     # Querying of multiple regions not supported
                     raise RuntimeError('There are missing bkg region files in the obs definition'
                                        +' XML. Please specify all bkg region files!')
                 else:
                     # Query bkg region file for single observation
-                    self._bkgregfiles[self._bkgregfiles.keys()[0]] = self['bkgreg'].filename()
+                    self._bkg_reg_files[self._bkg_reg_files.keys()[0]] = self['bkgreg'].filename()
 
             # Query missing src region file
-            if srcregfile is None:
-                srcregfile  = self['srcreg'].filename()
+            if src_reg_file is None:
+                src_reg_file  = self['srcreg'].filename()
 
             # Set up src (=On) region. Only 1 region is allowed
-            self._src_reg = gammalib.GSkyRegions(srcregfile)
+            self._src_reg = gammalib.GSkyRegions(src_reg_file)
 
             if len(self._src_reg) > 1:
                 raise RuntimeError('Only 1 ON region is allowed.')
@@ -252,15 +257,16 @@ class csphagen(ctools.csobservation):
         # Return reflected regions
         return regions
 
-    def _regions_from_file(self, obs, filePath):
+    def _regions_from_file(self, obs, file_path):
         """
         Read list of reflected regions for a single observation (pointing) from file.
+        Perform basic tests for circle shaped regions.
 
         Parameters
         ----------
         obs : `~gammalib.GCTAObservation()`
             CTA observation
-        filePath: `~gammalib.GFilename()`
+        file_path: `~gammalib.GFilename()`
             File path to file containing off regions.
 
         Returns
@@ -270,16 +276,16 @@ class csphagen(ctools.csobservation):
         """
 
         # Load regions from ds9 file of FITS WCS map
-        regions  = gammalib.GSkyRegions( filePath )
+        regions  = gammalib.GSkyRegions( file_path )
 
         # Do region tests only for circle shaped on-region. Else simply return list.
-        onRegion = self._src_reg[0]
-        if isinstance(onRegion, gammalib.GSkyRegionCircle):
+        on_region = self._src_reg[0]
+        if isinstance(on_region, gammalib.GSkyRegionCircle):
 
             # Prepare parameters for comparison
             pnt_dir  = obs.pointing().dir()
-            offsetOn = pnt_dir.dist_deg(self._src_dir)
-            radiusOn = onRegion.radius()
+            offset_on = pnt_dir.dist_deg(self._src_dir)
+            radius_on = on_region.radius()
 
             # Do some tests
             for region in regions:
@@ -288,30 +294,30 @@ class csphagen(ctools.csobservation):
                 if isinstance(region, gammalib.GSkyRegionCircle):
 
                     # Gather parameters
-                    offsetOff = pnt_dir.dist_deg(region.centre())
-                    radiusOff = region.radius()
+                    offset_off = pnt_dir.dist_deg(region.centre())
+                    radius_off = region.radius()
 
                     # Warn: different radius
-                    if radiusOff != radiusOn:
+                    if radius_off != radius_on:
                         self._log_string(gammalib.EXPLICIT, 'Off region radius differs from on'
-                                         'region radius: %.2f vs %.2f' % ((radiusOff, radiusOn)))
+                                         'region radius: %.2f vs %.2f' % ((radius_off, radius_on)))
 
                     # Warn: offset is too small or too large
-                    if offsetOff <= radiusOn or offsetOff >= self['maxoffset'].real():
+                    if offset_off <= radius_on or offset_off >= self['maxoffset'].real():
                         self._log_string(gammalib.EXPLICIT, 'Region offset invalid for observation '
-                                         '%s (%.3f deg) ' % ((obs.id(), offsetOff)))
+                                         '%s (%.3f deg) ' % ((obs.id(), offset_off)))
 
                     # Warn: offset of off and on region differ
-                    if offsetOff != offsetOn:
+                    if offset_off != offset_on:
                         self._log_string(gammalib.EXPLICIT, 'Off region offset differs '
-                                         '%.3f deg from on region offset' % (offsetOff-offsetOn))
+                                         '%.3f deg from on region offset' % (offset_off-offset_on))
 
                     # end: off-regions test for circle shaped regions
                 # end: for loop iterating over off regions
             # end: do region tests only if on-region is circle shaped
 
         # Inform user how many regions were loaded
-        self._log_string(gammalib.NORMAL, 'Read %i regions from file %s.' % (regions.size(), filePath.url()))
+        self._log_string(gammalib.NORMAL, 'Read %i regions from file %s.' % (regions.size(), file_path.url()))
 
         # return list of regions
         return regions
@@ -435,14 +441,14 @@ class csphagen(ctools.csobservation):
                 bkg_reg = self._reflected_regions(obs)
             elif self['bkgmethod'].string() == 'CUSTOM':
                 # Get file path of bkg region file from dictionary
-                if len(self._bkgregfiles) > 1:
-                    bkgregfile = self._bkgregfiles[obs.id()]
+                if len(self._bkg_reg_files) > 1:
+                    bkg_reg_file = self._bkg_reg_files[obs.id()]
                 else:
                     # for inobs==event list no obs id is set.
-                    bkgregfile = self._bkgregfiles[self._bkgregfiles.keys()[0]]
+                    bkg_reg_file = self._bkg_reg_files[self._bkg_reg_files.keys()[0]]
 
-                # If file is valid load. Else warn and use reflected method.
-                bkg_reg = self._regions_from_file(obs, bkgregfile)
+                # Load off regions from region file for current observation
+                bkg_reg = self._regions_from_file(obs, bkg_reg_file)
 
 
             # If there are reflected regions then create On/Off observation
