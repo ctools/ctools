@@ -21,6 +21,7 @@
 import gammalib
 import ctools
 from cscripts import obsutils
+import math
 
 
 # =============== #
@@ -206,6 +207,9 @@ class csresspec(ctools.csobservation):
                  ra: RA of ROI centre
                  dec: Dec of ROI centre
                  rad: ROI radius
+                 emin: minimum energy of events
+                 emax: maximum energy of events
+
         """
         # Retrieve information about ROI in event list
         roi = obs[0].roi()
@@ -223,7 +227,7 @@ class csresspec(ctools.csobservation):
         cntcube['binsz'] = 0.02
         cntcube['nxpix'] = npix
         cntcube['nypix'] = npix
-        cntcube['proj'] = 'CAR'
+        cntcube['proj'] = 'TAN'
         cntcube['coordsys'] = 'CEL'
         cntcube['ebinalg'] = self['ebinalg'].string()
         if self['ebinalg'].string() == 'FILE'
@@ -243,129 +247,246 @@ class csresspec(ctools.csobservation):
         # Set models for new oberservation container
         binned_obs.models(models)
 
-        # Return new oberservation container
-        return binned_obs, ra, dec, rad
-
-    def _add_binned_response(self, obs):
-        """
-        Add response to binned observation
-        :param obs: observation container
-        :return: obs: observation container with response
-        """
-
-        # use counts cube to extract geometry
-        cube = obs[0].events()
-        proj = cube.counts().projection()
-
-        response = obsutils.get_stacked_response(obs,
-                                                 proj.crval(0),
-                                                 proj.crval(1),
-                                                 binsz=max(abs(proj.cdelt(0)),
-                                                           abs(proj.cdelt(1))),
-                                                 # always ensures coverage of whole cube
-                                                 nxpix=cube.nx(),
-                                                 nypix=cube.ny(),
-                                                 coordsys=proj.coordsys(),
-                                                 proj=proj.code(),
-                                                 emin=cube.emin().TeV(),
-                                                 emax=cube.emax().TeV(),
-                                                 edisp=self['edisp'].boolean())
-
-        if self['edisp'].boolean():
-            obs[0].response(response['expcube'], response['psfcube'],
-                            response['edispcube'], response['bkgcube'])
+        # Check if energy boundaries provided by user extend beyond
+        # the content of the event list
+        if self['emin'].real() > obs[0].emin().TeV:
+            emin = 'INDEF'
         else:
-            obs[0].response(response['expcube'], response['psfcube'],
-                            response['bkgcube'])
+            emin = obs[0].emin().TeV
+        if self['emax'].real() < obs[0].emax().TeV:
+            emax = 'INDEF'
+        else:
+            emax = obs[0].emax().TeV
 
-        # Get new models
-        models = response['models']
+        # Return new oberservation container
+        return binned_obs, ra, dec, rad, emin, emax
 
-        # Set models for observation container
-        obs.models(models)
+    def _masked_cube(self, cube, ra, dec, rad, emin='INDEF', emax='INDEF',
+                     regfile='NONE'):
+        """
+        Mask an event cube and returns the masked cube
+        :param cube: Events cube
+        :param ra:
+        :param dec:
+        :param rad:
+        :param emin:
+        :param emax:
+        :return: outcube: masked cube
+        """
 
-        # Return observation container
-        return obs
+        # Turn cube into observation container to feed to ctcubemask
+        obs = gammalib.GCTAObservation()
+        obs.events(cube)
+        obs_cont = gammalib.GObservations()
+        obs_cont.append(obs)
+
+        # Use ctcubemask to mask
+        cubemask = ctools.ctcubemask(obs_cont)
+        cubemask['ra'] = ra
+        cubemask['dec'] = dec
+        cubemask['rad'] = rad
+        cubemask['emin'] = emin
+        cubemask['emax'] = emax
+        cubemask['regfile'] = regfile
+        cubemask.run()
+
+        return cubemask.cube()
+
+
+def _add_binned_response(self, obs):
+    """
+    Add response to binned observation
+    :param obs: observation container
+    :return: obs: observation container with response
+    """
+
+    # use counts cube to extract geometry
+    cube = obs[0].events()
+    proj = cube.counts().projection()
+
+    response = obsutils.get_stacked_response(obs,
+                                             proj.crval(0),
+                                             proj.crval(1),
+                                             binsz=max(abs(proj.cdelt(0)),
+                                                       abs(proj.cdelt(1))),
+                                             # always ensures coverage of whole cube
+                                             nxpix=cube.nx(),
+                                             nypix=cube.ny(),
+                                             coordsys=proj.coordsys(),
+                                             proj=proj.code(),
+                                             emin=cube.emin().TeV(),
+                                             emax=cube.emax().TeV(),
+                                             edisp=self['edisp'].boolean())
+
+    if self['edisp'].boolean():
+        obs[0].response(response['expcube'], response['psfcube'],
+                        response['edispcube'], response['bkgcube'])
+    else:
+        obs[0].response(response['expcube'], response['psfcube'],
+                        response['bkgcube'])
+
+    # Get new models
+    models = response['models']
+
+    # Set models for observation container
+    obs.models(models)
+
+    # Return observation container
+    return obs
 
     # Public methods
-    def run(self):
-        """
-        Run the script
-        """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
-        # Get parameters
-        self._get_parameters()
-
-        # Write observation into logger
-        self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
-
-        # Stack observations if requested
-        if self._stack:
-            self.obs(self._stack_observations())
-
-        # Loop over observations and calculate residuals
-        for obs in self.obs():
-
-            # Turn into observation container and assign models
-            obs = gammalib.GObservations(obs)
-            obs.models(self.obs().models())
-
-            # if 3D observations
-            if obs[0].classname() == 'GCTAObservation':
-
-                ## Prepare Observations
-
-                ## If already binned pass
-                was_list = False
-                if obs[0].eventtype() == 'CountsCube':
-                    pass
-                ## Otherwise bin now
-                else:
-                    # we remember if we binned an event list
-                    # so that we can mask only the ROI for residual calculation
-                    was_list = True
-                    obs, ev_ra, ev_dec, ev_rad = self._bin_evlist(obs)
-
-                ## If binned response is present or model cube provided pass
-                if obs[0].has_response() or self._use_maps:
-                    pass
-                ## Otherwise calculate binned response now
-                else:
-                    obs = self._add_binned_response(obs)
-
-                ## Calculate Model and residuals
-
-                ## If model cube is provided load it
-                if self._use_maps:
-                    modcube = gammalib.GCTAEventCube(self['inmodel'].filename())
-                ## Otherwise calculate it now
-                else:
-                    modelcube = ctools.ctmodel(obs)
-                    modelcube.run()
-                    modcube = modelcube.cube().copy()
-
-                ## Extract cntcube for residual computation
-                cntcube = obs[0].events().copy()
-
-                ## If we started from event list mask the ROI only
-                ## for residual computation
-                if was_list:
-                    for cube in [cntcube,modcube]:
-                        pass
-                else:
-                    pass
 
 
-                ## Calculate models of individual components if requested
+def run(self):
+    """
+    Run the script
+    """
+    # Switch screen logging on in debug mode
+    if self._logDebug():
+        self._log.cout(True)
 
-            # otherwise, if On/Off
-            elif obs[0].classname() == 'GCTAOnOffObservation':
+    # Get parameters
+    self._get_parameters()
 
-                ## Calculate Model and residuals
+    # Write observation into logger
+    self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
 
-                ## Calculate models of individual components if requested
+    # Stack observations if requested
+    if self._stack:
+        self.obs(self._stack_observations())
 
+    # Loop over observations and calculate residuals
+    for obs in self.obs():
+
+        # Turn into observation container and assign models
+        obs = gammalib.GObservations(obs)
+        obs.models(self.obs().models())
+
+        # if 3D observations
+        if obs[0].classname() == 'GCTAObservation':
+
+            ## Prepare Observations
+
+            # If already binned pass
+            was_list = False
+            if obs[0].eventtype() == 'CountsCube':
                 pass
+            # Otherwise bin now
+            else:
+                # we remember if we binned an event list
+                # so that we can mask only the ROI for residual calculation
+                was_list = True
+                obs, ev_ra, ev_dec, ev_rad, ev_emin, ev_emax = self._bin_evlist(
+                    obs)
+
+            # If binned response is present or model cube provided pass
+            if obs[0].has_response() or self._use_maps:
+                pass
+            # Otherwise calculate binned response now
+            else:
+                obs = self._add_binned_response(obs)
+
+            ## Calculate Model and residuals
+
+            # If model cube is provided load it
+            if self._use_maps:
+                modcube = gammalib.GCTAEventCube(self['inmodel'].filename())
+            # Otherwise calculate it now
+            else:
+                modelcube = ctools.ctmodel(obs)
+                modelcube.run()
+                modcube = modelcube.cube().copy()
+
+            # Extract cntcube for residual computation
+            cntcube = obs[0].events().copy()
+
+            # If we started from event list mask the ROI only
+            # for residual computation
+            if was_list:
+                cntcube = self._masked_cube(cntcube, ev_ra, ev_dec, ev_rad,
+                                            emin=ev_emin, emax=ev_emax)
+                modcube = self._masked_cube(modcube, ev_ra, ev_dec, ev_rad,
+                                            emin=ev_emin, emax=ev_emax)
+            else:
+                pass
+
+            # Apply user mask
+            if self._mask:
+                cntcube = self._masked_cube(cntcube, self['ra'], self['dec'],
+                                            self['rad'],
+                                            regfile=self['regfile'])
+                modcube = self._masked_cube(modcube, self['ra'], self['dec'],
+                                            self['rad'],
+                                            regfile=self['regfile'])
+            else:
+                pass
+
+            # Calculate residuals
+
+            # Arrays with counts and model
+            counts = cntcube.counts().total_counts()
+            model =  modcube.counts().total_counts()
+
+            # Get residual algorithm type
+            algorithm = self['algorithm'].string()
+
+            # Subtract
+            if algorithm == 'SUB':
+                residuals = counts - model
+
+            # Subtract and divide by model map
+            elif algorithm == 'SUBDIV':
+                residuals = counts - model
+                residuals /= model
+
+            # Subtract and divide by sqrt of model map
+            elif algorithm == 'SUBDIVSQRT':
+                residuals = counts - model
+                residuals /= model.sqrt()
+
+            # Calculate significance from Li&Ma derivation
+            elif algorithm == 'SIGNIFICANCE':
+                residuals = counts.copy()
+
+                # Compute sign array
+                sign = (counts - model).sign() ##not implemented!!
+
+                # Loop over energy bins
+                for i in range(counts.size()):
+
+                    # If the model value > 0.0 do the computation as normal ...
+                    model_val = model[i]
+                    if model_val > 0.0:
+
+                        # If the data value is also > 0 then compute the
+                        # significance^2 and fill it in the residuals ...
+                        data_val = counts[i]
+                        if data_val > 0.0:
+                            log_val = math.log(data_val / model_val)
+                            residuals[i] = (
+                                              data_val * log_val) + model_val - data_val
+
+                        # ... otherwise compute the reduced value of the above
+                        # expression. This is necessary to avoid computing log(0).
+                        else:
+                            residuals[i] = model_val
+
+                    # ... otherwise hard-code the significance to 0
+                    else:
+                        residuals[i] = 0.0
+
+                # Compute significance
+                residuals *= 2.0
+                residuals = residuals.sqrt()
+                residuals = residuals * sign
+
+            ## Calculate models of individual components if requested
+
+        # otherwise, if On/Off
+        elif obs[0].classname() == 'GCTAOnOffObservation':
+
+            ## Calculate Model and residuals
+
+            ## Calculate models of individual components if requested
+
+            pass
