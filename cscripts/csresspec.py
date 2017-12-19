@@ -21,7 +21,6 @@
 import gammalib
 import ctools
 from cscripts import obsutils
-import math
 
 
 # =============== #
@@ -130,17 +129,10 @@ class csresspec(ctools.csobservation):
                 self['nypix'].real()
                 self['binsz'].real()
 
-        # If we are not using a precomputed model query input XML model file
-        if not self._use_maps:
-            modxml = self['inmodel'].filename()
-            # If None check whether models are provided in observation
-            # container, otherwise throw exception and stop here
-            if modxml == 'NONE' and self.obs().models().is_empty():
-                msg = 'No model provided. Please specify an input XML model file'
-                raise RuntimeError(msg)
-            # Otherwise set the input model
-            else:
-                self.obs().models(modxml)
+        # If we are not using a precomputed model and no models are available
+        # in the observation container query input XML model file
+        if not self._use_maps and self.obs().models().size() == 0:
+            self.obs().models(self['inmodel'].filename())
 
         # Unless all observations are On/Off query for mask definition
         if n_onoff == n_cta:
@@ -230,7 +222,7 @@ class csresspec(ctools.csobservation):
         cntcube['proj'] = 'TAN'
         cntcube['coordsys'] = 'CEL'
         cntcube['ebinalg'] = self['ebinalg'].string()
-        if self['ebinalg'].string() == 'FILE'
+        if self['ebinalg'].string() == 'FILE':
             cntcube['ebinfile'] = self['ebinfile'].filename()
         else:
             cntcube['enumbins'] = self['enumbins'].integer()
@@ -426,59 +418,6 @@ def run(self):
             # Arrays with counts and model
             counts = cntcube.counts().total_counts()
             model =  modcube.counts().total_counts()
-
-            # Get residual algorithm type
-            algorithm = self['algorithm'].string()
-
-            # Subtract
-            if algorithm == 'SUB':
-                residuals = counts - model
-
-            # Subtract and divide by model map
-            elif algorithm == 'SUBDIV':
-                residuals = counts - model
-                residuals /= model
-
-            # Subtract and divide by sqrt of model map
-            elif algorithm == 'SUBDIVSQRT':
-                residuals = counts - model
-                residuals /= model.sqrt()
-
-            # Calculate significance from Li&Ma derivation
-            elif algorithm == 'SIGNIFICANCE':
-                residuals = counts.copy()
-
-                # Compute sign array
-                sign = (counts - model).sign() ##not implemented!!
-
-                # Loop over energy bins
-                for i in range(counts.size()):
-
-                    # If the model value > 0.0 do the computation as normal ...
-                    model_val = model[i]
-                    if model_val > 0.0:
-
-                        # If the data value is also > 0 then compute the
-                        # significance^2 and fill it in the residuals ...
-                        data_val = counts[i]
-                        if data_val > 0.0:
-                            log_val = math.log(data_val / model_val)
-                            residuals[i] = (
-                                              data_val * log_val) + model_val - data_val
-
-                        # ... otherwise compute the reduced value of the above
-                        # expression. This is necessary to avoid computing log(0).
-                        else:
-                            residuals[i] = model_val
-
-                    # ... otherwise hard-code the significance to 0
-                    else:
-                        residuals[i] = 0.0
-
-                # Compute significance
-                residuals *= 2.0
-                residuals = residuals.sqrt()
-                residuals = residuals * sign
 
             ## Calculate models of individual components if requested
 
