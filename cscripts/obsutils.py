@@ -828,3 +828,92 @@ def get_onoff_obs(cls, obs):
 
     # Return On/Off oberservation container
     return onoff_obs
+
+# ========================================= #
+# Calculate residuals from counts and model #
+# ========================================= #
+def residuals(cls,counts,model):
+    """
+    Calculate residuals given counts and models,
+    according to algorithm specified by user.
+    Can handle GSkyMap or GNdarray objects
+    :param cls: `~ctools.cscript`
+        cscript class
+    :param counts: `~gammalib.GSkyMap/~gammalib.GNdarray' data counts
+    :param model: `~gammalib.GSkyMap/~gammalib.GNdarray' model counts
+    :return residuals: `~gammalib.GSkyMap/~gammalib.GNdarray' residuals
+    """
+    # Find type of objects we are manipulating
+    # and set size to iterate later
+
+    # If GNdarray
+    if counts.classname() == 'GNdarray':
+        nelem = counts.size()
+    elif counts.classname() == 'GSkyMap':
+        nelem = counts.npix()
+    else:
+        msg = 'obsutils.residuals only handles ' \
+              + 'GNdarray or GSkyMap objects.\n'
+        raise RuntimeError(msg)
+
+    # Copy counts to initialise residuals
+    residuals = counts.copy()
+
+    # Get residual map algorithm type
+    algorithm = cls['algorithm'].string()
+
+    # Subtract
+    if algorithm == 'SUB':
+        residuals -= model
+
+    # Subtract and divide by model
+    elif algorithm == 'SUBDIV':
+        residuals -= model
+        residuals /= model
+
+    # Subtract and divide by sqrt of model
+    elif algorithm == 'SUBDIVSQRT':
+        residuals -= model
+        residuals /= model.sqrt()
+
+    # Calculate significance from Li&Ma
+    elif algorithm == 'SIGNIFICANCE':
+
+        # Compute sign
+        sign = (residuals - model).sign()
+
+        # Loop over every bin
+        for i in range(nelem):
+
+            # If the model value > 0.0 do the computation as normal ...
+            model_val = model[i]
+            if model_val > 0.0:
+
+                # If the data value is also > 0 then compute the
+                # significance^2 and save it ...
+                data_val = residuals[i]
+                if data_val > 0.0:
+                    log_val = math.log(data_val / model_val)
+                    residuals[i] = (
+                                      data_val * log_val) + model_val - data_val
+
+                # ... otherwise compute the reduced value of the above
+                # expression. This is necessary to avoid computing log(0).
+                else:
+                    residuals[i] = model_val
+
+            # ... otherwise hard-code the significance to 0
+            else:
+                residuals[i] = 0.0
+
+        # Compute significance map
+        residuals *= 2.0
+        residuals = residuals.sqrt()
+        residuals = residuals * sign
+
+    # Raise exception if algorithm is unknown
+    else:
+        raise TypeError('Algorithm "' + algorithm + '" not known')
+
+    # Return
+    return residuals

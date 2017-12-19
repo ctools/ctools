@@ -19,9 +19,9 @@
 #
 # ==========================================================================
 import sys
-import math
 import gammalib
 import ctools
+from cscripts import obsutils
 
 
 # ============== #
@@ -209,67 +209,15 @@ class csresmap(ctools.csobservation):
             # Get model map into GSkyMap object
             modelmap = model.cube().counts().copy()
 
-        # Store counts map as residual map. Note that we need a special
+        # Calculate residual maps
+        # Note that we need a special
         # construct here to avoid memory leaks. This seems to be a SWIG feature
         # as SWIG creates a new object when calling binning.cube()
-        self._resmap = countmap.copy()
-        self._resmap.stack_maps()
+        countmap1 = countmap.copy()
+        countmap1.stack_maps()
+        print("TEST",countmap1.classname())
         modelmap.stack_maps()
-
-        # Get residual map algorithm type
-        algorithm = self['algorithm'].string()
-
-        # Subtract maps
-        if algorithm == 'SUB':
-            self._resmap -= modelmap
-
-        # Subtract and divide by model map
-        elif algorithm == 'SUBDIV':
-            self._resmap -= modelmap
-            self._resmap /= modelmap
-
-        # Subtract and divide by sqrt of model map
-        elif algorithm == 'SUBDIVSQRT':
-            self._resmap -= modelmap
-            self._resmap /= modelmap.sqrt()
-
-        # Calculate significance from Li&Ma derivation
-        elif algorithm == 'SIGNIFICANCE':
-
-            # Compute sign map
-            signmap = (self._resmap - modelmap).sign()
-
-            # Loop over every bin in the map
-            for i in range(self._resmap.npix()):
-
-                # If the model value > 0.0 do the computation as normal ...
-                model_val = modelmap[i]
-                if model_val > 0.0:
-
-                    # If the data value is also > 0 then compute the
-                    # significance^2 and save it to the map ...
-                    data_val = self._resmap[i]
-                    if data_val > 0.0:
-                        log_val         = math.log(data_val/model_val)
-                        self._resmap[i] = (data_val*log_val) + model_val  - data_val
-
-                    # ... otherwise compute the reduced value of the above
-                    # expression. This is necessary to avoid computing log(0).
-                    else:
-                        self._resmap[i] = model_val
-
-                # ... otherwise hard-code the significance to 0
-                else:
-                    self._resmap[i] = 0.0
-
-            # Compute significance map
-            self._resmap *= 2.0
-            self._resmap  = self._resmap.sqrt()
-            self._resmap  = self._resmap * signmap
-
-        # Raise exception if algorithm is unknown
-        else:
-            raise TypeError('Algorithm "'+algorithm+'" not known')
+        self._resmap = obsutils.residuals(self,countmap1,modelmap)
 
         # Optionally publish map
         if self['publish'].boolean():
