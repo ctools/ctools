@@ -21,7 +21,7 @@
 import gammalib
 import ctools
 from cscripts import obsutils
-
+import sys
 
 # =============== #
 # csresspec class #
@@ -44,6 +44,7 @@ class csresspec(ctools.csobservation):
         self._use_maps = False
         self._stack = False
         self._mask = False
+        self._fits = gammalib.GFits()
 
         # Return
         return
@@ -171,7 +172,7 @@ class csresspec(ctools.csobservation):
         Stack multiple observations and replace observation container
         with single stacked observation
 
-        :return: stacked_obs container with a single stacked observation
+        :return: `~gammalib.GObservations' container with a single stacked observation
         """
         # Use first observation to determine the type and apply the
         # appropriate stacking method
@@ -194,13 +195,9 @@ class csresspec(ctools.csobservation):
     def _bin_evlist(self, obs):
         """
         Turn single event list into counts cube
-        :param   obs: observation container with single event list
-        :return: binned_obs: binned observation container
-                 ra: RA of ROI centre
-                 dec: Dec of ROI centre
-                 rad: ROI radius
-                 emin: minimum energy of events
-                 emax: maximum energy of events
+        :param   obs: `~gammalib.GObservations' observation container with single event list
+        :return: `~gammalib.GObservations' binned observation container
+                 dict with event list ROI and energy range information
 
         """
         # Retrieve information about ROI in event list
@@ -250,20 +247,66 @@ class csresspec(ctools.csobservation):
         else:
             emax = obs[0].emax().TeV
 
+        # Put ROI and E bound info in dictionary
+        info = {'was_list': True, 'roi_ra': ra, 'roi_dec': dec, 'roi_rad': rad,
+                'emin': emin, 'emax': emax}
+
         # Return new oberservation container
-        return binned_obs, ra, dec, rad, emin, emax
+        return binned_obs, info
+
+    def _add_binned_response(self, obs):
+        """
+        Add response to binned observation
+        :param obs: `~gammalib.GObservations' observation container
+        :return: obs: `~gammalib.GObservations' observation container with response
+        """
+
+        # use counts cube to extract geometry
+        cube = obs[0].events()
+        proj = cube.counts().projection()
+
+        response = obsutils.get_stacked_response(obs,
+                                                 proj.crval(0),
+                                                 proj.crval(1),
+                                                 binsz=max(abs(proj.cdelt(0)),
+                                                           abs(proj.cdelt(1))),
+                                                 # always ensures coverage of whole cube
+                                                 nxpix=cube.nx(),
+                                                 nypix=cube.ny(),
+                                                 coordsys=proj.coordsys(),
+                                                 proj=proj.code(),
+                                                 emin=cube.emin().TeV(),
+                                                 emax=cube.emax().TeV(),
+                                                 edisp=self['edisp'].boolean())
+
+        if self['edisp'].boolean():
+            obs[0].response(response['expcube'], response['psfcube'],
+                            response['edispcube'], response['bkgcube'])
+        else:
+            obs[0].response(response['expcube'], response['psfcube'],
+                            response['bkgcube'])
+
+        # Get new models
+        models = response['models']
+
+        # Set models for observation container
+        obs.models(models)
+
+        # Return observation container
+        return obs
 
     def _masked_cube(self, cube, ra, dec, rad, emin='INDEF', emax='INDEF',
                      regfile='NONE'):
         """
         Mask an event cube and returns the masked cube
-        :param cube: Events cube
-        :param ra:
-        :param dec:
-        :param rad:
-        :param emin:
-        :param emax:
-        :return: outcube: masked cube
+        :param cube: `~gammalib.GCTAEventCube' Events cube
+        :param ra: double (str 'INDEF' for no selection on direction)
+        :param dec: double (str 'INDEF' for no selection on direction)
+        :param rad: double (str 'INDEF' for no selection on direction)
+        :param emin: double (str 'INDEF' for no selection on energy)
+        :param emax: double (str 'INDEF' for no selection on energy)
+        :param regfile: str with name of ds9 file with exclusion regions
+        :return: `~gammalib.GCTAEventCube'
         """
 
         # Turn cube into observation container to feed to ctcubemask
@@ -284,148 +327,260 @@ class csresspec(ctools.csobservation):
 
         return cubemask.cube()
 
+    def _cube_to_spectrum(self, cube, evlist_info):
+        """
+        Derive from event cube a count spectrum. If data come from event list
+        use only the ROI and energy range of the original data. Apply user
+        defined mask if requested.
+        :param cube: `~gammalib.GCTAEventCube' input cube
+        :param evlist_info: dic with information on original event list
+        :return: `~gammalib.GNdarray' count spectrum
+        """
+        # If we started from event list mask the ROI only
+        # for residual computation
+        if evlist_info['was_list']:
+            cube = self._masked_cube(cube, evlist_info['roi_ra'],
+                                     evlist_info['roi_dec'],
+                                     evlist_info['roi_rad'],
+                                     emin=evlist_info['emin'],
+                                     emax=evlist_info['emax'])
 
-def _add_binned_response(self, obs):
-    """
-    Add response to binned observation
-    :param obs: observation container
-    :return: obs: observation container with response
-    """
+        # Apply user mask
+        if self._mask:
+            cube = self._masked_cube(cube, self['ra'], self['dec'],
+                                     self['rad'],
+                                     regfile=self['regfile'])
 
-    # use counts cube to extract geometry
-    cube = obs[0].events()
-    proj = cube.counts().projection()
+        # Extract skymap and clip at 0 to null masked areas
+        counts = cube.counts()
+        counts = counts.clip(0)
 
-    response = obsutils.get_stacked_response(obs,
-                                             proj.crval(0),
-                                             proj.crval(1),
-                                             binsz=max(abs(proj.cdelt(0)),
-                                                       abs(proj.cdelt(1))),
-                                             # always ensures coverage of whole cube
-                                             nxpix=cube.nx(),
-                                             nypix=cube.ny(),
-                                             coordsys=proj.coordsys(),
-                                             proj=proj.code(),
-                                             emin=cube.emin().TeV(),
-                                             emax=cube.emax().TeV(),
-                                             edisp=self['edisp'].boolean())
+        # Convert skymap into GNdarray count spectrum
+        counts = counts.total_counts()
 
-    if self['edisp'].boolean():
-        obs[0].response(response['expcube'], response['psfcube'],
-                        response['edispcube'], response['bkgcube'])
-    else:
-        obs[0].response(response['expcube'], response['psfcube'],
-                        response['bkgcube'])
+        # Return
+        return counts
 
-    # Get new models
-    models = response['models']
+    def _residuals_table(self, obs_id, ebounds, counts, model, residuals):
+        """
+        Create a Fits Table and store counts, model, and residuals
+        :param obs_id: str observation id
+        :param ebounds: `~gammalib.GEbounds' energy bounds
+        :param counts: `~gammalib.GNdarray'
+        :param model: `~gammalib.GNdarray'
+        :param residuals: `~gammalib.GNdarray'
+        :return: `~gammalib.GFitsBinTable'
+        """
+        # Create FITS table columns
+        nrows = self._ebounds.size()
+        energy_low = gammalib.GFitsTableDoubleCol('ed_Energy', nrows)
+        energy_high = gammalib.GFitsTableDoubleCol('eu_Energy', nrows)
+        counts_col = gammalib.GFitsTableDoubleCol('Counts', nrows)
+        model_col = gammalib.GFitsTableDoubleCol('Model', nrows)
+        resid_col = gammalib.GFitsTableDoubleCol('Residuals', nrows)
+        energy_low.unit('TeV')
+        energy_high.unit('TeV')
 
-    # Set models for observation container
-    obs.models(models)
+        # Fill FITS table columns
+        for i in range(nrows):
+            energy_low[i] = ebounds.emin(i).TeV()
+            energy_high[i] = ebounds.emax(i).TeV()
+            counts_col[i] = counts[i]
+            model_col[i] = model[i]
+            resid_col[i] = residuals[i]
 
-    # Return observation container
-    return obs
+        # Initialise FITS Table with extension set to obs id
+        table = gammalib.GFitsBinTable(nrows)
+        table.extname('RESIDUALS ' + obs_id)
+
+        # Add Header card to specify algorithm used for residual computation
+        table.card('ALGORITHM', self['algorithm'].string(),
+                   'Algorithm used for computation of residuals')
+
+        # Append filled columns to fits table
+        table.append(energy_low)
+        table.append(energy_high)
+        table.append(counts_col)
+        table.append(model_col)
+        table.append(residuals)
+
+        return table
+
+    def _append_column(self, table, name, data):
+        """
+        Append optional column to residual table
+        :param table: `~gammalib.GFitsBinTable'
+        :param name: str column name
+        :param data: `gammalib.GNdarray' table to be filled into new column
+        :return: `~gammalib.GFitsBinTable'
+        """
+        # Check size compatibility
+        if table.nrows() == data.size():
+            pass
+        # Otherwise throw error
+        else:
+            msg = 'csresspec._append_column: FITS table and data have ' \
+                  + 'incompatible size.'
+            raise RuntimeError(msg)
+
+        # Create column
+        column = gammalib.GFitsTableDoubleCol(name, table.nrows())
+
+        # Fill data
+        for s, value in enumerate(data):
+            column[i] = data[i]
+
+        # Append new column to table
+        table.append(column)
+
+        # Return modified table
+        return table
 
     # Public methods
+    def run(self):
+        """
+        Run the script
+        """
+        # Switch screen logging on in debug mode
+        if self._logDebug():
+            self._log.cout(True)
 
+        # Get parameters
+        self._get_parameters()
 
-def run(self):
-    """
-    Run the script
-    """
-    # Switch screen logging on in debug mode
-    if self._logDebug():
-        self._log.cout(True)
+        # Write observation into logger
+        self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
 
-    # Get parameters
-    self._get_parameters()
+        # Stack observations if requested
+        if self._stack:
+            self.obs(self._stack_observations())
 
-    # Write observation into logger
-    self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
+        # Loop over observations and calculate residuals
+        for s, obs in enumerate(self.obs()):
 
-    # Stack observations if requested
-    if self._stack:
-        self.obs(self._stack_observations())
+            # Retrieve and store obs id
+            obs_id = obs.id()
+            # If observation id is empty replace with incremental number
+            if obs_id == '':
+                obs_id = str(s)
 
-    # Loop over observations and calculate residuals
-    for obs in self.obs():
+            # Turn into observation container and assign models
+            obs = gammalib.GObservations(obs)
+            obs.models(self.obs().models())
 
-        # Turn into observation container and assign models
-        obs = gammalib.GObservations(obs)
-        obs.models(self.obs().models())
+            # if 3D observations
+            if obs[0].classname() == 'GCTAObservation':
 
-        # if 3D observations
-        if obs[0].classname() == 'GCTAObservation':
+                ## Prepare Observations
 
-            ## Prepare Observations
+                # If already binned set the evlist_info dictionary to have
+                # attribute was_list False
+                was_list = False
+                if obs[0].eventtype() == 'CountsCube':
+                    evlist_info = {'was_list': False}
+                # Otherwise bin now
+                else:
+                    # we remember if we binned an event list
+                    # so that we can mask only the ROI for residual calculation
+                    was_list = True
+                    obs, evlist_info = self._bin_evlist(
+                        obs)
 
-            # If already binned pass
-            was_list = False
-            if obs[0].eventtype() == 'CountsCube':
+                # If binned response is present or model cube provided pass
+                if obs[0].has_response() or self._use_maps:
+                    pass
+                # Otherwise calculate binned response now
+                else:
+                    obs = self._add_binned_response(obs)
+
+                ## Calculate Model and residuals
+
+                # If model cube is provided load it
+                if self._use_maps:
+                    modcube = gammalib.GCTAEventCube(self['inmodel'].filename())
+                # Otherwise calculate it now
+                else:
+                    modelcube = ctools.ctmodel(obs)
+                    modelcube.run()
+                    modcube = modelcube.cube().copy()
+
+                # Extract cntcube for residual computation
+                cntcube = obs[0].events().copy()
+
+                # Derive count spectra from cubes
+                counts = self._cube_to_spectrum(cntcube, evlist_info)
+                model = self._cube_to_spectrum(modcube, evlist_info)
+
+                # Calculate residuals
+                residuals = obsutils.residuals(self, counts, model)
+
+                # Extract energy bounds
+                ebounds = cntcube.ebounds()
+
+                # Fill results table
+                table = self._residuals_table(obs_id, ebounds, counts, model,
+                                              residuals)
+
+                ## Calculate models of individual components if requested
+                if self._components:
+                    for component in obs.models():
+                        # Extract component name and set model cube models to
+                        # individual component
+                        name = component.name()
+                        component = gammalib.GModels(component)
+                        modelcube.obs().models(component)
+
+                        # Run model cube
+                        modelcube.run()
+
+                        # Extract spectrum of individual component
+                        modcube = modelcube.cube().copy()
+                        model = self._cube_to_spectrum(modcube, evlist_info)
+
+                        # append component to table
+                        table = self._append_column(table, name, model)
+
+            # otherwise, if On/Off
+            elif obs[0].classname() == 'GCTAOnOffObservation':
+
+                ## Calculate Model and residuals
+
+                ## Calculate models of individual components if requested
+
                 pass
-            # Otherwise bin now
-            else:
-                # we remember if we binned an event list
-                # so that we can mask only the ROI for residual calculation
-                was_list = True
-                obs, ev_ra, ev_dec, ev_rad, ev_emin, ev_emax = self._bin_evlist(
-                    obs)
 
-            # If binned response is present or model cube provided pass
-            if obs[0].has_response() or self._use_maps:
-                pass
-            # Otherwise calculate binned response now
-            else:
-                obs = self._add_binned_response(obs)
+            ## Append results table to output file
+            self._fits.append(table)
 
-            ## Calculate Model and residuals
+    def save(self):
+        """
+        Save residuals
+        """
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Save residuals')
 
-            # If model cube is provided load it
-            if self._use_maps:
-                modcube = gammalib.GCTAEventCube(self['inmodel'].filename())
-            # Otherwise calculate it now
-            else:
-                modelcube = ctools.ctmodel(obs)
-                modelcube.run()
-                modcube = modelcube.cube().copy()
+        # Continue only if FITS file is valid
+        if self._fits != None:
 
-            # Extract cntcube for residual computation
-            cntcube = obs[0].events().copy()
+            # Get outfile parameter
+            outfile = self['outfile'].filename()
 
-            # If we started from event list mask the ROI only
-            # for residual computation
-            if was_list:
-                cntcube = self._masked_cube(cntcube, ev_ra, ev_dec, ev_rad,
-                                            emin=ev_emin, emax=ev_emax)
-                modcube = self._masked_cube(modcube, ev_ra, ev_dec, ev_rad,
-                                            emin=ev_emin, emax=ev_emax)
-            else:
-                pass
+            # Log file name
+            self._log_value(gammalib.NORMAL, 'Residuals file', outfile.url())
 
-            # Apply user mask
-            if self._mask:
-                cntcube = self._masked_cube(cntcube, self['ra'], self['dec'],
-                                            self['rad'],
-                                            regfile=self['regfile'])
-                modcube = self._masked_cube(modcube, self['ra'], self['dec'],
-                                            self['rad'],
-                                            regfile=self['regfile'])
-            else:
-                pass
+            # Save residuals
+            self._fits.saveto(outfile, self['clobber'].boolean())
 
-            # Calculate residuals
+        # Return
+        return
 
-            # Arrays with counts and model
-            counts = cntcube.counts().total_counts()
-            model =  modcube.counts().total_counts()
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
 
-            ## Calculate models of individual components if requested
+    # Create instance of application
+    app = csresspec(sys.argv)
 
-        # otherwise, if On/Off
-        elif obs[0].classname() == 'GCTAOnOffObservation':
-
-            ## Calculate Model and residuals
-
-            ## Calculate models of individual components if requested
-
-            pass
+    # Execute application
+    app.execute()

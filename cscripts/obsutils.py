@@ -852,8 +852,8 @@ def residuals(cls,counts,model):
     elif counts.classname() == 'GSkyMap':
         nelem = counts.npix()
     else:
-        msg = 'obsutils.residuals only handles ' \
-              + 'GNdarray or GSkyMap objects.\n'
+        msg = 'cscripts.obsutils.residuals only handles ' \
+              + 'gammalib.GNdarray or gammalib.GSkyMap objects.\n'
         raise RuntimeError(msg)
 
     # Copy counts to initialise residuals
