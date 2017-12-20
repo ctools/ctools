@@ -375,7 +375,7 @@ class csresspec(ctools.csobservation):
         # If name not empty add leading blank
         if obs_id != '':
             obs_id = ' ' + obs_id
-        table.extname('RESIDUALS ' + obs_id)
+        table.extname('RESIDUALS' + obs_id)
 
         # Add Header card to specify algorithm used for residual computation
         table.card('ALGORITHM', self['algorithm'].string(),
@@ -395,7 +395,7 @@ class csresspec(ctools.csobservation):
         Append optional column to residual table
         :param table: `~gammalib.GFitsBinTable'
         :param name: str column name
-        :param data: `gammalib.GNdarray' table to be filled into new column
+        :param data: `gammalib.GNdarray' data to be filled into new column
         :return: `~gammalib.GFitsBinTable'
         """
         # Check size compatibility
@@ -519,11 +519,64 @@ class csresspec(ctools.csobservation):
             # otherwise, if On/Off
             elif obs[0].classname() == 'GCTAOnOffObservation':
 
-                ## Calculate Model and residuals
+                onoff = obs[0]
+
+                ## Calculate Counts, Model and residuals
+
+                # On spectrum
+                counts = onoff.on_spec().counts_spectrum()
+
+                # Model for On region
+                background = onoff.model_background(
+                    obs.models()).counts_spectrum()
+                alpha = onoff.on_spec().backscal_spectrum()
+                model = background.copy()
+                model *= alpha
+                model += onoff.model_gamma(obs.models()).counts_spectrum()
+
+                # On Residuals
+                residuals = obsutils.residuals(self, counts, model)
+
+                # Extract energy bounds
+                ebounds = onoff.on_spec().ebounds()
+
+                # Fill results table
+                table = self._residuals_table(obs_id, ebounds, counts, model,
+                                              residuals)
+
+                # Get Off spectrum and add to table
+                counts_off = onoff.off_spec().counts_spectrum()
+                table = self._append_column(table, 'Counts_Off',
+                                            counts_off)
+
+                # Add background/Off model to table
+                table = self._append_column(table, 'Model_Off',
+                                            background)
+
+                # Calculate Off residuals and add to table
+                residuals_off = obsutils.residuals(self, counts_off, background)
+                table = self._append_column(table, 'Residuals_Off',
+                                            residuals_off)
 
                 ## Calculate models of individual components if requested
-
-                pass
+                if self['components'].boolean():
+                    for component in obs.models():
+                        # If background, append the values already calculated
+                        if component.classname() == 'GCTAModelIrfBackground':
+                            background *= onoff.on_spec().backscal_spectrum()
+                            table = self._append_column(table, 'Background',
+                                                        background)
+                        # Otherwise calculate gamma component and append to Table
+                        else:
+                            # Create observation container for individual components
+                            model_cont = gammalib.GModels()
+                            model_cont.append(component)
+                            # Calculate gamma model
+                            model = onoff.model_gamma(model_cont)
+                            model = model.counts_spectrum()
+                            # Append to table
+                            table = self._append_column(table, component.name(),
+                                                        model)
 
             ## Append results table to output file
             self._fits.append(table)
