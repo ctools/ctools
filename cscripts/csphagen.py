@@ -274,7 +274,6 @@ class csphagen(ctools.csobservation):
         regions : `~gammalib.GSkyRegions`
             List of reflected regions
         """
-
         # Load regions from ds9 file of FITS WCS map
         regions  = gammalib.GSkyRegions( file_path )
 
