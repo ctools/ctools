@@ -909,7 +909,7 @@ def residuals(cls,counts,model):
         # Compute significance map
         residuals *= 2.0
         residuals = residuals.sqrt()
-        residuals = residuals * sign
+        residuals *= sign
 
     # Raise exception if algorithm is unknown
     else:
