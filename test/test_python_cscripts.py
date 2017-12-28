@@ -41,6 +41,7 @@ import test_csphagen
 import test_csphasecrv
 import test_cspull
 import test_csresmap
+import test_csrespec
 import test_csroot2caldb
 import test_cssens
 import test_csspec
@@ -133,6 +134,7 @@ def test(installed=False, debug=False):
              test_csphasecrv.Test(),
              test_cspull.Test(),
              test_csresmap.Test(),
+             test_csresspec.Test(),
              test_csroot2caldb.Test(),
              test_cssens.Test(),
              test_csspec.Test(),
