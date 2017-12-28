@@ -41,7 +41,7 @@ import test_csphagen
 import test_csphasecrv
 import test_cspull
 import test_csresmap
-import test_csrespec
+import test_csresspec
 import test_csroot2caldb
 import test_cssens
 import test_csspec
