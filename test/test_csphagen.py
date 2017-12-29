@@ -52,6 +52,9 @@ class Test(test):
         self._nbins          = 10
         # number of expected background regions with/wo exclusion,
         # and for two different runs
+        self._regfile_src    = self._datadir + '/crab_src_reg.reg'
+        self._regfile_bkg    = self._datadir + '/crab_bkg_reg.reg'
+        self._counts_reflected = 0
 
         # Return
         return
@@ -67,6 +70,7 @@ class Test(test):
         # Append tests
         self.append(self._test_cmd, 'Test csphagen on command line')
         self.append(self._test_python, 'Test csphagen from Python')
+        self.append(self._test_regfiles_cmd, 'Test csphagen input region files on command line')
 
         # Return
         return
@@ -102,6 +106,9 @@ class Test(test):
         # Check output files
         self._check_output('csphagen_cmd1', self._nbins, self._nreg_with_excl)
         self._check_outobs('csphagen_cmd1', 1)
+
+        # store on-counts for later testing bkgmethod CUSTOM
+        self._counts_reflected = self._read_pha_counts('csphagen_cmd1_pha_on.fits')
 
         # Setup csphagen command
         cmd = csphagen + ' inobs="events_that_do_not_exist.fits" ' + \
@@ -259,6 +266,57 @@ class Test(test):
         # Return
         return
 
+    # Test csphagen input region files (command line)
+    def _test_regfiles_cmd(self):
+        """
+        Test csphagen input region files (command line).
+        This is done by redoing the test performed in _test_cmd()
+        but this time bkgmethod is CUSTOM and the regions are read
+        from ds9 region files. Exactly the same output of csphagen
+        compared to _test_cmd() is expected.
+        Hint: The output region files of _test_cmd() could be used
+        directly, but to make the execution of this test case standalone
+        the output once created by _test_cmd() was copied and added
+        staticly to the repository.
+        """
+        # Set script name
+        csphagen = self._script('csphagen')
+
+        # Setup csphagen command
+        # TODO: remove rad from cmd line arguments. currently it is needed (ctool::set_obs_bounds needs rad!)
+        cmd = csphagen + ' inobs="' + self._myevents1 + \
+                         '" caldb="' + self._caldb + '" irf="' + self._irf + \
+                         '" ebinalg="LOG" emin=0.1 emax=100. enumbins=' + \
+                         str(self._nbins) + \
+                         ' etruemin=0.05 etruemax=150 etruebins=5 '+ \
+                         'stack="no" ' + \
+                         'inexclusion="' + self._exclusion + '" ' + \
+                         'bkgmethod="CUSTOM" ' + \
+                         'rad=0.2 ' + \
+                         'srcreg="' + self._regfile_src + '" ' + \
+                         'bkgreg="' + self._regfile_bkg + '" ' + \
+                         'outobs="csphagen_regfiles_cmd1.xml" prefix="csphagen_regfiles_cmd1" ' + \
+                         'logfile="csphagen_regfiles_cmd1.log" chatter=2 ' + \
+                         'coordsys="CEL" ra=83.633 dec=22.0145'
+
+        # Check if execution was successful
+        self.test_assert(self._execute(cmd) == 0,
+                         'Check successful execution from command line')
+
+        # Check output files
+        self._check_output('csphagen_regfiles_cmd1', self._nbins, self._nreg_with_excl)
+        self._check_outobs('csphagen_regfiles_cmd1', 1)
+
+        # Check resulting number of counts, which should be equal to those obtained in _test_cmd()
+        counts_custom = self._read_pha_counts('csphagen_regfiles_cmd1_pha_on.fits')
+
+        self.test_assert(counts_custom == self._counts_reflected,
+                         'Check bkgmethods CUSTOM and REFLECTED: number of on-counts should be equal')
+
+        # Return
+        return
+
+
     def _check_ebounds(self, table, bins):
         """
         Check EBOUNDS table
@@ -309,7 +367,7 @@ class Test(test):
             self.test_assert(table.contains(col),
                              'FITS file contains "' + col + '" column')
 
-        # Check SPECTRUM table
+        # Check EBOUNDS table
         table = fits['EBOUNDS']
         self._check_ebounds(table, bins)
 
@@ -433,3 +491,26 @@ class Test(test):
 
         # Return
         return
+
+    def _read_pha_counts(self, filename):
+        """
+        Read and integrate the counts in a pha file.
+        Pha file structure already tested in _check_pha()
+        """
+        # Open FITS file
+        fits = gammalib.GFits(filename)
+
+        # Get SPECTRUM table
+        table = fits['SPECTRUM']
+
+        # Integrate counts
+        counts_col = table['COUNTS']
+        counts     = 0
+        for channel in range( counts_col.nrows() ):
+            counts += counts_col[channel]
+
+        # Close FITS file
+        fits.close()
+
+        # Return
+        return counts
