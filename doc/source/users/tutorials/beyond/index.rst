@@ -17,5 +17,6 @@ analyses.
    beyond_stacked
    beyond_tsmap
    beyond_residual
+   beyond_residual_spectrum
    beyond_irf
    beyond_model
