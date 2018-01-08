@@ -367,8 +367,8 @@ class csresspec(ctools.csobservation):
         """
         # Create FITS table columns
         nrows = ebounds.size()
-        energy_low = gammalib.GFitsTableDoubleCol('ed_Energy', nrows)
-        energy_high = gammalib.GFitsTableDoubleCol('eu_Energy', nrows)
+        energy_low = gammalib.GFitsTableDoubleCol('Emin', nrows)
+        energy_high = gammalib.GFitsTableDoubleCol('Emax', nrows)
         counts_col = gammalib.GFitsTableDoubleCol('Counts', nrows)
         model_col = gammalib.GFitsTableDoubleCol('Model', nrows)
         resid_col = gammalib.GFitsTableDoubleCol('Residuals', nrows)
