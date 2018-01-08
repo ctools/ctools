@@ -21,6 +21,7 @@
 
 # Models to install
 models = crab.xml \
+         crab_beyond.xml \
          crab_poly.xml \
          crab_profile.xml \
          disk.xml \

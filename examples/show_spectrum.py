@@ -103,7 +103,7 @@ def plot_spectrum(filename, plotfile):
     plt.errorbar(ul_energies, ul_flux, xerr=[ul_ed_engs, ul_eu_engs],
                  yerr=yerr, uplims=True, fmt='ro')
     plt.xlabel('Energy (TeV)')
-    plt.ylabel(r'E $\times$ dN/dE (erg cm$^{-2}$ s$^{-1}$)')
+    plt.ylabel(r'E$^2$ $\times$ dN/dE (erg cm$^{-2}$ s$^{-1}$)')
 
     # Show figure
     if len(plotfile) > 0:
