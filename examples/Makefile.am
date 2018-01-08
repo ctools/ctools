@@ -28,6 +28,7 @@ scripts = README.md \
           show_pha.py \
           show_pull_evolution.py \
           show_pull_histogram.py \
+	  show_residuals.py \
           show_response.py \
           show_sensitivity.py \
           show_spectrum.py \
