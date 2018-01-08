@@ -215,7 +215,6 @@ class csresmap(ctools.csobservation):
         # as SWIG creates a new object when calling binning.cube()
         countmap1 = countmap.copy()
         countmap1.stack_maps()
-        print("TEST",countmap1.classname())
         modelmap.stack_maps()
         self._resmap = obsutils.residuals(self,countmap1,modelmap)
 
