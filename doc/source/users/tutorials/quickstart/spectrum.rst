@@ -26,19 +26,19 @@ bins between 100 GeV and 100 TeV:
 
 .. code-block:: bash
 
-		$ csspec
-		Input event list, counts cube, or observation definition XML file [events.fits] cntcube.fits 
-		Input exposure cube file [NONE] expcube.fits 
-		Input PSF cube file [NONE] psfcube.fits 
-		Input background cube file [NONE] bkgcube.fits 
-		Input model definition XML file [$CTOOLS/share/models/crab.xml] crab_results.xml 
-		Source name [Crab] 
-		Spectrum generation method (SLICE|NODES|AUTO) [AUTO] 
-		Binning algorithm (LIN|LOG|FILE) [LOG] 
-		Lower energy limit (TeV) [0.1] 
-		Upper energy limit (TeV) [100.0] 
-		Number of energy bins [20] 10
-		Output spectrum file [spectrum.fits]
+   $ csspec
+   Input event list, counts cube, or observation definition XML file [events.fits] cntcube.fits
+   Input exposure cube file [NONE] expcube.fits
+   Input PSF cube file [NONE] psfcube.fits
+   Input background cube file [NONE] bkgcube.fits
+   Input model definition XML file [$CTOOLS/share/models/crab.xml] crab_results.xml
+   Source name [Crab]
+   Spectrum generation method (SLICE|NODES|AUTO) [AUTO]
+   Binning algorithm (LIN|LOG|FILE) [LOG]
+   Lower energy limit (TeV) [0.1]
+   Upper energy limit (TeV) [100.0]
+   Number of energy bins [20] 10
+   Output spectrum file [spectrum.fits]
 
 There are different methods to create a binned spectrum:
 

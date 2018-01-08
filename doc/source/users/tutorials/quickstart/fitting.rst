@@ -49,27 +49,27 @@ that was produced by the run:
 
 .. code-block:: xml
 
-		<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-		<source_library title="source library">
-		<source name="Crab" type="PointSource">
-		<spectrum type="PowerLaw">
-		<parameter name="Prefactor" value="5.75838848465398" error="0.106769545262219" scale="1e-16" min="1e-07" max="1000" free="1" />
-		<parameter name="Index" value="2.48329029246896" error="0.0156629819926589" scale="-1" min="0" max="5" free="1" />
-		<parameter name="PivotEnergy" value="0.3" scale="1000000" min="0.01" max="1000" free="0" />
-		</spectrum>
-		<spatialModel type="PointSource">
-		<parameter name="RA" value="83.6331" scale="1" min="-360" max="360" free="0" />
-		<parameter name="DEC" value="22.0145" scale="1" min="-90" max="90" free="0" />
-		</spatialModel>
-		</source>
-		<source name="BackgroundModel" type="CTACubeBackground" instrument="CTA,HESS,MAGIC,VERITAS">
-		<spectrum type="PowerLaw">
-		<parameter name="Prefactor" value="1.01452697987952" error="0.0164053949309481" scale="1" min="0.01" max="100" free="1" />
-		<parameter name="Index" value="0.0139985850735283" error="0.00978611932246665" scale="1" min="-5" max="5" free="1" />
-		<parameter name="PivotEnergy" value="1" scale="1000000" free="0" />
-		</spectrum>
-		</source>
-		</source_library>
+   <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+   <source_library title="source library">
+      <source name="Crab" type="PointSource">
+         <spectrum type="PowerLaw">
+            <parameter name="Prefactor" value="5.75838848465398" error="0.106769545262219" scale="1e-16" min="1e-07" max="1000" free="1" />
+            <parameter name="Index" value="2.48329029246896" error="0.0156629819926589" scale="-1" min="0" max="5" free="1" />
+            <parameter name="PivotEnergy" value="0.3" scale="1000000" min="0.01" max="1000" free="0" />
+         </spectrum>
+         <spatialModel type="PointSource">
+            <parameter name="RA" value="83.6331" scale="1" min="-360" max="360" free="0" />
+            <parameter name="DEC" value="22.0145" scale="1" min="-90" max="90" free="0" />
+         </spatialModel>
+       </source>
+       <source name="BackgroundModel" type="CTACubeBackground" instrument="CTA,HESS,MAGIC,VERITAS">
+          <spectrum type="PowerLaw">
+             <parameter name="Prefactor" value="1.01452697987952" error="0.0164053949309481" scale="1" min="0.01" max="100" free="1" />
+             <parameter name="Index" value="0.0139985850735283" error="0.00978611932246665" scale="1" min="-5" max="5" free="1" />
+             <parameter name="PivotEnergy" value="1" scale="1000000" free="0" />
+          </spectrum>
+      </source>
+   </source_library>
 
 In this example, the ``Prefactor`` and ``Index`` of the spectral model for the
 Crab nebula as well as the ``Prefactor`` and ``Index`` of the background spectral

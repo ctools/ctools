@@ -1,7 +1,7 @@
 .. _sec_notebooks:
 
 Jupyter notebooks
-============
+=================
 
 Some of the tutorials are provided as Jupyter notebooks. If you see
 this icon

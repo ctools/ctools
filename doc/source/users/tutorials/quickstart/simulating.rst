@@ -24,18 +24,18 @@ characteristics of the simulation:
 
 .. code-block:: bash
 
-		$ ctobssim
-		RA of pointing (degrees) (0-360) [83.63] 83.5
-		Dec of pointing (degrees) (-90-90) [22.01] 22.8
-		Radius of FOV (degrees) (0-180) [5.0] 
-		Start time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:00:00] 
-		Stop time (UTC string, JD, MJD or MET in seconds) [2020-01-01T01:00:00] 2020-01-01T01:00:00
-		Lower energy limit (TeV) [0.03] 
-		Upper energy limit (TeV) [200.] 
-		Calibration database [prod2] 
-		Instrument response function [South_0.5h] 
-		Input model definition XML file [$CTOOLS/share/models/crab.xml] 
-		Output event data file or observation definition XML file [events.fits]
+   $ ctobssim
+   RA of pointing (degrees) (0-360) [83.63] 83.5
+   Dec of pointing (degrees) (-90-90) [22.01] 22.8
+   Radius of FOV (degrees) (0-180) [5.0]
+   Start time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:00:00]
+   Stop time (UTC string, JD, MJD or MET in seconds) [2020-01-01T01:00:00] 2020-01-01T01:00:00
+   Lower energy limit (TeV) [0.03]
+   Upper energy limit (TeV) [200.]
+   Calibration database [prod2]
+   Instrument response function [South_0.5h]
+   Input model definition XML file [$CTOOLS/share/models/crab.xml]
+   Output event data file or observation definition XML file [events.fits]
 
 Each line represents a query for one parameter value.
 The line starts with a short description of the parameter, followed by 
@@ -211,29 +211,29 @@ from this file are shown here:
 
 .. code-block:: none
 
-		2017-11-28T14:13:40: === CTA observation ===
-		2017-11-28T14:13:40:  Simulation cone ...........: RA=83.5 deg, Dec=22.8 deg, radius=5.5 deg
-		2017-11-28T14:13:40:  Time interval .............: 6.31109e+08 - 6.31112e+08 s
-		2017-11-28T14:13:40:  Photon energy range .......: 30 GeV - 72.3622611060088 GeV
-		2017-11-28T14:13:40:  Event energy range ........: 30 GeV - 72.3622611060088 GeV
-		2017-11-28T14:13:40:   Simulation area ..........: 1.97769e+09 cm2
-		2017-11-28T14:13:40:   Use model ................: Crab
-		2017-11-28T14:13:40:   Normalization ............: 1 [Crab]
-		2017-11-28T14:13:40:   Flux .....................: 2.5413e-09 [Crab] photons/cm2/s
-		2017-11-28T14:13:40:   Normalized flux ..........: 2.5413e-09 [Crab] photons/cm2/s
-		2017-11-28T14:13:40:   Photon rate ..............: 5.0259 photons/s [Crab]
-		2017-11-28T14:13:40:   MC source photons ........: 18186 [Crab]
-		2017-11-28T14:13:40:   MC source events .........: 3544 [Crab]
-		2017-11-28T14:13:40:   MC source events .........: 3544 (all source models)
-		2017-11-28T14:13:40:  Photon energy range .......: 72.3622611060088 GeV - 174.543227745807 GeV
-		...
-		2017-11-28T14:13:40:  MC source photons .........: 47219 [Crab]
-		2017-11-28T14:13:40:  MC source events ..........: 11356 [Crab]
-		2017-11-28T14:13:49:  MC events outside ROI .....: 0
-		2017-11-28T14:13:49:  MC background events ......: 189477
-		2017-11-28T14:13:49:  MC identifier 1 ...........: Crab
-		2017-11-28T14:13:49:  MC identifier 2 ...........: CTABackgroundModel
-		2017-11-28T14:13:49:  MC events .................: 200833 (all models)
+   2017-11-28T14:13:40: === CTA observation ===
+   2017-11-28T14:13:40:  Simulation cone ...........: RA=83.5 deg, Dec=22.8 deg, radius=5.5 deg
+   2017-11-28T14:13:40:  Time interval .............: 6.31109e+08 - 6.31112e+08 s
+   2017-11-28T14:13:40:  Photon energy range .......: 30 GeV - 72.3622611060088 GeV
+   2017-11-28T14:13:40:  Event energy range ........: 30 GeV - 72.3622611060088 GeV
+   2017-11-28T14:13:40:   Simulation area ..........: 1.97769e+09 cm2
+   2017-11-28T14:13:40:   Use model ................: Crab
+   2017-11-28T14:13:40:   Normalization ............: 1 [Crab]
+   2017-11-28T14:13:40:   Flux .....................: 2.5413e-09 [Crab] photons/cm2/s
+   2017-11-28T14:13:40:   Normalized flux ..........: 2.5413e-09 [Crab] photons/cm2/s
+   2017-11-28T14:13:40:   Photon rate ..............: 5.0259 photons/s [Crab]
+   2017-11-28T14:13:40:   MC source photons ........: 18186 [Crab]
+   2017-11-28T14:13:40:   MC source events .........: 3544 [Crab]
+   2017-11-28T14:13:40:   MC source events .........: 3544 (all source models)
+   2017-11-28T14:13:40:  Photon energy range .......: 72.3622611060088 GeV - 174.543227745807 GeV
+   ...
+   2017-11-28T14:13:40:  MC source photons .........: 47219 [Crab]
+   2017-11-28T14:13:40:  MC source events ..........: 11356 [Crab]
+   2017-11-28T14:13:49:  MC events outside ROI .....: 0
+   2017-11-28T14:13:49:  MC background events ......: 189477
+   2017-11-28T14:13:49:  MC identifier 1 ...........: Crab
+   2017-11-28T14:13:49:  MC identifier 2 ...........: CTABackgroundModel
+   2017-11-28T14:13:49:  MC events .................: 200833 (all models)
 
 Each line starts with the UTC time at which the line has been written. In
 this run, 47219 Crab photons have been thrown. 11356 of these photons have been
