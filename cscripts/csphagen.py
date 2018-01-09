@@ -56,6 +56,22 @@ class csphagen(ctools.csobservation):
         return
 
     # Private methods
+    def __query_src_direction(self):
+        """
+        Set up the source direction parameter.
+        Query relevant parameters.
+        """
+        self._src_dir = gammalib.GSkyDir()
+        coordsys = self['coordsys'].string()
+        if coordsys == 'CEL':
+            ra  = self['ra'].real()
+            dec = self['dec'].real()
+            self._src_dir.radec_deg(ra, dec)
+        elif coordsys == 'GAL':
+            glon = self['glon'].real()
+            glat = self['glat'].real()
+            self._src_dir.lb_deg(glon, glat)
+
     def _get_parameters(self):
         """
         Get parameters from parfile and setup observations
@@ -72,23 +88,17 @@ class csphagen(ctools.csobservation):
         # Set energy bounds
         self._ebounds = self._create_ebounds()
 
-        # Initialise source position/region querying relevant parameters
-        self._src_dir = gammalib.GSkyDir()
+        # Initialize empty src regions container
         self._src_reg = gammalib.GSkyRegions()
-        coordsys = self['coordsys'].string()
-        if coordsys == 'CEL':
-            ra  = self['ra'].real()
-            dec = self['dec'].real()
-            self._src_dir.radec_deg(ra, dec)
-        elif coordsys == 'GAL':
-            glon = self['glon'].real()
-            glat = self['glat'].real()
-            self._src_dir.lb_deg(glon, glat)
 
         # Query background estimation method and parameters
         bkgmethod = self['bkgmethod'].string()
         if bkgmethod == 'REFLECTED':
 
+            # Always query src direction
+            self.__query_src_direction()
+
+            # Query region parameters
             self._srcshape = self['srcshape'].string()
             if self._srcshape == 'CIRCLE':
                 self._rad = self['rad'].real()
@@ -98,6 +108,21 @@ class csphagen(ctools.csobservation):
 
         elif bkgmethod == 'CUSTOM':
 
+            # Set up src region. Only 1 region is allowed.
+            src_reg_file  = self['srcreg'].filename()
+            self._src_reg = gammalib.GSkyRegions(src_reg_file)
+
+            if len(self._src_reg) != 1:
+                raise RuntimeError('Only 1 ON region is allowed.')
+
+            # Set up src direction. Query if neccessary.
+            if isinstance(self._src_reg[0], gammalib.GSkyRegionCircle):
+                self._src_dir = self._src_reg[0].centre()
+                self._rad     = self._src_reg[0].radius()
+            else:
+                self.__query_src_direction()
+
+            # Set up bkg regions
             obs_file     = self['inobs'].filename()
 
             # obs def XML: look for region files
@@ -140,13 +165,6 @@ class csphagen(ctools.csobservation):
                 else:
                     # Query bkg region file for single observation
                     self._bkg_reg_files[self._bkg_reg_files.keys()[0]] = self['bkgreg'].filename()
-
-            # Query src region file and set up the region. Only 1 region is allowed.
-            src_reg_file  = self['srcreg'].filename()
-            self._src_reg = gammalib.GSkyRegions(src_reg_file)
-
-            if len(self._src_reg) > 1:
-                raise RuntimeError('Only 1 ON region is allowed.')
 
         self['maxoffset'].real()
 
