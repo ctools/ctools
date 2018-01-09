@@ -37,7 +37,7 @@ pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/csphasecrv.py \
                 $(srcdir)/cspull.py \
                 $(srcdir)/csresmap.py \
-		$(srcdir)/csresspec.py \
+                $(srcdir)/csresspec.py \
                 $(srcdir)/csroot2caldb.py  \
                 $(srcdir)/cssens.py \
                 $(srcdir)/csspec.py \
@@ -72,7 +72,7 @@ parfiles = $(srcdir)/cscaldb.par \
            $(srcdir)/csphasecrv.par \
            $(srcdir)/cspull.par \
            $(srcdir)/csresmap.par \
-	   $(srcdir)/csresspec.par \
+           $(srcdir)/csresspec.par \
            $(srcdir)/csroot2caldb.par \
            $(srcdir)/cssens.par \
            $(srcdir)/csspec.par \
@@ -104,7 +104,7 @@ linkscripts = cscaldb \
               csphasecrv \
               cspull \
               csresmap \
-	      csresspec \
+              csresspec \
               csroot2caldb \
               cssens \
               csspec \

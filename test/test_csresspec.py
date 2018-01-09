@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csresspec script.
 #
-# Copyright (C) 2017- Luigi Tibaldo
+# Copyright (C) 2017-2018 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class Test(test):
         test.__init__(self)
 
         # Set members
-        self._inonoff = self._datadir + '/onoff_obs.xml'
+        self._inonoff     = self._datadir + '/onoff_obs.xml'
         self._onoff_model = self._datadir + '/onoff_model.xml'
 
         # Return
@@ -74,12 +74,12 @@ class Test(test):
 
         # Setup csresspec command
         cmd = csresspec + ' inobs="' + self._events + '"' + \
-              ' outfile="csresspec_cmd1.fits"' + \
-              ' inmodel="' + self._model + '"' + \
-              ' caldb="' + self._caldb + '" irf="' + self._irf + '"' + \
-              ' emin=0.1 emax=100.0 enumbins=20' + \
-              ' mask=no algorithm="SUB"' + \
-              ' logfile="csresspec_cmd1.log" chatter=4'
+                          ' outfile="csresspec_cmd1.fits"' + \
+                          ' inmodel="' + self._model + '"' + \
+                          ' caldb="' + self._caldb + '" irf="' + self._irf + '"' + \
+                          ' emin=0.1 emax=100.0 enumbins=20' + \
+                          ' mask=no algorithm="SUB"' + \
+                          ' logfile="csresspec_cmd1.log" chatter=4'
 
         # Check if execution of wrong command fails
         self.test_assert(self._execute('command_that_does_not_exist') != 0,
@@ -94,12 +94,12 @@ class Test(test):
 
         # Setup csresspec command
         cmd = csresspec + ' inobs="event_file_that_does_not_exist.fits"' + \
-              ' outfile="csresspec_cmd2.fits"' + \
-              ' inmodel="' + self._model + '"' + \
-              ' caldb="' + self._caldb + '" irf="' + self._irf + '"' + \
-              ' emin=0.1 emax=100.0 enumbins=20' + \
-              ' mask=no algorithm="SUBDIVSQRT"' + \
-              ' logfile="csresspec_cmd2.log" debug=yes chatter=2'
+                          ' outfile="csresspec_cmd2.fits"' + \
+                          ' inmodel="' + self._model + '"' + \
+                          ' caldb="' + self._caldb + '" irf="' + self._irf + '"' + \
+                          ' emin=0.1 emax=100.0 enumbins=20' + \
+                          ' mask=no algorithm="SUBDIVSQRT"' + \
+                          ' logfile="csresspec_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -118,18 +118,18 @@ class Test(test):
         """
         # Set-up csresspec for event list
         resspec = cscripts.csresspec()
-        resspec['inobs'] = self._events
-        resspec['outfile'] = 'csresspec_py1.fits'
-        resspec['inmodel'] = self._model
-        resspec['caldb'] = self._caldb
-        resspec['irf'] = self._irf
-        resspec['emin'] = 0.1
-        resspec['emax'] = 100.0
-        resspec['enumbins'] = 20
-        resspec['mask'] = False
+        resspec['inobs']     = self._events
+        resspec['outfile']   = 'csresspec_py1.fits'
+        resspec['inmodel']   = self._model
+        resspec['caldb']     = self._caldb
+        resspec['irf']       = self._irf
+        resspec['emin']      = 0.1
+        resspec['emax']      = 100.0
+        resspec['enumbins']  = 20
+        resspec['mask']      = False
         resspec['algorithm'] = 'SUB'
-        resspec['logfile'] = 'csresspec_py1.log'
-        resspec['chatter'] = 2
+        resspec['logfile']   = 'csresspec_py1.log'
+        resspec['chatter']   = 2
 
         # Run csresspec script
         resspec.logFileOpen()  # Make sure we get a log file
@@ -142,19 +142,19 @@ class Test(test):
         # Set-up csresspec for event list
         # with computation of individual model components
         resspec = cscripts.csresspec()
-        resspec['inobs'] = self._events
-        resspec['outfile'] = 'csresspec_py2.fits'
-        resspec['inmodel'] = self._model
-        resspec['caldb'] = self._caldb
-        resspec['irf'] = self._irf
-        resspec['emin'] = 0.1
-        resspec['emax'] = 100.0
-        resspec['enumbins'] = 20
-        resspec['mask'] = False
-        resspec['algorithm'] = 'SUBDIV'
+        resspec['inobs']      = self._events
+        resspec['outfile']    = 'csresspec_py2.fits'
+        resspec['inmodel']    = self._model
+        resspec['caldb']      = self._caldb
+        resspec['irf']        = self._irf
+        resspec['emin']       = 0.1
+        resspec['emax']       = 100.0
+        resspec['enumbins']   = 20
+        resspec['mask']       = False
+        resspec['algorithm']  = 'SUBDIV'
         resspec['components'] = True
-        resspec['logfile'] = 'csresspec_py2.log'
-        resspec['chatter'] = 2
+        resspec['logfile']    = 'csresspec_py2.log'
+        resspec['chatter']    = 2
 
         # Run csresspec script
         resspec.execute()
@@ -164,20 +164,20 @@ class Test(test):
 
         # Set-up csresspec for counts cube
         resspec = cscripts.csresspec()
-        resspec['inobs'] = self._cntcube
-        resspec['modcube'] = 'NONE'
-        resspec['expcube'] = 'NONE'
-        resspec['psfcube'] = 'NONE'
+        resspec['inobs']     = self._cntcube
+        resspec['modcube']   = 'NONE'
+        resspec['expcube']   = 'NONE'
+        resspec['psfcube']   = 'NONE'
         resspec['edispcube'] = 'NONE'
-        resspec['bkgcube'] = 'NONE'
-        resspec['caldb'] = self._caldb
-        resspec['irf'] = self._irf
-        resspec['inmodel'] = self._model
-        resspec['outfile'] = 'csresspec_py3.fits'
-        resspec['mask'] = False
+        resspec['bkgcube']   = 'NONE'
+        resspec['caldb']     = self._caldb
+        resspec['irf']       = self._irf
+        resspec['inmodel']   = self._model
+        resspec['outfile']   = 'csresspec_py3.fits'
+        resspec['mask']      = False
         resspec['algorithm'] = 'SUBDIVSQRT'
-        resspec['logfile'] = 'csresspec_py3.log'
-        resspec['chatter'] = 3
+        resspec['logfile']   = 'csresspec_py3.log'
+        resspec['chatter']   = 3
 
         # Run csresspec script
         resspec.execute()
@@ -188,24 +188,24 @@ class Test(test):
         # Set-up csresspec for counts cube
         # with source mask
         resspec = cscripts.csresspec()
-        resspec['inobs'] = self._cntcube
-        resspec['modcube'] = 'NONE'
-        resspec['expcube'] = 'NONE'
-        resspec['psfcube'] = 'NONE'
+        resspec['inobs']     = self._cntcube
+        resspec['modcube']   = 'NONE'
+        resspec['expcube']   = 'NONE'
+        resspec['psfcube']   = 'NONE'
         resspec['edispcube'] = 'NONE'
-        resspec['bkgcube'] = 'NONE'
-        resspec['caldb'] = self._caldb
-        resspec['irf'] = self._irf
-        resspec['inmodel'] = self._model
-        resspec['outfile'] = 'csresspec_py4.fits'
-        resspec['mask'] = True
-        resspec['ra'] = 83.63
-        resspec['dec'] = 22.01
-        resspec['rad'] = 0.2
-        resspec['regfile'] = 'NONE'
+        resspec['bkgcube']   = 'NONE'
+        resspec['caldb']     = self._caldb
+        resspec['irf']       = self._irf
+        resspec['inmodel']   = self._model
+        resspec['outfile']   = 'csresspec_py4.fits'
+        resspec['mask']      = True
+        resspec['ra']        = 83.63
+        resspec['dec']       = 22.01
+        resspec['rad']       = 0.2
+        resspec['regfile']   = 'NONE'
         resspec['algorithm'] = 'SUBDIVSQRT'
-        resspec['logfile'] = 'csresspec_py4.log'
-        resspec['chatter'] = 3
+        resspec['logfile']   = 'csresspec_py4.log'
+        resspec['chatter']   = 3
 
         # Run csresspec script
         resspec.execute()
@@ -215,13 +215,13 @@ class Test(test):
 
         # Set-up csresspec for On/Off observations
         resspec = cscripts.csresspec()
-        resspec['inobs'] = self._inonoff
-        resspec['inmodel'] = self._onoff_model
-        resspec['outfile'] = 'csresspec_py5.fits'
+        resspec['inobs']     = self._inonoff
+        resspec['inmodel']   = self._onoff_model
+        resspec['outfile']   = 'csresspec_py5.fits'
         resspec['algorithm'] = 'SIGNIFICANCE'
-        resspec['stack'] = False
-        resspec['logfile'] = 'csresspec_py5.log'
-        resspec['chatter'] = 3
+        resspec['stack']     = False
+        resspec['logfile']   = 'csresspec_py5.log'
+        resspec['chatter']   = 3
 
         # Run csresspec script
         resspec.execute()
@@ -232,14 +232,14 @@ class Test(test):
         # Set-up csresspec for On/Off observations
         # in stacked mode and with WSTAT background
         resspec = cscripts.csresspec()
-        resspec['inobs'] = self._inonoff
-        resspec['inmodel'] = self._onoff_model
-        resspec['outfile'] = 'csresspec_py6.fits'
+        resspec['inobs']     = self._inonoff
+        resspec['inmodel']   = self._onoff_model
+        resspec['outfile']   = 'csresspec_py6.fits'
         resspec['algorithm'] = 'SIGNIFICANCE'
         resspec['statistic'] = 'WSTAT'
-        resspec['stack'] = True
-        resspec['logfile'] = 'csresspec_py6.log'
-        resspec['chatter'] = 3
+        resspec['stack']     = True
+        resspec['logfile']   = 'csresspec_py6.log'
+        resspec['chatter']   = 3
 
         # Run csresspec script
         resspec.execute()
@@ -263,9 +263,11 @@ class Test(test):
 
         # Check first hdu with residuals
         table = fits[1]
+
         # Check number of rows = number of energy bins
         self.test_value(table.nrows(), enumbins,
                         'Check for %d rows in residuals' % enumbins)
+
         # Check number of columns, 2 for energy bounds + 3 for 3D or 6 for
         # On/Off + 1 for each model component if components = yes
         self.test_value(table.ncols(), ncols,

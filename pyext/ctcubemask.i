@@ -48,7 +48,6 @@ public:
     void run(void);
     void save(void);
     void publish(const std::string& name = "");
-    GCTAEventCube* cube(void);
 };
 
 
