@@ -386,7 +386,7 @@ void ctbin::init_members(void)
     m_dirs.clear();
 
     // Set CTA reference time
-    m_gti.reference(m_cta_ref);
+    m_gti.reference(ctools::time_reference);
 
     // Return
     return;

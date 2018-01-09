@@ -280,8 +280,9 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.98, \
     roi.radius(rad)
 
     # Set GTI
-    gti = gammalib.GGti()
-    gti.append(gammalib.GTime(tstart), gammalib.GTime(tstart+duration))
+    gti = gammalib.GGti(ctools.time_reference)
+    gti.append(gammalib.GTime(tstart, ctools.time_reference),
+               gammalib.GTime(tstart+duration, ctools.time_reference))
 
     # Set energy boundaries
     ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, 'TeV'),

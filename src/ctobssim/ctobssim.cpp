@@ -790,9 +790,9 @@ void ctobssim::simulate_source(GCTAObservation* obs,
                     wrklog->indent(indent);
                 }
                 *wrklog << gammalib::parformat("Time interval", indent);
-                *wrklog << tmin.convert(m_cta_ref);
+                *wrklog << tmin.convert(ctools::time_reference);
                 *wrklog << " - ";
-                *wrklog << tmax.convert(m_cta_ref);
+                *wrklog << tmax.convert(ctools::time_reference);
                 *wrklog << " s" << std::endl;
             }
 
@@ -1057,8 +1057,8 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
                     wrklog->indent(indent);
                 }
                 *wrklog << gammalib::parformat("Time slice", indent);
-                *wrklog << tstart.convert(m_cta_ref) << " - ";
-                *wrklog << tstop.convert(m_cta_ref) << " s";
+                *wrklog << tstart.convert(ctools::time_reference) << " - ";
+                *wrklog << tstop.convert(ctools::time_reference) << " s";
                 if (model->name().length() > 0) {
                     *wrklog << " [" << model->name() << "]";
                 }

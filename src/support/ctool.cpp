@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -253,7 +253,7 @@ void ctool::init_members(void)
     // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
     // which is defined in GCTALib.hpp. This is somehow a kluge. We need
     // a better mechanism to implement the CTA reference MJD.
-    m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
+    //m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
 
     // Set logger properties
     log.date(true);
@@ -276,7 +276,7 @@ void ctool::copy_members(const ctool& app)
     // Copy members
     m_read_ahead = app.m_read_ahead;
     m_use_xml    = app.m_use_xml;
-    m_cta_ref    = app.m_cta_ref;
+    //m_cta_ref    = app.m_cta_ref;
 
     // Return
     return;
@@ -1059,14 +1059,14 @@ GEbounds ctool::get_ebounds(void)
 GGti ctool::get_gti(void)
 {
     // Initialise Good Time Intervals with CTA reference time
-    GGti gti(m_cta_ref);
+    GGti gti(ctools::time_reference);
 
     // Continue only if "tmin" has a valid time value
     if ((*this)["tmin"].is_valid() && (*this)["tmax"].is_valid()) {
 
         // Get minimum and maximum time for CTA time reference
-        GTime tmin = (*this)["tmin"].time(m_cta_ref);
-        GTime tmax = (*this)["tmax"].time(m_cta_ref);
+        GTime tmin = (*this)["tmin"].time(ctools::time_reference);
+        GTime tmax = (*this)["tmax"].time(ctools::time_reference);
 
         // Append GTI
         gti.append(tmin, tmax);

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -27,7 +27,6 @@
 /* Put headers and other declarations here that are needed for compilation */
 #define SWIG
 #include "ctool.hpp"
-
 
 /***********************************************************************//**
  * @class cscript
@@ -57,6 +56,12 @@ public:
 // arguments to GApplication constructor
 %include "argcargv.i"
 
+/* __ Constants __________________________________________________________ */
+namespace ctools {
+    const GTimeReference time_reference =
+          GTimeReference(G_CTA_MJDREF, "s", "TT", "LOCAL");
+}
+
 
 /***********************************************************************//**
  * @class ctool
@@ -83,7 +88,6 @@ public:
 
     // Make methods private in Python by prepending an underscore
     %rename(_read_ahead)               read_ahead;
-    %rename(_time_reference)           time_reference;
     %rename(_get_observations)         get_observations;
     %rename(_setup_observations)       setup_observations;
     %rename(_setup_models)             setup_models;
@@ -119,7 +123,6 @@ public:
 
     // Protected methods
     const bool&           read_ahead(void) const;
-    const GTimeReference& time_reference(void) const;
 
     // Protected high-level setup methods
     void setup_observations(GObservations& obs, const bool& response = true,

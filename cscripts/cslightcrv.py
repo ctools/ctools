@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a lightcurve.
 #
-# Copyright (C) 2014-2017 Michael Mayer
+# Copyright (C) 2014-2018 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -174,8 +174,8 @@ class cslightcrv(ctools.csobservation):
         elif algorithm == 'LIN':
 
             # Get start and stop time and number of time bins
-            time_min = self['tmin'].time(self._time_reference())
-            time_max = self['tmax'].time(self._time_reference())
+            time_min = self['tmin'].time(ctools.time_reference)
+            time_max = self['tmax'].time(ctools.time_reference)
             nbins    = self['tbins'].integer()
 
             # Compute time step in seconds and setup the GTIs
@@ -386,8 +386,8 @@ class cslightcrv(ctools.csobservation):
         select = ctools.ctselect(self.obs())
         select['emin'] = self['emin'].real()
         select['emax'] = self['emax'].real()
-        select['tmin'] = tmin.convert(self._time_reference())
-        select['tmax'] = tmax.convert(self._time_reference())
+        select['tmin'] = tmin.convert(ctools.time_reference)
+        select['tmax'] = tmax.convert(ctools.time_reference)
         select['rad']  = 'UNDEFINED'
         select['ra']   = 'UNDEFINED'
         select['dec']  = 'UNDEFINED'
@@ -445,8 +445,8 @@ class cslightcrv(ctools.csobservation):
             select = ctools.ctselect(self.obs())
             select['emin'] = self['emin'].real()
             select['emax'] = self['emax'].real()
-            select['tmin'] = tmin.convert(self._time_reference())
-            select['tmax'] = tmax.convert(self._time_reference())
+            select['tmin'] = tmin.convert(ctools.time_reference)
+            select['tmax'] = tmax.convert(ctools.time_reference)
             select['rad']  = 'UNDEFINED'
             select['ra']   = 'UNDEFINED'
             select['dec']  = 'UNDEFINED'

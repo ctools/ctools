@@ -24,6 +24,12 @@ Support model
 None
 
 
+Base classes
+------------
+Add ctools::time_reference constant and remove ctools::time_reference() method
+(#2295).
+
+
 ctbin - CTA event binning
 -------------------------
 None

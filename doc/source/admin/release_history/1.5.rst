@@ -26,6 +26,9 @@ Bug fixes
 Improvements
 ------------
 
+* [`2295 <https://cta-redmine.irap.omp.eu/issues/2295>`_] -
+  Add ``ctools::time_reference`` constant and remove ``ctools::time_reference()``
+  method
 * [`2273 <https://cta-redmine.irap.omp.eu/issues/2273>`_] -
   Support On/Off analysis in :ref:`cslightcrv` and :ref:`csphasecrv`
 * [`2267 <https://cta-redmine.irap.omp.eu/issues/2267>`_] -
