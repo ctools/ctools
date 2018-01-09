@@ -54,7 +54,7 @@ the ctools software. Make sure that you read at least this section.
    The Test Statistic value is useful for computing the detection significance
    of a source, but for many sources in your region of interest you may actually
    not be interested in that value. Computation of the Test Statistic value
-   takes some extra time, so do not request the computation if you don't reaaly
+   takes some extra time, so do not request the computation if you don't really
    need it.
 
 

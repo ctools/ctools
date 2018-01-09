@@ -37,7 +37,7 @@ except:
 
 try:
     import nbsphinx
-    extensions += ['nbsphinx']
+    extensions += ['nbsphinx','IPython.sphinxext.ipython_console_highlighting']
 except:
     print('WARNING: Python package `nbsphinx` not found.\n'
           'WARNING: Please install it to get fully-functional Sphinx docs.\n'
@@ -61,7 +61,7 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 
 # The encoding of source files.
-#source_encoding = 'utf-8-sig'
+source_encoding = 'utf-8'
 
 # The master toctree document.
 master_doc = 'contents'

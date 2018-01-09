@@ -22,4 +22,5 @@ examples should take about an hour, so grab some coffee before you start.
    spectrum
    unbinned
    energy_dispersion
+   onoff
    ctools-from-python

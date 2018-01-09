@@ -29,8 +29,8 @@ To simulate events taking the energy dispersion into account you run the
 .. code-block:: bash
 
    $ ctobssim edisp=yes
-   RA of pointing (degrees) (0-360) [83.63]
-   Dec of pointing (degrees) (-90-90) [22.01]
+   RA of pointing (degrees) (0-360) [83.5]
+   Dec of pointing (degrees) (-90-90) [22.8]
    Radius of FOV (degrees) (0-180) [5.0]
    Start time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:00:00]
    Stop time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:30:00] 2020-01-01T01:00:00
