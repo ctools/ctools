@@ -17,6 +17,8 @@ In particular, this release provides:
 Bug fixes
 ---------
 
+* [`2287 <https://cta-redmine.irap.omp.eu/issues/2287>`_] -
+  Correctly strip .gz suffix from output filenames
 * [`2262 <https://cta-redmine.irap.omp.eu/issues/2262>`_] -
   Fix chatter level handling in :ref:`ctpsfcube`
 

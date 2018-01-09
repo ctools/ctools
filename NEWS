@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.5.0
 
-28 November 2017
+9 January 2018
 
 
 Introduction
@@ -103,6 +103,9 @@ The chatter level is now correctly forwarded to the PSF cube fill method (#2262)
 
 ctselect - CTA event selection
 ------------------------------
+Any .gz suffix is now correctly stripped from the event filenames when creating
+the output filenames (#2287).
+
 Use t-type parameters for "tmin" and "tmax" to all specifying times in various
 formats (#1864).
 

@@ -958,14 +958,14 @@ void ctool::log_models(const GChatter&    chatter,
  * @param[in] pnt Pointing direction.
  * @return Region of Interest.
  *
- * Returns Region of Interest (RoI) from the User parameters "ra", "dec" and
- * "rad". If any of the parameters "ra", "dec" or "rad" is not valid an
+ * Returns Region of Interest (RoI) from the User parameters `ra`, `dec` and
+ * `rad`. If any of the parameters `ra`, `dec` or `rad` is not valid an
  * invalid RoI is returned.
  *
- * If the "usepnt" parameter exists and is set to "yes", the RoI centre will
- * be taken from the specified pointing direction instead of the "ra" and
- * "dec" parameters. Make sure to provide a valid pointing direction in case
- * that you want to use the "usepnt" User parameter.
+ * If the `usepnt` parameter exists and is set to `yes`, the RoI centre will
+ * be taken from the specified pointing direction instead of the `ra` and
+ * `dec` parameters. Make sure to provide a valid pointing direction in case
+ * that you want to use the `usepnt` User parameter.
  ***************************************************************************/
 GCTARoi ctool::get_roi(const GCTAPointing& pnt)
 {
@@ -1016,9 +1016,9 @@ GCTARoi ctool::get_roi(const GCTAPointing& pnt)
  *
  * @return Energy boundaries.
  *
- * Returns energy boundaries from the User parameters "emin" and "emax". If
- * one of "emin" or "emax" is not valid, an empty energy boundaries object
- * is returned. If "emin" is not valid, "emax" is not queried.
+ * Returns energy boundaries from the User parameters `emin` and `emax`. If
+ * one of `emin` or `emax` is not valid, an empty energy boundaries object
+ * is returned. If `emin` is not valid, `emax` is not queried.
  ***************************************************************************/
 GEbounds ctool::get_ebounds(void)
 {
@@ -1051,10 +1051,10 @@ GEbounds ctool::get_ebounds(void)
  *
  * @return Good Time Intervals.
  *
- * Returns Good Time Intervals from the User parameters "tmin" and "tmax",
+ * Returns Good Time Intervals from the User parameters `tmin` and `tmax`,
  * taking into account the transformation into the CTA reference time system.
- * If one of "tmin" or "tmax" is not valid, an empty Good Time Interval
- * object is returned. If "tmin" is not valid, "tmax" is not queried.
+ * If one of `tmin` or `tmax` is not valid, an empty Good Time Interval
+ * object is returned. If `tmin` is not valid, `tmax` is not queried.
  ***************************************************************************/
 GGti ctool::get_gti(void)
 {
@@ -1083,7 +1083,7 @@ GGti ctool::get_gti(void)
  *
  * @return CTA pointing.
  *
- * Returns CTA pointing from the User parameters "ra" and "dec".
+ * Returns CTA pointing from the User parameters `ra` and `dec`.
  ***************************************************************************/
 GCTAPointing ctool::get_pointing(void)
 {
@@ -1103,7 +1103,7 @@ GCTAPointing ctool::get_pointing(void)
  *
  * @return Sky direction.
  *
- * Returns sky direction from the User parameters "ra" and "dec".
+ * Returns sky direction from the User parameters `ra` and `dec`.
  ***************************************************************************/
 GSkyDir ctool::get_skydir(void)
 {
@@ -1124,9 +1124,7 @@ GSkyDir ctool::get_skydir(void)
  * @brief Set output file name.
  *
  * @param[in] filename Input file name.
- *
- * Required user parameters:
- *      prefix
+ * @return Output file name.
  *
  * Converts an input file name into an output filename by prepending the
  * prefix specified by the `prefix` parameter to the input file name. Any
@@ -1145,10 +1143,15 @@ std::string ctool::set_outfile_name(const std::string& filename)
     std::vector<std::string> elements = gammalib::split(fname.url(), "/");
 
     // The last path element is the filename
-    std::string outname = prefix + elements[elements.size()-1];
+    std::string outname = (elements.size() > 0) ?
+                          prefix + elements[elements.size()-1] : "";
 
-    // Strip any ".gz"
-    outname = gammalib::strip_chars(outname, ".gz");
+    // Strip any ".gz" from the outname
+    std::string            strip   = ".gz";
+    std::string::size_type i_start = outname.find(strip);
+    if (i_start != std::string::npos) {
+        outname.erase(i_start, strip.length());
+    }
 
     // Return output filename
     return outname;
@@ -1160,10 +1163,10 @@ std::string ctool::set_outfile_name(const std::string& filename)
  *
  * @return True if a stacked analysis should be done.
  *
- * Queries the user parameters "emin", "emax" and "enumbins", and if
- * "enumbins" is positive, signal that a stacked analysis is requested. In
- * that case, also the "coordsys", "proj", "xref", "yref", "nxpix", "nypix"
- * and "binsz" parameters are queried.
+ * Queries the user parameters `emin`, `emax` and `enumbins`, and if
+ * `enumbins` is positive, signal that a stacked analysis is requested. In
+ * that case, also the `coordsys`, `proj`, `xref`, `yref`, `nxpix`, `nypix`
+ * and `binsz` parameters are queried.
  *
  * Using this method assures that the parameters are always queried in the
  * same order.
