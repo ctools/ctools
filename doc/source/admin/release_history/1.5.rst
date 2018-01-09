@@ -55,6 +55,8 @@ Improvements
 New features
 ------------
 
+* [`2289 <https://cta-redmine.irap.omp.eu/issues/2289>`_] -
+  Add :ref:`csresspec` script
 * [`2208 <https://cta-redmine.irap.omp.eu/issues/2208>`_] -
   Add :ref:`csphagen` script
 * [`2180 <https://cta-redmine.irap.omp.eu/issues/2180>`_] -

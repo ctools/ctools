@@ -179,7 +179,7 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = csresmap.log) [string]``
+``(logfile = csresspec.log) [string]``
     Log filename.
 
 

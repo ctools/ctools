@@ -261,6 +261,11 @@ csresmap - Generate residual map
 None
 
 
+csresspec - Generate residual spectrum
+--------------------------------------
+Add script to generate a residual spectrum (#2289)
+
+
 csroot2caldb - Generates calibration database from ROOT file
 ------------------------------------------------------------
 None
