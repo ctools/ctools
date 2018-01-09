@@ -57,6 +57,7 @@ cscripts
    csphasecrv --- Computes phase curve <csphasecrv>
    cspull --- Generates pull distribution <cspull>
    csresmap --- Generates residual map <csresmap>
+   csresspec --- Generates residual spectrum <csresspec>
    csroot2caldb --- Creates a caldb entry from a ROOT file <csroot2caldb>
    cssens --- Computes CTA sensitivity <cssens>
    csspec --- Computes spectral points <csspec>

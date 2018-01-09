@@ -1,7 +1,7 @@
 # ==========================================================================
 # cscripts Python module
 #
-# Copyright (C) 2015-2017 Juergen Knoedlseder
+# Copyright (C) 2015-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ __all__ = [
     "csphasecrv",
     "cspull",
     "csresmap",
+    "csresspec",
     "csroot2caldb",
     "cssens",
     "csspec",
@@ -77,6 +78,7 @@ from cscripts.csphagen      import csphagen
 from cscripts.csphasecrv    import csphasecrv
 from cscripts.cspull        import cspull
 from cscripts.csresmap      import csresmap
+from cscripts.csresspec     import csresspec
 from cscripts.csroot2caldb  import csroot2caldb
 from cscripts.cssens        import cssens
 from cscripts.csspec        import csspec

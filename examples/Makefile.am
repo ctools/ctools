@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools examples                                              #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2018 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -28,6 +28,7 @@ scripts = README.md \
           show_pha.py \
           show_pull_evolution.py \
           show_pull_histogram.py \
+          show_residuals.py \
           show_response.py \
           show_sensitivity.py \
           show_spectrum.py \

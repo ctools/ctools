@@ -33,6 +33,7 @@
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
 #include "ctobservation.hpp"
+#include "GCTAEventCube.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTCUBEMASK_NAME "ctcubemask"
@@ -86,6 +87,5 @@ protected:
     std::vector<std::string> m_infiles;       //!< Input event filenames
     bool                     m_select_energy; //!< Perform energy selection
 };
-
 
 #endif /* CTCUBEMASK_HPP */
