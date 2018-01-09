@@ -99,7 +99,6 @@ class csphagen(ctools.csobservation):
         elif bkgmethod == 'CUSTOM':
 
             obs_file     = self['inobs'].filename()
-            src_reg_file = gammalib.GFilename()
 
             # obs def XML: look for region files
             if obs_file.file()[-3:] == 'xml':
@@ -115,35 +114,22 @@ class csphagen(ctools.csobservation):
 
                     # Get region file path from <observation> body
                     off_regions_file = ''
-                    on_region_file   = ''
                     for entry in elem:
 
                         # <parameter name="OffRegions" file=".."/> contains region file
                         if entry.attribute('name') == 'OffRegions':
                             off_regions_file = entry.attribute('file')
 
-                        # <parameter name="OnRegion" file=".."/> contains region file.
-                        if entry.attribute('name') == 'OnRegion':
-                            on_region_file = entry.attribute('file')
-
                     # Store file paths
                     self._bkg_reg_files[obs_id] = gammalib.GFilename(off_regions_file)
-
-                    if on_region_file != '':
-                        src_reg_file = gammalib.GFilename(on_region_file)
 
                     # Not existing bkg region files are set to None (for every obs)
                     if not self._bkg_reg_files[obs_id].exists():
                         self._bkg_reg_files[obs_id] = None
 
-                # Not existing src region files are set to None (one time)
-                if not src_reg_file.exists():
-                    src_reg_file = None
-
             else:
-                # event FITS files: query later 1 bkg & 1 src region file
+                # event FITS files: query later 1 bkg region file
                 self._bkg_reg_files = {0:None}
-                src_reg_file  = None
 
             # Query missing bkg region file
             if len([True for x in self._bkg_reg_files if self._bkg_reg_files[x] is None]) > 0:
@@ -155,11 +141,8 @@ class csphagen(ctools.csobservation):
                     # Query bkg region file for single observation
                     self._bkg_reg_files[self._bkg_reg_files.keys()[0]] = self['bkgreg'].filename()
 
-            # Query missing src region file
-            if src_reg_file is None:
-                src_reg_file  = self['srcreg'].filename()
-
-            # Set up src (=On) region. Only 1 region is allowed
+            # Query src region file and set up the region. Only 1 region is allowed.
+            src_reg_file  = self['srcreg'].filename()
             self._src_reg = gammalib.GSkyRegions(src_reg_file)
 
             if len(self._src_reg) > 1:
