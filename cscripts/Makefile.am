@@ -141,6 +141,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_csphasecrv.py \
               $(top_srcdir)/test/test_cspull.py \
               $(top_srcdir)/test/test_csresmap.py \
+              $(top_srcdir)/test/test_csresspec.py \
               $(top_srcdir)/test/test_csroot2caldb.py \
               $(top_srcdir)/test/test_cssens.py \
               $(top_srcdir)/test/test_csspec.py \
