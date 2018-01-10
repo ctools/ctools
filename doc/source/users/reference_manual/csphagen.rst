@@ -99,8 +99,9 @@ General parameters
     For event list or single obs in an obs definition XML: region files can
     be queried.
     For multiple observations: those have to be specified in the obs def XML.
-    Here use parameters name="OnRegion" and name="OffRegions" (per observation)
-    with appropriate <file> entry. Files can be ds9 regions or FITS WCS maps.
+    Here use parameter name="OffRegions" (per observation) with appropriate
+    <file> entry. Files can be ds9 regions or FITS WCS maps. The on region
+    will always be queried.
 
 ``(bkgregmin = 2) [integer]``
     Minimum number of background regions that are required for an observation.
