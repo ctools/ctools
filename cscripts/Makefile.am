@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for cscripts scripts                                             #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2018 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -172,6 +172,8 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/crab_offaxis1.fits.gz \
            $(top_srcdir)/test/data/crab_offaxis2.fits.gz \
            $(top_srcdir)/test/data/crab_exclusion.fits.gz \
+           $(top_srcdir)/test/data/crab_src_reg.reg \
+           $(top_srcdir)/test/data/crab_bkg_reg.reg \
            $(top_srcdir)/test/data/tsmap_0.fits \
            $(top_srcdir)/test/data/tsmap_1.fits \
            $(top_srcdir)/test/data/exclusion.reg \

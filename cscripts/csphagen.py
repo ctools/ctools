@@ -3,7 +3,7 @@
 # Computes the PHA spectra for source/background and ARF/RMF files using the
 # reflected region method
 #
-# Copyright (C) 2017 Luigi Tibaldo
+# Copyright (C) 2017-2018 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -54,7 +54,103 @@ class csphagen(ctools.csobservation):
         # Return
         return
 
+
     # Private methods
+    def _query_src_direction(self):
+        """
+        Set up the source direction parameter.
+        Query relevant parameters.
+        """
+        self._src_dir = gammalib.GSkyDir()
+        coordsys = self['coordsys'].string()
+        if coordsys == 'CEL':
+            ra  = self['ra'].real()
+            dec = self['dec'].real()
+            self._src_dir.radec_deg(ra, dec)
+        elif coordsys == 'GAL':
+            glon = self['glon'].real()
+            glat = self['glat'].real()
+            self._src_dir.lb_deg(glon, glat)
+
+    def _get_parameters_bkgmethod_reflected(self):
+        """
+        Get parameters for REFLECTED background method
+        """
+        # Get source shape
+        self._srcshape = self['srcshape'].string()
+
+        # Set source region (so far only CIRCLE is supported)
+        if self._srcshape == 'CIRCLE':
+
+            # Query source direction
+            self._query_src_direction()
+
+            # Query minimum number of background regions
+            self['bkgregmin'].integer()
+
+            # Set circular source region
+            self._rad = self['rad'].real()
+            self._src_reg.append(gammalib.GSkyRegionCircle(self._src_dir, self._rad))
+
+        # Return
+        return
+
+    def _get_parameters_bkgmethod_custom(self):
+        """
+        Get parameters for CUSTOM background method
+
+        Raises
+        ------
+        RuntimeError
+            Only one On region is allowed
+        """
+        # Set up source region
+        filename      = self['srcregfile'].filename()
+        self._src_reg = gammalib.GSkyRegions(filename)
+
+        # Raise an exception if there is more than one source region
+        if len(self._src_reg) != 1:
+            raise RuntimeError('Only one On region is allowed')
+
+        # Set up source direction. Query parameters if neccessary.
+        if isinstance(self._src_reg[0], gammalib.GSkyRegionCircle):
+            self._src_dir = self._src_reg[0].centre()
+            self._rad     = self._src_reg[0].radius()
+        else:
+            self._query_src_direction()
+
+        # Make sure that all CTA observations have an Off region by loading the
+        # Off region region the parameter 'bkgregfile' for all CTA observations
+        # without Off region
+        for obs in self.obs():
+            if obs.instrument() == 'CTA':
+                if obs.off_regions().is_empty():
+                    filename = self['bkgregfile'].filename()
+                    regions  = gammalib.GSkyRegions(filename)
+                    obs.off_regions(regions)
+
+        # Return
+        return
+
+    def _get_parameters_bkgmethod(self):
+        """
+        Get background method parameters
+        """
+        # Get background method
+        bkgmethod = self['bkgmethod'].string()
+
+        # Get background method dependent parameters
+        if bkgmethod == 'REFLECTED':
+            self._get_parameters_bkgmethod_reflected()
+        elif bkgmethod == 'CUSTOM':
+            self._get_parameters_bkgmethod_custom()
+
+        # Query parameters that are needed for all background methods
+        self['maxoffset'].real()
+
+        # Return
+        return
+
     def _get_parameters(self):
         """
         Get parameters from parfile and setup observations
@@ -66,28 +162,8 @@ class csphagen(ctools.csobservation):
         # Set energy bounds
         self._ebounds = self._create_ebounds()
 
-        # Initialise source position/region querying relevant parameters
-        self._src_dir = gammalib.GSkyDir()
+        # Initialize empty src regions container
         self._src_reg = gammalib.GSkyRegions()
-        coordsys = self['coordsys'].string()
-        if coordsys == 'CEL':
-            ra  = self['ra'].real()
-            dec = self['dec'].real()
-            self._src_dir.radec_deg(ra, dec)
-        elif coordsys == 'GAL':
-            glon = self['glon'].real()
-            glat = self['glat'].real()
-            self._src_dir.lb_deg(glon, glat)
-        self._srcshape = self['srcshape'].string()
-        if self._srcshape == 'CIRCLE':
-            self._rad = self['rad'].real()
-            self._src_reg.append(gammalib.GSkyRegionCircle(self._src_dir, self._rad))
-
-        # Query background estimation method and parameters
-        bkgmethod = self['bkgmethod'].string()
-        if bkgmethod == 'REFLECTED':
-            self['bkgregmin'].integer()
-        self['maxoffset'].real()
 
         # Exclusion map
         if self['inexclusion'].filename().is_fits():
@@ -108,6 +184,10 @@ class csphagen(ctools.csobservation):
         # parameter file
         if self.obs().is_empty():
             self.obs(self._get_observations(False))
+
+        # Get background method parameters (have to come after setting up of
+        # observations)
+        self._get_parameters_bkgmethod()
 
         # Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -247,6 +327,38 @@ class csphagen(ctools.csobservation):
         # Return energy boundaries
         return ebounds
 
+    def _set_background_regions(self, obs):
+        """
+        Set background regions for an observation
+
+        Parameters
+        ----------
+        obs : `~gammalib.GCTAObservation()`
+            CTA observation
+
+        Returns
+        -------
+        regions : `~gammalib.GSkyRegions()`
+            Background regions
+        """
+        # Initialise empty background regions for this observation
+        bkg_reg = gammalib.GSkyRegions()
+
+        # If reflected background is requested then created reflected
+        # background regions
+        if self['bkgmethod'].string() == 'REFLECTED':
+            bkg_reg = self._reflected_regions(obs)
+
+        # ... otherwise if custom background is requested then get the
+        # background regions from the observation. We use a copy here since
+        # otherwise the background regions go out of scope once the observations
+        # are replaced by the On/Off observations.
+        elif self['bkgmethod'].string() == 'CUSTOM':
+            bkg_reg = obs.off_regions().copy()
+
+        # Return background regions
+        return bkg_reg
+
 
     # Public methods
     def run(self):
@@ -286,15 +398,20 @@ class csphagen(ctools.csobservation):
         # Loop through observations and generate pha, arf, rmf files
         for obs in self.obs():
 
-            # Initialise background regions for this observation
-            bkg_reg = gammalib.GSkyRegions()
+            # Skip non CTA observations
+            if obs.instrument() != 'CTA':
+                self._log_string(gammalib.NORMAL, 'Skip %s observation "%s"' % \
+                                 (obs.instrument(), obs.id()))
+                continue
 
-            # If reflected background is requested then created reflected
-            # background regions
-            if self['bkgmethod'].string() == 'REFLECTED':
-                bkg_reg = self._reflected_regions(obs)
+            # Log current observation
+            self._log_string(gammalib.NORMAL, 'Process observation "%s"' % \
+                             (obs.id()))
 
-            # If there are reflected regions then create On/Off observation
+            # Set background regions for this observation
+            bkg_reg = self._set_background_regions(obs)
+
+            # If there are background regions then create On/Off observation
             # and append it to the output container
             if bkg_reg.size() >= self['bkgregmin'].integer():
                 onoff = gammalib.GCTAOnOffObservation(obs, self._src_dir,
