@@ -32,8 +32,8 @@ AC_INIT([ctools], [1.5.0.dev1], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 #AM_INIT_AUTOMAKE([gnu no-dependencies foreign])
-#AM_INIT_AUTOMAKE([gnu -Wno-portability foreign])
-AM_INIT_AUTOMAKE([gnu -Wno-portability foreign serial-tests])
+AM_INIT_AUTOMAKE([gnu -Wno-portability foreign])
+#AM_INIT_AUTOMAKE([gnu -Wno-portability foreign serial-tests])
 AC_CONFIG_HEADER([config.h])
 
 
