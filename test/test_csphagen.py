@@ -48,13 +48,11 @@ class Test(test):
         self._exclusion      = self._datadir + '/crab_exclusion.fits'
         self._nreg_with_excl = 5
         self._nreg_wo_excl   = 8
+        self._nreg_bkg_reg   = 5
         self._nreg_mul       = [self._nreg_with_excl, 6]
         self._nbins          = 10
-        # number of expected background regions with/wo exclusion,
-        # and for two different runs
         self._regfile_src    = self._datadir + '/crab_src_reg.reg'
         self._regfile_bkg    = self._datadir + '/crab_bkg_reg.reg'
-        self._counts_reflected = 0
 
         # Return
         return
@@ -70,7 +68,6 @@ class Test(test):
         # Append tests
         self.append(self._test_cmd, 'Test csphagen on command line')
         self.append(self._test_python, 'Test csphagen from Python')
-        self.append(self._test_regfiles_cmd, 'Test csphagen input region files on command line')
 
         # Return
         return
@@ -107,9 +104,6 @@ class Test(test):
         # Check output files
         self._check_output('csphagen_cmd1', self._nbins, self._nreg_with_excl)
         self._check_outobs('csphagen_cmd1', 1)
-
-        # store on-counts for later testing bkgmethod CUSTOM
-        self._counts_reflected = self._read_pha_counts('csphagen_cmd1_pha_on.fits')
 
         # Setup csphagen command
         cmd = csphagen + ' inobs="events_that_do_not_exist.fits" ' + \
@@ -162,7 +156,7 @@ class Test(test):
         phagen['logfile']     = 'csphagen_py1.log'
         phagen['chatter']     = 1
 
-        # Run script
+        # Execute script
         phagen.execute()
 
         # Check output
@@ -192,7 +186,7 @@ class Test(test):
         phagen['logfile']   = 'csphagen_py2.log'
         phagen['chatter']   = 2
 
-        # Run script
+        # Execute script
         phagen.execute()
 
         # Check output
@@ -260,7 +254,7 @@ class Test(test):
         phagen['logfile']     = 'csphagen_py4.log'
         phagen['chatter']     = 4
 
-        # Run script
+        # Execute script
         phagen.execute()
 
         # Check output
@@ -269,60 +263,36 @@ class Test(test):
                                0, check_regions=False)
         self._check_outobs('csphagen_py4', 1)
 
-        # Return
-        return
+        # Setup csphagen for test with custom On and Off regions provided
+        phagen = cscripts.csphagen()
+        phagen['inobs']      = self._myevents1
+        phagen['caldb']      = self._caldb
+        phagen['irf']        = self._irf
+        phagen['ebinalg']    = 'LOG'
+        phagen['emin']       = 0.1
+        phagen['emax']       = 100.0
+        phagen['enumbins']   = self._nbins
+        phagen['bkgmethod']  = 'CUSTOM'
+        phagen['srcregfile'] = self._regfile_src
+        phagen['bkgregfile'] = self._regfile_bkg
+        phagen['etruemin']   = 0.05
+        phagen['etruemax']   = 150.0
+        phagen['etruebins']  = 5
+        phagen['stack']      = False
+        phagen['outobs']     = 'csphagen_py5.xml'
+        phagen['prefix']     = 'csphagen_py5'
+        phagen['logfile']    = 'csphagen_py5.log'
+        phagen['chatter']    = 2
 
-    # Test csphagen input region files (command line)
-    def _test_regfiles_cmd(self):
-        """
-        Test csphagen input region files (command line).
-        This is done by redoing the test performed in _test_cmd()
-        but this time bkgmethod is CUSTOM and the regions are read
-        from ds9 region files. Exactly the same output of csphagen
-        compared to _test_cmd() is expected.
-        Hint: The output region files of _test_cmd() could be used
-        directly, but to make the execution of this test case standalone
-        the output once created by _test_cmd() was copied and added
-        staticly to the repository.
-        """
-        # Set script name
-        csphagen = self._script('csphagen')
+        # Execute script
+        phagen.execute()
 
-        # Setup csphagen command
-        # TODO: remove rad from cmd line arguments. currently it is needed (ctool::set_obs_bounds needs rad!)
-        cmd = csphagen + ' inobs="' + self._myevents1 + \
-                         '" caldb="' + self._caldb + '" irf="' + self._irf + \
-                         '" ebinalg="LOG" emin=0.1 emax=100. enumbins=' + \
-                         str(self._nbins) + \
-                         ' etruemin=0.05 etruemax=150 etruebins=5 '+ \
-                         'stack="no" ' + \
-                         'inexclusion="' + self._exclusion + '" ' + \
-                         'bkgmethod="CUSTOM" ' + \
-                         'rad=0.2 ' + \
-                         'srcregfile="' + self._regfile_src + '" ' + \
-                         'bkgregfile="' + self._regfile_bkg + '" ' + \
-                         'outobs="csphagen_regfiles_cmd1.xml" ' + \
-                         'prefix="csphagen_regfiles_cmd1" ' + \
-                         'logfile="csphagen_regfiles_cmd1.log" chatter=2 ' + \
-                         'coordsys="CEL" ra=83.633 dec=22.0145'
-
-        # Check if execution was successful
-        self.test_assert(self._execute(cmd) == 0,
-                         'Check successful execution from command line')
-
-        # Check output files
-        self._check_output('csphagen_regfiles_cmd1', self._nbins, self._nreg_with_excl)
-        self._check_outobs('csphagen_regfiles_cmd1', 1)
-
-        # Check resulting number of counts, which should be equal to those obtained in _test_cmd()
-        counts_custom = self._read_pha_counts('csphagen_regfiles_cmd1_pha_on.fits')
-
-        self.test_assert(counts_custom == self._counts_reflected,
-                         'Check bkgmethods CUSTOM and REFLECTED: number of on-counts should be equal')
+        # Check output
+        self._check_output('csphagen_py5', self._nbins, self._nreg_bkg_reg)
+        self._check_outobs('csphagen_py5', 1)
 
         # Return
         return
-
 
     def _check_ebounds(self, table, bins):
         """
