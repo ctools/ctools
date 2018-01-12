@@ -92,7 +92,8 @@ class Test(test):
                          ' coordsys="CEL" ra=83.633 dec=22.0145' + \
                          ' rad=0.2 stack="no" inexclusion="' + \
                          self._exclusion + \
-                         '" outobs="csphagen_cmd1.xml" prefix="csphagen_cmd1" ' + \
+                         '" bkgmethod="REFLECTED" '+ \
+                         'outobs="csphagen_cmd1.xml" prefix="csphagen_cmd1" ' + \
                          'logfile="csphagen_cmd1.log" chatter=2'
 
         # Check if execution of wrong command fails
@@ -119,7 +120,8 @@ class Test(test):
                          ' coordsys="CEL" ra=83.633 dec=22.0145' + \
                          ' rad=0.2 stack="no" inexclusion="' + \
                          self._exclusion + \
-                         '" outobs="csphagen_cmd2.xml" prefix="csphagen_cmd2" ' + \
+                         '" bkgmethod="REFLECTED" '+ \
+                         'outobs="csphagen_cmd2.xml" prefix="csphagen_cmd2" ' + \
                          'logfile="csphagen_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
@@ -151,6 +153,7 @@ class Test(test):
         phagen['rad']         = 0.2
         phagen['stack']       = False
         phagen['inexclusion'] = self._exclusion
+        phagen['bkgmethod']   = 'REFLECTED'
         phagen['etruemin']    = 0.05
         phagen['etruemax']    = 150.0
         phagen['etruebins']   = 5
@@ -180,6 +183,7 @@ class Test(test):
         phagen['dec']       = 22.0145
         phagen['rad']       = 0.2
         phagen['stack']     = False
+        phagen['bkgmethod'] = 'REFLECTED'
         phagen['etruemin']  = 0.05
         phagen['etruemax']  = 150.0
         phagen['etruebins'] = 5
@@ -216,6 +220,7 @@ class Test(test):
         phagen['rad']         = 0.2
         phagen['stack']       = False
         phagen['inexclusion'] = self._exclusion
+        phagen['bkgmethod']   = 'REFLECTED'
         phagen['etruemin']    = 0.05
         phagen['etruemax']    = 150.0
         phagen['etruebins']   = 5
@@ -246,6 +251,7 @@ class Test(test):
         phagen['rad']         = 0.2
         phagen['stack']       = True
         phagen['inexclusion'] = self._exclusion
+        phagen['bkgmethod']   = 'REFLECTED'
         phagen['etruemin']    = 0.05
         phagen['etruemax']    = 150.0
         phagen['etruebins']   = 5
@@ -293,9 +299,10 @@ class Test(test):
                          'inexclusion="' + self._exclusion + '" ' + \
                          'bkgmethod="CUSTOM" ' + \
                          'rad=0.2 ' + \
-                         'srcreg="' + self._regfile_src + '" ' + \
-                         'bkgreg="' + self._regfile_bkg + '" ' + \
-                         'outobs="csphagen_regfiles_cmd1.xml" prefix="csphagen_regfiles_cmd1" ' + \
+                         'srcregfile="' + self._regfile_src + '" ' + \
+                         'bkgregfile="' + self._regfile_bkg + '" ' + \
+                         'outobs="csphagen_regfiles_cmd1.xml" ' + \
+                         'prefix="csphagen_regfiles_cmd1" ' + \
                          'logfile="csphagen_regfiles_cmd1.log" chatter=2 ' + \
                          'coordsys="CEL" ra=83.633 dec=22.0145'
 

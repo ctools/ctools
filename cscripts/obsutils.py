@@ -1,7 +1,7 @@
 # ==========================================================================
 # Utility functions for observation handling
 #
-# Copyright (C) 2011-2017 Juergen Knoedlseder
+# Copyright (C) 2011-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -130,6 +130,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
             phagen['rad']         = onrad
             phagen['stack']       = False
             phagen['inexclusion'] = 'NONE'
+            phagen['bkgmethod']   = 'REFLECTED'
 
             # Optionally open the log file
             if log:

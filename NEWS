@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.5.0
 
-28 November 2017
+12 January 2018
 
 
 Introduction
@@ -219,6 +219,11 @@ None
 
 csphagen - Generate On/Off observations
 ---------------------------------------
+The CUSTOM background method was added to allow specifying On and Off regions
+from a region file or FITS WCS map. For multiple observations, a custom Off
+region per observation can be specified in the observation definition XML file
+using the OffRegions parameter (#2284).
+
 The script was added to allow the generation of PHA, ARF and RMF datasets for classical On/Off IACT analysis (#2208).
 
 

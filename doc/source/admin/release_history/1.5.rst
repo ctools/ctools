@@ -24,6 +24,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`2284 <https://cta-redmine.irap.omp.eu/issues/2284>`_] -
+  Add ``CUSTOM`` background method to :ref:`csphagen` script
 * [`2273 <https://cta-redmine.irap.omp.eu/issues/2273>`_] -
   Support On/Off analysis in :ref:`cslightcrv` and :ref:`csphasecrv`
 * [`2267 <https://cta-redmine.irap.omp.eu/issues/2267>`_] -

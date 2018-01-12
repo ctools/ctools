@@ -31,50 +31,48 @@ General parameters
 ------------------
 
 ``inobs [file]``
-    Input event list or observation definition XML file.
+    Input event list or observation definition XML file
 
 ``caldb [string]``
-    Calibration database.
+    Calibration database
 
 ``irf [string]``
-    Instrument response function.
+    Instrument response function
 
 ``(inexclusion = NONE) [file]``
     Optional FITS file containing a WCS map in the first hdu that defines sky
-    regions not to be used for background estimation (where map value != 0).
+    regions not to be used for background estimation (where map value != 0)
 
 ``outobs [string]``
-    Output observation definition XML file.
+    Output observation definition XML file
 
 ``(prefix = onoff) [string]``
-    Prefix of the file name for output PHA, ARF, RMF, XML, and DS9 region files.
+    Prefix of the file name for output PHA, ARF, RMF, XML, and DS9 region files
 
 ``emin [real]``
-    Lower energy limit (TeV) if ``LIN`` or ``LOG`` binning algorithms are used.
+    Lower energy limit (TeV) if ``LIN`` or ``LOG`` binning algorithms are used
 
 ``emax [real]``
-    Upper energy limit (TeV) if ``LIN`` or ``LOG`` binning algorithms are used.
+    Upper energy limit (TeV) if ``LIN`` or ``LOG`` binning algorithms are used
 
 ``enumbins [integer]``
     Number of energy bins. At least 30 bins per decade are recommended for
     proper evaluation of the instrument response.
 
-``ebinalg [string]``
-    Energy binning algorithm:
-    ``LOG`` : logarithmically spaced energy bins;
-    ``LIN`` : linearly spaced energy bins;
-    ``FILE``: energy bounds retrieved from file.
+``ebinalg <FILE|LIN|LOG> [string]``
+    Algorithm for defining energy bins (``FILE``: energy bounds retrieved from
+    file, see ``ebinfile`` parameter; ``LIN``: linearly spaced energy bins;
+    ``LOG``: logarithmically spaced energy bins)
 
 ``ebinfile [file]``
     Name of the file containing the energy bin definition if ``FILE`` algorithm
-    is used.
+    is used
 
-``(srcshape = CIRCLE) [string]``
-    Shape of the source region.
-    ``CIRCLE``: circular region around given position.
+``(srcshape = CIRCLE) <CIRCLE> [string]``
+    Shape of the source region (``CIRCLE``: circular region around given position)
 
-``coordsys [string]``
-    Coordinate system (``CEL`` - celestial, ``GAL`` - galactic)
+``coordsys <CEL|GAL> [string]``
+    Coordinate system (``CEL``: celestial; ``GAL``: galactic)
 
 ``ra [real]``
     Right Ascension of source region centre (deg)
@@ -91,17 +89,25 @@ General parameters
 ``rad [real]``
     Radius of source region circle (deg)
 
-``(bkgmethod = REFLECTED) [string]``
-    Method for background estimation.
-    ``REFLECTED:`` background evaluated in regions with the same shape as
-    source region reflected w.r.t. pointing direction for each observation.
-    ``CUSTOM:`` background evaluated in regions specified by user.
-    For event list or single obs in an obs definition XML: region files can
-    be queried.
-    For multiple observations: those have to be specified in the obs def XML.
-    Here use parameter name="OffRegions" (per observation) with appropriate
-    <file> entry. Files can be ds9 regions or FITS WCS maps. The on region
-    will always be queried.
+``srcregfile [file]``
+    Source region file (ds9 or FITS WCS map)
+
+``bkgmethod <REFLECTED|CUSTOM> [string]``
+    Method for background estimation:
+
+    - ``REFLECTED``: background is evaluated in regions with the same shape as
+      the source region reflected w.r.t. pointing direction for each observation
+
+    - ``CUSTOM``: background is evaluated in regions specified by user. For an
+      event list or a single observation in the observation definition XML file
+      a region file will be queried (see ``bkgregfile`` parameter). For multiple
+      observations specified in the observation definition XML file the name of
+      the region file will be extracted from the ``OffRegions`` parameter that
+      needs to be specified for each observation in the observation definition
+      XML file. Off region files can be either ds9 region files or FITS WCS maps.
+
+``bkgregfile [file]``
+    Background regions file (ds9 or FITS WCS map)
 
 ``(bkgregmin = 2) [integer]``
     Minimum number of background regions that are required for an observation.
@@ -110,26 +116,20 @@ General parameters
 
 ``(maxoffset = 4.0) [real]``
     Maximum offset in degrees of source from camera center to accept the
-    observation.
+    observation
 
 ``stack [boolean]``
     Specifies whether multiple observations should be stacked (``yes``) or
-    whether run-wise PHA, ARF and RMF files should be produced (``no``).
+    whether run-wise PHA, ARF and RMF files should be produced (``no``)
 
 ``(etruemin = 0.01) [real]``
-    Minimum true energy (TeV).
+    Minimum true energy (TeV)
 
 ``(etruemax = 0.01) [real]``
-    Maximum true energy (TeV).
+    Maximum true energy (TeV)
 
 ``(etruebins = 30) [integer]``
-    Number of bins per decade for true energy bins.
-
-``(bkgreg = bkg.reg) [file]``
-    Background regions file (ds9 or FITS WCS map).
-
-``(srcreg = on.reg) [file]``
-    Source region file (ds9 or FITS WCS map).
+    Number of bins per decade for true energy bins
 
 
 Standard parameters

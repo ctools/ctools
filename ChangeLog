@@ -1,8 +1,9 @@
-2017-11-28
+2018-01-12
 
         * Version 1.5.0 released
         ========================
 
+        Add CUSTOM background method to csphagen script (#2284)
         Support On/Off analysis in cslightcrv and csphasecrv (#2273)
         Add tutorial for classical analysis (#2267)
         Fix chatter level handling in ctpsfcube (#2262)
