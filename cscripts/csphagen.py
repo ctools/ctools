@@ -50,7 +50,6 @@ class csphagen(ctools.csobservation):
         self._has_exclusion = False
         self._srcshape      = ''
         self._rad           = 0.0
-        #self._bkg_reg_files = {}     # dictionary: bkg region file per observation {obsid:filepath, ..}
 
         # Return
         return

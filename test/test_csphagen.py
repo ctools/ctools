@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csphagen script.
 #
-# Copyright (C) 2017 Luigi Tibaldo
+# Copyright (C) 2017-2018 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -232,8 +232,7 @@ class Test(test):
                                self._nreg_mul[s])
         self._check_outobs('csphagen_py3', 2)
 
-        # Setup csphagen for test with multiple input observations and
-        # stacking
+        # Setup csphagen for test with multiple input observations and stacking
         phagen = cscripts.csphagen(obs)
         phagen['ebinalg']     = 'LOG'
         phagen['emin']        = 0.1
@@ -290,6 +289,38 @@ class Test(test):
         # Check output
         self._check_output('csphagen_py5', self._nbins, self._nreg_bkg_reg)
         self._check_outobs('csphagen_py5', 1)
+
+        # Append off regions to observation container
+        for run in obs:
+            run.off_regions(gammalib.GSkyRegions(self._regfile_bkg))
+
+        # Setup csphagen for test with multiple input observations and stacking
+        phagen = cscripts.csphagen(obs)
+        phagen['ebinalg']     = 'LOG'
+        phagen['emin']        = 0.1
+        phagen['emax']        = 100.0
+        phagen['enumbins']    = self._nbins
+        phagen['coordsys']    = 'CEL'
+        phagen['stack']       = True
+        phagen['inexclusion'] = self._exclusion
+        phagen['bkgmethod']   = 'CUSTOM'
+        phagen['srcregfile']  = self._regfile_src
+        phagen['etruemin']    = 0.05
+        phagen['etruemax']    = 150.0
+        phagen['etruebins']   = 5
+        phagen['outobs']      = 'csphagen_py6.xml'
+        phagen['prefix']      = 'csphagen_py6'
+        phagen['logfile']     = 'csphagen_py6.log'
+        phagen['chatter']     = 4
+
+        # Execute script
+        phagen.execute()
+
+        # Check output
+        for s in range(2):
+            self._check_output('csphagen_py6_stacked', self._nbins,
+                               0, check_regions=False)
+        self._check_outobs('csphagen_py6', 1)
 
         # Return
         return
