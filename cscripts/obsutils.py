@@ -130,6 +130,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
             phagen['rad']         = onrad
             phagen['stack']       = False
             phagen['inexclusion'] = 'NONE'
+            phagen['bkgmethod']   = 'REFLECTED'
 
             # Optionally open the log file
             if log:

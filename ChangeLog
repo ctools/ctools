@@ -1,8 +1,9 @@
-2018-01-09
+2018-01-12
 
         * Version 1.5.0 released
         ========================
 
+        Add CUSTOM background method to csphagen script (#2284)
         Add csresspec script (#2289)
         Add ctools::time_reference constant and remove ctools::time_reference() method (#2295)
         Correctly strip .gz suffix from output filenames (#2287)
