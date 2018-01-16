@@ -59,12 +59,9 @@ shown below.
 
    *Spectral energy distribution of the Crab nebula*
 
-..
+.. note::
+   The figure was created by typing:
 
-  .. note::
+   .. code-block:: bash
 
-     The figure was created by typing:
-
-     .. code-block:: bash
-
-         $ $CTOOLS/share/examples/python/show_spectrum.py spectrum.fits
+       $ $CTOOLS/share/examples/python/show_spectrum.py spectrum.fits

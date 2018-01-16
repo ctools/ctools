@@ -25,15 +25,12 @@ subtracted. You run the :ref:`csresmap` script as follows:
    Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT|SIGNIFICANCE) [SIGNIFICANCE]
    Output residual map file [resmap.fits]
 
-..
-
-  .. note::
-
-     :ref:`csresmap` is a Python script while the other tools that you have
-     used so far are C++ binary executables. From the User perspective, Python
-     scripts and C++ binary executables behave the same way, but to distinguish
-     both all Python scripts names start with ``cs`` while all C++ binary
-     executables names start with ``ct``.
+.. note::
+   :ref:`csresmap` is a Python script while the other tools that you have
+   used so far are C++ binary executables. From the User perspective, Python
+   scripts and C++ binary executables behave the same way, but to distinguish
+   both all Python scripts names start with ``cs`` while all C++ binary
+   executables names start with ``ct``.
 
 The :ref:`csresmap` script produces the FITS file ``resmap.fits`` that contains
 the residual counts map. The image is displayed below using
@@ -47,16 +44,13 @@ indicates that the model fit was satisfactory.
 
    *Residual sky map of the selected events with all model components subtracted*
 
-..
+.. note::
+   :ref:`csresmap` implements different algorithms for the computation of the
+   residuals. These are:
 
-  .. note::
+   * ``SUB``: :math:`DATA - MODEL`
+   * ``SUBDIV``: :math:`(DATA - MODEL) / MODEL`
+   * ``SUBDIVSQRT``: :math:`(DATA - MODEL) / \sqrt{MODEL}`
+   * ``SIGNIFICANCE``: :math:`{\rm sign}(DATA-MODEL) \times \sqrt{ 2 \times ( DATA \times \ln \left(\frac{DATA}{MODEL} \right) + MODEL - DATA ) }`
 
-     :ref:`csresmap` implements different algorithms for the computation of the
-     residuals. These are:
-
-     * ``SUB``: :math:`DATA - MODEL`
-     * ``SUBDIV``: :math:`(DATA - MODEL) / MODEL`
-     * ``SUBDIVSQRT``: :math:`(DATA - MODEL) / \sqrt{MODEL}`
-     * ``SIGNIFICANCE``: :math:`{\rm sign}(DATA-MODEL) \times \sqrt{ 2 \times ( DATA \times \ln \left(\frac{DATA}{MODEL} \right) + MODEL - DATA ) }`
-
-     By default the ``SIGNIFICANCE`` algorithm is used.
+   By default the ``SIGNIFICANCE`` algorithm is used.

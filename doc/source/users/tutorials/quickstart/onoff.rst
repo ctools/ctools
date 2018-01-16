@@ -1,42 +1,47 @@
 .. _start_onoff:
 
 Doing an On/Off analysis
---------------------------
+------------------------
 
   .. admonition:: What you will learn
 
      You will learn how to **adjust a parametrised spectral model to
      the events deriving the background from the data**.
 
-     Gamma-ray events are rare compared to the background events,
-     hence small imperfections of the background model can have a
-     large impact on the estimated source parameters.
-
      In classical IACT analyses the background has been normally
      derived from the data, by defining On (source) and Off
      (background) regions. An On/Off analysis is recommended if you
      want to assure minimal dependency on the Monte Carlo background model.
 
+  .. warning::
+     For the time being the **On/Off analysis only works for point sources**. Make
+     sure that the spatial component of the model you want to analyse is of
+     type ``PointSource``.
+
 Last, we consider the classical technique for IACT spectral analysis,
 in which 1D spectra for On and Off regions are used jointly to
 determine the source parameters.
 
-The script :ref:`csphagen` is used to derive a set of On/Off
-observations from the event lists.  This script saves the source (On) and background (Off) count spectra
-in `OGIP format <https://heasarc.gsfc.nasa.gov/docs/heasarc/ofwg/docs/spectra/ogip_92_007/node5.html>`_,
+The script :ref:`csphagen` is used to derive a set of On/Off observations from
+the event lists. This script saves the source (On) and background (Off) count
+spectra in
+`OGIP format <https://heasarc.gsfc.nasa.gov/docs/heasarc/ofwg/docs/spectra/ogip_92_007/node5.html>`_,
 along with the relevant information from the :ref:`instrument response functions <glossary_irf>`
 refashioned according to this format conventions.
 
-:ref:`csphagen` calculates the background counts using the REFLECTED algorithm, in which, for each individual
-observation the background regions have the same shape as the source region, and
-are rotated around the center of the camera keeping the same offset. As many
+By default, :ref:`csphagen` calculates the background counts using the
+``REFLECTED`` algorithm, in which, for each individual observation the
+background regions have the same shape as the source region, and are rotated
+around the center of the camera keeping the same offset. As many
 reflected regions as possible are used, excluding the area of the camera near
 the source position. Since the background rates are expected to be approximately
 radially symmetric in camera coordinates, this method minimizes the impact of
 the background rate modeling from Monte Carlo. An optional exclusion map (in
-FITS WCS format) can be provided as input through the ``inexclusion`` hidden
+FITS WCS format) can be provided as input through the hidden ``inexclusion``
 parameter if other regions of significant gamma-ray emission ought to be
 excluded from the background computation.
+
+To derive On/Off observations from the ``events_edisp.fits`` event list, type:
 
 .. code-block:: bash
 
@@ -56,56 +61,64 @@ excluded from the background computation.
    Output observation definition XML file [onoff_obs.xml]
 
 .. note::
+   We have used the events simulated accounting for energy dispersion, since
+   energy dispersion is always used in On/Off analysis.
 
-   - We have used the events simulated accounting for energy
-     dispersion, since energy dispersion is always used in On/Off analysis.
-   
-   - If you wish to limit the number of observations considered to
-     those pointed closer to the source, you can do this either at the
-     observation selection level (see :ref:`csobsselect`), or directly
-     in :ref:`csphagen` via the hidden ``maxoffset`` parameter.
-   
-   - The parameters specified control the energy binning of the count
-     spectra in *reconstructed* energy. For the computation of the
-     instrument response we need a fine binning in *true* energy,
-     which is controlled by the hidden parameters ``etruemin``,
-     ``etruemax``, and ``etruebins``.
+.. note::
+   If you wish to limit the number of observations considered to those
+   pointed closer to the source, you can do this either at the observation
+   selection level (see :ref:`csobsselect`), or directly in :ref:`csphagen`
+   via the hidden ``maxoffset`` parameter.
 
-This has produced in output several files. The xml observations file
-contains a single On/Off observation.
+.. note::
+   The specified parameters control the energy binning of the count spectra
+   in *reconstructed* energy. For the computation of the instrument response
+   we need a fine binning in *true* energy, which is controlled by the hidden
+   parameters ``etruemin``, ``etruemax``, and ``etruebins``.
+
+The :ref:`csphagen` script has produced several files. The
+:ref:`output observation definition XML file <glossary_obsdef>`
+``onoff_obs.xml`` contains a single On/Off observation:
 
 .. code-block:: bash
 
    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
    <observation_list title="observation list">
       <observation name="" id="" instrument="CTAOnOff" statistic="cstat">
-         <parameter name="Pha_on" file="onoff_pha_on.fits" />
-         <parameter name="Pha_off" file="onoff_pha_off.fits" />
-         <parameter name="Arf" file="onoff_arf.fits" />
-         <parameter name="Rmf" file="onoff_rmf.fits" />
+         <parameter name="Pha_on"  file="onoff_pha_on.fits"/>
+         <parameter name="Pha_off" file="onoff_pha_off.fits"/>
+         <parameter name="Arf"     file="onoff_arf.fits"/>
+         <parameter name="Rmf"     file="onoff_rmf.fits"/>
       </observation>
    </observation_list>
 
+.. note::
+   Note that the instrument name for an On/Off analysis is ``CTAOnOff``.
+   This allows combining an On/Off observations with other observation
+   types into a single
+   :ref:`observation definition file <glossary_obsdef>`.
+
 The observation entails four FITS files. ``onoff_pha_on.fits`` and
 ``onoff_pha_off.fits`` contain the On and Off spectra, respectively.
-These are stored in the SPECTRUM extension of the FITS file, along with ancillary
-information, notably the scaling factor to be applied to the background spectrum,
-BACKSCAL. The third extension, EBOUNDS, contains the boundaries of the energy
-bins, as defined by the binning parameters in input to csphagen. The file
-``onoff_arf.fits`` contains the spectral response of the instrument
-extracted fromt the :ref:`instrument response functions <glossary_irf>`,
+These are stored in the ``SPECTRUM`` extension of the FITS file, along with
+ancillary information, notably the scaling factor to be applied to the
+background spectrum, ``BACKSCAL``. The third extension, ``EBOUNDS``, contains
+the boundaries of the energy bins, as defined by the binning parameters in
+input to :ref:`csphagen`.
+
+The file ``onoff_arf.fits`` contains the spectral response of the instrument
+extracted from the :ref:`instrument response functions <glossary_irf>`,
 including effective area for gamma-ray detection and background rates, in the
-SPECRESP extension. The file ``onoff_rmf.fits`` contains the remaining
-part of the instrument response, i.e., an energy redistribution matrix (MATRIX),
-as well as another instance of the EBOUNDS table. Note that we are performing a
-1D analysis: the effect of the PSF is already folded into the effective area
-computation.
+``SPECRESP`` extension. The file ``onoff_rmf.fits`` contains the remaining
+part of the instrument response, i.e., an energy redistribution matrix
+(``MATRIX``), as well as another instance of the ``EBOUNDS`` table. Note that
+we are performing a 1D analysis: the effect of the ``PSF`` is already folded
+into the spectral response computation.
 
 .. note::
-
-    The first part of the FITS files names (and a full path to the desired
-    location) can be set using the hidden ``prefix`` parameter of
-    :ref:`csphagen`.
+   The first part of the FITS files names (and a full path to the desired
+   location) can be set using the hidden ``prefix`` parameter of
+   :ref:`csphagen`.
 
 There are also come ancillary `ds9 <http://ds9.si.edu>`_ region files, that show
 the On region and the Off regions, ``onoff_on.reg`` and
@@ -121,8 +134,17 @@ the On and Off regions.
    the green circles the Off regions, and the white circle the On
    region.*
 
-The model to be fit to the observations needs to specify for the
-background component that we are dealing with a ``CTAOnOff`` analysis.
+Now you are ready to fit a model to the On/Off data. As usual, you need to
+create for this purpose a
+:ref:`model definition file <glossary_moddef>`.
+So far, only fitting of point sources is supported, hence you need a single
+point source as celestial component of the
+:ref:`model definition file <glossary_moddef>`.
+As background component you need to add a ``CTAIrfBackground`` model for
+the ``CTAOnOff`` instrument, which is the instrument code that defines an
+On/Off analysis. Your
+:ref:`model definition XML file <glossary_moddef>`
+should look as follows:
 
 .. code-block:: bash
 
@@ -148,22 +170,26 @@ background component that we are dealing with a ``CTAOnOff`` analysis.
       </source>
    </source_library>
 
-At this point we can run an On/Off analysis just by passing the On/Off
-observation container to  :ref:`ctlike`.
+You can now fit this model using an On/Off analysis by specifying the
+:ref:`output observation definition file <glossary_obsdef>`
+and the
+:ref:`model definition file <glossary_moddef>`
+to :ref:`ctlike`:
 
 .. code-block:: bash
-		
-	Input event list, counts cube or observation definition XML file [selected_events.fits] onoff_obs.xml 
-	Input model definition XML file [$CTOOLS/share/models/crab.xml] crab_onoff.xml 
-	Output model definition XML file [crab_results.xml]
 
-Below you see the corresponding output from the ``ctlike.log``
-file.The fitted parameters are still the same within statistical
-uncertainties as the ones found in binned/unbinned mode. This may not
-always be the case, especially if the background is not well known a priori.
+   $ ctlike
+   Input event list, counts cube or observation definition XML file [selected_events.fits] onoff_obs.xml
+   Input model definition XML file [$CTOOLS/share/models/crab.xml] crab_onoff.xml
+   Output model definition XML file [crab_results.xml]
+
+Below you see the corresponding output from the ``ctlike.log`` file. The fitted
+parameters are still the same within statistical uncertainties as the ones
+found in binned/unbinned mode. This may not always be the case, especially if
+the background is not well known a priori.
 
 .. code-block:: bash
-		
+
    2017-11-28T17:26:56: +=================================+
    2017-11-28T17:26:56: | Maximum likelihood optimisation |
    2017-11-28T17:26:56: +=================================+
@@ -221,39 +247,38 @@ always be the case, especially if the background is not well known a priori.
    2017-11-28T17:26:56:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 :ref:`ctlike` has a hidden parameter called ``statistic`` that sets the
-statistic used for the fit.
+statistic used for the fit. By default, :ref:`ctlike` will use ``CSTAT``
+which is the statistic for a Poisson signal and Poisson background. When
+``CSTAT`` is used, a spectral model for the signal and a spectral model for the
+background are jointly fit to the On and Off spectra.
 
-- The DEFAULT for OnOff osbervations is CSTAT, i.e., Poisson signal and Poisson
-  background. A spectral model for the signal and a spectral model for the
-  background are jointly fit to the On and Off spectra.
-- WSTAT is a special case of CSTAT, Poisson signal with Poisson background, in
-  which you do not need to have a spectral model for the background and
-  free parameters associated with it. The number of background counts in each
-  energy bin is treated as a nuisance parameter, derived from the On and Off
-  counts by profiling the likelihood function. In this case the only assumption
-  is that the background rate spectrum is the same in the On and Off regions.
+Alternatively, you can use ``WSTAT`` for an On/Off analysis, which treats the
+number of background counts in each energy bin as a nuisance parameter that is
+derived from the On and Off counts by profiling the likelihood function. In
+this case, the only assumption is that the background rate spectrum is the same
+in the On and Off regions.
 
 .. warning::
-    Beware that the profiling may yield unphysical results (negative background
-    counts) if the number of events in the Off spectra are zero. In this case a
-    null number of expected background events must be enforced,
-    which can result in a bias on the source's parameters. You can address this
-    issue by stacking multiple observations, using a coarser energy binning, or
-    using CSTAT instead (if you have a spectral model for the background that is
-    good enough). See the `XSPEC manual Appendix B <https://heasarc.gsfc.nasa.gov/xanadu/xspec/manual/XSappendixStatistics.html>`_
-    for more information.
+   Beware that the profiling may yield unphysical results (negative background
+   counts) if the number of events in the Off spectra are zero. In this case a
+   null number of expected background events must be enforced,
+   which can result in a bias on the source's parameters. You can address this
+   issue by stacking multiple observations, using a coarser energy binning, or
+   using ``CSTAT`` instead (if you have a spectral model for the background that is
+   good enough). See the
+   `XSPEC manual Appendix B <https://heasarc.gsfc.nasa.gov/xanadu/xspec/manual/XSappendixStatistics.html>`_
+   for more information.
 
-- You can also use CHI2, a classical chi square, i.e., a Gaussian signal and
-  Gaussian background. As for CSTAT, a spectral model for the signal and a
-  spectral model for the background are jointly fit to the On and Off
-  spectra.
+Finally, you can also use ``CHI2`` as fit statistic which is a classical chi
+square, i.e., a Gaussian signal and Gaussian background. As for ``CSTAT``, a
+spectral model for the signal and a spectral model for the background are
+jointly fit to the On and Off spectra.
 
 .. note::
-
    Many scripts can also be used in On/Off mode, including
    :ref:`ctbutterfly` and :ref:`csspec` that were used earlier. It is
    sufficient to replace the input counts cube/event list with an
-   On/Off observation container to activate On/Off mode for these
-   tools.
-	
-	
+   On/Off
+   :ref:`output observation definition file <glossary_obsdef>`
+   to activate On/Off mode for these tools.
+

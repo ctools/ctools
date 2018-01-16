@@ -36,31 +36,30 @@ line by typing:
    $ wget https://owncloud.cta-observatory.org/remote.php/webdav/1dc/agn.tar.gz --user=<user> --ask-password
    $ wget https://owncloud.cta-observatory.org/remote.php/webdav/1dc/caldb.tar.gz --user=<user> --ask-password
    $ wget https://owncloud.cta-observatory.org/remote.php/webdav/1dc/models.tar.gz --user=<user> --ask-password
-..
 
-  .. warning::
-     ``<user>`` needs to be replaced by your CTA user name.
-     Don't type the ``$`` symbol. It indicates that a command should be typed
-     on the command line of your terminal.
+.. warning::
+   ``<user>`` needs to be replaced by your CTA user name.
+   Don't type the ``$`` symbol. It indicates that a command should be typed
+   on the command line of your terminal.
 
-  .. note::
-     You may need to add the ``--no-check-certificate`` option to download the
-     files using ``wget``.
+.. note::
+   You may need to add the ``--no-check-certificate`` option to download the
+   files using ``wget``.
 
-  .. note::
-     In case you encounter the following error message
+.. note::
+   In case you encounter the following error message
 
 
-     .. code-block:: bash
+   .. code-block:: bash
 
-        HTTP request sent, awaiting response... 401 Unauthorized
-        Authentication selected: Basic realm="ownCloud"
-        Reusing existing connection to owncloud.cta-observatory.org:443.
-        HTTP request sent, awaiting response... 404 Not Found
-        2017-06-06 14:43:33 ERROR 404: Not Found.
+      HTTP request sent, awaiting response... 401 Unauthorized
+      Authentication selected: Basic realm="ownCloud"
+      Reusing existing connection to owncloud.cta-observatory.org:443.
+      HTTP request sent, awaiting response... 404 Not Found
+      2017-06-06 14:43:33 ERROR 404: Not Found.
 
-     or any other problems with the download, please contact
-     sstober@cta-observatory.org.
+   or any other problems with the download, please contact
+   sstober@cta-observatory.org.
 
 To make sure that you have the relevant files you may check the MD5 checksums
 after downloading by typing for example
@@ -114,12 +113,11 @@ Before continuing, please set the following environment variables:
 
    $ export CTADATA=$PWD/1dc
    $ export CALDB=$CTADATA/caldb
-..
 
-  .. note::
-     You may consider adding the ``CTADATA`` and ``CALDB`` environment variables
-     to your ``.bashrc`` file (or equivalent) so that your analysis environment
-     for the
-     :ref:`first CTA Data Challenge <glossary_1dc>`
-     is always setup correctly.
+.. note::
+   You may consider adding the ``CTADATA`` and ``CALDB`` environment variables
+   to your ``.bashrc`` file (or equivalent) so that your analysis environment
+   for the
+   :ref:`first CTA Data Challenge <glossary_1dc>`
+   is always setup correctly.
 

@@ -80,22 +80,20 @@ adjusted by the fit. Obviously, in this example the adjustment compensates only
 for the statistical fluctuations of the background, but with real data, the
 adjustment may account also for some of the systematic uncertainties.
 
-  .. warning::
+.. warning::
+   As good practice, the amplitude of the background model should always be
+   left as a free parameter of the fit. Otherwise, any uncertainty in the
+   background rate will immediately propagate into the flux estimate of the
+   source.
 
-     As good practice, the amplitude of the background model should always be
-     left as a free parameter of the fit. Otherwise, any uncertainty in the
-     background rate will immediately propagate into the flux estimate of the
-     source.
-
-  .. warning::
-
-     You may have recognized the ``scale`` and ``value`` attributes in the
-     :ref:`model definition XML file <glossary_moddef>`. The value of each
-     parameter is obtained by multiplying ``value`` with ``scale``. This allows
-     for a pre-scaling of the parameters, and **you should make use of this
-     capability to have the value attributes of all parameters that are fitted
-     of about the same order, typically 1**. This is necessary to assure a
-     proper convergence of the fitting algorithm.
+.. warning::
+   You may have recognized the ``scale`` and ``value`` attributes in the
+   :ref:`model definition XML file <glossary_moddef>`. The value of each
+   parameter is obtained by multiplying ``value`` with ``scale``. This allows
+   for a pre-scaling of the parameters, and **you should make use of this
+   capability to have the value attributes of all parameters that are fitted
+   of about the same order, typically 1**. This is necessary to assure a
+   proper convergence of the fitting algorithm.
 
 To get more details about the model fitting you can inspect the log file.
 Below the last lines of the log file that was produced by this run:
@@ -171,49 +169,46 @@ fitted. You will see that the optimizer requires a couple of more iterations,
 but it should converge to the same solution (provided that the initial values
 are not too far from the best fitting values).
 
-  .. note::
+.. note::
+   As sanity check you should verify that the predicted number of events
+   (Npred) is equal to the observed number of events (Nobs). To facilitate
+   this comparison, :ref:`ctlike` provides the difference Nobs - Npred in
+   the log file. In real life situations, this difference may not always be
+   small, in particular if the source model is too constrained. You may
+   then free some of the model parameters so that the fit can correctly
+   describe the data.
 
-     As sanity check you should verify that the predicted number of events
-     (Npred) is equal to the observed number of events (Nobs). To facilitate
-     this comparison, :ref:`ctlike` provides the difference Nobs - Npred in
-     the log file. In real life situations, this difference may not always be
-     small, in particular if the source model is too constrained. You may
-     then free some of the model parameters so that the fit can correctly
-     describe the data.
+.. note::
+   The :ref:`ctlike` tool has the ability to estimate the detection
+   significance for sources in the XML model. This is done by computing
+   the Test Statistic value which is defined as twice the log-likelihood
+   difference between fitting a source at a given position on top of a
+   (background) model or fitting no source. As a rule of thumb, the square
+   root of the Test Statistic value gives the source detection significance
+   in Gaussian sigmas, although the actual conversion depends somewhat on
+   the formulation of the statistical problem and the number of
+   degrees of freedom associated with the source.
 
-  .. note::
+   To instruct :ref:`ctlike` to compute the Test Statistic value for a
+   given source you need to add the attribute ``tscalc="1"`` to the XML
+   file:
 
-     The :ref:`ctlike` tool has the ability to estimate the detection
-     significance for sources in the XML model. This is done by computing
-     the Test Statistic value which is defined as twice the log-likelihood
-     difference between fitting a source at a given position on top of a
-     (background) model or fitting no source. As a rule of thumb, the square
-     root of the Test Statistic value gives the source detection significance
-     in Gaussian sigmas, although the actual conversion depends somewhat on
-     the formulation of the statistical problem and the number of
-     degrees of freedom associated with the source.
+   .. code-block:: xml
 
-     To instruct :ref:`ctlike` to compute the Test Statistic value for a
-     given source you need to add the attribute ``tscalc="1"`` to the XML
-     file:
+      <source name="Crab" type="PointSource" tscalc="1">
 
-     .. code-block:: xml
+   :ref:`ctlike` will then compute the Test Statistic value for that
+   source and dump the result in the log file:
 
-        <source name="Crab" type="PointSource" tscalc="1">
+   .. code-block:: none
 
-     :ref:`ctlike` will then compute the Test Statistic value for that
-     source and dump the result in the log file:
+      2017-11-28T15:47:53:  Name ......................: Crab
+      2017-11-28T15:47:53:  Instruments ...............: all
+      2017-11-28T15:47:53:  Test Statistic ............: 19478.9230755261
 
-     .. code-block:: none
+   The Test Statistic value will also be added as new attribute
+   ``ts`` to the XML result file:
 
-		     2017-11-28T15:47:53:  Name ......................: Crab
-		     2017-11-28T15:47:53:  Instruments ...............: all
-		     2017-11-28T15:47:53:  Test Statistic ............: 19478.9230755261
+   .. code-block:: xml
 
-
-     The Test Statistic value will also be added as new attribute
-     ``ts`` to the XML result file:
-
-     .. code-block:: xml
-
-        <source name="Crab" type="PointSource" ts="19478.923" tscalc="1">
+      <source name="Crab" type="PointSource" ts="19478.923" tscalc="1">

@@ -13,7 +13,7 @@ observations the script is then used as follows:
 
 .. code-block:: bash
 
-  $csresspec components=yes
+  $ csresspec components=yes
   Input event list, counts cube, or observation definition XML file [obs.xml] 
   Calibration database [prod2] 
   Instrument response function [South_0.5h] 
@@ -52,20 +52,16 @@ shown below.
 
    *Data, model, and residuals from the spectral fit of the Crab nebula*
 
-..
-
-
 .. note::
+   The figure was created by typing:
 
-     The figure was created by typing:
+   .. code-block:: bash
 
-     .. code-block:: bash
+      $ $CTOOLS/share/examples/python/show_spectrum.py residual_spectrum.fits
 
-         $ $CTOOLS/share/examples/python/show_spectrum.py residual_spectrum.fits
+   Use the option ``-h`` to select the table to display if there are
+   multiple observations.
 
-     Use the option ``-h`` to select the table to display if there are
-     multiple observations.
-	 
 
 
 

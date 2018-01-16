@@ -27,13 +27,13 @@ After downloading, configure GammaLib and ctools as follows:
 Have a look at :ref:`getting the ctools <sec_install>` if you need more
 information about the installation and configuration process.
 
-  .. note::
-     You may consider adding the ``GAMMALIB`` and ``CTOOLS`` environment variables
-     as well as the sourcing of the configuration scripts to your ``.bashrc`` file
-     (or equivalent) so that your analysis environment
-     for the
-     :ref:`first CTA Data Challenge <glossary_1dc>`
-     is always setup correctly.
+.. note::
+   You may consider adding the ``GAMMALIB`` and ``CTOOLS`` environment variables
+   as well as the sourcing of the configuration scripts to your ``.bashrc`` file
+   (or equivalent) so that your analysis environment
+   for the
+   :ref:`first CTA Data Challenge <glossary_1dc>`
+   is always setup correctly.
 
 
 

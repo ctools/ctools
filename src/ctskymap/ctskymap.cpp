@@ -892,7 +892,7 @@ void ctskymap::map_significance(void)
     if (m_bkgsubtract == "RING") {
 
         // Log message about what is being done
-        log_header1(NORMAL, "Computing RBM map");
+        log_header1(NORMAL, "Computing Ring background map");
         log_value(NORMAL, "Total pixels to process", m_onmap.npix());
 
         // Store the number of bins with an inappropriate alpha parameter

@@ -68,15 +68,10 @@ extragalactic isotropic source component.
        </spatialModel>
      </source>
    </source_library>
-..
 
-  .. warning::
-
-     The names of the diffuse model components have to be identical to the
-     names used when preparing the ``srcmaps.fits`` file using ``gtsrcmap``.
-
-     **Positions of point sources can so far not be fitted for a Fermi-LAT
-     analysis**, hence the corresponding parameters are fixed.
+.. warning::
+   The names of the diffuse model components have to be identical to the
+   names used when preparing the ``srcmaps.fits`` file using ``gtsrcmap``.
 
 Now you are ready to fit the model using the :ref:`ctlike` model tool. You do
 this as follows:
@@ -193,70 +188,68 @@ reasonably close to those found in
 `Abdo et al. 2010, ApJ, 713, 154 <http://iopscience.iop.org/article/10.1088/0004-637X/713/1/154/pdf>`_
 using the Fermi-LAT Science Tools.
 
-  .. note::
+.. note::
+   The fit results can be compared to the corresponding output of gtlike
+   when the tool is applied to the same test data. As you will see below,
+   the fitted model parameters are basically identical.
 
-     The fit results can be compared to the corresponding output of gtlike
-     when the tool is applied to the same test data. As you will see below,
-     the fitted model parameters are basically identical.
+   .. code-block:: bash
 
-     .. code-block:: bash
+      Extragalactic_diffuse:
+      Normalization: 1
+      Flux: 0.000149604 photons/cm^2/s
 
-        Extragalactic_diffuse:
-        Normalization: 1
-        Flux: 0.000149604 photons/cm^2/s
+      Galactic_diffuse:
+      Value: 1.11394 +/- 0.00508393
+      Flux: 0.00054415 +/- 2.48325e-06 photons/cm^2/s
 
-        Galactic_diffuse:
-        Value: 1.11394 +/- 0.00508393
-        Flux: 0.00054415 +/- 2.48325e-06 photons/cm^2/s
+      Vela:
+      Prefactor: 4.3344 +/- 0.65258
+      Index1: 1.34634 +/- 0.0429336
+      Scale: 1
+      Cutoff: 1.00992 +/- 0.25512
+      Index2: 0.595018 +/- 0.0398585
+      TS value: 326648
+      Flux: 1.0758e-05 +/- 4.33949e-08 photons/cm^2/s
 
-        Vela:
-        Prefactor: 4.3344 +/- 0.65258
-        Index1: 1.34634 +/- 0.0429336
-        Scale: 1
-        Cutoff: 1.00992 +/- 0.25512
-        Index2: 0.595018 +/- 0.0398585
-        TS value: 326648
-        Flux: 1.0758e-05 +/- 4.33949e-08 photons/cm^2/s
+      WARNING: Fit may be bad in range [100, 149.23] (MeV)
+      WARNING: Fit may be bad in range [182.299, 405.972] (MeV)
+      WARNING: Fit may be bad in range [6690.96, 8173.66] (MeV)
+      WARNING: Fit may be bad in range [14900.5, 18202.4] (MeV)
+      WARNING: Fit may be bad in range [33182.8, 40536] (MeV)
+      WARNING: Fit may be bad in range [49518.7, 60491.9] (MeV)
 
-        WARNING: Fit may be bad in range [100, 149.23] (MeV)
-        WARNING: Fit may be bad in range [182.299, 405.972] (MeV)
-        WARNING: Fit may be bad in range [6690.96, 8173.66] (MeV)
-        WARNING: Fit may be bad in range [14900.5, 18202.4] (MeV)
-        WARNING: Fit may be bad in range [33182.8, 40536] (MeV)
-        WARNING: Fit may be bad in range [49518.7, 60491.9] (MeV)
+      Total number of observed counts: 202330
+      Total number of model events: 202327
 
-        Total number of observed counts: 202330
-        Total number of model events: 202327
+      -log(Likelihood): -215606.3555
 
-        -log(Likelihood): -215606.3555
+      Elapsed CPU time: 72.33
 
-        Elapsed CPU time: 72.33
+   You may also compute the Test Statistic value using :ref:`ctlike` by
+   adding the ``tscalc="1"`` attribute to the
+   :ref:`model definition file <glossary_moddef>`:
 
-     You may also compute the Test Statistic value using :ref:`ctlike` by
-     adding the ``tscalc="1"`` attribute to the
-     :ref:`model definition file <glossary_moddef>`:
+   .. code-block:: xml
 
-     .. code-block:: xml
+      <?xml version="1.0" standalone="no"?>
+      <source_library title="source library">
+        <source type="PointSource" name="Vela" tscalc="1">
+        ...
+      </source_library>
 
-        <?xml version="1.0" standalone="no"?>
-        <source_library title="source library">
-          <source type="PointSource" name="Vela" tscalc="1">
-          ...
-        </source_library>
+   This results in
 
-     This results in
+   .. code-block:: bash
 
-     .. code-block:: bash
+      2017-08-26T13:05:12: === GModelSky ===
+      2017-08-26T13:05:12:  Name ......................: Vela
+      2017-08-26T13:05:12:  Instruments ...............: all
+      2017-08-26T13:05:12:  Test Statistic ............: 326326.556902542
 
-        2017-08-26T13:05:12: === GModelSky ===
-        2017-08-26T13:05:12:  Name ......................: Vela
-        2017-08-26T13:05:12:  Instruments ...............: all
-        2017-08-26T13:05:12:  Test Statistic ............: 326326.556902542
+   which is also close to the value determined by gtlike.
 
-     which is also close to the value determined by gtlike.
-
-  .. warning::
-
-     ctools supports for the moment only the fitting of point sources for
-     Fermi-LAT data. Other spatial shapes need to be preconvolved with the
-     instrument response functions and added to the ``srcmaps.fits`` file.
+.. warning::
+   ctools supports for the moment only the fitting of point sources for
+   Fermi-LAT data. Other spatial shapes need to be preconvolved with the
+   instrument response functions and added to the ``srcmaps.fits`` file.

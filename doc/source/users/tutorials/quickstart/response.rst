@@ -33,13 +33,12 @@ function of sky position and energy. In the example above you extracted the
 binning of the exposure cube from the counts cube, which considerably reduces
 the number of parameters that are queried by the tool.
 
-  .. note::
-
-     The binning of the exposure cube does not need to correspond to the
-     binning of the counts cube. In any case, exposure values will be
-     determined by interpolation from the values stored in the exposure cube
-     file. The same is true for the point spread function and background cubes
-     that are described below.
+.. note::
+   The binning of the exposure cube does not need to correspond to the
+   binning of the counts cube. In any case, exposure values will be
+   determined by interpolation from the values stored in the exposure cube
+   file. The same is true for the point spread function and background cubes
+   that are described below.
 
 Next, we use the :ref:`ctpsfcube` tool to compute the
 :ref:`point spread function (PSF) cube <glossary_psfcube>` for the counts

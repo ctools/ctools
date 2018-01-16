@@ -52,23 +52,20 @@ A graphical display of the results is shown below:
 
    *Butterfly diagram of the Crab nebula*
 
-..
+.. note::
+   The ctools package does not contain any tools or scripts for graphical
+   display of results since results are generally written into standard FITS
+   files that are readily displayed by existing astronomical tools.
 
-  .. note::
+   Nevertheless, for your convenience several scripts for graphical display
+   are included in the ctools package that rely on the
+   `matplotlib <http://matplotlib.org>`_
+   Python module. You can find these scripts in the
+   ``$CTOOLS/share/examples/python`` folder.
 
-     The ctools package does not contain any tools or scripts for graphical
-     display of results since results are generally written into standard FITS
-     files that are readily displayed by existing astronomical tools.
+   Read the section :ref:`1dc_howto_display` to learn more about the
+   available scripts. The plot above was generated using:
 
-     Nevertheless, for your convenience several scripts for graphical display
-     are included in the ctools package that rely on the
-     `matplotlib <http://matplotlib.org>`_
-     Python module. You can find these scripts in the
-     ``$CTOOLS/share/examples/python`` folder.
+   .. code-block:: bash
 
-     Read the section :ref:`1dc_howto_display` to learn more about the
-     available scripts. The plot above was generated using:
-
-     .. code-block:: bash
-
-        $ $CTOOLS/share/examples/python/show_butterfly.py butterfly.txt
+      $ $CTOOLS/share/examples/python/show_butterfly.py butterfly.txt

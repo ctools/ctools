@@ -46,20 +46,20 @@ Otherwise, the specified value will overwrite the default value.
 The round brackets ``( )`` indicate the range of possible parameter
 values (if applicable).
 
-  .. note::
+.. note::
 
-     Times can be entered in various formats in ctools. Times can be provided
-     as
+   Times can be entered in various formats in ctools. Times can be provided
+   as
 
-     * UTC date strings (e.g. ``"2020-01-01T00:00:00"``)
-     * Modified Julian days (e.g. ``"MJD 58849.0"``)
-     * Julian days (e.g. ``"JD 2458849.5"``)
-     * Mission elapsed time in seconds, counted from ``2000-01-01T12:00:00``
-       (e.g. ``"631108869.18"``)
+   * UTC date strings (e.g. ``"2020-01-01T00:00:00"``)
+   * Modified Julian days (e.g. ``"MJD 58849.0"``)
+   * Julian days (e.g. ``"JD 2458849.5"``)
+   * Mission elapsed time in seconds, counted from ``2000-01-01T12:00:00``
+     (e.g. ``"631108869.18"``)
 
-     Usually times are given in Terrestial Time (``TT``) but may also be
-     specified as ``TAI`` or ``UTC`` (e.g. ``"MJD 58849.0 (TAI)"`` or
-     ``"MJD 58849.0 (UTC)"``).
+   Usually times are given in Terrestial Time (``TT``) but may also be
+   specified as ``TAI`` or ``UTC`` (e.g. ``"MJD 58849.0 (TAI)"`` or
+   ``"MJD 58849.0 (UTC)"``).
 
 You may have recognised that the environment variable ``$CTOOLS`` has 
 been used in the path name of the model. ctools will automatically expand
@@ -70,21 +70,21 @@ The CTA
 is taken from the ``prod2`` database. The response for the southern array
 using the cuts optimised for 0.5 hours of observing time is used.
 
-  .. note::
+.. note::
 
-     ctools comes bundled with CTA
-     :ref:`instrument response functions <glossary_irf>` for the northern and
-     the southern array. The IRFs are based on a ``prod2``
-     analysis with cuts optimised for 0.5 hours, 5 hours and 50 hours of
-     observing time. **Be aware that these times do not need to correspond
-     to the actual observing time that is simulated.** IRFs optimised for
-     short observation times correspond to ``loose`` cuts that keep more
-     photons but also more background events, while IRFs optimised for
-     long observation times correspond to ``hard`` cuts that limit the
-     number of background events at the expense of loosing some photons.
-     The following IRFs are available:
-     ``North_0.5h``, ``North_5h``, ``North_50h``,
-     ``South_0.5h``, ``South_5h``, and ``South_50h``.
+   ctools comes bundled with CTA
+   :ref:`instrument response functions <glossary_irf>` for the northern and
+   the southern array. The IRFs are based on a ``prod2``
+   analysis with cuts optimised for 0.5 hours, 5 hours and 50 hours of
+   observing time. **Be aware that these times do not need to correspond
+   to the actual observing time that is simulated.** IRFs optimised for
+   short observation times correspond to ``loose`` cuts that keep more
+   photons but also more background events, while IRFs optimised for
+   long observation times correspond to ``hard`` cuts that limit the
+   number of background events at the expense of loosing some photons.
+   The following IRFs are available:
+   ``North_0.5h``, ``North_5h``, ``North_50h``,
+   ``South_0.5h``, ``South_5h``, and ``South_50h``.
 
 Events are simulated based on the
 :ref:`instrument response function <glossary_irf>`
@@ -153,18 +153,18 @@ where the parameters in the XML definition have the following mappings:
 * :math:`\gamma` = ``Index``
 * :math:`E_0` = ``PivotEnergy``
 
-..
 
-  .. warning::
-     **Energies are given in the XML file in MeV units.** This is a GammaLib
-     convention that can not be modified. So make sure you always use
-     MeV as energy unit in an XML file.
 
- .. note::
-    As customary for IACT observations, the pointing direction
-    was slightly offset from the source of interest, i.e.,
-    the Crab. This makes it possible to better handle systematics due
-    to the instrumental background.
+.. warning::
+   **Energies are given in the XML file in MeV units.** This is a GammaLib
+   convention that can not be modified. So make sure you always use
+   MeV as energy unit in an XML file.
+
+.. note::
+   As customary for IACT observations, the pointing direction
+   was slightly offset from the source of interest, i.e.,
+   the Crab. This makes it possible to better handle systematics due
+   to the instrumental background.
 
 The instrumental background of CTA is modelled using the background
 information provided in the
@@ -187,14 +187,11 @@ To use for example a seed value of 41 you should type:
 
   $ ctobssim seed=41
 
-..
-
-  .. note::
-
-     Hidden parameters are parameters that are not queried by a tool since
-     in general their values is not expected to change frequently. To change
-     hidden parameters they have to be given as arguments on the command line.
-     Multiple hidden parameters need to be separated by a white space.
+.. note::
+   Hidden parameters are parameters that are not queried by a tool since
+   in general their values is not expected to change frequently. To change
+   hidden parameters they have to be given as arguments on the command line.
+   Multiple hidden parameters need to be separated by a white space.
 
 :ref:`ctobssim` will write two files in the working directory: ``events.fits``
 and ``ctobssim.log``. The first file contains the simulated events in FITS 
@@ -240,16 +237,15 @@ this run, 47219 Crab photons have been thrown. 11356 of these photons have been
 registered by CTA as events. In the same time interval, 189477 background
 events have been registred by CTA.
 
-  .. note::
-
-     :ref:`ctobssim` will split the simulated energy range into a number of
-     slices, controlled via the hidden ``eslices`` parameter (ten energy slices
-     are used by default). For each energy slice, the simulation area
-     will be adapted to the effective area of the array in that energy slice,
-     which helps to keep the computing time low. The log file will provide
-     information about the simulation in each slice. In the example above, the
-     simulation results for the first energy slice are shown, followed by a
-     summary of the results for all slices.
+.. note::
+   :ref:`ctobssim` will split the simulated energy range into a number of
+   slices, controlled via the hidden ``eslices`` parameter (ten energy slices
+   are used by default). For each energy slice, the simulation area
+   will be adapted to the effective area of the array in that energy slice,
+   which helps to keep the computing time low. The log file will provide
+   information about the simulation in each slice. In the example above, the
+   simulation results for the first energy slice are shown, followed by a
+   summary of the results for all slices.
 
 You may change the name of the log file using the hidden parameter 
 ``logfile``:
@@ -278,14 +274,11 @@ the hidden ``debug`` parameter to yes:
 
   $ ctobssim debug=yes
 
-..
-
-  .. note::
-
-     All tools have the hidden parameters ``logfile``, ``chatter``, and
-     ``debug`` and you can use these parameters to control the log file
-     output. In addition, all tools have the hidden parameter ``clobber``
-     that allows to overwrite existing files (set to ``yes`` by default)
-     and ``mode`` that defines the mode of automatic parameters (set to
-     ``ql`` for *query and learn* by default).
+.. note::
+   All tools have the hidden parameters ``logfile``, ``chatter``, and
+   ``debug`` and you can use these parameters to control the log file
+   output. In addition, all tools have the hidden parameter ``clobber``
+   that allows to overwrite existing files (set to ``yes`` by default)
+   and ``mode`` that defines the mode of automatic parameters (set to
+   ``ql`` for *query and learn* by default).
 

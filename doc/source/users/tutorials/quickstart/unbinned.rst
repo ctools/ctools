@@ -114,8 +114,7 @@ the same events for both analyses.
   2017-11-28T16:26:57:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 .. note::
-
-     Many tools or scripts can also be used in unbinned mode, including
-     :ref:`csresmap`, :ref:`ctbutterfly` and :ref:`csspec` that were used
-     earlier. It is sufficient to replace the input counts cube by an event
-     list to activate unbinned mode for these tools.
+   Many tools or scripts can also be used in unbinned mode, including
+   :ref:`csresmap`, :ref:`ctbutterfly` and :ref:`csspec` that were used
+   earlier. It is sufficient to replace the input counts cube by an event
+   list to activate unbinned mode for these tools.

@@ -85,14 +85,14 @@ kernel smoothing applied is shown below:
 
 If a reliable model of the instrumental background is not available,
 you can estimate it from the data by running the :ref:`ctskymap` tool with
-the background subtraction method set to `RING``. For each position in
+the background subtraction method set to ``RING``. For each position in
 the map the number of background counts is estimated from a ring,
-scaled accroding to the acceptance model in the :ref:`instrument
+scaled according to the background model in the :ref:`instrument
 response functions <glossary_irf>`, and subtracted from a circular
 region centred on the trial source region. You need to avoid regions
 with significant gamma-ray emission when deriving the background
 rates, by providing an exclusion region (`ds9 <http://ds9.si.edu>`_
-region file, or FITS map) through the hidden inexclusion parameter.
+region file, or FITS map) through the hidden ``inexclusion`` parameter.
 
 .. code-block:: bash
 
@@ -120,7 +120,7 @@ nebula.
 
 .. code-block:: bash
 
-	$ less exclusion.reg
+	$ more exclusion.reg
 	# Region file format: DS9 version 4.1
 	global color=green dashlist=8 3 width=1 font="helvetica 10
 	normal roman" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1

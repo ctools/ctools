@@ -265,24 +265,21 @@ source component to determine the Test Statistic value of the Crab.
 The source is detected with a Test Statistic of 915.7 which corresponds to
 a detection significance of about 30 sigma.
 
-  .. note::
+.. note::
+   `Kuiper et al. 2001, A&A, 378, 918 <http://cdsads.u-strasbg.fr/abs/2001A%26A...378..918K>`_
+   presented the most comprehensive analysis of the COMPTEL Crab observations
+   and summarize in their Table 3 the gamma-ray intensity as function of
+   energy for the unpulsed and pulsed component of source. By adding the
+   intensities and fitting the resulting values we obtained a prefactor
+   of 2.5e-3, which is very close to the prefactor of 2.4e-3 obtained
+   in the analysis above. The spectral index of the Kuiper's data is
+   -2.2, a bit harder than the index of -2.5 obtained in the fit.
 
-     `Kuiper et al. 2001, A&A, 378, 918 <http://cdsads.u-strasbg.fr/abs/2001A%26A...378..918K>`_
-     presented the most comprehensive analysis of the COMPTEL Crab observations
-     and summarize in their Table 3 the gamma-ray intensity as function of
-     energy for the unpulsed and pulsed component of source. By adding the
-     intensities and fitting the resulting values we obtained a prefactor
-     of 2.5e-3, which is very close to the prefactor of 2.4e-3 obtained
-     in the analysis above. The spectral index of the Kuiper's data is
-     -2.2, a bit harder than the index of -2.5 obtained in the fit.
+.. note::
+   The position of a point source can also be adjusted by :ref:`ctlike` for
+   an analysis of COMPTEL data, hence you may set the corresponding parameters
+   to ``free="1"`` to determine also the best fitting source position.
 
-  .. note::
-
-     The position of a point source can also be adjusted by :ref:`ctlike` for
-     an analysis of COMPTEL data, hence you may set the corresponding parameters
-     to ``free="1"`` to determine also the best fitting source position.
-
-  .. warning::
-
-     ctools supports for the moment only the fitting of point sources for
-     COMPTEL data. Other spatial shapes will be implemented in the future.
+.. warning::
+   ctools supports for the moment only the fitting of point sources for
+   COMPTEL data. Other spatial shapes will be implemented in the future.

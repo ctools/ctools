@@ -60,7 +60,6 @@ value of 42622 near the centre of the map.
    *Test Statistic map of the Crab region*
 
 .. note::
-
    Similar to :ref:`ctlike` the :ref:`cttsmap` tool works either for unbinned,
    binned or stacked analysis. On input it takes either a single event 
    list, a single counts cube, or an observation definition XML file that

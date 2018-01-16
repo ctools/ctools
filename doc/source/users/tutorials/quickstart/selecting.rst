@@ -74,19 +74,18 @@ event selection:
 
 From the 200833 events in the input event list 20877 events were selected.
 
-  .. note::
+.. note::
+   Event selection by :ref:`ctselect` in a given dimension can be avoided
+   by specifying ``NONE`` (or ``INDEF``, ``UNDEF`` or ``UNDEFINED``) for
+   one of the selection parameters. The following run for example only
+   performs a selection by time but no selection by ROI or energy:
 
-     Event selection by :ref:`ctselect` in a given dimension can be avoided
-     by specifying ``NONE`` (or ``INDEF``, ``UNDEF`` or ``UNDEFINED``) for
-     one of the selection parameters. The following run for example only
-     performs a selection by time but no selection by ROI or energy:
+   .. code-block:: bash
 
-     .. code-block:: bash
-
-        $ ctselect
-        Input event list or observation definition XML file [events.fits]
-        RA for ROI centre (degrees) (0-360) [83.63] NONE
-        Start time (UTC string, JD, MJD or time in seconds) [2020-01-01T00:10:00]
-        Stop time (UTC string, JD, MJD or time in seconds) [2020-01-01T00:40:00]
-        Lower energy limit (TeV) [0.1] NONE
-        Output event list or observation definition XML file [selected_events.fits]
+      $ ctselect
+      Input event list or observation definition XML file [events.fits]
+      RA for ROI centre (degrees) (0-360) [83.63] NONE
+      Start time (UTC string, JD, MJD or time in seconds) [2020-01-01T00:10:00]
+      Stop time (UTC string, JD, MJD or time in seconds) [2020-01-01T00:40:00]
+      Lower energy limit (TeV) [0.1] NONE
+      Output event list or observation definition XML file [selected_events.fits]

@@ -56,15 +56,13 @@ following files were downloaded:
    $ wget http://fermi.gsfc.nasa.gov/FTP/fermi/data/lat/queries/L1708251631252315B1AD08_PH01.fits
    $ wget https://fermi.gsfc.nasa.gov/ssc/data/analysis/software/aux/gll_iem_v06.fits
    $ wget https://fermi.gsfc.nasa.gov/ssc/data/analysis/software/aux/iso_P8R2_SOURCE_V6_v06.txt
-..
 
-  .. warning::
-
-     In the current example data within a radius of only 10 degrees around the
-     source of interest were selected. This was mainly for getting a small
-     data set. The
-     `Fermi Science Support Center (FSSC) <https://fermi.gsfc.nasa.gov/ssc/>`_
-     recommends to use larger regions for the Fermi-LAT data analysis.
+.. warning::
+   In the current example data within a radius of only 10 degrees around the
+   source of interest were selected. This was mainly for getting a small
+   data set. The
+   `Fermi Science Support Center (FSSC) <https://fermi.gsfc.nasa.gov/ssc/>`_
+   recommends to use larger regions for the Fermi-LAT data analysis.
 
 
 Data preparation
@@ -194,15 +192,13 @@ Start with putting the diffuse model components into a
        </spatialModel>
      </source>
    </source_library>
-..
 
-  .. warning::
-
-     While ctools also implements the syntax used for Fermi-LAT Science Tools
-     :ref:`model definition files <glossary_moddef>`,
-     the Fermi-LAT Science Tools naming conventions are not very homogenous,
-     hence we usually advocate to use the more coherent ctools syntax. For the
-     Fermi-LAT Science Tools you have to use however the Fermi-LAT syntax.
+.. warning::
+   While ctools also implements the syntax used for Fermi-LAT Science Tools
+   :ref:`model definition files <glossary_moddef>`,
+   the Fermi-LAT Science Tools naming conventions are not very homogenous,
+   hence we usually advocate to use the more coherent ctools syntax. For the
+   Fermi-LAT Science Tools you have to use however the Fermi-LAT syntax.
 
 Now you can generate the source maps using ``gtsrcmaps``:
 
