@@ -286,7 +286,7 @@ def show_residuals():
     Show residuals
     """
     # Set usage string
-    usage = 'show_spectrum.py [-p plotfile] [-h hdu] [file]'
+    usage = 'show_residual.py [-p plotfile] [-h hdu] [file]'
 
     # Set default options
     options = [{'option': '-p', 'value': ''},
@@ -297,7 +297,7 @@ def show_residuals():
 
     # Extract script parameters from options
     plotfile = options[0]['value']
-    hdu = options[1]['value']
+    hdu      = options[1]['value']
 
     # Show residuals
     plot_residuals(args[0], plotfile, hdu)

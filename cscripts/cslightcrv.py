@@ -558,12 +558,12 @@ class cslightcrv(ctools.csobservation):
             # fill results table with zeros
             else:
                 self._log_value(gammalib.TERSE, 'Warning',
-                                'No observations available in this time bin',
-                                'Skip bin.')
+                                'No observations available in this time bin, '
+                                'skip bin.')
 
                 # Set all results to 0
                 for par in pars:
-                    result['values'][par] = 0.0
+                    result['values'][par]        = 0.0
                     result['values']['e_' + par] = 0.0
 
                 # Append result
