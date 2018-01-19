@@ -24,12 +24,31 @@ import gammalib
 import cscripts
 try:
     import matplotlib.pyplot as plt
-    from matplotlib import gridspec
     plt.figure()
     plt.close()
 except (ImportError, RuntimeError):
     print('This script needs the "matplotlib" module')
     sys.exit()
+
+
+# ======================= #
+# Set residual label text #
+# ======================= #
+def set_residual_label(algorithm):
+    """
+    """
+    # Set algorithm dependent residual level
+    if algorithm == 'SUB':
+        label = 'Residuals (counts)'
+    elif algorithm == 'SUBDIV':
+        label = 'Residuals (fraction)'
+    elif algorithm == 'SUBDIVSQRT' or algorithm == 'SIGNIFICANCE':
+        label = r'Residuals ($\sigma$)'
+    else:
+        label = ''
+
+    # Return label
+    return label
 
 
 # ================================= #
@@ -186,23 +205,19 @@ def plot_residuals(filename, plotfile, hdu):
     if is_onoff:
         model_off = [model_off[0]] + model_off
 
-    # Plot
+    # Initialise figure
     axarr = []
     if is_onoff:
-        f  = plt.figure(figsize=(8, 4))
-        gs = gridspec.GridSpec(2, 2, height_ratios=[2, 1])
-        gs.update(hspace=0, left=0.09, right=0.97)
-        axarr.append(f.add_subplot(gs[0]))
-        axarr.append(f.add_subplot(gs[2]))
-        axarr.append(f.add_subplot(gs[1], sharex=axarr[0]))
-        axarr.append(f.add_subplot(gs[3], sharex=axarr[1]))
+        f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex='col', sharey='row')
+        axarr.append(ax1)
+        axarr.append(ax2)
+        axarr.append(ax3)
+        axarr.append(ax4)
     else:
-        f  = plt.figure()
-        gs = gridspec.GridSpec(2, 1, height_ratios=[2, 1])
-        gs.update(hspace=0)
-        axarr.append(f.add_subplot(gs[0]))
-        axarr.append(f.add_subplot(gs[1], sharex=axarr[0]))
-    plt.setp(axarr[1].get_xticklabels(), visible=False)
+        f, (ax1, ax2) = plt.subplots(2, sharex=True)
+        axarr.append(ax1)
+        axarr.append(ax2)
+        f.subplots_adjust(hspace=0)
     axarr[0].set_xscale('log')
     axarr[1].set_xscale('log')
     axarr[0].set_yscale('log')
@@ -219,21 +234,19 @@ def plot_residuals(filename, plotfile, hdu):
                       fmt='ko', capsize=0, linewidth=2, zorder=2)
     axarr[1].axhline(0, color='0.5', linestyle='--')
     axarr[1].set_xlabel('Energy (TeV)')
-    if algorithm == 'SUB':
-        axarr[1].set_ylabel('Residuals (counts)')
-    elif algorithm == 'SUBDIV':
-        axarr[1].set_ylabel('Residuals (fraction)')
-    elif algorithm == 'SUBDIVSQRT' or algorithm == 'SIGNIFICANCE':
-        axarr[1].set_ylabel(r'Residuals ($\sigma$)')
+    axarr[1].set_ylabel(set_residual_label(algorithm))
 
     # On/Off
     if is_onoff:
+
+        # Set titles and axes labels
         axarr[0].set_title('ON')
         axarr[2].set_title('OFF')
-        plt.setp(axarr[3].get_xticklabels(), visible=False)
+        axarr[2].set_ylabel('Counts')
         axarr[2].set_xscale('log')
         axarr[3].set_xscale('log')
         axarr[2].set_yscale('log')
+        axarr[3].set_ylabel(set_residual_label(algorithm))
 
         # Counts and model
         axarr[2].errorbar(em_engs, counts_off, yerr=e_counts_off,
@@ -242,6 +255,7 @@ def plot_residuals(filename, plotfile, hdu):
                           label='Data')
         axarr[2].step(ebounds, model_off, color='0.5', linewidth=2, zorder=1,
                       label='Model')
+        axarr[2].set_xlabel('Energy (TeV)')
 
         # Residuals
         axarr[3].errorbar(em_engs, resid_off, yerr=e_resid_off,
