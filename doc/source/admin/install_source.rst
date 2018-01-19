@@ -1,7 +1,7 @@
-.. _sec_install:
+.. _sec_compiling_source:
 
-Installing ctools
-=================
+Compiling from source
+=====================
 
 Before you start
 ----------------
@@ -26,8 +26,6 @@ software:
 
 No system administrator privileges are needed to install ctools.
 
-
-.. _sec_installing_gammalib:
 
 Installing GammaLib
 -------------------
@@ -97,8 +95,6 @@ which then installs GammaLib in the ``gamma`` folder of your home
 directory.
 
 
-.. _sec_setup_gammalib:
-
 Setting up the GammaLib environment
 -----------------------------------
 
@@ -160,8 +156,6 @@ You can get the full list of configuration options by typing
 
   $ ./configure --help
 
-
-.. _sec_testing_ctools:
 
 Testing ctools
 --------------
@@ -249,7 +243,6 @@ first the :ref:`issues` section. If you cannot fix the problem, please
 create an issue on the ctools tracker
 `here <https://cta-redmine.irap.omp.eu/projects/ctools>`_.
 
-.. _sec_installing_ctools:
 
 Installing ctools
 -----------------
@@ -277,7 +270,6 @@ can be given, for example:
 
   $ ./configure --prefix=$HOME/gamma
 
-.. _sec_setup_ctools:
 
 Setting up the ctools environment
 ---------------------------------
@@ -302,7 +294,6 @@ If you use C shell or a variant then add the following to your
   setenv CTOOLS /usr/local/gamma
   source $CTOOLS/bin/ctools-init.csh
 
-.. _sec_check_ctools_setup:
 
 Checking your setup
 -------------------
@@ -329,8 +320,6 @@ If the setup is not okay, run the ``csinfo info`` command to print
 detailed information about your setup. There's also a ``csinfo list``
 command to quickly list the available tools.
 
-
-.. _sec_known_problems:
 
 Known problems
 --------------

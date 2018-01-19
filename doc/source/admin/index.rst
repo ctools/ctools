@@ -6,6 +6,7 @@ Getting ctools
 .. toctree::
    :maxdepth: 1
 
+   install_source
+   install_conda
    download
-   install
    release_history/index
