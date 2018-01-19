@@ -196,6 +196,7 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/skymap.fits \
            $(top_srcdir)/test/data/spectrum.fits \
            $(top_srcdir)/test/data/residual.fits \
+           $(top_srcdir)/test/data/residual_onoff.fits \
            $(top_srcdir)/test/data/lightcurve.fits \
            $(top_srcdir)/test/data/ts.dat \
            $(top_srcdir)/test/data/models_spatial.xml \

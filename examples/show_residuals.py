@@ -36,8 +36,19 @@ except (ImportError, RuntimeError):
 # ======================= #
 def set_residual_label(algorithm):
     """
+    Set residual label text for a given algorithm.
+
+    Parameters
+    ----------
+    algorithm : str
+        Algorithm
+
+    Returns
+    -------
+    label : str
+        Label text
     """
-    # Set algorithm dependent residual level
+    # Set algorithm dependent residual label text
     if algorithm == 'SUB':
         label = 'Residuals (counts)'
     elif algorithm == 'SUBDIV':
@@ -74,11 +85,11 @@ def fill_cmr(row, counts, model, resid, e_counts, e_resid, c_counts, c_model,
         Counts error
     e_resid : list of float
         Residual error
-    c_counts : `~gammalib.GFitsTableCol()'
+    c_counts : `~gammalib.GFitsTableCol'
         Counts FITS table column
-    c_model : `~gammalib.GFitsTableCol()'
+    c_model : `~gammalib.GFitsTableCol'
         Model FITS table column
-    c_resid : `~gammalib.GFitsTableCol()'
+    c_resid : `~gammalib.GFitsTableCol'
         Residual FITS table column
     algorithm : str
         Algorithm
@@ -86,7 +97,7 @@ def fill_cmr(row, counts, model, resid, e_counts, e_resid, c_counts, c_model,
     Returns
     -------
     counts, model, resid, e_counts, e_resid : tuple of float
-        Values
+        Counts, model and residual arrays
     """
     # Extract values
     counts.append(c_counts.real(row))
@@ -96,10 +107,7 @@ def fill_cmr(row, counts, model, resid, e_counts, e_resid, c_counts, c_model,
     # Calculate count error
     err = math.sqrt(c_counts.real(row))
     if err == 1:
-        # this prevents visualization problem in matplotlib
-        err = 0.99
-    else:
-        pass
+        err = 0.99 # This prevents visualization problem in matplotlib
     e_counts.append(err)
 
     # Calculate residual error
@@ -110,15 +118,17 @@ def fill_cmr(row, counts, model, resid, e_counts, e_resid, c_counts, c_model,
     elif algorithm == 'SUBDIVSQRT':
         e_resid.append(err / math.sqrt(c_model.real(row)))
     elif algorithm == 'SIGNIFICANCE':
-        e_resid.append(1.)
+        e_resid.append(1.0)
+    else:
+        e_resid.append(0.0)
 
     # Return tuple
     return counts, model, resid, e_counts, e_resid
 
 
-# ============= #
-# Plot spectrum #
-# ============= #
+# ====================== #
+# Plot residual spectrum #
+# ====================== #
 def plot_residuals(filename, plotfile, hdu):
     """
     Plot spectrum
@@ -129,7 +139,7 @@ def plot_residuals(filename, plotfile, hdu):
         Name of spectrum FITS file
     plotfile : str
         Plot file name
-    hdu      : int
+    hdu : int
         Number of observation to plot
     """
     # Read spectrum file    
@@ -270,20 +280,16 @@ def plot_residuals(filename, plotfile, hdu):
         axarr[3].axhline(0, color='0.5', linestyle='--')
         axarr[3].set_xlabel('Energy (TeV)')
 
-    # Add spectra of individual components
-    skiplist = ['Counts', 'Model', 'Residuals',
-                'Counts_Off', 'Model_Off', 'Residuals_Off',
-                'Emin', 'Emax']
+    # Add spectra of individual components. Skip all standard columns.
+    skiplist = ['Counts', 'Model', 'Residuals', 'Counts_Off', 'Model_Off',
+                'Residuals_Off', 'Emin', 'Emax']
     for s in range(table.ncols()):
-        if table[s].name() in skiplist:
-            pass
-        else:
+        if table[s].name() not in skiplist:
             component = []
             for row in range(nrows):
                 component.append(table[s].real(row))
             component = [component[0]] + component
-            axarr[0].step(ebounds, component, zorder=0,
-                          label=table[s].name())
+            axarr[0].step(ebounds, component, zorder=0, label=table[s].name())
 
     # Add legend
     axarr[0].legend(loc='best')

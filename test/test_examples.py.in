@@ -379,6 +379,13 @@ class Test(gammalib.GPythonTestSuite):
         # Execute script
         self._execute_python('show_residuals', args=args)
 
+        # Set arguments
+        args = ('-p example_show_residuals_onoff.eps %s/residual_onoff.fits' %
+                self._datadir)
+
+        # Execute script
+        self._execute_python('show_residuals', args=args)
+
         # Return
         return
 
