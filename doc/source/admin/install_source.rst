@@ -1,7 +1,14 @@
-.. _sec_compiling_source:
+.. _sec_install_source:
 
-Compiling from source
-=====================
+Installing from source code
+===========================
+
+Compiling ctools from source is the recommended method to install the package
+in case that you do not use Anaconda (if you use Anaconda, please follow
+the instructions at :ref:`sec_install_conda`, and better do not try to compile
+the source code against your Anaconda Python installation). You also need to
+compile from source if you want to use the development version of ctools.
+
 
 Before you start
 ----------------
@@ -23,8 +30,6 @@ software:
    the Python developer package installed, compiling with Python support
    is highly recommended to enable dynamic scripting of ctools and
    developing and using of cscripts.
-
-No system administrator privileges are needed to install ctools.
 
 
 Installing GammaLib

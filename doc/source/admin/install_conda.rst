@@ -1,7 +1,7 @@
 .. _sec_install_conda:
 
-Installing via conda
-====================
+Installing via Anaconda
+=======================
 
 `Anaconda <https://www.anaconda.com/download/>`_ (you can also use
 `Miniconda <https://conda.io/miniconda.html>`_ for a smaller footprint) is a
@@ -11,7 +11,8 @@ Anaconda Python version. An Anaconda Python installation is completely separate
 from any existing system wide or user space Python installation, so Anaconda
 can be tested without the fear of breaking an existing installation.
 
-Anaconda works on most systems without root access!
+**Anaconda ctools packages exist for Mac OS X and Linux distributions. Windows
+is not supported.**
 
 
 Installing
@@ -30,7 +31,8 @@ Installing
 - We strongly recommend to work with separate Anaconda environments, and
   especially not use the special root environment (that is used for all conda
   commands and environment manipulations, package installations etc.) for
-  anything besides updating the conda package itself (if necessary):
+  anything besides updating the conda package itself. For example create
+  a ``myenv`` environment as follows:
 
   .. code-block:: bash
 

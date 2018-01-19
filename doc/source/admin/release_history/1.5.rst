@@ -38,7 +38,7 @@ Improvements
 * [`2260 <https://cta-redmine.irap.omp.eu/issues/2260>`_] -
   Handle On/Off observations by :ref:`cspull`
 * [`2237 <https://cta-redmine.irap.omp.eu/issues/2237>`_] -
-  Add ``statistic`` parameters to :ref:`ctbutterfly`, :ref:`cterror`,
+  Add ``statistic`` parameter to :ref:`ctbutterfly`, :ref:`cterror`,
   :ref:`cttsmap`, :ref:`ctulimit`, :ref:`cslightcrv`, :ref:`csphasecrv`,
   :ref:`cspull`, :ref:`cssens`, :ref:`csspec`, :ref:`cstsdist` and
   :ref:`cstsmapsplit`
