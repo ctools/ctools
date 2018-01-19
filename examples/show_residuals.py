@@ -208,13 +208,19 @@ def plot_residuals(filename, plotfile, hdu):
     # Initialise figure
     axarr = []
     if is_onoff:
-        f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex='col', sharey='row')
+        f   = plt.figure(figsize=(10,6))
+        ax1 = f.add_subplot(221)
+        ax2 = f.add_subplot(222)
+        ax3 = f.add_subplot(223)
+        ax4 = f.add_subplot(224)
         axarr.append(ax1)
         axarr.append(ax2)
         axarr.append(ax3)
         axarr.append(ax4)
     else:
-        f, (ax1, ax2) = plt.subplots(2, sharex=True)
+        f   = plt.figure()
+        ax1 = f.add_subplot(211)
+        ax2 = f.add_subplot(212)
         axarr.append(ax1)
         axarr.append(ax2)
         f.subplots_adjust(hspace=0)
