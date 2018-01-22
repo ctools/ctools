@@ -342,6 +342,13 @@ void ctobssim::run(void)
                 continue;
             }
 
+            // If observation identifier is not yet set then set it now
+            if (obs->id().empty()) {
+                char buffer[256];
+                std::sprintf(buffer, "%6.6d", i + m_startindex);
+                obs->id(std::string(buffer));
+            }
+
             // Remove now all events from the event list but keep the
             // event list information such as ROI, Good Time Intervals,
             // energy boundaries. This will also keep additional columns
@@ -634,13 +641,13 @@ void ctobssim::get_parameters(void)
     m_eslices     = (*this)["eslices"].integer();
     m_apply_edisp = (*this)["edisp"].boolean();
     m_max_rate    = (*this)["maxrate"].real();
+    m_startindex  = (*this)["startindex"].integer();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
         m_outevents  = (*this)["outevents"].filename();
         m_prefix     = (*this)["prefix"].string();
-        m_startindex = (*this)["startindex"].integer();
     }
 
     // Initialise random number generators. We initialise here one random
@@ -1676,11 +1683,6 @@ void ctobssim::save_fits(void)
         // Get CTA observation from observation container
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
-        // Store OBS_ID
-        char buffer[256];
-        std::sprintf(buffer, "%6.6d", m_startindex);
-        obs->id(std::string(buffer));
-
         // Log filename
         log_value(NORMAL, "Event list file", m_outevents);
 
@@ -1732,11 +1734,6 @@ void ctobssim::save_xml(void)
 
                     // Store output file name in observation
                     obs->eventfile(outfile);
-
-                    // Store OBS_ID
-                    char buffer[256];
-                    std::sprintf(buffer, "%6.6d", i + m_startindex);
-                    obs->id(std::string(buffer));
 
                     // Log filename
                     log_value(NORMAL, "Event list file", outfile);
