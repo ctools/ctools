@@ -113,6 +113,9 @@ ctselect - CTA event selection
 Any .gz suffix is now correctly stripped from the event filenames when creating
 the output filenames (#2287).
 
+ctselect now informs about non-overlapping time interval; before the time interval
+was set to [0,0] which was disturbing and eventually incorrect (#2272).
+
 Use t-type parameters for "tmin" and "tmax" to all specifying times in various
 formats (#1864).
 

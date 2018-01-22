@@ -752,25 +752,37 @@ void ctselect::select_events(GCTAObservation*   obs,
     // Make time selection
     if (!m_gti.is_empty()) {
 
-        // Extract effective time interval in the reference time of the
-        // event list. We get this reference time from gti.reference().
-        double tmin = gti.tstart().convert(gti.reference());
-        double tmax = gti.tstop().convert(gti.reference());
+        // If there are no GTIs then request removal of all events
+        if (list->gti().is_empty()) {
+            remove_all = true;
+            log_value(NORMAL, "Time range", "None. There is no overlap "
+                      "between existing and requested time interval.");
+        }
 
-        // Format time with sufficient accuracy and add to selection string
-        char cmin[80];
-        char cmax[80];
-        sprintf(cmin, "%.8f", tmin);
-        sprintf(cmax, "%.8f", tmax);
-        selection = "TIME >= "+std::string(cmin)+" && TIME <= "+std::string(cmax);
-        add       = " && ";
-        log_value(NORMAL, "Time range (MJD)",
-                  gammalib::str(gti.tstart().mjd())+" - "+
-                  gammalib::str(gti.tstop().mjd())+" days");
-        log_value(NORMAL, "Time range (UTC)",
-                  gti.tstart().utc()+" - "+gti.tstop().utc());
-        log_value(NORMAL, "Time range (MET)",
-                  gammalib::str(tmin)+" - "+gammalib::str(tmax)+" seconds");
+        // ... otherwise set time interval
+        else {
+
+            // Extract effective time interval in the reference time of the
+            // event list. We get this reference time from gti.reference().
+            double tmin = gti.tstart().convert(gti.reference());
+            double tmax = gti.tstop().convert(gti.reference());
+
+            // Format time with sufficient accuracy and add to selection string
+            char cmin[80];
+            char cmax[80];
+            sprintf(cmin, "%.8f", tmin);
+            sprintf(cmax, "%.8f", tmax);
+            selection = "TIME >= "+std::string(cmin)+" && TIME <= "+std::string(cmax);
+            add       = " && ";
+            log_value(NORMAL, "Time range (MJD)",
+                      gammalib::str(gti.tstart().mjd())+" - "+
+                      gammalib::str(gti.tstop().mjd())+" days");
+            log_value(NORMAL, "Time range (UTC)",
+                      gti.tstart().utc()+" - "+gti.tstop().utc());
+            log_value(NORMAL, "Time range (MET)",
+                      gammalib::str(tmin)+" - "+gammalib::str(tmax)+" seconds");
+
+        } // endelse: set time interval
 
     } // endif: made time selection
 

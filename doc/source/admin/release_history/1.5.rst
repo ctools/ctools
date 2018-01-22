@@ -35,6 +35,8 @@ Improvements
   Add ``CUSTOM`` background method to :ref:`csphagen` script
 * [`2273 <https://cta-redmine.irap.omp.eu/issues/2273>`_] -
   Support On/Off analysis in :ref:`cslightcrv` and :ref:`csphasecrv`
+* [`2272 <https://cta-redmine.irap.omp.eu/issues/2272>`_] -
+  :ref:`ctselect` informs about non-overlapping time interval
 * [`2267 <https://cta-redmine.irap.omp.eu/issues/2267>`_] -
   Add tutorial for classical analysis
 * [`2260 <https://cta-redmine.irap.omp.eu/issues/2260>`_] -

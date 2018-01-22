@@ -10,6 +10,7 @@
         Add ctools::time_reference constant and remove ctools::time_reference() method (#2295)
         Correctly strip .gz suffix from output filenames (#2287)
         Support On/Off analysis in cslightcrv and csphasecrv (#2273)
+        ctselect informs about non-overlapping time interval (#2272)
         Add tutorial for classical analysis (#2267)
         Fix chatter level handling in ctpsfcube (#2262)
         Handle On/Off observations by cspull (#2260)
