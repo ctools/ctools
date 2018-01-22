@@ -23,6 +23,7 @@
         Add csmodelsois script (#2180)
         Add "NODES" method to csspec to support non-CTA analysis (#1927)
         Use t-type parameters for all "tmin" and "tmax" parameters (#1864)
+        Set OBS_ID in ctobssim (#1836)
 
 
 2017-07-28

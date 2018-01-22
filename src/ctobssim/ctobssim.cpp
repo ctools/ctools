@@ -1676,6 +1676,11 @@ void ctobssim::save_fits(void)
         // Get CTA observation from observation container
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
+        // Store OBS_ID
+        char buffer[256];
+        std::sprintf(buffer, "%6.6d", m_startindex);
+        obs->id(std::string(buffer));
+
         // Log filename
         log_value(NORMAL, "Event list file", m_outevents);
 
@@ -1727,6 +1732,11 @@ void ctobssim::save_xml(void)
 
                     // Store output file name in observation
                     obs->eventfile(outfile);
+
+                    // Store OBS_ID
+                    char buffer[256];
+                    std::sprintf(buffer, "%6.6d", i + m_startindex);
+                    obs->id(std::string(buffer));
 
                     // Log filename
                     log_value(NORMAL, "Event list file", outfile);

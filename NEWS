@@ -89,6 +89,9 @@ ctobssim - CTA observation simulation
 Use t-type parameters for "tmin" and "tmax" to all specifying times in various
 formats (#1864).
 
+Set the OBS_ID keyword to the number that is used for creating the FITS file
+(#1836).
+
 
 ctphase - Event phase computation
 ---------------------------------
