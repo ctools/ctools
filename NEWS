@@ -1,4 +1,4 @@
-12 January 2018
+22 January 2018
 
 
 Introduction
@@ -136,6 +136,9 @@ Add "statistic" parameter to allow setting of optimizer statistic (#2237).
 
 support - Support classes
 -------------------------
+Change DATE_OBS, DATE_END, TIME_OBS and TIME_END FITS keywords into DATA-OBS,
+DATE-END, TIME-OBS and TIME-END.
+
 Add ctobservation.obs() method to set an observation container.
 
 

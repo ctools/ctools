@@ -1,7 +1,7 @@
 /***************************************************************************
  *             ctobservation - Base class for observation tools            *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -349,10 +349,10 @@ void ctobservation::write_ogip_keywords(GFitsHDU* hdu) const
         hdu->card("TELESCOP", m_ogip_telescope, "Telescope");
 
         // Set observation time information
-        hdu->card("DATE_OBS", date_obs,        "Observation start date");
-        hdu->card("TIME_OBS", time_obs,        "Observation start time");
-        hdu->card("DATE_END", date_end,        "Observation end date");
-        hdu->card("TIME_END", time_end,        "Observation end time");
+        hdu->card("DATE-OBS", date_obs,        "Observation start date");
+        hdu->card("TIME-OBS", time_obs,        "Observation start time");
+        hdu->card("DATE-END", date_end,        "Observation end date");
+        hdu->card("TIME-END", time_end,        "Observation end time");
         hdu->card("TELAPSE",  m_ogip_telapse,  "[s] Elapsed time");
         hdu->card("ONTIME",   m_ogip_ontime,   "[s] Total good time including deadtime");
         hdu->card("LIVETIME", m_ogip_livetime, "[s] Total livetime");

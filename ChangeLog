@@ -1,8 +1,10 @@
-2018-01-12
+2018-01-22
 
         * Version 1.5.0 released
         ========================
 
+        Change DATE_OBS, DATE_END, TIME_OBS and TIME_END FITS keywords into DATA-OBS,
+          DATE-END, TIME-OBS and TIME-END
         Add CUSTOM background method to csphagen script (#2284)
         Add csresspec script (#2289)
         Add ctools::time_reference constant and remove ctools::time_reference() method (#2295)

@@ -17,6 +17,8 @@ In particular, this release provides:
 Bug fixes
 ---------
 
+* Change ``DATE_OBS``, ``DATE_END``, ``TIME_OBS`` and ``TIME_END`` FITS keywords
+  into ``DATA-OBS``, ``DATE-END``, ``TIME-OBS`` and ``TIME-END``
 * [`2287 <https://cta-redmine.irap.omp.eu/issues/2287>`_] -
   Correctly strip .gz suffix from output filenames
 * [`2262 <https://cta-redmine.irap.omp.eu/issues/2262>`_] -
