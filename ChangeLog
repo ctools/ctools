@@ -22,6 +22,7 @@
         Add RING background method to ctskymap (#2207)
         Add keywords to sky maps produced by ctskymap (#2194)
         Enhance efficiency of computations in ctmodel (#2189)
+        cscripts::execute() no longer creates log files (#2182)
         Add csmodelsois script (#2180)
         Add "NODES" method to csspec to support non-CTA analysis (#1927)
         Use t-type parameters for all "tmin" and "tmax" parameters (#1864)

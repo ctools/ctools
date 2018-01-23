@@ -9,7 +9,8 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-None
+The cscripts::execute() method no longer creates log files, making the
+cscripts behaviour compliant with that of ctools (#2182).
 
 
 Python interface

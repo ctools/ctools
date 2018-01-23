@@ -54,6 +54,8 @@ Improvements
   Add keywords to sky maps produced by :ref:`ctskymap`
 * [`2189 <https://cta-redmine.irap.omp.eu/issues/2189>`_] -
   Enhance efficiency of computations in :ref:`ctmodel`
+* [`2182 <https://cta-redmine.irap.omp.eu/issues/2182>`_] -
+  ``cscripts::execute()`` no longer creates log files
 * [`1927 <https://cta-redmine.irap.omp.eu/issues/1927>`_] -
   Add ``NODES`` method to :ref:`csspec` to support non-CTA analysis
 * [`1836 <https://cta-redmine.irap.omp.eu/issues/1836>`_] -

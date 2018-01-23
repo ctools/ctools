@@ -304,7 +304,6 @@ cscript.pardict = _pardict
 
 # Execute the script
 def _execute(self):
-    self.logFileOpen()
     self._read_ahead(True)
     self.run()
     self.save()
