@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csroot2caldb script.
 #
-# Copyright (C) 2016-2017 Juergen Knoedlseder
+# Copyright (C) 2016-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 #
 # ==========================================================================
 import os
-#import gammalib
 import cscripts
 from testing import test
 
@@ -81,10 +80,6 @@ class Test(test):
                            ' inst=prod3 id=South_50h version=prod3'+ \
                            ' analysis=DESY zenith=20.0 azimuth=0.0'+ \
                            ' logfile="csroot2caldb_cmd1.log" chatter=2'
-
-        # Check if execution of wrong command fails
-        self.test_assert(self._execute('command_that_does_not_exist') != 0,
-             'Self test of test script')
 
         # Check if execution was successful
         self.test_assert(self._execute(cmd) == 0,

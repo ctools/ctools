@@ -85,10 +85,6 @@ class Test(test):
                        ' outfile="cstsdist_cmd1.dat"'+ \
                        ' logfile="cstsdist_cmd1.log" chatter=2'
 
-        # Check if execution of wrong command fails
-        self.test_assert(self._execute('command_that_does_not_exist') != 0,
-             'Self test of test script')
-
         # Check if execution was successful
         self.test_assert(self._execute(cmd) == 0,
              'Check successful execution from command line')
@@ -105,7 +101,7 @@ class Test(test):
                        ' logfile="cstsdist_cmd2.log" chatter=2'
 
         # Check if execution failed
-        self.test_assert(self._execute(cmd) != 0,
+        self.test_assert(self._execute(cmd, success=False) != 0,
              'Check invalid input file when executed from command line')
 
         # Check cstsdist --help

@@ -9,6 +9,8 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
+In case of an error, test output is now written into log file (#2264).
+
 The cscripts::execute() method no longer creates log files, making the
 cscripts behaviour compliant with that of ctools (#2182).
 

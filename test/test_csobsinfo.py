@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csobsinfo script.
 #
-# Copyright (C) 2016-2017 Juergen Knoedlseder
+# Copyright (C) 2016-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-#import gammalib
 import cscripts
 from testing import test
 
@@ -77,10 +76,6 @@ class Test(test):
                         ' offset=yes ra=83.63 dec=22.01'+ \
                         ' logfile="csobsinfo_cmd1.log" chatter=1'
 
-        # Check if execution of wrong command fails
-        self.test_assert(self._execute('command_that_does_not_exist') != 0,
-             'Self test of test script')
-
         # Check if execution was successful
         self.test_assert(self._execute(cmd) == 0,
              'Check successful execution from command line')
@@ -95,7 +90,7 @@ class Test(test):
                         ' logfile="csobsinfo_cmd2.log" debug=yes'
 
         # Check if execution failed
-        self.test_assert(self._execute(cmd) != 0,
+        self.test_assert(self._execute(cmd, success=False) != 0,
              'Check invalid input file when executed from command line')
 
         # Check csobsinfo --help

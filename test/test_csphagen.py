@@ -93,10 +93,6 @@ class Test(test):
                          'outobs="csphagen_cmd1.xml" prefix="csphagen_cmd1" ' + \
                          'logfile="csphagen_cmd1.log" chatter=2'
 
-        # Check if execution of wrong command fails
-        self.test_assert(self._execute('command_that_does_not_exist') != 0,
-                         'Self test of test script')
-
         # Check if execution was successful
         self.test_assert(self._execute(cmd) == 0,
                          'Check successful execution from command line')
@@ -119,8 +115,8 @@ class Test(test):
                          'logfile="csphagen_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
-        self.test_assert(self._execute(cmd) != 0,
-                         'Check invalid input file when executed from command line')
+        self.test_assert(self._execute(cmd, success=False) != 0,
+             'Check invalid input file when executed from command line')
 
         # Check csphagen --help
         self._check_help(csphagen)

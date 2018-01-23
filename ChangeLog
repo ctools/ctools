@@ -13,6 +13,7 @@
         Support On/Off analysis in cslightcrv and csphasecrv (#2273)
         ctselect informs about non-overlapping time interval (#2272)
         Add tutorial for classical analysis (#2267)
+        In case of an error, test output is now written into log file (#2264)
         Fix chatter level handling in ctpsfcube (#2262)
         Handle On/Off observations by cspull (#2260)
         Add "statistic" parameter to all likelihood tools and scripts (#2237)

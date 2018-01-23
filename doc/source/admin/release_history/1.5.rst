@@ -39,6 +39,8 @@ Improvements
   :ref:`ctselect` informs about non-overlapping time interval
 * [`2267 <https://cta-redmine.irap.omp.eu/issues/2267>`_] -
   Add tutorial for classical analysis
+* [`2264 <https://cta-redmine.irap.omp.eu/issues/2264>`_] -
+  In case of an error, test output is now written into log file
 * [`2260 <https://cta-redmine.irap.omp.eu/issues/2260>`_] -
   Handle On/Off observations by :ref:`cspull`
 * [`2237 <https://cta-redmine.irap.omp.eu/issues/2237>`_] -

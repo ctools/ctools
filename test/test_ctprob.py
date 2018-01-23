@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctprob tool.
 #
-# Copyright (C) 2017 by Leonardo Di Venere
+# Copyright (C) 2017-2018 by Leonardo Di Venere
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ class Test(test):
                      ' logfile="ctprob_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
-        self.test_assert(self._execute(cmd) != 0,
+        self.test_assert(self._execute(cmd, success=False) != 0,
              'Check invalid input file when executed from command line')
 
         # Check ctprob --help

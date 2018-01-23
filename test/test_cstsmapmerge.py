@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the cstsmapmerge script
 #
-# Copyright (C) 2016-2017 Juergen Knoedlseder
+# Copyright (C) 2016-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -79,10 +79,6 @@ class Test(test):
                            ' outmap="cstsmapmerge_cmd1.fits"'+ \
                            ' logfile="cstsmapmerge_cmd1.log" chatter=1'
 
-        # Check if execution of wrong command fails
-        self.test_assert(self._execute('command_that_does_not_exist') != 0,
-             'Self test of test script')
-
         # Check if execution was successful
         self.test_assert(self._execute(cmd) == 0,
              'Check successful execution from command line')
@@ -96,7 +92,7 @@ class Test(test):
                            ' logfile="cstsmapmerge_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
-        self.test_assert(self._execute(cmd) != 0,
+        self.test_assert(self._execute(cmd, success=False) != 0,
              'Check invalid input file when executed from command line')
 
         # Check cstsmapmerge --help
