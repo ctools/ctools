@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the cstsdist script.
 #
-# Copyright (C) 2016-2017 Juergen Knoedlseder
+# Copyright (C) 2016-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,6 +42,10 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set members
+        self._stacked_inobs = self._datadir + '/obs_stacked.xml'
+        self._stacked_model = self._datadir + '/crab_bkgcube.xml'
+
         # Return
         return
 
@@ -55,7 +59,12 @@ class Test(test):
 
         # Append tests
         self.append(self._test_cmd, 'Test cstsdist on command line')
-        self.append(self._test_python, 'Test cstsdist from Python')
+        self.append(self._test_python_unbinned,
+                    'Test cstsdist from Python in unbinned mode')
+        self.append(self._test_python_binned,
+                    'Test cstsdist from Python in binned mode')
+        self.append(self._test_python_stacked,
+                    'Test cstsdist from Python in stacked mode')
 
         # Return
         return
@@ -69,12 +78,10 @@ class Test(test):
         cstsdist = self._script('cstsdist')
 
         # Setup cstsdist command
-        cmd = cstsdist+' inmodel="'+self._model+'"'+ \
-                       ' srcname="Crab"'+ \
+        cmd = cstsdist+' inobs="'+self._events+'"'+ \
+                       ' inmodel="'+self._model+'" srcname="Crab"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                       ' ntrials=1 ra=83.63 dec=22.01 emin=0.1 emax=100.0'+ \
-                       ' enumbins=0 tmin=0.0 tmax=1800.0 rad=5.0 npix=200 npix=200'+ \
-                       ' binsz=0.05'+ \
+                       ' ntrials=2 '+ \
                        ' outfile="cstsdist_cmd1.dat"'+ \
                        ' logfile="cstsdist_cmd1.log" chatter=2'
 
@@ -90,14 +97,12 @@ class Test(test):
         self._check_result_file('cstsdist_cmd1.dat')
 
         # Setup cstsdist command
-        cmd = cstsdist+' inmodel="model_that_does_not_exist.xml"'+ \
-                       ' srcname="Crab"'+ \
+        cmd = cstsdist+' inobs="event_file_that_does_not_exist.xml"'+ \
+                       ' inmodel="'+self._model+'" srcname="Crab"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                       ' ntrials=1 ra=83.63 dec=22.01 emin=0.1 emax=100.0'+ \
-                       ' enumbins=0 tmin=0.0 tmax=1800.0 rad=5.0 npix=200 npix=200'+ \
-                       ' binsz=0.05'+ \
+                       ' ntrials=1 '+ \
                        ' outfile="cstsdist_cmd2.dat"'+ \
-                       ' logfile="cstsdist_cmd2.log" debug=yes chatter=2'
+                       ' logfile="cstsdist_cmd2.log" chatter=2'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -110,25 +115,18 @@ class Test(test):
         return
 
     # Test cstsdist from Python
-    def _test_python(self):
+    def _test_python_unbinned(self):
         """
         Test cstsdist from Python
         """
-        # Set-up cstsdist
+        # Set-up cstsdist for event list
         tsdist = cscripts.cstsdist()
+        tsdist['inobs']    = self._events
         tsdist['inmodel']  = self._model
         tsdist['srcname']  = 'Crab'
         tsdist['caldb']    = self._caldb
         tsdist['irf']      = self._irf
-        tsdist['ntrials']  = 1
-        tsdist['ra']       = 83.63
-        tsdist['dec']      = 22.01
-        tsdist['emin']     = 0.1
-        tsdist['emax']     = 100.0
-        tsdist['enumbins'] = 0
-        tsdist['tmin']     = 0.0
-        tsdist['tmax']     = 1800.0
-        tsdist['rad']      = 5.0
+        tsdist['ntrials']  = 2
         tsdist['outfile']  = 'cstsdist_py1.dat'
         tsdist['logfile']  = 'cstsdist_py1.log'
         tsdist['chatter']  = 3
@@ -144,8 +142,61 @@ class Test(test):
         # Return
         return
 
+    def _test_python_binned(self):
+        """
+        Test cstsdist from Python
+        """
+        # Set-up cstsdist for counts cube
+        tsdist = cscripts.cstsdist()
+        tsdist['inobs']    = self._cntcube
+        tsdist['inmodel']  = self._model
+        tsdist['srcname']  = 'Crab'
+        tsdist['expcube']  = 'NONE'
+        tsdist['psfcube']  = 'NONE'
+        tsdist['bkgcube']  = 'NONE'
+        tsdist['caldb']    = self._caldb
+        tsdist['irf']      = self._irf
+        tsdist['ntrials']  = 2
+        tsdist['outfile']  = 'cstsdist_py2.dat'
+        tsdist['logfile']  = 'cstsdist_py2.log'
+        tsdist['chatter']  = 4
+
+        # Run cstsdist script
+        tsdist.logFileOpen()   # Make sure we get a log file
+        tsdist.execute()
+
+        # Check pull distribution file
+        self._check_result_file('cstsdist_py2.dat')
+
+        # Return
+        return
+
+    def _test_python_stacked(self):
+        """
+        Test cstsdist from Python
+        """
+        # Set-up cstsdist for stacked cube
+        tsdist = cscripts.cstsdist()
+        tsdist['inobs']    = self._stacked_inobs
+        tsdist['inmodel']  = self._stacked_model
+        tsdist['srcname']  = 'Crab'
+        tsdist['ntrials']  = 2
+        tsdist['outfile']  = 'cstsdist_py3.dat'
+        tsdist['logfile']  = 'cstsdist_py3.log'
+        tsdist['chatter']  = 4
+
+        # Run cstsdist script
+        tsdist.logFileOpen()   # Make sure we get a log file
+        tsdist.execute()
+
+        # Check pull distribution file
+        self._check_result_file('cstsdist_py3.dat')
+
+        # Return
+        return
+
     # Check result file
-    def _check_result_file(self, filename, ncols=9):
+    def _check_result_file(self, filename, nrows=3, ncols=9):
         """
         Check result file
 
@@ -153,6 +204,8 @@ class Test(test):
         ----------
         filename : str
             Name of result file
+        nrows : int, optional
+            Required number of rows
         ncols : int, optional
             Required number of columns
         """
@@ -160,7 +213,7 @@ class Test(test):
         results = gammalib.GCsv(filename, ',')
 
         # Check dimensions
-        self.test_value(results.nrows(), 2,     'Check rows in TS file')
+        self.test_value(results.nrows(), nrows, 'Check rows in TS file')
         self.test_value(results.ncols(), ncols, 'Check columns in TS file')
 
         # Return

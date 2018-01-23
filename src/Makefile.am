@@ -100,7 +100,7 @@ help-install:
         echo "$(INSTALL_DATA) $$file $(DESTDIR)$(datadir)/help/$$helpname" ; \
         $(INSTALL_DATA) "$$file" $(DESTDIR)$(datadir)/help/"$$helpname" ; \
         sed -i.bak -e 's/``//g' -e 's/`//g' -e 's/:ref://g' -e 's/:doc://g' \
-            -e 's/.. note::/Note/g' -e '1d' \
+            -e 's/.. note::/Note/g' -e 's/.. warning::/Warning/g' -e '1d' \
             $(DESTDIR)$(datadir)/help/"$$helpname" ; \
         rm -rf $(DESTDIR)$(datadir)/help/"$$helpname".bak ; \
     done

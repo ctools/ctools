@@ -319,8 +319,14 @@ The script now derives from the csobservation base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the Test
 Statistic distribution generation (#2237).
 
-Use t-type parameters for "tmin" and "tmax" to all specifying times in various
-formats (#1864).
+The parameter interface was considerably revised, in particular the following
+parameters were removed: "ra", "dec", "rad", "coordsys", "proj", "emin",
+"emax", "enumbins", "tmin", "tmax", "npix" and "binsz". The "inobs" parameter
+is now always queried. The script now reads in an observation or an observation
+container and derives the TS distribution for a source based on that observation
+container. So far the script supports unbinned, binned and stacked observations.
+If an observation definition XML file is specified the script assumes that all
+observations are event lists (#1567).
 
 
 cstsmapmerge - Merge Test Statistic maps
