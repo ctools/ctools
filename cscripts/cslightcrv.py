@@ -107,7 +107,6 @@ class cslightcrv(ctools.csobservation):
         # Set On/Off analysis flag and query relevant user parameters
         self._onoff = self._is_onoff()
 
-        # If cube analysis is selected
         # Set stacked analysis flag and query relevant user parameters
         if not self._onoff:
             self._stacked = self._is_stacked()

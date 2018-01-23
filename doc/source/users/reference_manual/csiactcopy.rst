@@ -1,7 +1,7 @@
 .. _csiactcopy:
 
 csiactcopy
-===========
+==========
 
 Copies IACT data from one location to another
 
@@ -14,7 +14,7 @@ has to be mounted before running the script. For mounting, e.g. sshfs can be use
 
 .. code-block:: bash
 
-  $ sshfs user@remote.server.com:/path/to/remote/fits /path/to/mountpoint/
+   $ sshfs user@remote.server.com:/path/to/remote/fits /path/to/mountpoint/
 
 The script can optionally take an ASCII file with a list of observation IDs as input.
 In this way the user can copy only a specific subset of the data. Index files and data
@@ -36,7 +36,7 @@ General parameters
 
 ``prodname [string]``
     Name of FITS production to download
-    
+
 ``outpath [file]``
     Destination path of FITS data
 
@@ -50,23 +50,23 @@ Standard parameters
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether existing output files should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = csiactdload.log) [filename]``
     Log filename.

@@ -18,10 +18,10 @@ binning and used for residual computation. Before residual computation,
 the counts and model cubes are collapsed into maps by summing over all
 energies. Four options exist then for residual computation:
 
-* the subtraction of the model from the counts (SUB)
-* the subtraction and division by the model (SUBDIV)
-* the subtraction and division by the square root of the model (SUBDIVSQRT)
-* the computation of the significance using Li & Ma (SIGNIFICANCE)
+- the subtraction of the model from the counts (SUB)
+- the subtraction and division by the model (SUBDIV)
+- the subtraction and division by the square root of the model (SUBDIVSQRT)
+- the computation of the significance using Li & Ma (SIGNIFICANCE)
 
 The residual map is written into a FITS file.  
 
@@ -31,6 +31,9 @@ General parameters
 
 ``inobs [file]``
     Input event list, counts cube or observation definition XML file.
+
+``inmodel [file]``
+    Input model XML file.
 
 ``modcube [file]``
     Input model cube file (generated with ctmodel).
@@ -46,9 +49,6 @@ General parameters
 
 ``bkgcube [file]``
     Input background cube file.
-
-``inmodel [file]``
-    Input model XML file.
 
 ``caldb [string]``
     Calibration database.
@@ -135,7 +135,7 @@ Standard parameters
     Enables debug mode. In debug mode the executable will dump any log file output to the console.
 
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = csresmap.log) [string]``
     Log filename.

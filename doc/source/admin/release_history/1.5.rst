@@ -88,4 +88,4 @@ Clean up
   :ref:`csspec` and :ref:`cstsdist` scripts from ``cslikelihood`` base
   class
 * [`1567 <https://cta-redmine.irap.omp.eu/issues/1567>`_] -
-  Revise :ref:`cstsdist parameters`
+  Revise :ref:`cstsdist` parameters

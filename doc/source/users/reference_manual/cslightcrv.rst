@@ -3,21 +3,35 @@
 cslightcrv
 ==========
 
-Computes a lightcurve for a given source.
+Computes a light curve for a given source.
 
 
 Synopsis
 --------
 
-This script computes a lightcurve by performing a maximum likelihood fit
+This script computes a light curve by performing a maximum likelihood fit
 using :doc:`ctlike` in a series of time bins. The time bins can be either
 specified in an ASCII file, as an interval divided into equally sized time
 bins, or can be taken from the Good Time Intervals of the observation(s).
 The format of the ASCII file is one row per time bin, each specifying the
 start of stop value of the bin, separated by a whitespace. The times are
-given in Modified Julian Days (MJD). 
+given in Modified Julian Days (MJD).
 
-cslightcrv writes the fitted model parameters and their statistical errors 
+:ref:`cslightcrv` can perform the light curve fitting in unbinned, stacked or
+On/Off analysis mode; on input the script always requires unbinned data, i.e.
+event list(s), since only event data retain time information for light curve
+fitting. To select unbinned analysis, specify ``method=3D`` and ``enumbins=0``;
+for stacked analysis specify ``method=3D`` and any positive number for ``enumbins``.
+To perform the analysis in On/Off model, specify ``method=ONOFF``.
+
+For a stacked analysis, :ref:`cslightcrv` will query the parameters that define
+the counts cube (``coordsys``, ``proj``, ``xref``, ``yref``, ``nxpix``, ``nypix``,
+``binsz``) while for an On/Off analysis the script will query the parameters that
+are necessary to run internally the :ref:`csphagen` script (``inexclusion``, ``coordsys``,
+``xref``, ``yref``, ``srcshape``, ``rad``, ``bkgmethod``, ``bkgregmin``, ``maxoffset``,
+``etruemin``, ``etruemax``, ``etruebins``).
+
+:ref:`cslightcrv` writes the fitted model parameters and their statistical errors
 in a FITS file. In addition, it computes for each time bin the statistical 
 significance of the detection, expressed by the Test Statistics, and the 
 upper flux limit.
@@ -44,12 +58,12 @@ General parameters
 
 ``(inexclusion = NONE) [file]``
     Optional FITS file containing a WCS map in the first hdu that defines sky
-    regions not to be used for background estimation in ``ONOFF`` analysis (where
+    regions not to be used for background estimation in On/Off analysis (where
     map value != 0).
 
 ``(edisp = no) [boolean]``
     Applies energy dispersion to response computation (for ``3D`` analysis only,
-    energy dispersion is always taken into account in ``ONOFF`` analysis).
+    energy dispersion is always taken into account in On/Off analysis).
 
 ``outfile [file]``
     Name of the light curve output file.
@@ -90,11 +104,11 @@ General parameters
 
 ``xref [real]``
     Right Ascension / Galactic longitude of image centre for ``3D`` analysis or
-    source region centre for ``ONOFF`` analysis (J2000, in degrees).
+    source region centre for On/Off analysis (J2000, in degrees).
 
 ``yref [real]``
     Declination / Galactic latitude of image centre for ``3D`` analysis or
-    source region centre for ``ONOFF`` analysis (J2000, in degrees).
+    source region centre for On/Off analysis (J2000, in degrees).
 
 ``nxpix [integer]``
     Size of the Right Ascension / Galactic longitude axis for ``3D`` analysis (in pixels).
@@ -106,14 +120,14 @@ General parameters
     Pixel size for ``3D`` analysis (in degrees/pixel).
 
 ``(srcshape = CIRCLE) [string]``
-    Shape of the source region for ``ONOFF`` analysis.
+    Shape of the source region for On/Off analysis.
     ``CIRCLE``: circular region around given position.
 
 ``rad [real]``
-    Radius of source region circle for ``ONOFF`` analysis (deg)
+    Radius of source region circle for On/Off analysis (deg)
 
 ``(bkgmethod = REFLECTED) [string]``
-    Method for background estimation in ``ONOFF`` analysis.
+    Method for background estimation in On/Off analysis.
     ``REFLECTED:`` background evaluated in regions with the same shape as
     source region reflected w.r.t. pointing direction for each observation.
 
@@ -124,17 +138,17 @@ General parameters
 
 ``(maxoffset = 4.0) [real]``
     Maximum offset in degrees of source from camera center to accept the
-    observation for ``ONOFF`` analysis.
+    observation for On/Off analysis.
 
 ``(etruemin = 0.01) [real]``
-    Minimum true energy to evaluate instrumental response in ``ONOFF`` analysis (TeV).
+    Minimum true energy to evaluate instrumental response in On/Off analysis (TeV).
 
 ``(etruemax = 0.01) [real]``
-    Maximum true energy to evaluate instrumental response in ``ONOFF`` analysis (TeV).
+    Maximum true energy to evaluate instrumental response in On/Off analysis (TeV).
 
 ``(etruebins = 30) [integer]``
     Number of bins per decade for true energy bins to evaluate instrumental
-    response in ``ONOFF`` analysis.
+    response in On/Off analysis.
 
 ``(statistic = DEFAULT) <DEFAULT|CSTAT|WSTAT|CHI2> [string]``
     Optimization statistic. ``DEFAULT`` uses the default statistic for all
@@ -174,16 +188,16 @@ Standard parameters
      ``chatter = 3``: report about the task execution
 
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether an existing light curve output file should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file
     output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = cslightcrv.log) [filename]``
     Log filename.
@@ -193,3 +207,4 @@ Related tools or scripts
 ------------------------
 
 :doc:`ctlike`
+:doc:`csphagen`

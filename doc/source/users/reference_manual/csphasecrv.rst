@@ -12,15 +12,27 @@ Synopsis
 This script computes spectra by performing a maximum likelihood fit using
 :doc:`ctlike` in a series of phase bins for periodic sources. The input event
 list must have a ``PHASE`` column containing the phase values, that can be
-assigned using :doc:`ctphase`. The phase bins can be
-either specified in an ASCII file or as an interval divided into equally sized
-phase bins. The format of the ASCII file is one row per phase bin, each
-specifying the start of stop value of the phase bin, separated by a whitespace.
-The phase goes from 0.0 to 1.0.
+assigned using :doc:`ctphase`. The phase bins can be either specified in an ASCII
+file or as an interval divided into equally sized phase bins. The format of the
+ASCII file is one row per phase bin, each specifying the start of stop value of
+the phase bin, separated by a whitespace. The phase goes from 0.0 to 1.0.
 
-The script writes the fit results into a FITS file. The script
-also produces one XML file per phase bin that contains the best-fit model for
-that bin.
+:ref:`csphasecrv` can perform the phase curve fitting in unbinned, stacked or
+On/Off analysis mode; on input the script always requires unbinned data, i.e.
+event list(s), since only event data retain phase information for phase curve
+fitting. To select unbinned analysis, specify ``method=3D`` and ``enumbins=0``;
+for stacked analysis specify ``method=3D`` and any positive number for ``enumbins``.
+To perform the analysis in On/Off model, specify ``method=ONOFF``.
+
+For a stacked analysis, :ref:`csphasecrv` will query the parameters that define
+the counts cube (``coordsys``, ``proj``, ``xref``, ``yref``, ``nxpix``, ``nypix``,
+``binsz``) while for an On/Off analysis the script will query the parameters that
+are necessary to run internally the :ref:`csphagen` script (``inexclusion``, ``coordsys``,
+``xref``, ``yref``, ``srcshape``, ``rad``, ``bkgmethod``, ``bkgregmin``, ``maxoffset``,
+``etruemin``, ``etruemax``, ``etruebins``).
+
+The script writes the fit results into a FITS file. The script also produces one
+XML file per phase bin that contains the best-fit model for that bin.
 
 
 General parameters
@@ -43,7 +55,7 @@ General parameters
 
 ``(inexclusion = NONE) [file]``
     Optional FITS file containing a WCS map in the first hdu that defines sky
-    regions not to be used for background estimation in ``ONOFF`` analysis (where
+    regions not to be used for background estimation in On/Off analysis (where
     map value != 0).
 
 ``(edisp = no) [boolean]``
@@ -74,7 +86,7 @@ General parameters
     Upper energy limit of events (in TeV).
 
 ``enumbins [integer]``
-    Number of energy bins per phase bin (0=unbinned).
+    Number of energy bins per phase bin (0=unbinned for ``3D`` analysis only).
 
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
@@ -84,11 +96,11 @@ General parameters
 
 ``xref [real]``
     Right Ascension / Galactic longitude of image centre for ``3D`` analysis or
-    source region centre for ``ONOFF`` analysis (J2000, in degrees).
+    source region centre for On/Off analysis (J2000, in degrees).
 
 ``yref [real]``
     Declination / Galactic latitude of image centre for ``3D`` analysis or
-    source region centre for ``ONOFF`` analysis (J2000, in degrees).
+    source region centre for On/Off analysis (J2000, in degrees).
 
 ``nxpix [integer]``
     Size of the Right Ascension / Galactic longitude axis for ``3D`` analysis (in pixels).
@@ -100,35 +112,35 @@ General parameters
     Pixel size for ``3D`` analysis (in degrees/pixel).
 
 ``(srcshape = CIRCLE) [string]``
-    Shape of the source region for ``ONOFF`` analysis.
+    Shape of the source region for On/Off analysis.
     ``CIRCLE``: circular region around given position.
 
 ``rad [real]``
-    Radius of source region circle for ``ONOFF`` analysis (deg)
+    Radius of source region circle for On/Off analysis (deg)
 
 ``(bkgmethod = REFLECTED) [string]``
-    Method for background estimation in ``ONOFF`` analysis.
+    Method for background estimation in On/Off analysis.
     ``REFLECTED:`` background evaluated in regions with the same shape as
     source region reflected w.r.t. pointing direction for each observation.
 
 ``(bkgregmin = 2) [integer]``
     Minimum number of background regions that are required for an observation in
-    ``ONOFF`` analysis. If this number of background regions is not available the
+    On/Off analysis. If this number of background regions is not available the
     observation is skipped.
 
 ``(maxoffset = 4.0) [real]``
     Maximum offset in degrees of source from camera center to accept the
-    observation for ``ONOFF`` analysis.
+    observation for On/Off analysis.
 
 ``(etruemin = 0.01) [real]``
-    Minimum true energy to evaluate instrumental response in ``ONOFF`` analysis (TeV).
+    Minimum true energy to evaluate instrumental response in On/Off analysis (TeV).
 
 ``(etruemax = 0.01) [real]``
-    Maximum true energy to evaluate instrumental response in ``ONOFF`` analysis (TeV).
+    Maximum true energy to evaluate instrumental response in On/Off analysis (TeV).
 
 ``(etruebins = 30) [integer]``
     Number of bins per decade for true energy bins to evaluate instrumental
-    response in ``ONOFF`` analysis.
+    response in On/Off analysis.
 
 ``(statistic = DEFAULT) <DEFAULT|CSTAT|WSTAT|CHI2> [string]``
     Optimization statistic. ``DEFAULT`` uses the default statistic for all
@@ -156,7 +168,7 @@ Standard parameters
      ``chatter = 3``: report about the task execution
 
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether an existing light curve output file should be overwritten.
 
@@ -165,7 +177,7 @@ Standard parameters
     output to the console.
 
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = csphasecrv.log) [filename]``
     Log filename.

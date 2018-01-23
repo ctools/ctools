@@ -16,14 +16,14 @@
 #
 # Input and output parameters
 #============================
-inobs,        f, a, events.fits,,, "Input event list or observation definition XML file"
-inmodel,      f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
-srcname,      s, a, Crab,,, "Source name"
-caldb,        s, a, prod2,,, "Calibration database"
-irf,          s, a, South_0.5h,,, "Instrument response function"
-inexclusion,  f, h, NONE,,, "Sky map of exclusion regions for On/Off analysis"
-edisp,     b, h, no,,, "Apply energy dispersion in Cube analysis?"
-outfile,   f, a, lightcurve.fits,,, "Output light curve file"
+inobs,       f, a, events.fits,,, "Input event list or observation definition XML file"
+inmodel,     f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
+srcname,     s, a, Crab,,, "Source name"
+caldb,       s, a, prod2,,, "Calibration database"
+irf,         s, a, South_0.5h,,, "Instrument response function"
+inexclusion, f, h, NONE,,, "Sky map of exclusion regions for On/Off analysis"
+edisp,       b, h, no,,, "Apply energy dispersion in Cube analysis?"
+outfile,     f, a, lightcurve.fits,,, "Output light curve file"
 
 #
 # Script parameters

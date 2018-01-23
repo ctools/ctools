@@ -1,7 +1,7 @@
 .. _sec_residual_spectrum:
 
 Generating a residual spectrum
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the previous tutorial you have used the :ref:`csresmap` script to
 inspect the spatial residuals. You can also inspect the spectral

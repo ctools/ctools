@@ -3,7 +3,7 @@
 cstsmapsplit
 ============
 
-Generate commands to split the Test Statistic map computation
+Generate commands to split the Test Statistic map computation.
 
 
 Synopsis
@@ -48,21 +48,24 @@ General parameters
     Instrumental response function.
 
 ``(edisp = no) [boolean]``
-    Applies energy dispersion to response computation.
+    Applies energy dispersion to response computation?
 
 ``(errors = no) [boolean]``
     Compute and store parameter errors?
 
-``(statistic = CSTAT) <CSTAT|WSTAT|CHI2> [string]``
-    Optimization statistic. ``CSTAT`` applies to all types of observations,
-    ``WSTAT``applies only to On/Off observations, and ``CHI2`` applies only
-    to binned or stacked observations.
+``(statistic = DEFAULT) <DEFAULT|CSTAT|WSTAT|CHI2> [string]``
+    Optimization statistic. ``DEFAULT`` uses the default statistic for all
+    observations, which is ``CSTAT`` or the statistic specified in the
+    observation definition XML file. ``CSTAT`` uses the C statistic for
+    all observations, ``WSTAT`` uses the W statistic for all On/Off
+    observations, and ``CHI2`` uses the Chi squared statistic for all
+    binned or stacked observations.
 
 ``outmap [file]``
     Output Test Statistic map file.
 
 ``bins_per_job [integer]``
-    Number of bins of the TS map that should be computed within one command
+    Number of bins of the TS map that should be computed within one command.
 
 ``compute_null [boolean]``
     Pre-computes the null hypothesis globally and passes the value to the
@@ -78,28 +81,28 @@ General parameters
 
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for map centre instead of xref/yref parameters?
- 	 	 
+
 ``nxpix [integer]``
     Number of map pixels in Right Ascension or Galactic longitude.
- 	 	 
+
 ``nypix [integer]``
     Number of map pixels in Declination or Galactic latitude.
- 	 	 
+
 ``binsz [real]``
     Map pixel size (in degrees/pixel).
- 	 	 
+
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
- 	 	 
+
 ``proj <AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN> [string]``
     Projection method.
 
 ``xref [real]``
     Right Ascension / Galactic longitude of map centre (J2000, in degrees).
- 	 	 
+
 ``yref [real]``
     Declination / Galactic latitude of map centre (J2000, in degrees).
- 	 	 
+
 
 Standard parameters
 -------------------
@@ -107,24 +110,24 @@ Standard parameters
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether an existing output TS map file should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file
     output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = cstsmapsplit.log) [string]``
     Name of log file.

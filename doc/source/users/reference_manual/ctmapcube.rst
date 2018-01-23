@@ -96,7 +96,7 @@ Standard parameters
     Enables debug mode. In debug mode the executable will dump any log file output to the console.
 
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = ctmapcube.log) [string]``
     Name of log file.

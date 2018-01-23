@@ -1,7 +1,7 @@
 .. _csiactobs:
 
 csiactobs
-===========
+=========
 
 Creates an observation XML file for IACTs using a list of observation IDs as
 input.
@@ -37,8 +37,8 @@ that will be in the output XML model.
 
 If an observation that given in the input ASCII file is not available on the user
 machine, the script dumps a warning into the logfile and the observation is
-skipped. 
- 
+skipped.
+
 
 General parameters
 ------------------
@@ -48,16 +48,16 @@ General parameters
 
 ``prodname [string]``
     Name of FITS production (Run :doc:`csiactdata` to view your options).
-    
+
 ``infile [file]``
     Input runlist ASCII file.
 
 ``(inmodel = NONE) [file]``
     Input model XML file.
-    
+
 ``outobs [file]``
     Output Observation Definition XML file.
-    
+
 ``outmodel [file]``
     Output model XML file.
 
@@ -66,7 +66,7 @@ General parameters
 
 ``(master_indx = master.json) [file]``
     Name of master index file.
-    
+
 ``(bkg_scale = yes) [boolean]``
     Specifies whether the background scaling factor from the observation index
     file should be applied if available. 
@@ -82,10 +82,10 @@ General parameters
 
 ``(edisp_hiera = edisp_2d) [string]``
     Hierarchy of energy disperson formats.
-    
+
 ``(bkg_hiera = bkg_3d) [string]``
     Hierarchy of background formats.
- 
+
 ``(bkg_mod_hiera = irf|aeff|gauss) [string]``
     Hierarchy of background models.
 
@@ -107,30 +107,30 @@ General parameters
 ``(bkg_range_factor = 100.0) [real]``
     Factor to determine range of background normalisation.
 
-    
+
 Standard parameters
 -------------------
 
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether existing output files should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = csiactobs.log) [filename]``
     Log filename.

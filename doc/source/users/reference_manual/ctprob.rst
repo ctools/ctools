@@ -22,22 +22,22 @@ General parameters
 
 ``inobs [file]``
     Input event list or observation definition XML file
- 	 	 
+
 ``outobs [file]``
     Output event list or observation definition XML file.
- 	 	 
+
 ``(prefix = "prob_") [string]``
     Prefix for output event lists in observation definition XML file.
- 	 	 
+
 ``inmodel [string]``
     Input model definition XML file.
 
 ``caldb [string]``
     Calibration database.
- 	 	 
+
 ``irf [string]``
     Instrument response function.
- 	 	 
+
 ``(edisp = no) [boolean]``
     Applies energy dispersion to response computation.
 
@@ -51,23 +51,23 @@ Standard parameters
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether existing output files should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = ctprob.log) [string]``
     Name of log file.

@@ -11,14 +11,25 @@ Synopsis
 
 This script generates pull distributions for all free model parameters.
 The pull is defined as the fitted model parameter value minus the true
-value, divided by the parameter error. cspull will perform ``ntrials`` 
+value, divided by the parameter error. :ref:`cspull` will perform ``ntrials``
 statistically independent Monte Carlo simulations followed by maximum
 likelihood model fitting to derive the pull distribution for each free
 model parameter. If the model fit is unbiased and the parameters are 
 correct, the pull distribution should follow a Gaussian centred on 0
 and with a sigma parameter of 1.
 
-cspull will generate an ASCII file in comma-separated value (CSV) format,
+The script can generate pull distributions for unbinned, binned, stacked or
+On/Off analyses. The script always starts from simulating an event list. If
+the ``enumbins`` parameter is zero and ``onsrc=NONE`` an unbinned analysis will
+be performed. If ``enumbins`` is positive and ``onsrc=NONE`` the script will
+perform a binned analysis. To perform a stacked analysis, an observation definition
+XML file with response cube information has to be specified for the ``inobs``
+parameter. Finally, if the ``onsrc`` parameter is set to the name of a source in
+the input model (specified via the ``inmodel`` parameter), the script will perform
+an On/Off analysis using the ``REFLECTED`` method and a On region radius that is
+given by the ``onrad`` parameter.
+
+:ref:`cspull` will generate an ASCII file in comma-separated value (CSV) format,
 containing one row per pull. The first row is a header row providing the 
 column names. The following rows give the pull results, one row per pull. 
 This includes for each parameter the parameter value, error and pull. The 
@@ -35,7 +46,7 @@ of trials. Both scripts require matplotlib for plotting.
 General parameters
 ------------------
 
-``inobs [file]``
+``(inobs = NONE) [file]``
     Event list, counts cube, or observation definition XML file.
 
 ``inmodel [file]``
@@ -99,7 +110,7 @@ General parameters
     Number of pixels for binned analysis.
 
 ``binsz [real]``
-    Pixel size for binned analysis.
+    Pixel size for binned analysis (degrees/pixel).
 
 ``(statistic = DEFAULT) <DEFAULT|CSTAT|WSTAT|CHI2> [string]``
     Optimization statistic. ``DEFAULT`` uses the default statistic for all
@@ -139,7 +150,7 @@ Standard parameters
     output to the console.
 
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = cspull.log) [string]``
     Log filename.

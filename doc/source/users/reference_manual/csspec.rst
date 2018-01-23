@@ -19,23 +19,28 @@ significance of the source detection. Optionally, it also computes an upper
 flux limit that is particularly useful in case that the source is not
 significantly detected within a spectral bin (hidden parameter ``calc_ulim``).
 
-The script works on binned and unbinned data.
+There are two fundamental methods to run the script depending on the value of
+the ``method`` parameter. If ``method=SLICE`` the energy interval defined by the
+``emin`` and ``emax`` parameters is divided into a number of energy bins and an
+independent maximum likelihood fit is performed in each of the energy bins,
+while if ``method=NODES`` the spectral model will be replaced by a node function
+that will be fit to all data. The latter is particularly useful if non-CTA data
+should be fitted such as data from Fermi/LAT or COMPTEL. By default, ``method`` is
+set to ``AUTO`` which will automatically select the method based on the input data.
+For CTA-only observations ``SLICE`` will be used, otherwise ``NODES`` will be used.
 
-For unbinned data, the spectral binning is either defined by a FITS file
-containing the energy boundaries of each bin (option ``ebinalg=FILE``) or
-as ``enumbins`` bins spread linearly  (option ``ebinalg=LIN``) or
-logarithmically (option ``ebinalg=LOG``) from a minimum energy given by
-``emin`` to a maximum energy given by ``emax``.
+The spectral binning is either defined by a FITS file containing the energy
+boundaries of each bin (option ``ebinalg=FILE``) or as ``enumbins`` bins spread
+linearly  (option ``ebinalg=LIN``) or logarithmically (option ``ebinalg=LOG``)
+from a minimum energy, given by ``emin``, to a maximum energy, given by ``emax``.
 
-For binned data, all energy bins within the counts cube that overlap with
-the energy range spanned by ``emin`` and ``emax`` are considered. The number
-of spectral bins is only approximately determined by the ``enumbins`` parameter.
-Naturally, the script cannot create more spectral bins than the number of
-energy bins that are available in the cube. Also, in case that ``enumbins``
-is smaller than the number of energy bins in the cube, the script will fit
-several layers of the counts cube for each spectral bin. The number of 
-layers fit is determined by the total number of energy bins divided by the
-``enumbins`` parameter.
+For binned, stacked or On/Off CTA data, all energy bins that overlap with the
+energy range spanned by ``emin`` and ``emax`` are considered. The number of spectral
+bins is only approximately determined by the ``enumbins`` parameter. Naturally,
+:ref:`csspec` cannot create more spectral bins than the number of energy bins that
+are available in the data. In case that there are more energy bins in the data
+than the number of spectral bins that are requested, :ref:`csspec` will fit the
+data in all energy bins that overlap with a given spectral bin simultaneously.
 
 On output, the script will provide a FITS file with the fitted source 
 spectrum in form of a binary table. Each row corresponds to a spectral bin.
@@ -44,11 +49,14 @@ the fitted flux and flux error, the Test Statistics value (option
 ``calc_ts=yes``), the upper flux limit (option ``calc_ulim=yes``) and the
 predicted number of events (only for unbinned data).
 
+.. warning::
+   The upper limit computation is not yet implemented for the ``NODES`` method.
+
 
 General parameters
 ------------------
 
-``(inobs = NONE) [file]``
+``inobs [file]``
     Input event list, counts cube or observation definition XML file.
 
 ``inmodel [file]``
@@ -84,11 +92,11 @@ General parameters
 
 ``method <SLICE|NODES|AUTO> [string]``
     Spectrum generation method.
-    ``SLICE``: Slice energy interval into ``enumbins`` independent bins.
-    ``NODES``: Replace spectral model by node function with ``enumbins`` nodes.
-    ``AUTO`` : Automatically select method based on input data. Will use
-               ``SLICE`` for CTA-only observations and ``NODES`` for
-               observations including non-CTA data.
+    ``SLICE`` will slice energy interval into ``enumbins`` independent bins,
+    ``NODES`` will replace spectral model by node function with ``enumbins``
+    nodes, and ``AUTO`` will automatically select the method based on the input
+    data. For CTA-only observations ``SLICE`` will be used, otherwise ``NODES``
+    will be used.
 
 ``emin [real]``
     Lower energy limit of events (in TeV).
@@ -153,7 +161,7 @@ Standard parameters
     output to the console.
 
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = csspec.log) [filename]``
     Log filename.

@@ -46,10 +46,10 @@ General parameters
 
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction instead of ra/dec parameters?
- 	 	 
+
 ``ra [real]``
     Right Ascension of circular selection region centre (J2000, in degrees).
- 	 	 
+
 ``dec [real]``
     Declination of circular selection region centre (J2000, in degrees).
 
@@ -61,10 +61,10 @@ General parameters
 
 ``emin [real]``
     Lower energy limit (in TeV).
- 	 	 
+
 ``emax [real]``
     Upper energy limit (in TeV).
- 	 	 
+
 
 Standard parameters
 -------------------
@@ -75,23 +75,23 @@ Standard parameters
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether an existing output counts cube file should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = ctcubemask.log) [string]``
     Name of log file.

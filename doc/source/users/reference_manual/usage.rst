@@ -1,7 +1,10 @@
-Description of ctools parameters in the reference manual
-=====================================
+.. _sec_usage:
 
-For a generic introduction to ctools and user parameters see `here <../user_manual/introduction.html>`__.
+Description of ctools parameters in the :ref:`reference`
+========================================================
+
+For a generic introduction to ctools and user parameters see
+`here <../user_manual/introduction.html>`__.
 
 Automatic parameters
 --------------------
@@ -27,18 +30,18 @@ Examples
 
 ``infile [file]``
     Describes an automatic (queried) file-type parameter with no default value.
- 	 	 
+
 ``irf = South_50h <North_50h|South_50h> [string]``
     Describes an automatic (queried) string-type parameter with two value
     options.
- 	 	 
+
 ``(plot = yes) [boolean]``
     Describes a hidden bool-type parameter named plot, whose default value
     is yes (true).
- 	 	 
+
 .. note::
 
-  You can set hidden parameters at runtime by specifying them explicitly on 
-  the command line; for example:
+   You can set hidden parameters at runtime by specifying them explicitly on 
+   the command line; for example:
 
-  ``ctobssim start_time=900``
+   ``ctobssim start_time=900``

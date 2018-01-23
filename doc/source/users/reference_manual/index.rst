@@ -63,8 +63,8 @@ cscripts
    csspec --- Computes spectral points <csspec>
    cssrcdetect --- Detects sources in sky map <cssrcdetect>
    cstsdist --- Generates Test Statistic distribution <cstsdist>
-   cstsmapsplit --- Creates commands to split the Test Statistic map computations <cstsmapsplit>
    cstsmapmerge --- Merges slices from Test Statistic map computations <cstsmapmerge>
+   cstsmapsplit --- Creates commands to split the Test Statistic map computations <cstsmapsplit>
    csviscube --- Computes visibility cube <csviscube>
 
 

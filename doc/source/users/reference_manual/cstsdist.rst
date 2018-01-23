@@ -106,7 +106,7 @@ Standard parameters
     output to the console.
 
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = cstsdist.log) [string]``
     Log filename.
@@ -117,4 +117,3 @@ Related tools or scripts
 
 :doc:`ctlike`
 :doc:`cspull`
-

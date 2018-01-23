@@ -21,28 +21,28 @@ General parameters
 ------------------
 
 ``inobs [file]``
-    Input event list or observation definition XML file
+    Input event list or observation definition XML file.
 
 ``inmodel [file]``
-    Input model definition XML file
+    Input model definition XML file.
 
 ``outmodel [file]``
-    Output model definition XML file
+    Output model definition XML file.
 
 ``(roilimit = 4.5) [real]``
-    Maximum RoI radius (degrees)
+    Maximum RoI radius (degrees).
 
 ``(roimargin = 0.1) [real]``
-    Radial margin to be added to RoIs (degrees)
+    Radial margin to be added to RoIs (degrees).
 
 ``(ethres = 0.1) [real]``
-    Energy threshold for source flux selection (TeV)
+    Energy threshold for source flux selection (TeV).
 
 ``(fluxlimit = 1.0e-12) [real]``
-    Minimum source flux for selection (ph/cm2/s)
+    Minimum source flux for selection (ph/cm2/s).
 
 ``(tslimit = 10.0) [real]``
-    Minimum Test Statistic for selection
+    Minimum Test Statistic for selection.
 
 ``(fit_pos = yes) [boolean]``
     Fit source positions?
@@ -57,24 +57,24 @@ Standard parameters
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether an existing output model file should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file
     output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = csmodelselect.log) [filename]``
     Log filename.

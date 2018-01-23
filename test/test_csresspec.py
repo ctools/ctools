@@ -77,7 +77,7 @@ class Test(test):
                           ' outfile="csresspec_cmd1.fits"' + \
                           ' inmodel="' + self._model + '"' + \
                           ' caldb="' + self._caldb + '" irf="' + self._irf + '"' + \
-                          ' emin=0.1 emax=100.0 enumbins=20' + \
+                          ' emin=0.1 emax=100.0 enumbins=20 ebinalg="LOG"' + \
                           ' mask=no algorithm="SUB"' + \
                           ' logfile="csresspec_cmd1.log" chatter=4'
 
@@ -93,7 +93,7 @@ class Test(test):
                           ' outfile="csresspec_cmd2.fits"' + \
                           ' inmodel="' + self._model + '"' + \
                           ' caldb="' + self._caldb + '" irf="' + self._irf + '"' + \
-                          ' emin=0.1 emax=100.0 enumbins=20' + \
+                          ' emin=0.1 emax=100.0 enumbins=20 ebinalg="LOG"' + \
                           ' mask=no algorithm="SUBDIVSQRT"' + \
                           ' logfile="csresspec_cmd2.log" debug=yes chatter=2'
 
@@ -119,6 +119,7 @@ class Test(test):
         resspec['inmodel']   = self._model
         resspec['caldb']     = self._caldb
         resspec['irf']       = self._irf
+        resspec['ebinalg']   = 'LOG'
         resspec['emin']      = 0.1
         resspec['emax']      = 100.0
         resspec['enumbins']  = 20
@@ -135,14 +136,15 @@ class Test(test):
         # Check result file
         self._check_result_file('csresspec_py1.fits', 20, 5)
 
-        # Set-up csresspec for event list
-        # with computation of individual model components
+        # Set-up csresspec for event list with computation of individual
+        # model components
         resspec = cscripts.csresspec()
         resspec['inobs']      = self._events
         resspec['outfile']    = 'csresspec_py2.fits'
         resspec['inmodel']    = self._model
         resspec['caldb']      = self._caldb
         resspec['irf']        = self._irf
+        resspec['ebinalg']   = 'LOG'
         resspec['emin']       = 0.1
         resspec['emax']       = 100.0
         resspec['enumbins']   = 20
@@ -181,8 +183,7 @@ class Test(test):
         # Check result file
         self._check_result_file('csresspec_py3.fits', 20, 5)
 
-        # Set-up csresspec for counts cube
-        # with source mask
+        # Set-up csresspec for counts cube with source mask
         resspec = cscripts.csresspec()
         resspec['inobs']     = self._cntcube
         resspec['modcube']   = 'NONE'
