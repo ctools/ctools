@@ -83,3 +83,5 @@ Clean up
   Derive :ref:`cslightcrv`, :ref:`csphasecrv`, :ref:`cspull`, :ref:`cssens`,
   :ref:`csspec` and :ref:`cstsdist` scripts from ``cslikelihood`` base
   class
+* [`1567 <https://cta-redmine.irap.omp.eu/issues/1567>`_] -
+  Revise :ref:`cstsdist parameters`
