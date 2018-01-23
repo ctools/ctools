@@ -1,4 +1,4 @@
-22 January 2018
+23 January 2018
 
 
 Introduction
@@ -41,6 +41,8 @@ None
 ctbutterfly - Generate butterfly diagrams
 -----------------------------------------
 Add "statistic" parameter to allow setting of optimizer statistic (#2237).
+
+Add butterfly() method to return the butterfly diagram as CSV object (#1512).
 
 
 ctcubemask - CTA cube filtering

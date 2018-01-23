@@ -58,6 +58,8 @@ Improvements
   Add ``NODES`` method to :ref:`csspec` to support non-CTA analysis
 * [`1836 <https://cta-redmine.irap.omp.eu/issues/1836>`_] -
   Set ``OBS_ID`` in :ref:`ctobssim`
+* [`1512 <https://cta-redmine.irap.omp.eu/issues/1512>`_] -
+  Add ``ctbutterfly::butterfly()`` method to return butterfly diagram
 
 
 New features
