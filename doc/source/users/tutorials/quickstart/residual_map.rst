@@ -1,12 +1,12 @@
-.. _start_residuals:
+.. _start_residual_map:
 
-Inspecting the fit residuals
-----------------------------
+Inspecting the spatial fit residuals
+------------------------------------
 
   .. admonition:: What you will learn
 
      You will learn how to use the :ref:`csresmap` script to **inspect the
-     fit residuals**.
+     spatial fit residuals**.
 
 After having done a maximum likelihood fit it is good practice to inspect the
 fit residuals. You do this with the :ref:`csresmap` script that creates a

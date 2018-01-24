@@ -17,7 +17,8 @@ examples should take about an hour, so grab some coffee before you start.
    binning
    response
    fitting
-   residuals
+   residual_map
+   residual_spectrum
    butterfly
    spectrum
    unbinned

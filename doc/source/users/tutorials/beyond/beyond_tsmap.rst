@@ -33,15 +33,15 @@ nominal position of the Crab nebula with a grid spacing of 0.02°.
 
   $ cttsmap
   Input event list, counts cube or observation definition XML file [events.fits] obs.xml
-  Calibration database [prod2] 
-  Instrument response function [South_0.5h] 
-  Input model XML file [$CTOOLS/share/models/crab.xml] 
-  Test source name [Crab] 
-  First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 
-  Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 
-  Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR] 
-  Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] 
-  Image scale (in degrees/pixel) [0.02] 
+  Calibration database [prod2]
+  Instrument response function [South_0.5h]
+  Test source name [Crab]
+  Input model definition XML file [$CTOOLS/share/models/crab.xml]
+  First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63]
+  Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01]
+  Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
+  Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+  Image scale (in degrees/pixel) [0.02]
   Size of the X axis in pixels [200] 10
   Size of the Y axis in pixels [200] 10
   Output Test Statistic map file [tsmap.fits] 
