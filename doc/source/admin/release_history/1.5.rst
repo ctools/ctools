@@ -12,6 +12,9 @@ In particular, this release provides:
 
 * Support of classical IACT analysis
 * Specifcation of times in various formats (UTC, MJD, JD, MET)
+* Spectrum generation for non-IACT data
+* Generation of residual spectra
+* Jupyter notebooks
 
 
 Bug fixes
@@ -28,6 +31,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`2297 <https://cta-redmine.irap.omp.eu/issues/2297>`_] -
+  Add ``tmin`` and ``tmax`` parameters to :ref:`csobsselect`
 * [`2295 <https://cta-redmine.irap.omp.eu/issues/2295>`_] -
   Add ``ctools::time_reference`` constant and remove ``ctools::time_reference()``
   method
@@ -77,6 +82,7 @@ New features
   Add :ref:`csmodelsois` script
 * [`1864 <https://cta-redmine.irap.omp.eu/issues/1864>`_] -
   Use t-type parameters for all ``tmin`` and ``tmax`` parameters
+
 
 Clean up
 --------

@@ -41,6 +41,7 @@ You do this with the :ref:`csobsselect` script by typing:
    Galactic longitude of selection centre (deg) (0-360) [184.56] 0.0
    Galactic latitude of selection centre (deg) (-90-90) [-5.79] 0.0
    Radius of selection circle (deg) (0-180) [5.0] 3.0
+   Start time (UTC string, JD, MJD or MET in seconds) [NONE] 
    Output observation definition XML file [outobs.xml] obs.xml
 
 You selected ``CIRCLE`` as the shape of the pointing selection region,

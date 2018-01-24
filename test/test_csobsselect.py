@@ -72,7 +72,7 @@ class Test(test):
         cmd = csobsselect+' inobs="'+self._events+'"'+ \
                           ' outobs="csobsselect_cmd1.xml"'+ \
                           ' pntselect="CIRCLE" coordsys="CEL" ra=83.63'+ \
-                          ' dec=22.01 rad=5.0'+ \
+                          ' dec=22.01 rad=5.0 tmin=NONE tmax=NONE'+ \
                           ' logfile="csobsselect_cmd1.log" chatter=1'
 
         # Check if execution was successful
@@ -86,7 +86,7 @@ class Test(test):
         cmd = csobsselect+' inobs="observation_that_does_not_exist.xml"'+ \
                           ' outobs="csobsselect_cmd2.xml"'+ \
                           ' pntselect="CIRCLE" coordsys="CEL" ra=83.63'+ \
-                          ' dec=22.01 rad=5.0'+ \
+                          ' dec=22.01 rad=5.0 tmin=NONE tmax=NONE'+ \
                           ' logfile="csobsselect_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
@@ -121,12 +121,14 @@ class Test(test):
 
         # Now set csobsselect parameters
         obsselect['inobs']     = self._events
-        obsselect['outobs']    = 'csobsselect_py1.xml'
         obsselect['pntselect'] = 'CIRCLE'
         obsselect['coordsys']  = 'CEL'
         obsselect['ra']        = 83.63
         obsselect['dec']       = 22.01
         obsselect['rad']       = 5.0
+        obsselect['tmin']      = 'NONE'
+        obsselect['tmax']      = 'NONE'
+        obsselect['outobs']    = 'csobsselect_py1.xml'
         obsselect['logfile']   = 'csobsselect_py1.log'
         obsselect['chatter']   = 2
 
@@ -139,12 +141,14 @@ class Test(test):
         self._check_observation_file('csobsselect_py1.xml', 1)
 
         # Execute csobsselect script again, now in Galactic coordinates
-        obsselect['outobs']    = 'csobsselect_py2.xml'
         obsselect['pntselect'] = 'CIRCLE'
         obsselect['coordsys']  = 'GAL'
         obsselect['glon']      = 184.56
         obsselect['glat']      = -5.79
         obsselect['rad']       = 5.0
+        obsselect['tmin']      = 'NONE'
+        obsselect['tmax']      = 'NONE'
+        obsselect['outobs']    = 'csobsselect_py2.xml'
         obsselect['logfile']   = 'csobsselect_py2.log'
         obsselect['chatter']   = 3
         obsselect.logFileOpen()  # Needed to get a new log file
@@ -154,13 +158,15 @@ class Test(test):
         self._check_observation_file('csobsselect_py2.xml', 1)
 
         # Execute csobsselect script again, now a box in Galactic coordinates
-        obsselect['outobs']    = 'csobsselect_py3.xml'
         obsselect['pntselect'] = 'BOX'
         obsselect['coordsys']  = 'GAL'
         obsselect['glon']      = 184.56
         obsselect['glat']      = -5.79
         obsselect['width']     = 5.0
         obsselect['height']    = 5.0
+        obsselect['tmin']      = 'NONE'
+        obsselect['tmax']      = 'NONE'
+        obsselect['outobs']    = 'csobsselect_py3.xml'
         obsselect['logfile']   = 'csobsselect_py3.log'
         obsselect['chatter']   = 4
         obsselect.logFileOpen()  # Needed to get a new log file
@@ -170,13 +176,15 @@ class Test(test):
         self._check_observation_file('csobsselect_py3.xml', 1)
 
         # Execute csobsselect script again, now a box in celestial coordinates
-        obsselect['outobs']    = 'csobsselect_py4.xml'
         obsselect['pntselect'] = 'BOX'
         obsselect['coordsys']  = 'CEL'
         obsselect['ra']        = 83.63
         obsselect['dec']       = 22.01
         obsselect['width']     = 5.0
         obsselect['height']    = 5.0
+        obsselect['tmin']      = 'NONE'
+        obsselect['tmax']      = 'NONE'
+        obsselect['outobs']    = 'csobsselect_py4.xml'
         obsselect['logfile']   = 'csobsselect_py4.log'
         obsselect['chatter']   = 4
         obsselect.logFileOpen()  # Needed to get a new log file
@@ -184,6 +192,24 @@ class Test(test):
 
         # Check model file
         self._check_observation_file('csobsselect_py4.xml', 1)
+
+        # Execute csobsselect script again, now with time selection
+        obsselect['pntselect'] = 'BOX'
+        obsselect['coordsys']  = 'CEL'
+        obsselect['ra']        = 83.63
+        obsselect['dec']       = 22.01
+        obsselect['width']     = 5.0
+        obsselect['height']    = 5.0
+        obsselect['tmin']      = 0.0
+        obsselect['tmax']      = 100.0
+        obsselect['outobs']    = 'csobsselect_py5.xml'
+        obsselect['logfile']   = 'csobsselect_py5.log'
+        obsselect['chatter']   = 4
+        obsselect.logFileOpen()  # Needed to get a new log file
+        obsselect.execute()
+
+        # Check model file
+        self._check_observation_file('csobsselect_py5.xml', 0)
 
         # Return
         return

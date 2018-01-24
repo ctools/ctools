@@ -2,7 +2,7 @@
 # ==========================================================================
 # Selects observations from an observation definition XML file
 #
-# Copyright (C) 2016-2017 Juergen Knoedlseder
+# Copyright (C) 2016-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -68,6 +68,9 @@ class csobsselect(ctools.csobservation):
             self['width'].real()
             self['height'].real()
 
+        # Query time interval
+        self._get_gti()
+
         # Query ahead output model filename
         if self._read_ahead():
             self['outobs'].filename()
@@ -83,7 +86,34 @@ class csobsselect(ctools.csobservation):
         # Return
         return
 
-    def _select_observation(self, obs):
+    def _log_selection(self, obs, msg):
+        """
+        Log observation selection
+        
+        Parameters
+        ----------
+        obs : `~gammalib.GObservation`
+            Observation
+        msg : str
+            Message
+        """
+        # Set observation name
+        if len(obs.name()) > 0:
+            name = obs.name()
+        else:
+            name = 'Observation'
+
+        # Prepend obervation ID
+        if len(obs.id()) > 0:
+            msg = obs.id()+' '+msg
+
+        # Log observation selection
+        self._log_value(gammalib.NORMAL, name, msg)
+
+        # Return
+        return
+
+    def _select_observation(self, obs, gti):
         """
         Select observation
 
@@ -91,6 +121,8 @@ class csobsselect(ctools.csobservation):
         ----------
         obs : `~gammalib.GObservation`
             Observation
+        gti : `~gammalib.GGti`
+            Good time intervals
 
         Returns
         -------
@@ -103,14 +135,27 @@ class csobsselect(ctools.csobservation):
         # Continue only if observation is a CTA observation
         if obs.classname() == 'GCTAObservation':
 
-            # Get selection type
-            pntselect = self['pntselect'].string()
+            # Get observation start and stop time
+            obs_gti = obs.gti()
+            tstart  = obs_gti.tstart()
+            tstop   = obs_gti.tstop()
 
-            # Dispatch according to selection type
-            if pntselect == 'CIRCLE':
-                select = self._select_circle(obs)
+            # If the observation is not within the time selection then skip it
+            if gti.size() > 0 and not gti.contains(tstart) and \
+                                  not gti.contains(tstop):
+                self._log_selection(obs, 'outside time interval')
+
+            # ... otherwise select spatially
             else:
-                select = self._select_box(obs)
+
+                # Get selection type
+                pntselect = self['pntselect'].string()
+
+                # Dispatch according to selection type
+                if pntselect == 'CIRCLE':
+                    select = self._select_circle(obs)
+                else:
+                    select = self._select_box(obs)
 
         # Return selection flag
         return select
@@ -150,18 +195,8 @@ class csobsselect(ctools.csobservation):
             select = False
             msg    = 'outside selection circle'
 
-        # Set observation name
-        if len(obs.name()) > 0:
-            name = obs.name()
-        else:
-            name = 'Observation'
-
-        # Prepend obervation ID
-        if len(obs.id()) > 0:
-            msg = obs.id()+' '+msg
-
         # Log observation selection
-        self._log_value(gammalib.NORMAL, name, msg)
+        self._log_selection(obs, msg)
 
         # Return selection flag
         return select
@@ -240,18 +275,8 @@ class csobsselect(ctools.csobservation):
                     select = True
                     msg    = 'inside selection box'
 
-        # Set observation name
-        if len(obs.name()) > 0:
-            name = obs.name()
-        else:
-            name = 'Observation'
-
-        # Prepend obervation ID
-        if len(obs.id()) > 0:
-            msg = obs.id()+' '+msg
-
         # Log observation selection
-        self._log_value(gammalib.NORMAL, name, msg)
+        self._log_selection(obs, msg)
 
         # Return selection flag
         return select
@@ -269,6 +294,9 @@ class csobsselect(ctools.csobservation):
         # Get parameters
         self._get_parameters()
 
+        # Get Good Time Interval (empty if no time selection is applied)
+        gti = self._get_gti()
+
         # Initialise empty observation container for selected observations
         selected_obs = gammalib.GObservations()
 
@@ -282,7 +310,7 @@ class csobsselect(ctools.csobservation):
         for obs in self.obs():
 
             # If observation is selected then append observation
-            if self._select_observation(obs):
+            if self._select_observation(obs, gti):
                 selected_obs.append(obs)
 
         # Copy selected observations into observation

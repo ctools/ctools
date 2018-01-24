@@ -10,9 +10,9 @@ Synopsis
 --------
 
 This script selects all observations from an observation definiton XML file that
-have pointings within a specified selection region and writes these observations
-into a new observation definition XML file. Possible selection regions are a
-circle and a box, either in Galactic or Celestial coordinates.
+have pointings within a specified selection region and time interval and writes
+these observations into a new observation definition XML file. Possible selection
+regions are a circle and a box, either in Galactic or Celestial coordinates.
 
 
 General parameters
@@ -50,6 +50,16 @@ General parameters
 
 ``height [real]``
     Height of selection box (degrees).
+
+``tmin [time]``
+    Start time (UTC string, JD, MJD or time in seconds).
+    If ``INDEF``, ``NONE``, ``UNDEF`` or ``UNDEFINED`` is passed as value, no time
+    selection will be performed.
+
+``tmax [time]``
+    Stop time (UTC string, JD, MJD or time in seconds).
+    If ``INDEF``, ``NONE``, ``UNDEF`` or ``UNDEFINED`` is passed as value, no time
+    selection will be performed.
 
 
 Standard parameters

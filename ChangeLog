@@ -1,8 +1,9 @@
-2018-01-23
+2018-01-24
 
         * Version 1.5.0 released
         ========================
 
+        Add tmin and tmax parameters to csobsselect (#2297)
         Change DATE_OBS, DATE_END, TIME_OBS and TIME_END FITS keywords into DATA-OBS,
           DATE-END, TIME-OBS and TIME-END
         Add CUSTOM background method to csphagen script (#2284)

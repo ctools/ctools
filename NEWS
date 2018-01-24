@@ -1,4 +1,4 @@
-23 January 2018
+24 January 2018
 
 
 Introduction
@@ -235,7 +235,7 @@ None
 
 csobsselect - Select observations
 ---------------------------------
-None
+Add tmin and tmax parameters to allow selection of observation by time (#2297).
 
 
 csphagen - Generate On/Off observations
