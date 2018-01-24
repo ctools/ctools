@@ -66,7 +66,7 @@ observation definition XML file:
        <parameter name="EventList" file="south.fits"/>
        <parameter name="Calibration" database="prod2" response="South_0.5h"/>
      </observation>
-  </observation_list>
+   </observation_list>
 
 Each observation now has a ``Calibration`` parameter with the attributes
 ``database`` and ``response``.
