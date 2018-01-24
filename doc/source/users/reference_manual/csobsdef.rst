@@ -9,11 +9,10 @@ Generates an observation definition file.
 Synopsis
 --------
 
-The csobsdef script generates an observation definition file from
-a pointing list. The pointing list is a comma-separated value (CSV)
-ASCII file with header keywords in the first row followed by a list
-of pointings (one pointing per row). The following header keywords
-are supported (case sensitive, column order irrelevant):
+This script generates an observation definition file from a pointing list. The
+pointing list is a comma-separated value (CSV) ASCII file with header keywords
+in the first row followed by a list of pointings (one pointing per row). The
+following header keywords are supported (case sensitive, column order irrelevant):
 
 - name     - Observation name string
 - id       - Unique observation identifier string
@@ -29,10 +28,10 @@ are supported (case sensitive, column order irrelevant):
 - caldb    - Calibration database
 - irf      - Response function name
 
-Only the pairs (ra,dec) or (lon,lat) are mandatory header keywords.
-All other keywords are optional and can be specified when calling
-csobsdef as user parameters. The only exception is the "duration"
-keyword that will automatically be queried.
+Only the pairs (ra,dec) or (lon,lat) are mandatory header keywords. All other
+keywords are optional and can be specified when calling :ref:`csobsdef` as user
+parameters. The only exception is the ``duration`` keyword that will automatically
+be queried.
 
 Here some usage examples:
 

@@ -72,7 +72,8 @@ class Test(test):
                       ' inmodel="'+self._model+'"'+ \
                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' rad=5.0 ra=83.63 dec=22.01 tmin=0.0 tmax=1800'+ \
-                      ' emin=0.1 emax=100.0 enumbins=10 nxpix=40 nypix=40'+ \
+                      ' emin=0.1 emax=100.0 enumbins=10  ebinalg="LOG"'+ \
+                      ' nxpix=40 nypix=40'+ \
                       ' binsz=0.1 coordsys="CEL" proj="CAR"'+ \
                       ' xref=83.63 yref=22.01'+ \
                       ' logfile="ctmodel_cmd1.log" chatter=1'
@@ -91,7 +92,8 @@ class Test(test):
                       ' inmodel="model_that_does_not_exist.xml"'+ \
                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' rad=5.0 ra=83.63 dec=22.01 tmin=0.0 tmax=1800'+ \
-                      ' emin=0.1 emax=100.0 enumbins=10 nxpix=40 nypix=40'+ \
+                      ' emin=0.1 emax=100.0 enumbins=10  ebinalg="LOG"'+ \
+                      ' nxpix=40 nypix=40'+ \
                       ' binsz=0.1 coordsys="CEL" proj="CAR"'+ \
                       ' xref=83.63 yref=22.01'+ \
                       ' logfile="ctmodel_cmd2.log" debug=yes chatter=1'
@@ -142,6 +144,7 @@ class Test(test):
         model['dec']      = 22.01
         model['tmin']     = 0
         model['tmax']     = 1800
+        model['ebinalg']  = 'LOG'
         model['emin']     = 0.1
         model['emax']     = 100.0
         model['enumbins'] = 10

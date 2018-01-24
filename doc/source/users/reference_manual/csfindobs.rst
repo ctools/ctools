@@ -17,7 +17,9 @@ to further constrain criteria to select observations. The user can e.g. select
 all observations within a certain zenith angle range by specifying the hidden
 parameter expression. For example
 
-``csfindobs expression="ZEN_PNT<50&&ZEN_PNT>40"``
+.. code-block:: bash
+
+   $ csfindobs expression="ZEN_PNT<50&&ZEN_PNT>40"
 
 is used to select observations with zenith angle range between 40 and 50 degrees.
 

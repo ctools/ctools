@@ -14,7 +14,7 @@ the variation in the effective area and the background template of the response
 functions. The script takes either an observation definition XML file or a
 specific instrument response function on input.
 
-csebins writes an energy boundary extension into a FITS file.
+:ref:`csebins` writes an energy boundary extension into a FITS file.
 
 
 General parameters

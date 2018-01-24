@@ -16,7 +16,7 @@ which is the ratio between reconstructed and true photon energy. The energy
 binning of the cube may be either linear, logarithmic, or custom defined
 using an input file
 
-ctedispcube requires on input the event list or observation definition XML
+:ref:`ctedispcube` requires on input the event list or observation definition XML
 file that has been used in the generation of the counts cube using :doc:`ctbin`.
 
 It is not recommended to use the counts cube for the energy dispersion 
@@ -28,7 +28,7 @@ only little over the field of view of the camera it is recommended to use a
 rather coarse spatial binning to keep the file size manageable (with a typical
 value of ``binsz=1.0``).
 
-ctedispcube generates an energy dispersion cube FITS file comprising three
+:ref:`ctedispcube` generates an energy dispersion cube FITS file comprising three
 extensions. The primary extension contains a 4-dimensional image that contains
 the energy disperison values. The next extension named ``ENERGIES`` contains
 a binary table that defines the energies of the energy dispersion cube. The

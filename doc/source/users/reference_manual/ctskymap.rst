@@ -20,7 +20,7 @@ parameter. By default, no background model is subtracted (method ``NONE``).
 If ``IRF`` is selected, the background template that are shipped with the
 Instrument Response Functions will be used for background subtraction.
 
-ctskymap generates a FITS file comprising a sky map as primary extension.
+:ref:`ctskymap` generates a FITS file comprising a sky map as primary extension.
 If a background subtraction method was selected, the FITS file will contain
 the additional extensions ``BACKGROUND`` and ``SIGNIFICANCE`` that contain
 the background map and a significance map, respectively. For the latter, the

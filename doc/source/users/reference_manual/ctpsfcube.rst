@@ -16,7 +16,7 @@ and offset angle between true and measured arrival direction of a photon.
 The energy binning of the cube may be either linear, logarithmic, or custom
 defined using an input file.
 
-ctpsfcube requires on input the event list or observation definition XML
+:ref:`ctpsfcube` requires on input the event list or observation definition XML
 file that has been used in the generation of the counts cube using :doc:`ctbin`.
 
 It is not recommended to use the counts cube for the point spread function 
@@ -28,7 +28,7 @@ function varies only slowly over the field of view of the camera it is
 recommended to use a rather coarse spatial binning to keep the file size 
 manageable (with a typical value of ``binsz=1.0``).
 
-ctpsfcube generates a point spread function cube FITS file comprising three
+:ref:`ctpsfcube` generates a point spread function cube FITS file comprising three
 extensions. The primary extension contains a 4-dimensional image that contains
 the point spread function values. The next extension named ``ENERGIES`` contains
 a binary table that defines the energies of the point spread function cube.

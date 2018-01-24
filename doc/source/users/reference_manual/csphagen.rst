@@ -9,18 +9,50 @@ Creates files necessary to perform a region-based spectral On/Off analysis.
 Synopsis
 --------
 
-This script can be used to derive from an observation or a set of observations
-the count spectra in a source region and in background regions, as well as the
-detector response (effective area, energy redistribution matrix), that can be
-used to perform a classical 1D spectral analysis. Regions can be placed
-automatically or by hand. The output files are saved in the OGIP format normally
-used in X-ray astronomy (PHA, ARF, RMF).
-`See here <https://heasarc.gsfc.nasa.gov/docs/heasarc/ofwg/docs/spectra/ogip_92_007/node5.html>`__.
+This script generates the files that are necessary for a region-based spectral
+On/Off analysis from one or several event lists. The output files are saved in
+the OGIP format normally used in X-ray astronomy (PHA, ARF, RMF),
+`see here for a description of the format <https://heasarc.gsfc.nasa.gov/docs/heasarc/ofwg/docs/spectra/ogip_92_007/node5.html>`__.
 
-The outputs are:
+If the ``bkgmethod`` parameter is ``REFLECTED``, the script will use an On region
+shape defined by the ``srcshape`` parameter and generate reflected regions by
+placing regions of the same shape that are reflected with respect to the pointing
+direction. So far only circular regions are supported, with a center that is
+specified by the ``ra`` and ``dec`` parameters if ``coordsys=CEL`` or the ``glon``
+and ``glat`` parameters if ``coordsys=GAL``, and a radius that is specified by the
+``rad`` parameter. Reflected regions are only generated for offset angles with
+respect to the pointing direction that are smaller than the value specified by
+the ``maxoffset`` parameter. If less than ``bkgregmin`` reflected regions can be
+found because the offset angle between source and pointing direction is too small,
+the observation will be skipped. Regions to be excluded for background
+determination can be specified using a mask file that is specified using the
+``inexclusion`` parameter. A mask file is a sky map where all pixel values that
+differ from zero will be used as exclusion region.
 
-1) the PHA, ARF, RMF files, either separately for each observation, or stacked
-   for a set of observations;
+Alternatively, if ``bkgmethod=CUSTOM`` is specified, the source and background
+regions will be specified using the ``srcregfile`` and ``bkgregfile`` parameters,
+respectively. Both parameters accept either a ds9 region file or a sky map where
+all non-zero pixel values define a region. In case that an observation definition
+XML file is specified as input using the ``inobs``, background region files can
+be specified separately for each observation using the ``OffRegions`` parameter
+in the format
+
+.. code-block:: xml
+
+   <observation name="Crab" id="00001" instrument="CTA">
+     <parameter name="OffRegions" file="ds9.reg"/>
+     ...
+   </observation>
+
+The :ref:`csphagen` script will produce on output an observation definition XML
+file that points to all relevant files. All relevant files will be prefixed with
+the string specified by the ``prefix`` parameter. If several observations are
+contained in the input observation definition XML file the script can either
+generate region based files for each of the observations or stack all
+observations into single files (controlled via the ``stack`` parameter). The
+script will write out:
+
+1) the PHA, ARF, RMF files;
 2) DS9 regions files listing the source and background regions for each
    observation;
 3) a new observation definition XML file.
@@ -39,8 +71,8 @@ General parameters
     Instrument response function.
 
 ``(inexclusion = NONE) [file]``
-    Optional FITS file containing a WCS map in the first hdu that defines sky
-    regions not to be used for background estimation (where map value != 0).
+    Optional FITS file containing a WCS map in the first extension that defines
+    sky regions not to be used for background estimation (where map value != 0).
 
 ``outobs [string]``
     Output observation definition XML file.
@@ -72,10 +104,11 @@ General parameters
     You may use :ref:`csebins` to generate a file with appropriate energy binning.
 
 ``(srcshape = CIRCLE) <CIRCLE> [string]``
-    Shape of the source region (``CIRCLE``: circular region around given position).
+    Shape of the source region. So far only ``CIRCLE`` exists which defines a
+    circular region around given position.
 
 ``coordsys <CEL|GAL> [string]``
-    Coordinate system (``CEL``: celestial; ``GAL``: galactic).
+    Coordinate system (CEL - celestial, GAL - galactic).
 
 ``ra [real]``
     Right Ascension of source region centre (deg).

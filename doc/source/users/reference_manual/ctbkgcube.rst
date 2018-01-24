@@ -16,7 +16,7 @@ The energy binning may be either linear, logarithmic, or custom defined using
 an input file. The input model is used to predict the expected number of
 background counts in each background cube bin.
 
-ctbkgcube requires on input the event list or observation definition file 
+:ref:`ctbkgcube` requires on input the event list or observation definition file
 that has been used in the generation of the counts cube using :doc:`ctbin`.
 
 To assure consistency between an existing counts cube and the 
@@ -29,12 +29,12 @@ Note that there should at least be 25 bins per energy decade in the background
 cube to assure that the energy dependence of the background rate is sufficiently
 well sampled (in particular at low energies).
 
-ctbkgcube generates a background cube FITS file comprising two extensions.
+:ref:`ctbkgcube` generates a background cube FITS file comprising two extensions.
 The primary extension contains a 3-dimensional image that contains the 
 background cube values. The next extension named ``ENERGIES`` contains a
 binary table that defines the energies of the background cube.
 
-ctbkgcube generates also an output model XML file that can serve as input 
+:ref:`ctbkgcube` generates also an output model XML file that can serve as input 
 for a maximum likelihood analysis. The output model XML file is a copy of
 the input model XML file where the input background model has been replaced
 by a background model of type ``CTACubeBackground``. The ``CTACubeBackground``

@@ -21,14 +21,14 @@ a numerical random number generator for the simulations with a seed value
 provided by the hidden ``seed`` parameter. Changing this parameter for
 subsequent runs will lead to different event samples.
 
-ctobssim performs a safety check on the maximum photon rate for all model 
+:ref:`ctobssim` performs a safety check on the maximum photon rate for all model
 components to avoid that the tool locks up and requests huge memory 
 resources, which may happen if a mistake was made in setting up the input 
 model (for example if an error in the flux units is made). The maximum allowed
 photon rate is controlled by the hidden ``maxrate`` parameter, which by default 
 is set to 1e6.
 
-ctobssim can also generate multiple event lists if an observation definition 
+:ref:`ctobssim` can also generate multiple event lists if an observation definition 
 file is specified on input using the hidden ``inobs`` parameter. In that 
 case, simulation information will be gathered from the file, and for each 
 observation an event list will be created.

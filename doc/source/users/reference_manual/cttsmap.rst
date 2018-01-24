@@ -19,7 +19,7 @@ that excludes the specified source. The square-root of the TS values
 corresponds roughly to the pre-trial detection significance of the source (in
 Gaussian sigma).
 
-cttsmap generates a FITS file comprising a sky map of TS values followed by 
+:ref:`cttsmap` generates a FITS file comprising a sky map of TS values followed by
 one extension per free parameter that contains sky maps of the fitted 
 parameter values. To save computation time, the errors are not computed by
 default. Specifying the hidden parameter ``errors=yes`` will switch on the

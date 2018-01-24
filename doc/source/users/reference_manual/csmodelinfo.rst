@@ -17,9 +17,9 @@ quite useful for debugging a fit. Finally the tool also list the TS values of
 each source that was fitted, in order have a quick overview on these quantities
 on the screen.
 
-In addition the tool is also capable of exporting the input model XML container
+In addition the script is also capable of exporting the input model XML container
 to a region file which is compatible to be read with ds9 or other displying
-tools. To create a region file, the hidden parameter "ds9file" needs to be
+tools. To create a region file, the hidden parameter ``ds9file`` needs to be
 specified. There are quite a few further hidden parameters to steer e.g. color,
 font, etc of the region file output.
 

@@ -15,7 +15,7 @@ Declination or Galactic latitude, and energy, that gives the exposure
 as function of true sky direction and energy. The energy binning of the cube 
 may be either linear, logarithmic, or custom defined using an input file.
 
-ctexpcube requires on input the event list or observation definition file 
+:ref:`ctexpcube` requires on input the event list or observation definition file
 that has been used in the generation of the counts cube using :doc:`ctbin`.
 
 The binning of an exposure cube does not need to correspond to the binning
@@ -36,7 +36,7 @@ Note that there should at least be 25 bins per energy decade in the exposure
 cube to assure that the energy dependence of the exposure is sufficiently
 well sampled (in particular at low energies).
 
-ctexpcube generates an exposure cube FITS file comprising three extensions.
+:ref:`ctexpcube` generates an exposure cube FITS file comprising three extensions.
 The primary extension contains a 3-dimensional image that contains the 
 exposure values. The next extension named ``ENERGIES`` contains a binary table
 that defines the energies of the exposure cube. The last extension named ``GTI``

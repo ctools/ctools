@@ -23,11 +23,11 @@ law models that fall within the error ellipse of the prefactor and index
 parameters. The error ellipse is derived from the covariance matrix of a
 maximum likelihood fit.
 
-ctbutterfly assumes that the input model (parameter ``inmodel``) has been 
+:ref:`ctbutterfly` assumes that the input model (parameter ``inmodel``) has been
 adjusted using :doc:`ctlike` to the data, but if this is not the case you 
 can request a maximum likelihood fit by setting the hidden parameter ``fit=yes``.
 
-ctbutterfly writes the butterfly diagram into an ASCII file with 4 columns 
+:ref:`ctbutterfly` writes the butterfly diagram into an ASCII file with 4 columns 
 separated by a whitespace. Each row in the result file corresponds to a specific
 energy. The meaning of the columns are:
 

@@ -16,7 +16,7 @@ of the likelihood that corresponds to a given confidence level. By default a
 confidence level of 68% is used, but this level can be adjusted using the hidden
 ``confidence`` parameter.
 
-cterror generates an output model XML file that contains the values of the 
+:ref:`cterror` generates an output model XML file that contains the values of the
 best fitting model parameters. For all free parameters, an ``error`` attribute
 is added that provides the statistical uncertainty in the parameter estimate
 as obtained from the likelihood profile. While cterror computes asymmetrical

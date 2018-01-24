@@ -20,7 +20,7 @@ a list of files that should be merged:
 
 Note that the "@" needs to be specified in case of an ASCII file name. It is
 also important to note that models with the same name cannot be appended. The
-tool will throw and exception if the provided file contain models with the same
+script will throw and exception if the provided file contain models with the same
 name.
 
 

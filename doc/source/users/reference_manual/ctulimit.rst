@@ -16,7 +16,7 @@ to a decrease of the likelihood that corresponds to a given confidence level.
 By default a confidence level of 95% is used, but this level can be adjusted
 using the hidden ``confidence`` parameter.
 
-ctulimit writes the differential upper flux limit at a given reference 
+:ref:`ctulimit` writes the differential upper flux limit at a given reference
 energy (specified by the hidden parameter ``eref``) and the integrated 
 upper flux limit (specified by the hidden parameters ``emin`` and ``emax``)
 into the log file.

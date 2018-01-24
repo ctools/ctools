@@ -15,10 +15,10 @@ function of Right Ascension or Galactic longitude, Declination or Galactic
 latitude, and energy. The energy binning may be either linear, logarithmic,
 or custom defined using an input file.
 
-ctmodel requires on input either a counts cube, an event list or an observation
+:ref:`ctmodel` requires on input either a counts cube, an event list or an observation
 definition file.
 
-If a counts cube is provided, ctmodel will use the definition of this cube
+If a counts cube is provided, :ref:`ctmodel` will use the definition of this cube
 (such as sky coordinates and projection, number of pixels, pixel scale,
 energy binning) to compute a model cube. In case that the counts cube combines
 multiple observations (i.e. for a so-called "stacked cube"), an exposure cube,
@@ -26,17 +26,17 @@ a point spread function cube and a background cube have to be provided
 (otherwise you may just enter ``NONE`` when the names of these files are
 queried).
 
-If an event list is provided, ctmodel will query for a counts cube to 
+If an event list is provided, :ref:`ctmodel` will query for a counts cube to
 extract the model cube definition (parameter ``incube``). If no counts cube
-is  provided (``incube=NONE``), ctmodel tools will query for cube definition
+is  provided (``incube=NONE``), :ref:`ctmodel` will query for cube definition
 parameters.
 
-If an observation definition file is provided, ctmodel will query for a counts
+If an observation definition file is provided, :ref:`ctmodel` will query for a counts
 cube to extract the model cube definition, unless the observation definition
 file contains a single binned observation (in that case, the counts cube of
 that observation will be used to extract the model cube definition).
 
-ctmodel generates a model cube FITS file comprising three extensions. The
+:ref:`ctmodel` generates a model cube FITS file comprising three extensions. The
 primary extension contains a 3-dimensional image that contains the model 
 cube values. The next extension named ``EBOUNDS`` contains a binary table
 that defines the energy boundaries of the background cube. The last extension

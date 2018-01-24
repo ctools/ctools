@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for ctools module                                             #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2018 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -101,6 +101,8 @@ help-install:
         $(INSTALL_DATA) "$$file" $(DESTDIR)$(datadir)/help/"$$helpname" ; \
         sed -i.bak -e 's/``//g' -e 's/`//g' -e 's/:ref://g' -e 's/:doc://g' \
             -e 's/.. note::/Note/g' -e 's/.. warning::/Warning/g' -e '1d' \
+            -e 's/.. code-block:: bash//g' -e 's/.. code-block:: xml//g' \
+            -e 's/>__/>/g' -e 's/>_/>/g' \
             $(DESTDIR)$(datadir)/help/"$$helpname" ; \
         rm -rf $(DESTDIR)$(datadir)/help/"$$helpname".bak ; \
     done

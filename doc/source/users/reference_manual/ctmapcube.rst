@@ -16,7 +16,7 @@ map corresponds to a specific photon energy. The energy binning of the map
 cube may be either linear, logarithmic, or custom defined using an input
 file.
 
-ctmapcube generates a map cube FITS file comprising two extensions. The
+:ref:`ctmapcube` generates a map cube FITS file comprising two extensions. The
 primary extension contains a 3-dimensional image containing the map cube
 values. A second extension named ``ENERGIES`` contains a binary table that
 defines the energy values of each map in the cube.
