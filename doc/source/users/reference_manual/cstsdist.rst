@@ -15,7 +15,7 @@ sets. The Test Statistics is defined as twice the log-likelihood difference
 that is obtained when fitting simulated data with and without a given
 source model component.
 
-:red:`cstsdist` will create an ASCII file in comma-separated value (CSV) format,
+:ref:`cstsdist` will create an ASCII file in comma-separated value (CSV) format,
 containing one row per TS computation. The first row is a header row providing
 the column names. The following rows give the TS value, the log-likelihood 
 values of the fit with or without the source, the number of observed and 

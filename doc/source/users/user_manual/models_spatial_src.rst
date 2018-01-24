@@ -281,7 +281,7 @@ Diffuse source
      ``Normalization`` can be replaced by ``Prefactor``.
 
   .. note::
-     You may add the ``normalize="0"``to the spatial model tag to avoid the
+     You may add the ``normalize="0"`` to the spatial model tag to avoid the
      normalization of the diffuse map to an integral of unity
 
      .. code-block:: xml

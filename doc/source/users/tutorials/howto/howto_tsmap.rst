@@ -1,4 +1,4 @@
-.. _1dc_howto_tsmap:
+.. _howto_tsmap:
 
 How to generate a Test Statistic map?
 -------------------------------------

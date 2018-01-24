@@ -14,7 +14,7 @@ Stacking the data
      since for many cases the effect of the energy dispersion is negligible,
      and taking energy dispersion into account is computationally intensive. If
      you want to learn how to take the energy dispersion into account please
-     read :ref:`this section<1dc_howto_edisp>`.
+     read :ref:`this section <howto_edisp>`.
 
 To analyse the selected observations, we recommend to stack the events into
 a counts cube. You do this using the :ref:`ctbin` tool:
@@ -70,13 +70,12 @@ the counts cube, which considerably reduces the number of User parameters
 that are queried by the tool.
 
 .. note::
-
    The binning of the exposure cube does not need to correspond to the binning
    of the counts cube. In any case, exposure values will be determined by
    interpolation from the values stored in the exposure cube file. The same
    is true for the point spread function and background cubes that are
    described below, or the energy dispersion cube that is described
-   :ref:`here<1dc_howto_edisp>`.
+   :ref:`here <howto_edisp>`.
 
 Next, :ref:`ctpsfcube` computes the weighted Point Spread Function of the
 stacked counts cube.

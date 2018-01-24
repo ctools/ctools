@@ -1,4 +1,4 @@
-.. _1dc_howto_display:
+.. _howto_display:
 
 How to display the results?
 ---------------------------

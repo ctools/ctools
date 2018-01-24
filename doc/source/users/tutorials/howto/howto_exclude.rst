@@ -1,4 +1,4 @@
-.. _1dc_howto_exclude:
+.. _howto_exclude:
 
 How to exclude bins from a counts cube?
 ---------------------------------------

@@ -38,7 +38,7 @@ the residual counts map. The image is displayed below using
 kernel smoothing applied. Obviously, there are no significant residuals, which
 indicates that the model fit was satisfactory.
 
-.. figure:: residuals.jpg
+.. figure:: residual_map.jpg
    :width: 400px
    :align: center
 

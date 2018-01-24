@@ -185,7 +185,7 @@ fitted values, and where the statistical uncertainties were added using the
 ``error`` attribute. To investigate how the fit went you should inspect the
 log file ``ctlike.log`` that was also created by :ref:`ctlike`:
 
-.. code-block:: bash
+.. code-block:: none
 
    2017-08-26T22:05:05: +=================================+
    2017-08-26T22:05:05: | Maximum likelihood optimisation |

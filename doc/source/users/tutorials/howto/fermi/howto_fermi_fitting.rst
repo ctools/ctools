@@ -90,7 +90,7 @@ fitted values, and where the statistical uncertainties were added using the
 ``error`` attribute. To investigate how the fit went you should inspect the
 log file ``ctlike.log`` that was also created by :ref:`ctlike`:
 
-.. code-block:: bash
+.. code-block:: none
 
    2017-08-26T10:35:10: +=================================+
    2017-08-26T10:35:10: | Maximum likelihood optimisation |
@@ -193,7 +193,7 @@ using the Fermi-LAT Science Tools.
    when the tool is applied to the same test data. As you will see below,
    the fitted model parameters are basically identical.
 
-   .. code-block:: bash
+   .. code-block:: none
 
       Extragalactic_diffuse:
       Normalization: 1
@@ -240,7 +240,7 @@ using the Fermi-LAT Science Tools.
 
    This results in
 
-   .. code-block:: bash
+   .. code-block:: none
 
       2017-08-26T13:05:12: === GModelSky ===
       2017-08-26T13:05:12:  Name ......................: Vela

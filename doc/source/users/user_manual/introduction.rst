@@ -43,7 +43,7 @@ the ctool or cscript followed by the ``--help`` option:
 ctools includes also a Python module that declares every ctool as a
 Python class. The following example illustrates the usage:
 
-.. code-block:: python
+.. code-block:: bash
 
    $ python
    >>> import ctools
@@ -57,7 +57,7 @@ ctools comprise also cscripts, which are Python scripts that have the same
 user interface as the ctools binaries. cscripts can be started from the 
 command line or used as Python classes, as illustrated below:
 
-.. code-block:: python
+.. code-block:: bash
 
    $ python
    >>> import cscripts

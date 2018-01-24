@@ -1,4 +1,4 @@
-.. _1dc_howto:
+.. _howto:
 
 Analysis cookbook
 =================

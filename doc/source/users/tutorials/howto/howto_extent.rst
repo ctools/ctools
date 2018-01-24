@@ -1,4 +1,4 @@
-.. _1dc_howto_extent:
+.. _howto_extent:
 
 How to determine the extension of a source?
 -------------------------------------------
@@ -55,7 +55,7 @@ For illustration, an excerpt of the :ref:`ctlike` log file is shown below.
 The disk with of ``Src003`` has been fitted to 0.335 +/- 0.003 degrees.
 The source is detected with a TS value of 5393.8.
 
-.. code-block:: bash
+.. code-block:: none
 
    2017-08-25T19:37:47: === GModelSky ===
    2017-08-25T19:37:47:  Name ......................: Src003
@@ -121,7 +121,7 @@ of 5665.7 which is considerably larger than the TS value of 5393.8 that is found
 above for the radial disk model.
 Below an excerpt of the :ref:`ctlike` log file:
 
-.. code-block:: bash
+.. code-block:: none
 
    2017-08-25T20:32:55: === GModelSky ===
    2017-08-25T20:32:55:  Name ......................: Src003

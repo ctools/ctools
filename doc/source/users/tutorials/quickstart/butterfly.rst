@@ -63,8 +63,8 @@ A graphical display of the results is shown below:
    Python module. You can find these scripts in the
    ``$CTOOLS/share/examples/python`` folder.
 
-   Read the section about :ref:`sec_plotting` to learn more about the
-   available scripts. The plot above was generated using:
+   Read :ref:`howto_display` to learn more about the available scripts. The
+   plot above was generated using:
 
    .. code-block:: bash
 

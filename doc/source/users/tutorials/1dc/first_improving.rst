@@ -96,7 +96,7 @@ components for these additional sources in the
 :ref:`model definition file <glossary_moddef>`
 in order to reduce the fit residuals.
 An example for such an exercise is shown
-:ref:`here <1dc_howto_extent>`.
+:ref:`here <howto_extent>`.
 
 .. figure:: first_skymap_residual_iem.png
    :width: 400px

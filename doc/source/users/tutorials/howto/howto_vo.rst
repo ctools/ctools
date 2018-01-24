@@ -1,4 +1,4 @@
-.. _1dc_howto_vo:
+.. _howto_vo:
 
 How to use Virtual Observatory tools with ctools?
 -------------------------------------------------

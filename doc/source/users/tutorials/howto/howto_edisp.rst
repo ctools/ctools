@@ -1,4 +1,4 @@
-.. _1dc_howto_edisp:
+.. _howto_edisp:
 
 How to take the energy dispersion into account?
 -----------------------------------------------

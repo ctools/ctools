@@ -16,7 +16,7 @@ Fitting the model components to the counts cube
      scripts for result display that use the ``matplotlib`` Python module can be
      found in the
      ``$CTOOLS/share/examples/python``
-     folder (see :ref:`how to display results<1dc_howto_display>`).
+     folder (see :ref:`how to display results<howto_display>`).
 
 Now you are ready to fit the model to the counts cube and to determine its
 maximum likelihood parameters.

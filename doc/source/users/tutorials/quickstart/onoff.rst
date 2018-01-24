@@ -127,7 +127,7 @@ the On region and the Off regions, ``onoff_on.reg`` and
 a skymap where you can see the pointing direction along with the position of
 the On and Off regions.
 
-.. figure:: onoff.png
+.. figure:: onoff.jpg
    :width: 400px
    :align: center
 

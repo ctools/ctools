@@ -1,4 +1,4 @@
-.. _1dc_howto_phasecurve:
+.. _howto_phasecurve:
 
 How to generate a phase curve of a pulsar?
 ------------------------------------------
