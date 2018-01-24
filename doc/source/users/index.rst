@@ -11,7 +11,6 @@ This documentation will guide you in the process of using ctools.
    tips/index
    user_manual/index
    tutorials/index
-   notebooks
    reference_manual/index
    user_contributed/index
    glossary

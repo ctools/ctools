@@ -9,4 +9,5 @@ Tutorials
    quickstart/index
    beyond/index
    howto/index
+   notebooks
    1dc/index
