@@ -48,24 +48,28 @@ General parameters
 ``(prefix = onoff) [string]``
     Prefix of the file name for output PHA, ARF, RMF, XML, and DS9 region files.
 
+``ebinalg <FILE|LIN|LOG> [string]``
+    Algorithm for defining energy bins. For ``FILE``, the energy bins are defined
+    in a FITS file that is specified by the ``ebinfile`` parameter, for ``LIN``
+    and ``LOG`` there will be ``enumbins`` energy bins spaced linearly or
+    logarithmically between ``emin`` and ``emax``, respectively.
+
 ``emin [real]``
-    Lower energy limit (TeV) if ``LIN`` or ``LOG`` binning algorithms are used.
+    Lower energy value for first energy bin (in TeV) if ``LIN`` or ``LOG``
+    energy binning algorithms are used.
 
 ``emax [real]``
-    Upper energy limit (TeV) if ``LIN`` or ``LOG`` binning algorithms are used.
+    Upper energy value for last energy bin (in TeV) if ``LIN`` or ``LOG``
+    energy binning algorithms are used.
 
 ``enumbins [integer]``
-    Number of energy bins. At least 30 bins per decade are recommended for
-    proper evaluation of the instrument response.
-
-``ebinalg <FILE|LIN|LOG> [string]``
-    Algorithm for defining energy bins (``FILE``: energy bounds retrieved from
-    file, see ``ebinfile`` parameter; ``LIN``: linearly spaced energy bins;
-    ``LOG``: logarithmically spaced energy bins).
+    Number of energy bins if ``LIN`` or ``LOG`` energy binning algorithms are used.
+    At least 30 bins per decade are recommended for proper evaluation of the
+    instrument response.
 
 ``ebinfile [file]``
-    Name of the file containing the energy bin definition if ``FILE`` algorithm
-    is used.
+    Name of the file containing the energy binning definition if ``ebinalg=FILE``.
+    You may use :ref:`csebins` to generate a file with appropriate energy binning.
 
 ``(srcshape = CIRCLE) <CIRCLE> [string]``
     Shape of the source region (``CIRCLE``: circular region around given position).

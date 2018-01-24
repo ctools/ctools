@@ -16,17 +16,17 @@
 #
 # General parameters
 #===================
-inobs,    f, a, "NONE",,, "Input event list, counts cube or observation definition XML file"
-incube,   f, a, "NONE",,, "Input counts cube file to extract model cube definition"
-inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Input model definition XML file"
-expcube,  f, a, "NONE",,, "Input exposure cube file"
-psfcube,  f, a, "NONE",,, "Input PSF cube file"
-edispcube,f, a, "NONE",,, "Input energy dispersion cube file"
-bkgcube,  f, a, "NONE",,, "Input background cube file"
-caldb,    s, a, "prod2",,, "Calibration database"
-irf,      s, a, "South_0.5h",,, "Instrument response function"
+inobs,    f, a, NONE,,, "Input event list, counts cube or observation definition XML file"
+incube,   f, a, NONE,,, "Input counts cube file to extract model cube definition"
+inmodel,  f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
+expcube,  f, a, NONE,,, "Input exposure cube file"
+psfcube,  f, a, NONE,,, "Input PSF cube file"
+edispcube,f, a, NONE,,, "Input energy dispersion cube file"
+bkgcube,  f, a, NONE,,, "Input background cube file"
+caldb,    s, a, prod2,,, "Calibration database"
+irf,      s, a, South_0.5h,,, "Instrument response function"
 edisp,    b, h, no,,, "Apply energy dispersion?"
-outcube,  f, a, "modcube.fits",,, "Output model cube file"
+outcube,  f, a, modcube.fits,,, "Output model cube file"
 
 #
 # Observation parameters
@@ -41,11 +41,11 @@ deadc,    r, h, 0.98,0,1, "Average deadtime correction factor"
 #
 # Energy binning parameters
 #==========================
-ebinalg,  s, h, "LOG",FILE|LIN|LOG,, "Algorithm for defining energy bins"
-emin,     r, a, 0.1,,, "Start value for first energy bin in TeV"
-emax,     r, a, 100.0,,, "Stop value for last energy bin in TeV"
-enumbins, i, a, 20,,, "Number of energy bins"
-ebinfile, f, h, "NONE",,, "Name of the file containing the energy bin definition"
+ebinalg,  s, a, LOG,FILE|LIN|LOG,, "Algorithm for defining energy bins"
+emin,     r, a, 0.1,,, "Lower energy limit (TeV)"
+emax,     r, a, 100.0,,, "Upper energy limit (TeV)"
+enumbins, i, a, 20,1,200, "Number of energy bins"
+ebinfile, f, a, NONE,,, "Name of the file containing the energy bin definition"
 
 #
 # Spatial binning parameters
@@ -65,6 +65,6 @@ yref,     r, a, 22.01,-90,90, "Second coordinate of image center in degrees (DEC
 publish, b, h, no,,, "Publish model cube on VO Hub?"
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
-debug,   b, h, no,,, "Debugging mode activated"
-mode,    s, h, "ql",,, "Mode of automatic parameters"
-logfile, f, h, "ctmodel.log",,, "Log filename"
+debug,   b, h, no,,, "Activate debugging mode?"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, ctmodel.log,,, "Log filename"

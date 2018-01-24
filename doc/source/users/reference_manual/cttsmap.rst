@@ -104,7 +104,7 @@ General parameters
 ``(binmax = -1) [integer]``
     Last bin to compute.
 
-``(logLO = -1) [real]``
+``(logL0 = -1) [real]``
     LogLikelihood value of null hypothesis.
 
 

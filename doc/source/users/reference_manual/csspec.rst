@@ -98,20 +98,27 @@ General parameters
     data. For CTA-only observations ``SLICE`` will be used, otherwise ``NODES``
     will be used.
 
+``ebinalg <FILE|LIN|LOG> [string]``
+    Algorithm for defining energy bins. For ``FILE``, the energy bins are defined
+    in a FITS file that is specified by the ``ebinfile`` parameter, for ``LIN``
+    and ``LOG`` there will be ``enumbins`` energy bins spaced linearly or
+    logarithmically between ``emin`` and ``emax``, respectively.
+
 ``emin [real]``
-    Lower energy limit of events (in TeV).
+    Lower energy value for first energy bin (in TeV) if ``LIN`` or ``LOG``
+    energy binning algorithms are used.
 
 ``emax [real]``
-    Upper energy limit of events (in TeV).
+    Upper energy value for last energy bin (in TeV) if ``LIN`` or ``LOG``
+    energy binning algorithms are used.
 
 ``enumbins [integer]``
-    Number of energy bins.
-
-``ebinalg <FILE|LIN|LOG> [string]``
-    Algorithm for defining energy bins.
+    Number of energy bins if ``LIN`` or ``LOG`` energy binning algorithms are
+    used.
 
 ``ebinfile [file]``
-    Name of the file containing the energy bin definition.
+    Name of the file containing the energy binning definition if ``ebinalg=FILE``.
+    You may use :ref:`csebins` to generate a file with appropriate energy binning.
 
 ``(statistic = DEFAULT) <DEFAULT|CSTAT|WSTAT|CHI2> [string]``
     Optimization statistic. ``DEFAULT`` uses the default statistic for all

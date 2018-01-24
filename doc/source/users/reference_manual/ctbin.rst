@@ -18,7 +18,7 @@ specified in an observation definition file. In case that multiple event
 lists are given in an observation definition file, the tool will loop over
 all event lists and fill all events into a single counts cube.
 
-ctbin generates a counts cube FITS file comprising three extensions. The
+:ref:`ctbin` generates a counts cube FITS file comprising three extensions. The
 primary extension contains a 3-dimensional image that contains the counts
 cube values. The next extension named ``EBOUNDS`` contains a binary table
 that defines the energy boundaries of the counts cube. The last extension
@@ -36,19 +36,26 @@ General parameters
     Output counts cube file.
 
 ``ebinalg <FILE|LIN|LOG> [string]``
-    Algorithm for defining energy bins.
+    Algorithm for defining energy bins. For ``FILE``, the energy bins are defined
+    in a FITS file that is specified by the ``ebinfile`` parameter, for ``LIN``
+    and ``LOG`` there will be ``enumbins`` energy bins spaced linearly or
+    logarithmically between ``emin`` and ``emax``, respectively.
 
 ``emin [real]``
-    Lower energy value for first energy bin (in TeV).
+    Lower energy value for first energy bin (in TeV) if ``LIN`` or ``LOG``
+    energy binning algorithms are used.
 
 ``emax [real]``
-    Upper energy value for last energy bin (in TeV).
+    Upper energy value for last energy bin (in TeV) if ``LIN`` or ``LOG``
+    energy binning algorithms are used.
 
 ``enumbins [integer]``
-    Number of energy bins.
+    Number of energy bins if ``LIN`` or ``LOG`` energy binning algorithms are
+    used.
 
 ``ebinfile [file]``
-    Name of the file containing the energy bin definition.
+    Name of the file containing the energy binning definition if ``ebinalg=FILE``.
+    You may use :ref:`csebins` to generate a file with appropriate energy binning.
 
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for cube centre instead of xref/yref parameters?

@@ -16,15 +16,15 @@
 #
 # General parameters
 #===================
-inobs,    f, a, "events.fits",,, "Input event list, counts cube or observation definition XML file"
-inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Input model definition XML file"
-srcname,  s, a, "Crab",,, "Source of interest"
-expcube,  f, a, "NONE",,, "Input exposure cube file"
-psfcube,  f, a, "NONE",,, "Input PSF cube file"
-edispcube,f, a, "NONE",,, "Input energy dispersion cube file"
-bkgcube,  f, a, "NONE",,, "Input background cube file"
-caldb,    s, a, "prod2",,, "Calibration database"
-irf,      s, a, "South_0.5h",,, "Instrument response function"
+inobs,    f, a, events.fits,,, "Input event list, counts cube or observation definition XML file"
+inmodel,  f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
+srcname,  s, a, Crab,,, "Source of interest"
+expcube,  f, a, NONE,,, "Input exposure cube file"
+psfcube,  f, a, NONE,,, "Input PSF cube file"
+edispcube,f, a, NONE,,, "Input energy dispersion cube file"
+bkgcube,  f, a, NONE,,, "Input background cube file"
+caldb,    s, a, prod2,,, "Calibration database"
+irf,      s, a, South_0.5h,,, "Instrument response function"
 edisp,    b, h, no,,, "Apply energy dispersion?"
 
 #
@@ -45,6 +45,6 @@ max_iter,   i, h, 50,1,1000, "Maximum number of iterations"
 #====================
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
-debug,   b, h, no,,, "Debugging mode activated"
-mode,    s, h, "ql",,, "Mode of automatic parameters"
-logfile, f, h, "ctulimit.log",,, "Log filename"
+debug,   b, h, no,,, "Activate debugging mode?"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, ctulimit.log,,, "Log filename"

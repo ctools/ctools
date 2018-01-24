@@ -98,20 +98,27 @@ General parameters
 ``(deadc = 0.95) [real]``
     Average deadtime correction factor.
 
-``(ebinalg = LOG) <FILE|LIN|LOG> [string]``
-    Algorithm for defining energy bins.
+``ebinalg <FILE|LIN|LOG> [string]``
+    Algorithm for defining energy bins. For ``FILE``, the energy bins are defined
+    in a FITS file that is specified by the ``ebinfile`` parameter, for ``LIN``
+    and ``LOG`` there will be ``enumbins`` energy bins spaced linearly or
+    logarithmically between ``emin`` and ``emax``, respectively.
 
 ``emin [real]``
-    Lower energy value for first energy bin (in TeV).
+    Lower energy value for first energy bin (in TeV) if ``LIN`` or ``LOG``
+    energy binning algorithms are used.
 
 ``emax [real]``
-    Upper energy value for last energy bin (in TeV).
+    Upper energy value for last energy bin (in TeV) if ``LIN`` or ``LOG``
+    energy binning algorithms are used.
 
 ``enumbins [integer]``
-    Number of energy bins.
+    Number of energy bins if ``LIN`` or ``LOG`` energy binning algorithms are
+    used.
 
-``(ebinfile = NONE) [file]``
-    Name of the file containing the energy bin definition.
+``ebinfile [file]``
+    Name of the file containing the energy binning definition if ``ebinalg=FILE``.
+    You may use :ref:`csebins` to generate a file with appropriate energy binning.
 
 ``(usepnt = no) [boolean]``
     Use pointing instead of xref/yref parameters?

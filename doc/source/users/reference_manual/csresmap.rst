@@ -63,19 +63,20 @@ General parameters
     Output residual counts map file.
 
 ``(ebinalg = LOG) <FILE|LIN|LOG> [string]``
-    Algorithm for defining energy bins.
+    Algorithm for defining energy bins for internal residual map computation.
 
 ``emin [real]``
-    Lower energy value for first energy bin (in TeV).
+    Lower energy value for residual map (in TeV).
 
 ``emax [real]``
-    Upper energy value for last energy bin (in TeV).
+    Upper energy value for residual map (in TeV).
 
 ``(enumbins = 20) [integer]``
-    Number of model cube energy bins.
+    Number of model cube energy bins for internal residual map computation.
 
 ``ebinfile [file]``
-    Name of the file containing the energy bin definition.
+    Name of the file containing the energy bin definition for internal residual
+    map computation.
 
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).

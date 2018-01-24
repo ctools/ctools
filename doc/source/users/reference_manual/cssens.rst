@@ -83,7 +83,7 @@ General parameters
     Number of energy bins for sensitivity computation.
 
 ``(enumbins = 0) [integer]``
-    Number of energy bins (0=unbinned).
+    Number of energy bins for binned analysis (``0`` = unbinned analysis).
 
 ``(npix = 200) [integer]``
     Number of pixels for binned analysis.

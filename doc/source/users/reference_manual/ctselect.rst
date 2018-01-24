@@ -52,37 +52,37 @@ General parameters
 
 ``ra [real]``
     Right Ascension of acceptance cone (or ROI) centre (J2000, in degrees).
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no ROI
+    If ``INDEF``, ``NONE``, ``UNDEF`` or ``UNDEFINED`` is passed as value, no ROI
     selection will be performed.
 
 ``dec [real]``
     Declination of acceptance cone (or ROI) centre (J2000, in degrees).
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no ROI
+    If ``INDEF``, ``NONE``, ``UNDEF`` or ``UNDEFINED`` is passed as value, no ROI
     selection will be performed.
 
 ``rad [real]``
     Radius of acceptance cone (or ROI) centre (in degrees).
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no ROI
+    If ``INDEF``, ``NONE``, ``UNDEF`` or ``UNDEFINED`` is passed as value, no ROI
     selection will be performed.
 
 ``tmin [time]``
     Start time (UTC string, JD, MJD or time in seconds).
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no time
+    If ``INDEF``, ``NONE``, ``UNDEF`` or ``UNDEFINED`` is passed as value, no time
     selection will be performed.
 
 ``tmax [time]``
     Stop time (UTC string, JD, MJD or time in seconds).
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no time
+    If ``INDEF``, ``NONE``, ``UNDEF`` or ``UNDEFINED`` is passed as value, no time
     selection will be performed.
 
 ``emin [real]``
     Lower energy limit of events (in TeV).
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no energy
+    If ``INDEF``, ``NONE``, ``UNDEF`` or ``UNDEFINED`` is passed as value, no energy
     selection will be performed.
 
 ``emax [real]``
     Upper energy limit of events (in TeV).
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no energy
+    If ``INDEF``, ``NONE``, ``UNDEF`` or ``UNDEFINED`` is passed as value, no energy
     selection will be performed.
 
 ``(phase = NONE) [string]``

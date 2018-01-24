@@ -16,17 +16,17 @@
 #
 # General parameters
 #===================
-inobs,      f, a, "events.fits",,,"Input event list, counts cube or observation definition XML file"
-inmodel,    f, a, "$CTOOLS/share/models/crab.xml",,, "Input model definition XML file"
-srcname,    s, a, "Crab",,,"Source of interest"
-expcube,    f, a, "NONE",,, "Input exposure cube file"
-psfcube,    f, a, "NONE",,, "Input PSF cube file"
-edispcube,  f, a, "NONE",,, "Input energy dispersion cube file"
-bkgcube,    f, a, "NONE",,, "Input background cube file"
-caldb,      s, a, "prod2",,, "Calibration database"
-irf,        s, a, "South_0.5h",,, "Instrument response function"
+inobs,      f, a, events.fits,,,"Input event list, counts cube or observation definition XML file"
+inmodel,    f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
+srcname,    s, a, Crab,,,"Source of interest"
+expcube,    f, a, NONE,,, "Input exposure cube file"
+psfcube,    f, a, NONE,,, "Input PSF cube file"
+edispcube,  f, a, NONE,,, "Input energy dispersion cube file"
+bkgcube,    f, a, NONE,,, "Input background cube file"
+caldb,      s, a, prod2,,, "Calibration database"
+irf,        s, a, South_0.5h,,, "Instrument response function"
 edisp,      b, h, no,,, "Apply energy dispersion?"
-outfile,    f, a, "butterfly.txt",,, "Output ASCII file"
+outfile,    f, a, butterfly.txt,,, "Output ASCII file"
 method,     s, h, GAUSSIAN, GAUSSIAN|ENVELOPE,,"Butterfly computation method"
 
 #
@@ -35,22 +35,22 @@ method,     s, h, GAUSSIAN, GAUSSIAN|ENVELOPE,,"Butterfly computation method"
 fit,        b, h, no,,, "Perform maximum likelihood fitting?"
 confidence, r, h, 0.68,0.0,1.0, "Confidence level"
 statistic,  s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statistic"
-matrix,     f, h, "NONE",,, "Input covariance Matrix FITS file"
+matrix,     f, h, NONE,,, "Input covariance Matrix FITS file"
 
 #
 # Energy binning parameters
 #==========================
-ebinalg,  s, h, "LOG", FILE|LIN|LOG,,"Algorithm for defining energy bins"
-emin,     r, a, 0.1,,,"Lower energy limit (TeV)"
-emax,     r, a, 100.0,,,"Upper energy limit (TeV)"
-enumbins, i, h, 100,,,"Number of energy bins"
-ebinfile, f, h, "NONE",,,"Name of the file containing the energy bin definition"
+ebinalg,  s, h, LOG,FILE|LIN|LOG,, "Algorithm for defining energy bins"
+emin,     r, a, 0.1,,, "Lower energy limit (TeV)"
+emax,     r, a, 100.0,,, "Upper energy limit (TeV)"
+enumbins, i, h, 100,1,1000, "Number of energy bins"
+ebinfile, f, a, NONE,,, "Name of the file containing the energy bin definition"
 
 #
 # Standard parameters
 #====================
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
-debug,   b, h, no,,, "Debugging mode activated"
-mode,    s, h, "ql",,, "Mode of automatic parameters"
-logfile, f, h, "ctbutterfly.log",,, "Log filename"
+debug,   b, h, no,,, "Activate debugging mode?"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, ctbutterfly.log,,, "Log filename"

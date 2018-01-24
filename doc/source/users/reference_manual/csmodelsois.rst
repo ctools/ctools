@@ -47,7 +47,10 @@ General parameters
     Output model XML file (not generated if set to ``NONE``).
 
 ``ebinalg <FILE|LIN|LOG> [string]``
-    Algorithm for defining energy bins.
+    Algorithm for defining energy bins. For ``FILE``, the energy bins are defined
+    in a FITS file that is specified by the ``ebinfile`` parameter, for ``LIN``
+    and ``LOG`` there will be ``enumbins`` energy bins spaced linearly or
+    logarithmically between ``emin`` and ``emax``, respectively.
 
 ``emin [real]``
     Lower energy value for first energy bin (in TeV).
@@ -59,7 +62,8 @@ General parameters
     Number of energy bins.
 
 ``ebinfile [file]``
-    Name of the file containing the energy bin definition.
+    Name of the file containing the energy bin definition. You may use :ref:`csebins`
+    to generate a file with appropriate energy bins.
 
 ``nxpix [integer]``
     Number of map cube bins in Right Ascension or Galactic longitude.

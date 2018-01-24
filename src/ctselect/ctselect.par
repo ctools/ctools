@@ -16,9 +16,9 @@
 #
 # General parameters
 #===================
-inobs,  f, a, "events.fits",,, "Input event list or observation definition XML file"
-outobs, f, a, "selected_events.fits",,, "Output event list or observation definition XML file"
-prefix, s, h, "selected_",,, "Prefix for event lists in observation definition XML file"
+inobs,  f, a, events.fits,,, "Input event list or observation definition XML file"
+outobs, f, a, selected_events.fits,,, "Output event list or observation definition XML file"
+prefix, s, h, selected_,,, "Prefix for event lists in observation definition XML file"
 
 #
 # Selection parameters
@@ -41,6 +41,6 @@ usethres,s, h, NONE,NONE|DEFAULT|USER,, "Energy threshold type"
 publish, b, h, no,,, "Publish event list on VO Hub?"
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
-debug,   b, h, no,,, "Debugging mode activated"
-mode,    s, h, "ql",,, "Mode of automatic parameters"
-logfile, f, h, "ctselect.log",,, "Log filename"
+debug,   b, h, no,,, "Activate debugging mode?"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, ctselect.log,,, "Log filename"
