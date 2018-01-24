@@ -21,21 +21,27 @@ included in the ctools package that rely on the
 Python module. You can find these scripts in the
 ``$CTOOLS/share/examples/python`` folder. The following scripts are available:
 
-  +------------------------+-----------------------------+
-  | Script                 | Usage                       |
-  +========================+=============================+
-  | ``show_butterfly.py``  | Display a butterfly diagram |
-  +------------------------+-----------------------------+
-  | ``show_lightcurve.py`` | Display a light curve       |
-  +------------------------+-----------------------------+
-  | ``show_obs.py``        | Display observation summary |
-  +------------------------+-----------------------------+
-  | ``show_pointings.py``  | Display pointing directions |
-  +------------------------+-----------------------------+
-  | ``show_phases.py``     | Display event phases        |
-  +------------------------+-----------------------------+
-  | ``show_spectrum.py``   | Display a spectrum          |
-  +------------------------+-----------------------------+
+  +------------------------+--------------------------------------+
+  | Script                 | Usage                                |
+  +========================+======================================+
+  | ``show_butterfly.py``  | Display a butterfly diagram          |
+  +------------------------+--------------------------------------+
+  | ``show_irf.py``        | Display Instrument Response Function |
+  +------------------------+--------------------------------------+
+  | ``show_lightcurve.py`` | Display a light curve                |
+  +------------------------+--------------------------------------+
+  | ``show_obs.py``        | Display observation summary          |
+  +------------------------+--------------------------------------+
+  | ``show_phases.py``     | Display event phases                 |
+  +------------------------+--------------------------------------+
+  | ``show_pointings.py``  | Display pointing directions          |
+  +------------------------+--------------------------------------+
+  | ``show_residuals.py``  | Display spectral residuals           |
+  +------------------------+--------------------------------------+
+  | ``show_spectrum.py``   | Display a spectrum                   |
+  +------------------------+--------------------------------------+
+
+**Do not hesitate to copy and adapt these scripts to your needs.**
 
 Below some usage examples and the expected output.
 
@@ -44,13 +50,27 @@ show_butterfly.py
 
 .. code-block:: bash
 
-   $ $CTOOLS/share/examples/python/show_butterfly.py butterfly_src001.txt
+   $ $CTOOLS/share/examples/python/show_butterfly.py butterfly.txt
 
 .. figure:: howto_display_butterfly.png
    :width: 600px
    :align: center
 
    *Butterfly diagram displayed with show_butterfly.py*
+
+
+show_irf.py
+^^^^^^^^^^^
+
+.. code-block:: bash
+
+   $ $CTOOLS/share/examples/python/show_irf.py prod2 South_50h
+
+.. figure:: howto_display_irf.png
+   :width: 800px
+   :align: center
+
+   *Instrument Response Function displayed with show_irf.py*
 
 
 show_lightcurve.py
@@ -72,27 +92,13 @@ show_obs.py
 
 .. code-block:: bash
 
-   $ $CTOOLS/share/examples/python/show_obs.py obs_selected.xml
+   $ $CTOOLS/share/examples/python/show_obs.py obs.xml
 
 .. figure:: howto_display_obs.png
    :width: 600px
    :align: center
 
    *Observation summary displayed with show_obs.py*
-
-
-show_pointings.py
-^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
-   $ $CTOOLS/share/examples/python/show_pointings.py obs_selected.xml
-
-.. figure:: howto_display_pointings.png
-   :width: 600px
-   :align: center
-
-   *Observation summary displayed with show_pointings.py (zoomed in)*
 
 
 show_phases.py
@@ -109,17 +115,43 @@ show_phases.py
    *Event phases displayed with show_phases.py*
 
 
+show_pointings.py
+^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+   $ $CTOOLS/share/examples/python/show_pointings.py obs.xml
+
+.. figure:: howto_display_pointings.png
+   :width: 600px
+   :align: center
+
+   *Pointings displayed with show_pointings.py (zoomed in)*
+
+
+show_residuals.py
+^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+   $ $CTOOLS/share/examples/python/show_residuals.py residual.fits
+
+.. figure:: howto_display_residuals.png
+   :width: 600px
+   :align: center
+
+   *Spectral residuals displayed with show_residuals.py*
+
+
 show_spectrum.py
 ^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
-   $ $CTOOLS/share/examples/python/show_spectrum.py spectrum_src001.fits
+   $ $CTOOLS/share/examples/python/show_spectrum.py spectrum.fits
 
 .. figure:: howto_display_spectrum.png
    :width: 600px
    :align: center
 
-   *Observation summary displayed with show_spectrum.py*
-
-
+   *Spectrum displayed with show_spectrum.py*

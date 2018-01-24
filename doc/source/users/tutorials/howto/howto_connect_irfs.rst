@@ -1,7 +1,13 @@
-.. _sec_connecting_irf:
+.. _howto_connect_irfs:
 
-Connecting observations to dedicated instrument response functions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+How to connect observations to dedicated instrument response functions?
+-----------------------------------------------------------------------
+
+  .. admonition:: What you will learn
+
+     You will learn how to **connect individual observations to dedicated
+     Instrument Response Functions**.
+
 
 So far you used the same instrument response function for all observations.
 You always specified the calibration database ``prod2`` and the instrument

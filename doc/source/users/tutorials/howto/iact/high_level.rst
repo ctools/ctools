@@ -266,7 +266,7 @@ In case a model cube can be provided, :ref:`csresmap` simply collapses both cube
 Compute a test statistics (TS) map
 ----------------------------------
 The test statistics quantity is a more precise measurement of statistic than the ``SUBDIVSQRT`` option in :ref:`csresmap`. 
-To get familiar with the concept of this procedure, :ref:`read more about TS maps <sec_tsmap>`.
+To get familiar with the concept of this procedure, :ref:`read more about TS maps <howto_ts>`.
 
 .. code-block:: bash
 

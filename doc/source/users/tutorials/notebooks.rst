@@ -15,6 +15,6 @@ it on your computer. All notebooks are also available for download from
 this page.
 
 * :download:`Using ctools from Python <quickstart/ctools-from-python.ipynb>`
-* :download:`Combining observations <beyond/combining-observations.ipynb>`
-* :download:`Performing a stacked analysis <beyond/stacked-analysis.ipynb>`
-* :download:`Advanced model manipulation and fitting in Python <beyond/advanced-python-fitting.ipynb>`
+* :download:`Combining observations <howto/howto_combine_observations.ipynb>`
+* :download:`Performing a stacked analysis <howto/howto_stacked_analysis.ipynb>`
+* :download:`Advanced model manipulation and fitting in Python <howto/howto_advanced_python_fitting.ipynb>`

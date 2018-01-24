@@ -1,7 +1,12 @@
-.. _sec_connecting_model:
+.. _howto_connect_models:
 
-Connecting observations to specific models
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+How to connecting observations to specific models?
+--------------------------------------------------
+
+  .. admonition:: What you will learn
+
+     You will learn how to **connect individual observations to specific
+     model components**.
 
 In the previous examples there was always a single background model
 component to describe the residual particle background in the
@@ -68,7 +73,6 @@ tied to the ``events2.fits`` file.
   </source_library>
 
 .. note::
-
    **Model components in a XML file need to have a unique name.**
    For this reason the components are named here ``Background_00001``
    and ``Background_00002``.
@@ -86,7 +90,7 @@ Obviously, the upper observation has larger residuals owing to the ten
 times larger background rate that was used in the simulation of the
 associated data.
 
-.. figure:: resmap-bkg.png
+.. figure:: howto_connect_models.png
    :height: 400px
    :align: center
 
@@ -128,8 +132,3 @@ This is illustrated in the model definition file below where component
       </spectrum>
     </source>
   </source_library>
-
-
-
-   
-
