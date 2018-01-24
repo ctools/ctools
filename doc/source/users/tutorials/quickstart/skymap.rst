@@ -57,20 +57,20 @@ example:
 .. code-block:: bash
 
    $ ctskymap
-   Input event list or observation definition XML file [events.fits] selected_events.fits
-   First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63]
-   Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01]
-   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
-   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
-   Image scale (in degrees/pixel) [0.02]
-   Size of the X axis in pixels [200]
-   Size of the Y axis in pixels [200]
-   Lower energy limit (TeV) [0.1]
-   Upper energy limit (TeV) [100.0]
-   Background subtraction method (NONE|IRF|RING) [NONE] IRF
-   Calibration database [prod2]
-   Instrument response function [South_0.5h] 
-   Output skymap file [skymap.fits] skymap_subtracted.fits
+  Input event list or observation definition XML file [selected_events.fits]
+  First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63]
+  Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01]
+  Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
+  Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+  Image scale (in degrees/pixel) [0.02]
+  Size of the X axis in pixels [200]
+  Size of the Y axis in pixels [200]
+  Lower energy limit (TeV) [0.1]
+  Upper energy limit (TeV) [100.0]
+  Background subtraction method (NONE|IRF|RING) [NONE] IRF
+  Calibration database [prod2]
+  Instrument response function [South_0.5h]
+  Output skymap file [skymap.fits] skymap_subtracted.fits
 
 The resulting sky map, displayed using
 `ds9 <http://ds9.si.edu>`_ in logarithmic color scale with a small Gaussian
@@ -96,24 +96,24 @@ region file, or FITS map) through the hidden ``inexclusion`` parameter.
 
 .. code-block:: bash
 
-	$ ctskymap inexclusion=exclusion.reg 
-	Input event list or observation definition XML file [events.fits] selected_events.fits 
-	First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 
-	Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 
-	Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR] 
-	Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] 
-	Image scale (in degrees/pixel) [0.02] 
-	Size of the X axis in pixels [200] 
-	Size of the Y axis in pixels [200] 
-	Lower energy limit (TeV) [0.1] 
-	Upper energy limit (TeV) [100.0] 
-	Background subtraction method (NONE|IRF|RING) [NONE] RING
-	Source region radius for estimating on-counts (degrees) [0.0] 0.2
-	Inner ring radius (degrees) [0.6] 
-	Outer ring radius (degrees) [0.8] 
-	Calibration database [prod2] 
-	Instrument response function [South_0.5h] 
-	Output skymap file [skymap.fits] skymap_ring.fits
+   $ ctskymap inexclusion=exclusion.reg
+   Input event list or observation definition XML file [selected_events.fits]
+   First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63]
+   Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01]
+   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
+   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+   Image scale (in degrees/pixel) [0.02]
+   Size of the X axis in pixels [200]
+   Size of the Y axis in pixels [200]
+   Lower energy limit (TeV) [0.1]
+   Upper energy limit (TeV) [100.0]
+   Background subtraction method (NONE|IRF|RING) [IRF] RING
+   Source region radius for estimating on-counts (degrees) [0.2]
+   Inner ring radius (degrees) [0.6]
+   Outer ring radius (degrees) [0.8]
+   Calibration database [prod2]
+   Instrument response function [South_0.5h]
+   Output skymap file [skymap_subtracted.fits] skymap_ring.fits
 
 The exclusion file used contained just a circle centered on the Crab
 nebula.
@@ -121,12 +121,8 @@ nebula.
 .. code-block:: bash
 
 	$ more exclusion.reg
-	# Region file format: DS9 version 4.1
-	global color=green dashlist=8 3 width=1 font="helvetica 10
-	normal roman" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1
-	delete=1 include=1 source=1
 	fk5
-	circle(83.63,22.01,720.000")
+	circle(83.63,22.01,0.2)
 
 The resulting sky map, displayed using
 `ds9 <http://ds9.si.edu>`_ in logarithmic color scale is shown below.

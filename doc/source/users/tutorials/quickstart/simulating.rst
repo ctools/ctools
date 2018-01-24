@@ -25,13 +25,13 @@ characteristics of the simulation:
 .. code-block:: bash
 
    $ ctobssim
-   RA of pointing (degrees) (0-360) [83.63] 83.5
-   Dec of pointing (degrees) (-90-90) [22.01] 22.8
+   RA of pointing (degrees) (0-360) [83.63]
+   Dec of pointing (degrees) (-90-90) [22.51]
    Radius of FOV (degrees) (0-180) [5.0]
    Start time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:00:00]
-   Stop time (UTC string, JD, MJD or MET in seconds) [2020-01-01T01:00:00] 2020-01-01T01:00:00
-   Lower energy limit (TeV) [0.03]
-   Upper energy limit (TeV) [200.]
+   Stop time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:30:00] 2020-01-01T01:00:00
+   Lower energy limit (TeV) [0.1] 0.03
+   Upper energy limit (TeV) [100.0] 150.0
    Calibration database [prod2]
    Instrument response function [South_0.5h]
    Input model definition XML file [$CTOOLS/share/models/crab.xml]
@@ -46,8 +46,10 @@ Otherwise, the specified value will overwrite the default value.
 The round brackets ``( )`` indicate the range of possible parameter
 values (if applicable).
 
-.. note::
+In the example above the stop time and the energy range were specified, for the
+remaining parameters the default value was used.
 
+.. note::
    Times can be entered in various formats in ctools. Times can be provided
    as
 
@@ -71,7 +73,6 @@ is taken from the ``prod2`` database. The response for the southern array
 using the cuts optimised for 0.5 hours of observing time is used.
 
 .. note::
-
    ctools comes bundled with CTA
    :ref:`instrument response functions <glossary_irf>` for the northern and
    the southern array. The IRFs are based on a ``prod2``
@@ -153,8 +154,6 @@ where the parameters in the XML definition have the following mappings:
 * :math:`\gamma` = ``Index``
 * :math:`E_0` = ``PivotEnergy``
 
-
-
 .. warning::
    **Energies are given in the XML file in MeV units.** This is a GammaLib
    convention that can not be modified. So make sure you always use
@@ -164,7 +163,7 @@ where the parameters in the XML definition have the following mappings:
    As customary for IACT observations, the pointing direction
    was slightly offset from the source of interest, i.e.,
    the Crab. This makes it possible to better handle systematics due
-   to the instrumental background.
+   to the limited knowledge of the instrumental background.
 
 The instrumental background of CTA is modelled using the background
 information provided in the
@@ -208,33 +207,33 @@ from this file are shown here:
 
 .. code-block:: none
 
-   2017-11-28T14:13:40: === CTA observation ===
-   2017-11-28T14:13:40:  Simulation cone ...........: RA=83.5 deg, Dec=22.8 deg, radius=5.5 deg
-   2017-11-28T14:13:40:  Time interval .............: 6.31109e+08 - 6.31112e+08 s
-   2017-11-28T14:13:40:  Photon energy range .......: 30 GeV - 72.3622611060088 GeV
-   2017-11-28T14:13:40:  Event energy range ........: 30 GeV - 72.3622611060088 GeV
-   2017-11-28T14:13:40:   Simulation area ..........: 1.97769e+09 cm2
-   2017-11-28T14:13:40:   Use model ................: Crab
-   2017-11-28T14:13:40:   Normalization ............: 1 [Crab]
-   2017-11-28T14:13:40:   Flux .....................: 2.5413e-09 [Crab] photons/cm2/s
-   2017-11-28T14:13:40:   Normalized flux ..........: 2.5413e-09 [Crab] photons/cm2/s
-   2017-11-28T14:13:40:   Photon rate ..............: 5.0259 photons/s [Crab]
-   2017-11-28T14:13:40:   MC source photons ........: 18186 [Crab]
-   2017-11-28T14:13:40:   MC source events .........: 3544 [Crab]
-   2017-11-28T14:13:40:   MC source events .........: 3544 (all source models)
-   2017-11-28T14:13:40:  Photon energy range .......: 72.3622611060088 GeV - 174.543227745807 GeV
+   2018-01-24T14:01:30: === CTA observation ===
+   2018-01-24T14:01:30:  Simulation cone ...........: RA=83.63 deg, Dec=22.51 deg, radius=5.5 deg
+   2018-01-24T14:01:30:  Time interval .............: 6.31109e+08 - 6.31112e+08 s
+   2018-01-24T14:01:30:  Photon energy range .......: 30 GeV - 70.310187347763 GeV
+   2018-01-24T14:01:30:  Event energy range ........: 30 GeV - 70.310187347763 GeV
+   2018-01-24T14:01:30:   Simulation area ..........: 1.90195e+09 cm2
+   2018-01-24T14:01:30:   Use model ................: Crab
+   2018-01-24T14:01:30:   Normalization ............: 1 [Crab]
+   2018-01-24T14:01:30:   Flux .....................: 2.50006e-09 [Crab] photons/cm2/s
+   2018-01-24T14:01:30:   Normalized flux ..........: 2.50006e-09 [Crab] photons/cm2/s
+   2018-01-24T14:01:30:   Photon rate ..............: 4.75499 photons/s [Crab]
+   2018-01-24T14:01:30:   MC source photons ........: 17169 [Crab]
+   2018-01-24T14:01:30:   MC source events .........: 3870 [Crab]
+   2018-01-24T14:01:30:   MC source events .........: 3870 (all source models)
+   2018-01-24T14:01:30:  Photon energy range .......: 70.310187347763 GeV - 164.784081495918 GeV
    ...
-   2017-11-28T14:13:40:  MC source photons .........: 47219 [Crab]
-   2017-11-28T14:13:40:  MC source events ..........: 11356 [Crab]
-   2017-11-28T14:13:49:  MC events outside ROI .....: 0
-   2017-11-28T14:13:49:  MC background events ......: 189477
-   2017-11-28T14:13:49:  MC identifier 1 ...........: Crab
-   2017-11-28T14:13:49:  MC identifier 2 ...........: CTABackgroundModel
-   2017-11-28T14:13:49:  MC events .................: 200833 (all models)
+   2018-01-24T14:01:30:  MC source photons .........: 46368 [Crab]
+   2018-01-24T14:01:30:  MC source events ..........: 12749 [Crab]
+   2018-01-24T14:01:38:  MC events outside ROI .....: 0
+   2018-01-24T14:01:38:  MC background events ......: 189461
+   2018-01-24T14:01:38:  MC identifier 1 ...........: Crab
+   2018-01-24T14:01:38:  MC identifier 2 ...........: CTABackgroundModel
+   2018-01-24T14:01:38:  MC events .................: 202210 (all models)
 
 Each line starts with the UTC time at which the line has been written. In
-this run, 47219 Crab photons have been thrown. 11356 of these photons have been
-registered by CTA as events. In the same time interval, 189477 background
+this run, 46368 Crab photons have been thrown. 12749 of these photons have been
+registered by CTA as events. In the same time interval, 189461 background
 events have been registred by CTA.
 
 .. note::
@@ -252,7 +251,7 @@ You may change the name of the log file using the hidden parameter
 
 .. code-block:: bash
 
-  $ ctobssim logfile=my-private-log-file
+   $ ctobssim logfile=my-private-log-file
 
 Furthermore, you may decide on the amount of information provided in the 
 log file (the chattiness of the executable) using the hidden parameter 
@@ -260,7 +259,7 @@ log file (the chattiness of the executable) using the hidden parameter
 
 .. code-block:: bash
 
-  $ ctobssim chatter=4
+   $ ctobssim chatter=4
 
 ``chatter`` can vary between 0 and 4, 0 providing no information while 4 
 provides the most detailed information.
@@ -272,7 +271,7 @@ the hidden ``debug`` parameter to yes:
 
 .. code-block:: bash
 
-  $ ctobssim debug=yes
+   $ ctobssim debug=yes
 
 .. note::
    All tools have the hidden parameters ``logfile``, ``chatter``, and
