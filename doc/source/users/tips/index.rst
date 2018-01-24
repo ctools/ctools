@@ -44,7 +44,7 @@ the ctools software. Make sure that you read at least this section.
    final results for a publication. Taking into account energy dispersion
    adds a further dimension to the analysis which considerably slows down the
    computations. In many cases the impact of the energy dispersion is small
-   and can in a first order be neglected.
+   and can in first order be neglected.
 
 
 .. _tip_ts:
