@@ -48,12 +48,37 @@ following:
     PSF(p' | p, E, t) \times
     E_{\rm disp}(E' | p, E, t)
 
-ctools are shipped with response functions for the northern and southern
-arrays, and variants are available that have been optimised for exposure
-times of 0.5 hours, 5 hours and 50 hours.
+ctools are shipped with so called ``prod2`` response functions for the northern
+and southern arrays, and variants are available that have been optimised for
+exposure times of 0.5 hours, 5 hours and 50 hours.
 In total, the following six instrument response functions are available:
 ``North_0.5h``, ``North_5h``, ``North_50h``, ``South_0.5h``,
 ``South_5h``, and ``South_50h``.
+
+.. note::
+   In cases for which the CTA instrument response functions are used in a
+   research project, we ask to add the following acknowledgement in any
+   resulting publication:
+
+   *This research has made use of the CTA instrument response functions
+   provided by the CTA Consortium and Observatory.*
+
+   The latest CTA reponse function (prod3b-v1) can be downloaded from
+   `this link <http://www.cta-observatory.org/wp-content/uploads/2017/12/CTA-Performance-prod3b-v1-FITS1.tar.gz>`_. To install the response function, type
+
+   .. code-block:: bash
+
+      $ tar xvfz CTA-Performance-prod3b-v1-FITS1.tar.gz -C $CTOOLS/share
+
+   or
+
+   .. code-block:: bash
+
+      $ sudo tar xvfz CTA-Performance-prod3b-v1-FITS1.tar.gz -C $CTOOLS/share
+
+   if you need root priviledges to install in your ``$CTOOLS`` directory.
+   To use the prod3b-v1 response functions, specify ``prod3b-v1`` if a tool
+   or script queries for the calibration database.
 
 Each response is stored in a single FITS file, and each component of
 the response factorisation is stored in a binary table of that FITS
@@ -103,18 +128,18 @@ calibration database and the ``South_0.5h`` response function:
 
 .. code-block:: bash
 
-  $ ctobssim
-  RA of pointing (degrees) (0-360) [83.63] 
-  Dec of pointing (degrees) (-90-90) [22.51] 
-  Radius of FOV (degrees) (0-180) [5.0] 
-  Start time (MET in s) [0.0] 
-  End time (MET in s) [1800.0] 
-  Lower energy limit (TeV) [0.1] 
-  Upper energy limit (TeV) [100.0] 
-  Calibration database [prod2] 
-  Instrument response function [South_0.5h] 
-  Input model XML file [$CTOOLS/share/models/crab.xml] 
-  Output event data file or observation definition XML file [events.fits]
+   $ ctobssim
+   RA of pointing (degrees) (0-360) [83.63]
+   Dec of pointing (degrees) (-90-90) [22.51]
+   Radius of FOV (degrees) (0-180) [5.0]
+   Start time (MET in s) [0.0]
+   End time (MET in s) [1800.0]
+   Lower energy limit (TeV) [0.1]
+   Upper energy limit (TeV) [100.0]
+   Calibration database [prod2]
+   Instrument response function [South_0.5h]
+   Input model XML file [$CTOOLS/share/models/crab.xml]
+   Output event data file or observation definition XML file [events.fits]
 
 Running the other tools is equivalent.
 
@@ -179,11 +204,11 @@ and response name from within Python:
 
 .. code-block:: python
 
-  import gammalib
-  obs   = gammalib.GCTAObservation()
-  caldb = gammalib.GCaldb("cta", "prod2")
-  irf   = "South_0.5h"
-  obs.response(irf, caldb)
+   >>> import gammalib
+   >>> obs   = gammalib.GCTAObservation()
+   >>> caldb = gammalib.GCaldb("cta", "prod2")
+   >>> irf   = "South_0.5h"
+   >>> obs.response(irf, caldb)
 
 The calibration database is set by creating a ``GCaldb`` object. The
 constructor takes as argument the mission (always ``cta``) and the 

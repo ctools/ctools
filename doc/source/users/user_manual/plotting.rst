@@ -1,70 +1,120 @@
 Plotting
 ========
 
-Gammalib and ctools do not include classes and scripts to make plots.
+ctools and GammaLib do not include classes and scripts to make plots.
 
-This is intentional because creating and maintaining plotting tools that
-work on most user's machines and cover most user's needs is a big project
-in itself, and deciding to support a plotting package that is popular now
-as part of the CTA science tools could become very problematic in the
-future.
+This is intentional because creating and maintaining plotting tools that work
+on all platforms and cover all needs is a big project in itself, and deciding
+to support a plotting package that is popular now as part of the CTA science
+tools could become very problematic in the future.
 
-But we realise that most ctools users need to create plots for their
-high-level science results, so on this page we provide a few pointers 
-to external packages and tools.
+But we realise that most ctools users need to create plots for their high-level
+science results, so on this page we provide a few pointers to external packages
+and tools.
+
+Nevertheless, for your convenience several scripts for graphical display are
+included in the ctools package that rely on the
+`matplotlib <http://matplotlib.org>`_
+Python module. You can find these scripts in the
+``$CTOOLS/share/examples/python`` folder. The following scripts are available:
+
+  +------------------------+-----------------------------+
+  | Script                 | Usage                       |
+  +========================+=============================+
+  | ``show_butterfly.py``  | Display a butterfly diagram |
+  +------------------------+-----------------------------+
+  | ``show_lightcurve.py`` | Display a light curve       |
+  +------------------------+-----------------------------+
+  | ``show_obs.py``        | Display observation summary |
+  +------------------------+-----------------------------+
+  | ``show_pointings.py``  | Display pointing directions |
+  +------------------------+-----------------------------+
+  | ``show_phases.py``     | Display event phases        |
+  +------------------------+-----------------------------+
+  | ``show_spectrum.py``   | Display a spectrum          |
+  +------------------------+-----------------------------+
+
+Below some usage examples and the expected output.
+
+show_butterfly.py
+^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+   $ $CTOOLS/share/examples/python/show_butterfly.py butterfly_src001.txt
+
+.. figure:: plotting_butterfly.png
+   :width: 600px
+   :align: center
+
+   *Butterfly diagram displayed with show_butterfly.py*
 
 
-General
--------
+show_lightcurve.py
+^^^^^^^^^^^^^^^^^^
 
-The most common way to create publication-quality astronomy plots at the
-moment is to use the `matplotlib`_ Python plotting package. As illustrated
-by the `matplotlib gallery`_, virtually any plot can be constructed,
-but matplotlib doesn't have built-in easy-to-use classes or functions to
-create the common plots for gamma-ray astronomy, which are sky maps and
-spectra, so in the sections below we give some specific pointers for those.
+.. code-block:: bash
 
+   $ $CTOOLS/share/examples/python/show_lightcurve.py lightcurve.fits
 
-Sky maps
---------
+.. figure:: plotting_lightcurve.png
+   :width: 600px
+   :align: center
 
-For creating publication quality sky map plots via a Python script a good
-choice is to use `APLPy`_, `WCSAxes`_ or `kapteyn`_, which are all based on 
-matplotlib.
-
-You can also use interactive astronomy image viewers like `DS9`_, `Aladin`_
-or `Ginga`_ which allow you to save the image to a PNG or PDF file after
-customising it interactively, but also contain command line options to create
-the plot, i.e. you can write a bash or Python script to make the plot
-reproducible (DS9 and Ginga also feature direct communication with Python,
-but that is a bit harder to use and usually used for interactive image
-analysis, not plotting scripts).
+   *Light curve displayed with show_lightcurve.py*
 
 
-Spectra and light curves
-------------------------
+show_obs.py
+^^^^^^^^^^^
 
-To plot spectra or spectral energy distributions (including flux model curves,
-flux model error bands, flux points and residuals) and light curves, you can
-use matplotlib directly, or use the classes and scripts in `Gammapy`_.
+.. code-block:: bash
 
-Another option is to use virtual observatory interactive spectrum tools
-like `IRIS`_, `CASSIS`_ or `VOSpec`_ which allow you to save the plot to a
-PNG or PDF file after creating it interactively.
+   $ $CTOOLS/share/examples/python/show_obs.py obs_selected.xml
 
-.. _DS9: http://ds9.si.edu/
-.. _Aladin: http://aladin.u-strasbg.fr/
-.. _Ginga: http://ejeschke.github.io/ginga/
-.. _matplotlib: http://matplotlib.org/
-.. _matplotlib gallery: http://matplotlib.org/gallery.html
-.. _WCSAxes: http://wcsaxes.readthedocs.org/
-.. _APLPy: http://aplpy.github.io/
-.. _kapteyn: https://www.astro.rug.nl/software/kapteyn/
-.. _Gammapy: https://gammapy.readthedocs.org/
-.. _IRIS: http://cxc.cfa.harvard.edu/iris/
-.. _CASSIS: http://cassis.irap.omp.eu/
-.. _VOSpec: http://www.sciops.esa.int/index.php?project=SAT&page=vospec
+.. figure:: plotting_obs.png
+   :width: 600px
+   :align: center
 
-.. raw:: html
+   *Observation summary displayed with show_obs.py*
 
-   <iframe src="http://nbviewer.jupyter.org/github/davidchall/random-direction/blob/master/Generate_Beam_Directions.ipynb" width="100%" height="800"></iframe>
+
+show_pointings.py
+^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+   $ $CTOOLS/share/examples/python/show_pointings.py obs_selected.xml
+
+.. figure:: plotting_pointings.png
+   :width: 600px
+   :align: center
+
+   *Observation summary displayed with show_pointings.py (zoomed in)*
+
+
+show_phases.py
+^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+   $ $CTOOLS/share/examples/python/show_phases.py -n 50 events_phased.fits
+
+.. figure:: plotting_phases.png
+   :width: 600px
+   :align: center
+
+   *Event phases displayed with show_phases.py*
+
+
+show_spectrum.py
+^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+   $ $CTOOLS/share/examples/python/show_spectrum.py spectrum_src001.fits
+
+.. figure:: plotting_spectrum.png
+   :width: 600px
+   :align: center
+
+   *Observation summary displayed with show_spectrum.py*
