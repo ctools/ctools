@@ -24,7 +24,7 @@ outfile,  f, a, runlist.lis,,, "Output runlist file"
 # Script parameters
 #==================
 ra,          r, a, 83.63,,, "Right ascension of selection region centre (deg)"
-dec,         r, a, 22.01,,, "Declination of selection region centre (deg)"
+dec,         r, a, 22.51,,, "Declination of selection region centre (deg)"
 rad,         r, a, 2.5,,, "Search radius of selection region (deg)"
 min_qual,    i, h, 0,0|1|2,, "Minimum data quality (0=perfect, 1=ok, 2=bad)"
 expression,  s, h, NONE,,, "Additional expression"
