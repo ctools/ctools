@@ -47,8 +47,8 @@ extragalactic isotropic source component.
          <parameter name="Index2"       scale="1.0"   value="0.5" min="0.1"   max="5.0"    free="1"/>
        </spectrum>
        <spatialModel type="PointSource">
-         <parameter name="RA"  scale="1.0" value="128.84" min="-360" max="360" free="0"/>
-         <parameter name="DEC" scale="1.0" value="-45.18" min="-90"  max="90"  free="0"/>
+         <parameter name="RA"  scale="1.0" value="128.84" min="-360" max="360" free="1"/>
+         <parameter name="DEC" scale="1.0" value="-45.18" min="-90"  max="90"  free="1"/>
        </spatialModel>
      </source>
      <source type="DiffuseSource" name="Galactic_diffuse">
@@ -92,96 +92,95 @@ log file ``ctlike.log`` that was also created by :ref:`ctlike`:
 
 .. code-block:: none
 
-   2017-08-26T10:35:10: +=================================+
-   2017-08-26T10:35:10: | Maximum likelihood optimisation |
-   2017-08-26T10:35:10: +=================================+
-   2017-08-26T10:35:12:  >Iteration   0: -logL=-177232.327, Lambda=1.0e-03
-   2017-08-26T10:35:12:  >Iteration   1: -logL=-198931.081, Lambda=1.0e-03, delta=21698.754, step=1.0e+00, max(|grad|)=-22713.401202 [CutoffEnergy:4]
-   2017-08-26T10:35:12:  >Iteration   2: -logL=-200263.519, Lambda=1.0e-04, delta=1332.438, step=1.0e+00, max(|grad|)=-67648.133552 [CutoffEnergy:4]
-   2017-08-26T10:35:12:  >Iteration   3: -logL=-212350.035, Lambda=1.0e-05, delta=12086.515, step=1.0e+00, max(|grad|)=23036.151920 [Index2:6]
-   2017-08-26T10:35:12:  >Iteration   4: -logL=-213951.781, Lambda=1.0e-06, delta=1601.746, step=1.0e+00, max(|grad|)=-8297.648633 [CutoffEnergy:4]
-   2017-08-26T10:35:13:  >Iteration   5: -logL=-215341.362, Lambda=1.0e-07, delta=1389.581, step=1.0e+00, max(|grad|)=2747.034517 [Index2:6]
-   2017-08-26T10:35:13:  >Iteration   6: -logL=-215490.429, Lambda=1.0e-08, delta=149.067, step=1.0e+00, max(|grad|)=697.301361 [Index2:6]
-   2017-08-26T10:35:13:   Iteration   7: -logL=-215490.429, Lambda=1.0e-09, delta=-14.065, step=1.0e+00, max(|grad|)=-1205.683279 [Index1:3] (stalled)
-   2017-08-26T10:35:13:   Iteration   8: -logL=-215490.429, Lambda=1.0e-08, delta=-14.064, step=1.0e+00, max(|grad|)=-1205.659884 [Index1:3] (stalled)
-   2017-08-26T10:35:14:   Iteration   9: -logL=-215490.429, Lambda=1.0e-07, delta=-14.055, step=1.0e+00, max(|grad|)=-1205.425967 [Index1:3] (stalled)
-   2017-08-26T10:35:14:   Iteration  10: -logL=-215490.429, Lambda=1.0e-06, delta=-13.963, step=1.0e+00, max(|grad|)=-1203.090620 [Index1:3] (stalled)
-   2017-08-26T10:35:14:   Iteration  11: -logL=-215490.429, Lambda=1.0e-05, delta=-13.066, step=1.0e+00, max(|grad|)=-1180.113526 [Index1:3] (stalled)
-   2017-08-26T10:35:14:   Iteration  12: -logL=-215490.429, Lambda=1.0e-04, delta=-6.263, step=1.0e+00, max(|grad|)=-983.079153 [Index1:3] (stalled)
-   2017-08-26T10:35:14:  >Iteration  13: -logL=-215496.367, Lambda=1.0e-03, delta=5.937, step=1.0e+00, max(|grad|)=-285.734284 [Index1:3]
-   2017-08-26T10:35:15:   Iteration  14: -logL=-215496.367, Lambda=1.0e-04, delta=-8.812, step=1.0e+00, max(|grad|)=-731.894749 [Index1:3] (stalled)
-   2017-08-26T10:35:15:  >Iteration  15: -logL=-215497.536, Lambda=1.0e-03, delta=1.169, step=1.0e+00, max(|grad|)=-153.668138 [Index1:3]
-   2017-08-26T10:35:15:   Iteration  16: -logL=-215496.136, Lambda=1.0e-04, delta=-1.400, step=1.0e+00, max(|grad|)=-328.522942 [Index1:3] (stalled)
-   2017-08-26T10:35:15:  >Iteration  17: -logL=-215498.376, Lambda=1.0e-03, delta=2.240, step=1.0e+00, max(|grad|)=3.257091 [Index2:6]
-   2017-08-26T10:35:16:  >Iteration  18: -logL=-215498.383, Lambda=1.0e-04, delta=0.007, step=1.0e+00, max(|grad|)=-8.270351 [CutoffEnergy:4]
-   2017-08-26T10:35:16:  >Iteration  19: -logL=-215498.384, Lambda=1.0e-05, delta=0.002, step=1.0e+00, max(|grad|)=0.637485 [Index2:6]
-   2017-08-26T10:35:16:
-   2017-08-26T10:35:16: +=========================================+
-   2017-08-26T10:35:16: | Maximum likelihood optimisation results |
-   2017-08-26T10:35:16: +=========================================+
-   2017-08-26T10:35:16: === GOptimizerLM ===
-   2017-08-26T10:35:16:  Optimized function value ..: -215498.384
-   2017-08-26T10:35:16:  Absolute precision ........: 0.005
-   2017-08-26T10:35:16:  Acceptable value decrease .: 2
-   2017-08-26T10:35:16:  Optimization status .......: converged
-   2017-08-26T10:35:16:  Number of parameters ......: 14
-   2017-08-26T10:35:16:  Number of free parameters .: 5
-   2017-08-26T10:35:16:  Number of iterations ......: 19
-   2017-08-26T10:35:16:  Lambda ....................: 1e-06
-   2017-08-26T10:35:16:  Maximum log likelihood ....: 215498.384
-   2017-08-26T10:35:16:  Observed events  (Nobs) ...: 202330.000
-   2017-08-26T10:35:16:  Predicted events (Npred) ..: 202318.082 (Nobs - Npred = 11.9178772509331)
-   2017-08-26T10:35:16: === GModels ===
-   2017-08-26T10:35:16:  Number of models ..........: 3
-   2017-08-26T10:35:16:  Number of parameters ......: 14
-   2017-08-26T10:35:16: === GModelSky ===
-   2017-08-26T10:35:16:  Name ......................: Vela
-   2017-08-26T10:35:16:  Instruments ...............: all
-   2017-08-26T10:35:16:  Instrument scale factors ..: unity
-   2017-08-26T10:35:16:  Observation identifiers ...: all
-   2017-08-26T10:35:16:  Model type ................: PointSource
-   2017-08-26T10:35:16:  Model components ..........: "PointSource" * "SuperExponentialCutoffPowerLaw" * "Constant"
-   2017-08-26T10:35:16:  Number of parameters ......: 8
-   2017-08-26T10:35:16:  Number of spatial par's ...: 2
-   2017-08-26T10:35:16:   RA .......................: 128.84 [-360,360] deg (fixed,scale=1)
-   2017-08-26T10:35:16:   DEC ......................: -45.18 [-90,90] deg (fixed,scale=1)
-   2017-08-26T10:35:16:  Number of spectral par's ..: 5
-   2017-08-26T10:35:16:   Prefactor ................: 4.3553344038324e-09 +/- 4.75309654008435e-10 [1e-16,1e-06] ph/cm2/s/MeV (free,scale=1e-09,gradient)
-   2017-08-26T10:35:16:   Index1 ...................: -1.3435116067011 +/- 0.0311270092486095 [-0,-5]  (free,scale=-1,gradient)
-   2017-08-26T10:35:16:   CutoffEnergy .............: 988.499237722443 +/- 181.86709257978 [1,1000000] MeV (free,scale=1000,gradient)
-   2017-08-26T10:35:16:   PivotEnergy ..............: 1000 [10,1000000] MeV (fixed,scale=1000,gradient)
-   2017-08-26T10:35:16:   Index2 ...................: 0.587129723482927 +/- 0.0279303486200403 [0.1,5]  (free,scale=1,gradient)
-   2017-08-26T10:35:16:  Number of temporal par's ..: 1
-   2017-08-26T10:35:16:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-   2017-08-26T10:35:16: === GModelSky ===
-   2017-08-26T10:35:16:  Name ......................: Galactic_diffuse
-   2017-08-26T10:35:16:  Instruments ...............: all
-   2017-08-26T10:35:16:  Instrument scale factors ..: unity
-   2017-08-26T10:35:16:  Observation identifiers ...: all
-   2017-08-26T10:35:16:  Model type ................: DiffuseSource
-   2017-08-26T10:35:16:  Model components ..........: "DiffuseMapCube" * "Constant" * "Constant"
-   2017-08-26T10:35:16:  Number of parameters ......: 3
-   2017-08-26T10:35:16:  Number of spatial par's ...: 1
-   2017-08-26T10:35:16:   Normalization ............: 1 [0.1,10]  (fixed,scale=1,gradient)
-   2017-08-26T10:35:16:  Number of spectral par's ..: 1
-   2017-08-26T10:35:16:   Normalization ............: 1.10915296009432 +/- 0.00503367301009883 [0.1,1000]  (free,scale=1,gradient)
-   2017-08-26T10:35:16:  Number of temporal par's ..: 1
-   2017-08-26T10:35:16:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-   2017-08-26T10:35:16: === GModelSky ===
-   2017-08-26T10:35:16:  Name ......................: Extragalactic_diffuse
-   2017-08-26T10:35:16:  Instruments ...............: all
-   2017-08-26T10:35:16:  Instrument scale factors ..: unity
-   2017-08-26T10:35:16:  Observation identifiers ...: all
-   2017-08-26T10:35:16:  Model type ................: DiffuseSource
-   2017-08-26T10:35:16:  Model components ..........: "DiffuseIsotropic" * "FileFunction" * "Constant"
-   2017-08-26T10:35:16:  Number of parameters ......: 3
-   2017-08-26T10:35:16:  Number of spatial par's ...: 1
-   2017-08-26T10:35:16:   Value ....................: 1 [0,10]  (fixed,scale=1,gradient)
-   2017-08-26T10:35:16:  Number of spectral par's ..: 1
-   2017-08-26T10:35:16:   Normalization ............: 1 [0,1000]  (fixed,scale=1,gradient)
-   2017-08-26T10:35:16:  Number of temporal par's ..: 1
-   2017-08-26T10:35:16:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-
+   2018-01-25T20:07:55: +=================================+
+   2018-01-25T20:07:55: | Maximum likelihood optimisation |
+   2018-01-25T20:07:55: +=================================+
+   2018-01-25T20:07:57:  >Iteration   0: -logL=-177232.327, Lambda=1.0e-03
+   2018-01-25T20:07:58:  >Iteration   1: -logL=-198931.136, Lambda=1.0e-03, delta=21698.809, step=1.0e+00, max(|grad|)=-22717.063466 [CutoffEnergy:4]
+   2018-01-25T20:07:58:  >Iteration   2: -logL=-200269.888, Lambda=1.0e-04, delta=1338.753, step=1.0e+00, max(|grad|)=-67629.683771 [CutoffEnergy:4]
+   2018-01-25T20:07:59:  >Iteration   3: -logL=-212351.965, Lambda=1.0e-05, delta=12082.076, step=1.0e+00, max(|grad|)=23026.802421 [Index2:6]
+   2018-01-25T20:07:59:  >Iteration   4: -logL=-213954.259, Lambda=1.0e-06, delta=1602.294, step=1.0e+00, max(|grad|)=-8297.380912 [CutoffEnergy:4]
+   2018-01-25T20:07:59:  >Iteration   5: -logL=-215347.973, Lambda=1.0e-07, delta=1393.714, step=1.0e+00, max(|grad|)=2746.754042 [Index2:6]
+   2018-01-25T20:08:00:  >Iteration   6: -logL=-215497.807, Lambda=1.0e-08, delta=149.834, step=1.0e+00, max(|grad|)=699.848484 [Index2:6]
+   2018-01-25T20:08:00:   Iteration   7: -logL=-215497.807, Lambda=1.0e-09, delta=-13.845, step=1.0e+00, max(|grad|)=-1201.982875 [Index1:3] (stalled)
+   2018-01-25T20:08:01:   Iteration   8: -logL=-215497.807, Lambda=1.0e-08, delta=-13.844, step=1.0e+00, max(|grad|)=-1201.959647 [Index1:3] (stalled)
+   2018-01-25T20:08:01:   Iteration   9: -logL=-215497.807, Lambda=1.0e-07, delta=-13.835, step=1.0e+00, max(|grad|)=-1201.727401 [Index1:3] (stalled)
+   2018-01-25T20:08:02:   Iteration  10: -logL=-215497.807, Lambda=1.0e-06, delta=-13.744, step=1.0e+00, max(|grad|)=-1199.408717 [Index1:3] (stalled)
+   2018-01-25T20:08:02:   Iteration  11: -logL=-215497.807, Lambda=1.0e-05, delta=-12.858, step=1.0e+00, max(|grad|)=-1176.594021 [Index1:3] (stalled)
+   2018-01-25T20:08:03:   Iteration  12: -logL=-215497.807, Lambda=1.0e-04, delta=-6.126, step=1.0e+00, max(|grad|)=-980.833963 [Index1:3] (stalled)
+   2018-01-25T20:08:04:  >Iteration  13: -logL=-215503.803, Lambda=1.0e-03, delta=5.995, step=1.0e+00, max(|grad|)=-285.964915 [Index1:3]
+   2018-01-25T20:08:04:   Iteration  14: -logL=-215503.803, Lambda=1.0e-04, delta=-8.762, step=1.0e+00, max(|grad|)=-730.461326 [Index1:3] (stalled)
+   2018-01-25T20:08:05:  >Iteration  15: -logL=-215504.976, Lambda=1.0e-03, delta=1.173, step=1.0e+00, max(|grad|)=-153.941336 [Index1:3]
+   2018-01-25T20:08:05:   Iteration  16: -logL=-215503.593, Lambda=1.0e-04, delta=-1.383, step=1.0e+00, max(|grad|)=-327.368445 [Index1:3] (stalled)
+   2018-01-25T20:08:06:  >Iteration  17: -logL=-215505.817, Lambda=1.0e-03, delta=2.225, step=1.0e+00, max(|grad|)=3.256216 [Index2:6]
+   2018-01-25T20:08:06:  >Iteration  18: -logL=-215505.824, Lambda=1.0e-04, delta=0.007, step=1.0e+00, max(|grad|)=-8.190316 [CutoffEnergy:4]
+   2018-01-25T20:08:06:  >Iteration  19: -logL=-215505.826, Lambda=1.0e-05, delta=0.002, step=1.0e+00, max(|grad|)=0.635263 [Index2:6]
+   2018-01-25T20:08:07:
+   2018-01-25T20:08:07: +=========================================+
+   2018-01-25T20:08:07: | Maximum likelihood optimisation results |
+   2018-01-25T20:08:07: +=========================================+
+   2018-01-25T20:08:07: === GOptimizerLM ===
+   2018-01-25T20:08:07:  Optimized function value ..: -215505.826
+   2018-01-25T20:08:07:  Absolute precision ........: 0.005
+   2018-01-25T20:08:07:  Acceptable value decrease .: 2
+   2018-01-25T20:08:07:  Optimization status .......: converged
+   2018-01-25T20:08:07:  Number of parameters ......: 14
+   2018-01-25T20:08:07:  Number of free parameters .: 7
+   2018-01-25T20:08:07:  Number of iterations ......: 19
+   2018-01-25T20:08:07:  Lambda ....................: 1e-06
+   2018-01-25T20:08:07:  Maximum log likelihood ....: 215505.826
+   2018-01-25T20:08:07:  Observed events  (Nobs) ...: 202330.000
+   2018-01-25T20:08:07:  Predicted events (Npred) ..: 202318.925 (Nobs - Npred = 11.0749561789562)
+   2018-01-25T20:08:07: === GModels ===
+   2018-01-25T20:08:07:  Number of models ..........: 3
+   2018-01-25T20:08:07:  Number of parameters ......: 14
+   2018-01-25T20:08:07: === GModelSky ===
+   2018-01-25T20:08:07:  Name ......................: Vela
+   2018-01-25T20:08:07:  Instruments ...............: all
+   2018-01-25T20:08:07:  Instrument scale factors ..: unity
+   2018-01-25T20:08:07:  Observation identifiers ...: all
+   2018-01-25T20:08:07:  Model type ................: PointSource
+   2018-01-25T20:08:07:  Model components ..........: "PointSource" * "SuperExponentialCutoffPowerLaw" * "Constant"
+   2018-01-25T20:08:07:  Number of parameters ......: 8
+   2018-01-25T20:08:07:  Number of spatial par's ...: 2
+   2018-01-25T20:08:07:   RA .......................: 128.835772118429 +/- 0.00162177813558897 [-360,360] deg (free,scale=1)
+   2018-01-25T20:08:07:   DEC ......................: -45.1835812138884 +/- 0.00114069728792873 [-90,90] deg (free,scale=1)
+   2018-01-25T20:08:07:  Number of spectral par's ..: 5
+   2018-01-25T20:08:07:   Prefactor ................: 4.35032346821964e-09 +/- 4.73845090178596e-10 [1e-16,1e-06] ph/cm2/s/MeV (free,scale=1e-09,gradient)
+   2018-01-25T20:08:07:   Index1 ...................: -1.34367731366247 +/- 0.031088811599731 [-0,-5]  (free,scale=-1,gradient)
+   2018-01-25T20:08:07:   CutoffEnergy .............: 990.275379109663 +/- 181.814299583364 [1,1000000] MeV (free,scale=1000,gradient)
+   2018-01-25T20:08:07:   PivotEnergy ..............: 1000 [10,1000000] MeV (fixed,scale=1000,gradient)
+   2018-01-25T20:08:07:   Index2 ...................: 0.587550117179991 +/- 0.0279192539614008 [0.1,5]  (free,scale=1,gradient)
+   2018-01-25T20:08:07:  Number of temporal par's ..: 1
+   2018-01-25T20:08:07:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2018-01-25T20:08:07: === GModelSky ===
+   2018-01-25T20:08:07:  Name ......................: Galactic_diffuse
+   2018-01-25T20:08:07:  Instruments ...............: all
+   2018-01-25T20:08:07:  Instrument scale factors ..: unity
+   2018-01-25T20:08:07:  Observation identifiers ...: all
+   2018-01-25T20:08:07:  Model type ................: DiffuseSource
+   2018-01-25T20:08:07:  Model components ..........: "DiffuseMapCube" * "Constant" * "Constant"
+   2018-01-25T20:08:07:  Number of parameters ......: 3
+   2018-01-25T20:08:07:  Number of spatial par's ...: 1
+   2018-01-25T20:08:07:   Normalization ............: 1 [0.1,10]  (fixed,scale=1,gradient)
+   2018-01-25T20:08:07:  Number of spectral par's ..: 1
+   2018-01-25T20:08:07:   Normalization ............: 1.10941973066973 +/- 0.00503412002598653 [0.1,1000]  (free,scale=1,gradient)
+   2018-01-25T20:08:07:  Number of temporal par's ..: 1
+   2018-01-25T20:08:07:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2018-01-25T20:08:07: === GModelSky ===
+   2018-01-25T20:08:07:  Name ......................: Extragalactic_diffuse
+   2018-01-25T20:08:07:  Instruments ...............: all
+   2018-01-25T20:08:07:  Instrument scale factors ..: unity
+   2018-01-25T20:08:07:  Observation identifiers ...: all
+   2018-01-25T20:08:07:  Model type ................: DiffuseSource
+   2018-01-25T20:08:07:  Model components ..........: "DiffuseIsotropic" * "FileFunction" * "Constant"
+   2018-01-25T20:08:07:  Number of parameters ......: 3
+   2018-01-25T20:08:07:  Number of spatial par's ...: 1
+   2018-01-25T20:08:07:   Value ....................: 1 [0,10]  (fixed,scale=1,gradient)
+   2018-01-25T20:08:07:  Number of spectral par's ..: 1
+   2018-01-25T20:08:07:   Normalization ............: 1 [0,1000]  (fixed,scale=1,gradient)
+   2018-01-25T20:08:07:  Number of temporal par's ..: 1
+   2018-01-25T20:08:07:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 The fit converged after 19 iterations with spectral parameters that are
 reasonably close to those found in
@@ -242,12 +241,15 @@ using the Fermi-LAT Science Tools.
 
    .. code-block:: none
 
-      2017-08-26T13:05:12: === GModelSky ===
-      2017-08-26T13:05:12:  Name ......................: Vela
-      2017-08-26T13:05:12:  Instruments ...............: all
-      2017-08-26T13:05:12:  Test Statistic ............: 326326.556902542
+      2018-01-25T20:05:57:  Name ......................: Vela
+      2018-01-25T20:05:57:  Instruments ...............: all
+      2018-01-25T20:05:57:  Test Statistic ............: 326341.439917148
 
    which is also close to the value determined by gtlike.
+
+.. note::
+   Unlike gtlike, :ref:`ctlike` can also fit the source location. This has been
+   done in the example above by setting the parameter attributes to ``free="1"``.
 
 .. warning::
    ctools supports for the moment only the fitting of point sources for

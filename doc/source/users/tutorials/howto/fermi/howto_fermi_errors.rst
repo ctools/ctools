@@ -31,56 +31,82 @@ that was created by :ref:`cterror`. As you will see, the parameter errors
 are essentially symmetric and very close to the values determined using the
 covariance matrix.
 
-.. code-block:: bash
+.. code-block:: none
 
-   2017-08-26T14:16:00: +=======================================================+
-   2017-08-26T14:16:00: | Compute error for source "Vela" parameter "Prefactor" |
-   2017-08-26T14:16:00: +=======================================================+
-   2017-08-26T14:16:00:  Confidence level ..........: 68 %
-   2017-08-26T14:16:00:  Log-likelihood difference .: 0.494473
-   2017-08-26T14:16:00:  Initial factor range ......: [1e-07, 9.10916268820218]
-   2017-08-26T14:16:20:  Lower parameter factor ....: 3.93549
-   2017-08-26T14:16:20:  Upper parameter factor ....: 4.89285
-   2017-08-26T14:16:20:  Error from curvature ......: 4.75365104151534e-10 ph/cm2/s/MeV
-   2017-08-26T14:16:20:  Error from profile ........: 4.78682555317737e-10 ph/cm2/s/MeV
-   2017-08-26T14:16:20:  Negative profile error ....: 4.20026137925122e-10 ph/cm2/s/MeV
-   2017-08-26T14:16:20:  Positive profile error ....: 5.37338972710351e-10 ph/cm2/s/MeV
-   2017-08-26T14:16:20:
-   2017-08-26T14:16:20: +====================================================+
-   2017-08-26T14:16:20: | Compute error for source "Vela" parameter "Index1" |
-   2017-08-26T14:16:20: +====================================================+
-   2017-08-26T14:16:20:  Confidence level ..........: 68 %
-   2017-08-26T14:16:20:  Log-likelihood difference .: 0.494473
-   2017-08-26T14:16:20:  Initial factor range ......: [1.03221907174349, 1.65479046234989]
-   2017-08-26T14:16:42:  Lower parameter factor ....: 1.31121
-   2017-08-26T14:16:42:  Upper parameter factor ....: 1.37307
-   2017-08-26T14:16:42:  Error from curvature ......: 0.03112856953032
-   2017-08-26T14:16:42:  Error from profile ........: 0.0309309760713872
-   2017-08-26T14:16:42:  Negative profile error ....: 0.0322989307870749
-   2017-08-26T14:16:42:  Positive profile error ....: 0.0295630213556994
-   2017-08-26T14:16:42:
-   2017-08-26T14:16:42: +==========================================================+
-   2017-08-26T14:16:42: | Compute error for source "Vela" parameter "CutoffEnergy" |
-   2017-08-26T14:16:42: +==========================================================+
-   2017-08-26T14:16:42:  Confidence level ..........: 68 %
-   2017-08-26T14:16:42:  Log-likelihood difference .: 0.494473
-   2017-08-26T14:16:42:  Initial factor range ......: [0.001, 2.8071605417966]
-   2017-08-26T14:17:02:  Lower parameter factor ....: 0.813181
-   2017-08-26T14:17:02:  Upper parameter factor ....: 1.17404
-   2017-08-26T14:17:02:  Error from curvature ......: 181.871842544747 MeV
-   2017-08-26T14:17:02:  Error from profile ........: 180.431484426618 MeV
-   2017-08-26T14:17:02:  Negative profile error ....: 175.261332662553 MeV
-   2017-08-26T14:17:02:  Positive profile error ....: 185.601636190684 MeV
-   2017-08-26T14:17:02:
-   2017-08-26T14:17:02: +====================================================+
-   2017-08-26T14:17:02: | Compute error for source "Vela" parameter "Index2" |
-   2017-08-26T14:17:02: +====================================================+
-   2017-08-26T14:17:02:  Confidence level ..........: 68 %
-   2017-08-26T14:17:02:  Log-likelihood difference .: 0.494473
-   2017-08-26T14:17:02:  Initial factor range ......: [0.307804018748382, 0.866425033775455]
-   2017-08-26T14:17:24:  Lower parameter factor ....: 0.559156
-   2017-08-26T14:17:24:  Upper parameter factor ....: 0.615141
-   2017-08-26T14:17:24:  Error from curvature ......: 0.0279310507513537
-   2017-08-26T14:17:24:  Error from profile ........: 0.0279924226890397
-   2017-08-26T14:17:24:  Negative profile error ....: 0.027958327168103
-   2017-08-26T14:17:24:  Positive profile error ....: 0.0280265182099764
+   2018-01-25T20:45:22: +================================================+
+   2018-01-25T20:45:22: | Compute error for source "Vela" parameter "RA" |
+   2018-01-25T20:45:22: +================================================+
+   2018-01-25T20:45:22:  Confidence level ..........: 68 %
+   2018-01-25T20:45:22:  Log-likelihood difference .: 0.494473
+   2018-01-25T20:45:22:  Initial factor range ......: [128.819554251926, 128.851989886434]
+   2018-01-25T20:45:41:  Lower parameter factor ....: 128.834
+   2018-01-25T20:45:41:  Upper parameter factor ....: 128.837
+   2018-01-25T20:45:41:  Error from curvature ......: 0.00162178172537938 deg
+   2018-01-25T20:45:41:  Error from profile ........: 0.00169067577327553 deg
+   2018-01-25T20:45:41:  Negative profile error ....: 0.00165900034895117 deg
+   2018-01-25T20:45:41:  Positive profile error ....: 0.00172235119759989 deg
+   2018-01-25T20:45:41:
+   2018-01-25T20:45:41: +=================================================+
+   2018-01-25T20:45:41: | Compute error for source "Vela" parameter "DEC" |
+   2018-01-25T20:45:41: +=================================================+
+   2018-01-25T20:45:41:  Confidence level ..........: 68 %
+   2018-01-25T20:45:41:  Log-likelihood difference .: 0.494473
+   2018-01-25T20:45:41:  Initial factor range ......: [-45.1949881923928, -45.1721741961801]
+   2018-01-25T20:46:01:  Lower parameter factor ....: -45.1847
+   2018-01-25T20:46:01:  Upper parameter factor ....: -45.1824
+   2018-01-25T20:46:01:  Error from curvature ......: 0.00114069981063169 deg
+   2018-01-25T20:46:01:  Error from profile ........: 0.00116548552428952 deg
+   2018-01-25T20:46:01:  Negative profile error ....: 0.00115852324517363 deg
+   2018-01-25T20:46:01:  Positive profile error ....: 0.00117244780340542 deg
+   2018-01-25T20:46:01:
+   2018-01-25T20:46:01: +=======================================================+
+   2018-01-25T20:46:01: | Compute error for source "Vela" parameter "Prefactor" |
+   2018-01-25T20:46:01: +=======================================================+
+   2018-01-25T20:46:01:  Confidence level ..........: 68 %
+   2018-01-25T20:46:01:  Log-likelihood difference .: 0.494473
+   2018-01-25T20:46:01:  Initial factor range ......: [1e-07, 9.09784331905335]
+   2018-01-25T20:46:45:  Lower parameter factor ....: 3.93674
+   2018-01-25T20:46:45:  Upper parameter factor ....: 4.89558
+   2018-01-25T20:46:45:  Error from curvature ......: 4.74564602380296e-10 ph/cm2/s/MeV
+   2018-01-25T20:46:45:  Error from profile ........: 4.79421031311828e-10 ph/cm2/s/MeV
+   2018-01-25T20:46:45:  Negative profile error ....: 4.15456324058327e-10 ph/cm2/s/MeV
+   2018-01-25T20:46:45:  Positive profile error ....: 5.4338573856533e-10 ph/cm2/s/MeV
+   2018-01-25T20:46:45:
+   2018-01-25T20:46:45: +====================================================+
+   2018-01-25T20:46:45: | Compute error for source "Vela" parameter "Index1" |
+   2018-01-25T20:46:45: +====================================================+
+   2018-01-25T20:46:45:  Confidence level ..........: 68 %
+   2018-01-25T20:46:45:  Log-likelihood difference .: 0.494473
+   2018-01-25T20:46:45:  Initial factor range ......: [1.0323933217421, 1.65461803910864]
+   2018-01-25T20:47:31:  Lower parameter factor ....: 1.31084
+   2018-01-25T20:47:31:  Upper parameter factor ....: 1.37275
+   2018-01-25T20:47:31:  Error from curvature ......: 0.0311112358683271
+   2018-01-25T20:47:31:  Error from profile ........: 0.0309517300203693
+   2018-01-25T20:47:31:  Negative profile error ....: 0.032660721248488
+   2018-01-25T20:47:31:  Positive profile error ....: 0.0292427387922507
+   2018-01-25T20:47:31:
+   2018-01-25T20:47:31: +==========================================================+
+   2018-01-25T20:47:31: | Compute error for source "Vela" parameter "CutoffEnergy" |
+   2018-01-25T20:47:31: +==========================================================+
+   2018-01-25T20:47:31:  Confidence level ..........: 68 %
+   2018-01-25T20:47:31:  Log-likelihood difference .: 0.494473
+   2018-01-25T20:47:31:  Initial factor range ......: [0.001, 2.80853448949703]
+   2018-01-25T20:48:14:  Lower parameter factor ....: 0.81239
+   2018-01-25T20:48:14:  Upper parameter factor ....: 1.17294
+   2018-01-25T20:48:14:  Error from curvature ......: 181.899981380157 MeV
+   2018-01-25T20:48:14:  Error from profile ........: 180.277267463442 MeV
+   2018-01-25T20:48:14:  Negative profile error ....: 177.144641591912 MeV
+   2018-01-25T20:48:14:  Positive profile error ....: 183.409893334972 MeV
+   2018-01-25T20:48:14:
+   2018-01-25T20:48:14: +====================================================+
+   2018-01-25T20:48:14: | Compute error for source "Vela" parameter "Index2" |
+   2018-01-25T20:48:14: +====================================================+
+   2018-01-25T20:48:14:  Confidence level ..........: 68 %
+   2018-01-25T20:48:14:  Log-likelihood difference .: 0.494473
+   2018-01-25T20:48:14:  Initial factor range ......: [0.308028525758507, 0.866644263529458]
+   2018-01-25T20:49:01:  Lower parameter factor ....: 0.559037
+   2018-01-25T20:49:01:  Upper parameter factor ....: 0.615056
+   2018-01-25T20:49:01:  Error from curvature ......: 0.0279307868885475
+   2018-01-25T20:49:01:  Error from profile ........: 0.0280092058458762
+   2018-01-25T20:49:01:  Negative profile error ....: 0.028299015036004
+   2018-01-25T20:49:01:  Positive profile error ....: 0.0277193966557485

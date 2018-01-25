@@ -44,18 +44,18 @@ specifying ``emin=0.0001 emax=0.1`` (all values are given in TeV):
 .. code-block:: bash
 
    $ ctulimit eref=0.001 emin=0.0001 emax=0.1
-   Input event list, counts cube or observation definition XML file [obs.xml]
-   Source of interest [Test]
-   Input model definition XML file [model_lat_ulimit.xml]
+   Input event list, counts cube or observation definition XML file [events.fits] obs.xml
+   Source of interest [Crab] Test
+   Input model definition XML file [$CTOOLS/share/models/crab.xml] models_ulimit.xml
 
 The results of the upper limit computation can then be extracted from the
 ``ctulimit.log`` file that is created by :ref:`ctulimit`:
 
 .. code-block:: bash
 
-   2017-08-26T14:37:48: +=====================+
-   2017-08-26T14:37:48: | Upper limit results |
-   2017-08-26T14:37:48: +=====================+
-   2017-08-26T14:37:48:  Differential flux limit ...: 1.00100099727198e-13 ph/cm2/s/MeV at 0.001 TeV
-   2017-08-26T14:37:48:  Integral flux limit .......: 9.9999999627471e-10 ph/cm2/s within [0.0001-0.1] TeV
-   2017-08-26T14:37:48:  Energy flux limit .........: 1.10785216561628e-12 erg/cm2/s within [0.0001-0.1] TeV
+   2018-01-25T20:43:02: +=====================+
+   2018-01-25T20:43:02: | Upper limit results |
+   2018-01-25T20:43:02: +=====================+
+   2018-01-25T20:43:02:  Differential flux limit ...: 1.00100099727198e-13 ph/cm2/s/MeV at 0.001 TeV
+   2018-01-25T20:43:02:  Integral flux limit .......: 9.9999999627471e-10 ph/cm2/s within [0.0001-0.1] TeV
+   2018-01-25T20:43:02:  Energy flux limit .........: 1.10785216561628e-12 erg/cm2/s within [0.0001-0.1] TeV
