@@ -20,7 +20,8 @@
 #############################################################################
 
 # Models to install
-models = crab.xml \
+models = bkg_irf.xml \
+         crab.xml \
          crab_beyond.xml \
          crab_2bkg.xml \
          crab_poly.xml \
