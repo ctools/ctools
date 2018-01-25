@@ -20,6 +20,8 @@ In particular, this release provides:
 Bug fixes
 ---------
 
+* [`2298 <https://cta-redmine.irap.omp.eu/issues/2298>`_] -
+  Correct diffuse map cube upper limit computation in :ref:`ctulimit`
 * Change ``DATE_OBS``, ``DATE_END``, ``TIME_OBS`` and ``TIME_END`` FITS keywords
   into ``DATA-OBS``, ``DATE-END``, ``TIME-OBS`` and ``TIME-END``
 * [`2287 <https://cta-redmine.irap.omp.eu/issues/2287>`_] -

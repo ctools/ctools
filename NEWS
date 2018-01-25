@@ -1,4 +1,4 @@
-24 January 2018
+25 January 2018
 
 
 Introduction
@@ -142,6 +142,10 @@ Add "statistic" parameter to allow setting of optimizer statistic (#2237).
 
 ctulimit - Compute upper limit
 ------------------------------
+The tool now also computes correct upper flux limits for diffuse map cubes
+for which the spectral component is a normalization of the spectral information
+available in the map cube (#2298).
+
 Add "statistic" parameter to allow setting of optimizer statistic (#2237).
 
 

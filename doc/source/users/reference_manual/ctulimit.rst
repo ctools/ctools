@@ -19,7 +19,8 @@ using the hidden ``confidence`` parameter.
 :ref:`ctulimit` writes the differential upper flux limit at a given reference
 energy (specified by the hidden parameter ``eref``) and the integrated 
 upper flux limit (specified by the hidden parameters ``emin`` and ``emax``)
-into the log file.
+into the log file. This information can also be accessed using the ``diff_ulimit()``,
+``flux_ulimit()``, and ``eflux_ulimit()`` methods.
 
 
 General parameters

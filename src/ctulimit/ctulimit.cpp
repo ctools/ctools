@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2017 by Michael Mayer                               *
+ *  copyright (C) 2015-2018 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -302,17 +302,8 @@ void ctulimit::run(void)
     // Write final parameter into logger
     log_value(NORMAL, "Final parameter", m_model_par->value());
 
-    // Get reference energy for differential upper limit
-    GEnergy eref = GEnergy(m_eref, "TeV");
-
-    // Create energy range for flux limits
-    GEnergy emin = GEnergy(m_emin, "TeV");
-    GEnergy emax = GEnergy(m_emax, "TeV");
-
     // Compute upper limit intensity and fluxes
-    m_diff_ulimit  = m_skymodel->spectral()->eval(eref, GTime());
-    m_flux_ulimit  = m_skymodel->spectral()->flux(emin, emax);
-    m_eflux_ulimit = m_skymodel->spectral()->eflux(emin, emax);
+    compute_ulimit();
 
     // Write header into logger
     log_header1(TERSE, "Upper limit results");
@@ -639,4 +630,79 @@ void ctulimit::ulimit_bisection(const double& min, const double& max)
     // Return
     return;
 
+}
+
+
+/***********************************************************************//**
+ * @brief Compute upper limit intensity and fluxes
+ *
+ * Compute upper limit intensity and fluxes, including a correct computation
+ * for the diffuse map cube models.
+ ***************************************************************************/
+void ctulimit::compute_ulimit(void)
+{
+    // Initialise upper limit intensity and fluxes
+    m_diff_ulimit  = 0.0;
+    m_flux_ulimit  = 0.0;
+    m_eflux_ulimit = 0.0;
+
+    // Get reference energy for differential upper limit
+    GEnergy eref = GEnergy(m_eref, "TeV");
+
+    // Create energy range for flux limits
+    GEnergy emin = GEnergy(m_emin, "TeV");
+    GEnergy emax = GEnergy(m_emax, "TeV");
+
+    // Set pointer to spectral model and initialise spectral nodes model
+    // pointer
+    GModelSpectral*      spectral = m_skymodel->spectral();
+    GModelSpectralNodes* nodes    = NULL;
+
+    // If the spectral model is a diffuse cube then create a node function
+    // spectral model that is the product of the diffuse cube node function
+    // and the spectral model evaluated at the energies of the node function
+    GModelSpatialDiffuseCube* cube =
+        dynamic_cast<GModelSpatialDiffuseCube*>(m_skymodel->spatial());
+    if (cube != NULL) {
+
+
+        // Set MC cone to the entire sky. This method call is needed to
+        // set-up the cube spectrum
+        cube->set_mc_cone(GSkyDir(), 180.0);
+
+        // Allocate node function to replace the spectral component
+        nodes = new GModelSpectralNodes(cube->spectrum());
+        for (int i = 0; i < nodes->nodes(); ++i) {
+            GEnergy energy    = nodes->energy(i);
+            double  intensity = nodes->intensity(i);
+            double  value     = spectral->eval(energy);
+            nodes->intensity(i, value*intensity);
+        }
+
+        // Set the spectral model pointer to the node function. If there are
+        // no nodes the spectral pointer is set to NULL since in this case the
+        // spectral->flux method will throw an exception
+        if (nodes->nodes() > 0) {
+            spectral = nodes;
+        }
+        else {
+            spectral = NULL;
+        }
+
+    } // endif: spatial model was a diffuse cube
+
+    // Compute upper limit intensity and fluxes
+    if (spectral != NULL) {
+        m_diff_ulimit  = spectral->eval(eref);
+        m_flux_ulimit  = spectral->flux(emin, emax);
+        m_eflux_ulimit = spectral->eflux(emin, emax);
+    }
+
+    // Free spectral nodes if they have been allocated
+    if (nodes != NULL) {
+        delete nodes;
+    }
+
+    // Return
+    return;
 }
