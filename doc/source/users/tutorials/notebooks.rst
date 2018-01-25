@@ -19,3 +19,4 @@ this page.
 * :download:`How to connect observations to specific models? <howto/howto_connect_models.ipynb>`
 * :download:`How to perform a stacked analysis? <howto/howto_stacked_analysis.ipynb>`
 * :download:`How to do advanced model manipulation and fitting in Python? <howto/howto_advanced_python_fitting.ipynb>`
+* :download:`Data preparation for 1DC How-tos <howto/howto_prepare_1dc.ipynb>`

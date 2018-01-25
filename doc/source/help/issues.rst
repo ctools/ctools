@@ -20,8 +20,9 @@ list of
 
 **Model fitting issues**
 
-- :ref:`Broken power law has unreliable errors <issue_bplaw>`
+- :ref:`Pivot energy should be comprised in energy range of fitted data <issue_interval>`
 - :ref:`Errors become unreliable when fitting the pivot energy <issue_pivot>`
+- :ref:`Broken power law has unreliable errors <issue_bplaw>`
 - :ref:`Shell model is biased when width is comparable to angular resolution <issue_shell>`
 - :ref:`Elliptical Gaussian model fit converges slowly <issue_egauss>`
 
@@ -34,14 +35,14 @@ Installation issues
 
 .. topic:: Certificate problem when cloning from Git
 
-    When cloning ctools from git you may encounter an SSL certificate 
-    problem. This is related to the usage of the https protocol and can
-    be resolved by setting the ``GIT_SSL_NO_VERIFY`` environment variable
-    to true:
+   When cloning ctools from git you may encounter an SSL certificate 
+   problem. This is related to the usage of the https protocol and can
+   be resolved by setting the ``GIT_SSL_NO_VERIFY`` environment variable
+   to true:
 
-    .. code-block:: bash
+   .. code-block:: bash
 
-       export GIT_SSL_NO_VERIFY=true
+      export GIT_SSL_NO_VERIFY=true
  
 .. _issue_python:
 
@@ -71,15 +72,15 @@ Installation issues
 
 .. topic:: Installing on Solaris
 
-    Although ctools build on Solaris using the Sun compiler, there are
-    problems with global symbols in shared libraries and exception catching,
-    which prevents the FITS interface to work correctly. ctools have however
-    been built and tested successfully using the GNU compiler, and this is
-    the only build method that is currently supported. Problems have also
-    been encountered when compiling cfitsio versions more recent than 3.250.
-    The problems have been reported to the cfitsio developer team, and are
-    likely to be solved in the future. For the time being, it is recommended
-    to use cfitsio version 3.250 on Solaris.
+   Although ctools build on Solaris using the Sun compiler, there are
+   problems with global symbols in shared libraries and exception catching,
+   which prevents the FITS interface to work correctly. ctools have however
+   been built and tested successfully using the GNU compiler, and this is
+   the only build method that is currently supported. Problems have also
+   been encountered when compiling cfitsio versions more recent than 3.250.
+   The problems have been reported to the cfitsio developer team, and are
+   likely to be solved in the future. For the time being, it is recommended
+   to use cfitsio version 3.250 on Solaris.
 
 .. _issue_opensolaris:
 
@@ -119,15 +120,13 @@ Analysis issues
 Model fitting issues
 ^^^^^^^^^^^^^^^^^^^^
 
-.. _issue_bplaw:
+.. _issue_interval:
 
-.. topic:: Broken power law has unreliable errors
+.. topic:: Pivot energy should be comprised in energy range of fitted data
 
-   The broken power law spectral model has unreliable errors, specifically
-   for the prefactor and the break value. Errors are in general too large,
-   and this is related to the fact that the law's gradient is discontinuous
-   in energy. There is not very much we can do about it, it's inherent in
-   the law.
+   The pivot energy of a spectral model, such as for example a power law model,
+   should be comprised within the energy range of the fitted data,
+   otherwise some fit instabilities may occur.
 
 .. _issue_pivot:
 
@@ -142,6 +141,16 @@ Model fitting issues
    So please make sure that the pivot energy is fixed, or fix other
    parameters of the model to assure non-degeneracy of the free
    parameters.
+
+.. _issue_bplaw:
+
+.. topic:: Broken power law has unreliable errors
+
+   The broken power law spectral model has unreliable errors, specifically
+   for the prefactor and the break value. Errors are in general too large,
+   and this is related to the fact that the law's gradient is discontinuous
+   in energy. There is not very much we can do about it, it's inherent in
+   the law.
 
 .. _issue_shell:
 

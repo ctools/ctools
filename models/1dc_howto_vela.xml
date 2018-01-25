@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<source_library title="source library">
+  <source name="VelaPulsar" type="PointSource">
+    <spectrum type="PowerLaw">
+      <parameter name="Prefactor"   scale="1e-14" value="19.4" min="1e-07" max="1000.0" free="1"/>
+      <parameter name="Index"       scale="-1"    value="4.45" min="0.0"   max="+10.0"  free="1"/>
+      <parameter name="PivotEnergy" scale="1e3"   value="20.0" min="0.01"  max="1000.0" free="0"/>
+    </spectrum>
+    <spatialModel type="PointSource">
+      <parameter name="RA"  scale="1" value="128.838" min="-360" max="360" free="0"/>
+      <parameter name="DEC" scale="1" value="-45.178" min="-90"  max="90"  free="0"/>
+    </spatialModel>
+  </source>
+  <source name="Background" type="CTAIrfBackground" instrument="CTA">
+    <spectrum type="PowerLaw">
+      <parameter name="Prefactor"   value="1" scale="1" min="0"            free="1"/>
+      <parameter name="Index"       value="0" scale="1" min="-10" max="10" free="1"/>
+      <parameter name="PivotEnergy" value="1" scale="1000000"              free="0"/>
+    </spectrum>
+  </source>
+</source_library>

@@ -17,11 +17,19 @@ CTA data analysis
    howto_advanced_python_fitting
    howto_connect_irfs
    howto_connect_models
+
+
+CTA first Data Challenge data analysis
+--------------------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   howto_prepare_1dc
    howto_ts
    howto_tsmap
    howto_extent
    howto_ulimit
-   howto_edisp
    howto_lightcurve
    howto_phasecurve
    howto_exclude

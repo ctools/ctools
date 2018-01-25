@@ -20,7 +20,14 @@
 #############################################################################
 
 # Models to install
-models = bkg_irf.xml \
+models = 1dc_howto.xml \
+         1dc_howto_unbinned.xml \
+         1dc_howto_vela.xml \
+         1dc_howto_velapsr.xml \
+         bkg_irf.xml \
+         bkg_cube.xml \
+         test_irf.xml \
+         test_cube.xml \
          crab.xml \
          crab_beyond.xml \
          crab_2bkg.xml \

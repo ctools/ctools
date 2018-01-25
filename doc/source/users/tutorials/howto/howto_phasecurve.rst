@@ -57,9 +57,10 @@ Vela pulsar are selected:
    Input event list or observation definition XML file [obs.xml] $CTADATA/obs/obs_gps_baseline.xml
    Pointing selection region shape (CIRCLE|BOX) [CIRCLE]
    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
-   Galactic longitude of selection centre (deg) (0-360) [184.56] 128.838
-   Galactic latitude of selection centre (deg) (-90-90) [-5.79] -45.178
+   Right Ascension of selection centre (deg) (0-360) [83.63] 128.838
+   Declination of selection centre (deg) (-90-90) [22.01] -45.178
    Radius of selection circle (deg) (0-180) [5.0]
+   Start time (UTC string, JD, MJD or MET in seconds) [NONE] NONE
    Output observation definition XML file [outobs.xml] obs_vela.xml
 
 This results in a selection of 45 observations from the Galactic Plane Survey
@@ -73,14 +74,14 @@ as follows:
 
    $ ctphase
    Input event list or observation definition XML file [events.fits] obs_vela.xml
-   Model definition XML file [$CTOOLS/share/models/crab.xml] models.xml
+   Model definition XML file [$CTOOLS/share/models/crab.xml] $CTOOLS/share/models/1dc_howto_velapsr.xml
    Source in model definition XML file to use for phase computation [Crab] VelaPulsar
    Output event list or observation definition XML file [phased_events.fits] obs_vela_phased.xml
 
 This produces a new
 :ref:`observation definition file <glossary_obsdef>`
 ``obs_vela_phased.xml`` that points to event files to which a ``PHASE``
-column was added. The format of the file is dislayed below. Each event
+column was added. The format of the event files is dislayed below. Each event
 has now an associated phase value that was computed from the trigger time of
 the event.
 
@@ -100,10 +101,9 @@ the following:
    $ ctselect
    Input event list or observation definition XML file [events.fits] obs_vela_phased.xml
    RA for ROI centre (degrees) (0-360) [83.63] 128.838
-   Dec for ROI centre (degrees) (-90-90) [22.01] -45.178
+   Dec for ROI centre (degrees) (-90-90) [22.51] -45.178
    Radius of ROI (degrees) (0-180) [3.0] 0.2
-   Start time (CTA MET in seconds) [0.0]
-   End time (CTA MET in seconds) [0.0]
+   Start time (UTC string, JD, MJD or MET in seconds) [NONE]
    Lower energy limit (TeV) [0.1] 0.03
    Upper energy limit (TeV) [100.0] 160.0
    Output event list or observation definition XML file [selected_events.fits] obs_vela_phased_selected.xml
@@ -145,11 +145,11 @@ should look as follows:
          <parameter name="DEC" scale="1" value="-45.178" min="-90"  max="90"  free="0"/>
        </spatialModel>
      </source>
-     <source name="Background" type="CTAIrfBackground">
+     <source name="Background" type="CTAIrfBackground" instrument="CTA">
        <spectrum type="PowerLaw">
-         <parameter name="Prefactor" value="1" error="0" scale="1" min="0" free="1" />
-         <parameter name="Index" value="0" error="0" scale="1" min="-10" max="10" free="1" />
-         <parameter name="PivotEnergy" value="1" scale="1000000" free="0" />
+         <parameter name="Prefactor"   value="1" scale="1" min="0"            free="1"/>
+         <parameter name="Index"       value="0" scale="1" min="-10" max="10" free="1"/>
+         <parameter name="PivotEnergy" value="1" scale="1000000"              free="0"/>
        </spectrum>
      </source>
    </source_library>
@@ -161,7 +161,7 @@ event arises either from the source or from the background component:
 
    $ ctprob
    Input event list or observation definition XML file [events.fits] obs_vela_phased.xml
-   Input model definition XML file [$CTOOLS/share/models/crab.xml] models_prob.xml
+   Input model definition XML file [$CTOOLS/share/models/crab.xml] $CTOOLS/share/models/1dc_howto_vela.xml
    Output event list or observation definition XML file [prob_events.fits] obs_vela_phased_prob.xml
 
 This produces a new
@@ -188,9 +188,8 @@ probability threshold to >10% by adding the attribute
    Input event list or observation definition XML file [obs_vela_phased.xml] obs_vela_phased_prob.xml
    RA for ROI centre (degrees) (0-360) [128.838]
    Dec for ROI centre (degrees) (-90-90) [-45.178]
-   Radius of ROI (degrees) (0-180) [0.5] 5.0
-   Start time (CTA MET in seconds) [0.0]
-   End time (CTA MET in seconds) [0.0]
+   Radius of ROI (degrees) (0-180) [0.2] 5.0
+   Start time (UTC string, JD, MJD or MET in seconds) [NONE]
    Lower energy limit (TeV) [0.03]
    Upper energy limit (TeV) [160.0]
    Output event list or observation definition XML file [obs_vela_phased_selected.xml] obs_vela_phased_prob_selected.xml
@@ -222,8 +221,7 @@ after the :ref:`ctselect` command:
    RA for ROI centre (degrees) (0-360) [128.838]
    Dec for ROI centre (degrees) (-90-90) [-45.178]
    Radius of ROI (degrees) (0-180) [5.0]
-   Start time (CTA MET in seconds) [0.0]
-   End time (CTA MET in seconds) [0.0]
+   Start time (UTC string, JD, MJD or MET in seconds) [NONE]
    Lower energy limit (TeV) [0.03]
    Upper energy limit (TeV) [160.0]
    Output event list or observation definition XML file [obs_vela_phased_prob_selected.xml] obs_vela_phased_mcid.xml
