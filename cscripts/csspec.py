@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a spectrum.
 #
-# Copyright (C) 2014-2017 Michael Mayer
+# Copyright (C) 2014-2018 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -100,26 +100,29 @@ class csspec(ctools.csobservation):
         n_other = self.obs().size() - n_cta
 
         # If spectrum method is not "NODES" then set spectrum method and
-        # script mode according to type of CTA observations
+        # script mode according to type of observations
         if self._method != 'NODES':
-            if n_unbinned == 0 and n_binned != 0 and n_onoff == 0:
-                self._binned_mode = True
-                self._method      = 'SLICE'
-            elif n_unbinned == 0 and n_binned == 0 and n_onoff != 0:
-                self._onoff_mode = True
-                self._method      = 'SLICE'
-            elif n_unbinned == 0 and n_binned != 0 and n_onoff != 0:
-                msg = 'Mix of binned and On/Off CTA observations found in ' \
-                      'observation container. csscript does not support this ' \
-                      'mix.'
-                raise RuntimeError(msg)
-            elif n_unbinned != 0 and (n_binned != 0 or n_onoff != 0):
-                msg = 'Mix of unbinned and binned or On/Off CTA observations ' \
-                      'found in observation container. csscript does not support ' \
-                      'this mix.'
-                raise RuntimeError(msg)
-            elif n_unbinned != 0:
-                self._method = 'SLICE'
+            if n_other > 0:
+                self._method = 'NODES'
+            else:
+                if n_unbinned == 0 and n_binned != 0 and n_onoff == 0:
+                    self._binned_mode = True
+                    self._method      = 'SLICE'
+                elif n_unbinned == 0 and n_binned == 0 and n_onoff != 0:
+                    self._onoff_mode = True
+                    self._method      = 'SLICE'
+                elif n_unbinned == 0 and n_binned != 0 and n_onoff != 0:
+                    msg = 'Mix of binned and On/Off CTA observations found ' \
+                          'in observation container. csscript does not support ' \
+                          'this mix.'
+                    raise RuntimeError(msg)
+                elif n_unbinned != 0 and (n_binned != 0 or n_onoff != 0):
+                    msg = 'Mix of unbinned and binned or On/Off CTA observations ' \
+                          'found in observation container. csscript does not ' \
+                          'support this mix.'
+                    raise RuntimeError(msg)
+                elif n_unbinned != 0:
+                    self._method = 'SLICE'
 
         # Set ebounds
         self._set_ebounds()
@@ -148,10 +151,9 @@ class csspec(ctools.csobservation):
         # If there are a mix of CTA and non-CTA observations and the method
         # is 'SLICE' then log a warning that non-CTA observations will be
         # ignored
+        warning = False
         if n_cta > 0 and n_other > 0 and self._method == 'SLICE':
-            self._log_string(gammalib.TERSE, '\nWARNING: Only CTA observation '
-                             'can be handled with the "SLICE" method, all '
-                             'non-CTA observation will be ignored.')
+            warning = True
 
         # If there are only non-CTA observations and the method is 'SLICE'
         # then stop now
@@ -166,6 +168,12 @@ class csspec(ctools.csobservation):
 
         # Log selected spectrum method
         self._log_value(gammalib.TERSE, 'Selected spectrum method', self._method)
+
+        # Signal warning
+        if warning:
+            self._log_string(gammalib.TERSE, ' WARNING: Only CTA observation '
+                             'can be handled with the "SLICE" method, all '
+                             'non-CTA observation will be ignored.')
 
         # Return
         return
