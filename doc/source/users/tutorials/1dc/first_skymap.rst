@@ -44,8 +44,8 @@ All events between 100 GeV and 100 TeV are collected in the sky map.
 The sky map is written into the FITS file ``skymap.fits`` that is created in
 the working directory.
 The sky map, displayed using
-`ds9 <http://ds9.si.edu>`_ with a small Gaussian kernel smoothing applied,
-is shown below:
+`ds9 <http://ds9.si.edu>`_ with a square-root color scaling and small Gaussian
+kernel smoothing applied, is shown below:
 
 .. figure:: first_skymap.png
    :width: 400px
@@ -69,25 +69,73 @@ example:
 .. code-block:: bash
 
    $ ctskymap
-   Input event list or observation definition XML file [events.fits] obs_selected.xml
-   First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 0.0
-   Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 0.0
-   Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR]
-   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] GAL
+   Input event list or observation definition XML file [obs_selected.xml]
+   First coordinate of image center in degrees (RA or galactic l) (0-360) [0.0]
+   Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [0.0]
+   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
+   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [GAL]
    Image scale (in degrees/pixel) [0.02]
    Size of the X axis in pixels [400]
    Size of the Y axis in pixels [400]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
-   Background subtraction method (NONE|IRF) [NONE] IRF
-   Output skymap file [skymap.fits] skymap_bkgsubtract.fits
+   Background subtraction method (NONE|IRF|RING) [NONE] IRF
+   Output skymap file [skymap.fits] skymap_irf.fits
 
 The figure below shows the resulting sky map.
 The irreducable background has been subtracted from the sky map and the sources
 of gamma-ray emission are now clearly discernable.
 
-.. figure:: first_skymap_bkgsubtract.png
+.. figure:: first_skymap_irf.png
    :width: 400px
    :align: center
 
-   *Background subtracted sky map of the events recorded around the Galactic Centre during the Galactic Plane Survey*
+   *IRF background subtracted sky map of the events recorded around the Galactic Centre during the Galactic Plane Survey*
+
+In reality, however, the distribution of the irreducable background may only be
+purely known, and it may be necessary to estimate the background from the data
+themselves.
+This can be achieved by the so called ring-background method, that estimates the
+background rate from a ring around a given position.
+The ring-background can be used by specifying ``RING`` as the background
+subtraction method. :ref:`ctskymap` will then query for the source region and
+ring radii.
+
+.. warning::
+   The estimation of the ring-background by :ref:`ctskymap` is time consuming.
+   Be prepared to wait for about half an hour for the results on Max OS X.
+
+To create a ring-background subtracted sky map, type the following:
+
+.. code-block:: bash
+
+   $ ctskymap
+   Input event list or observation definition XML file [obs_selected.xml]
+   First coordinate of image center in degrees (RA or galactic l) (0-360) [0.0]
+   Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [0.0]
+   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
+   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [GAL]
+   Image scale (in degrees/pixel) [0.02]
+   Size of the X axis in pixels [400]
+   Size of the Y axis in pixels [400]
+   Lower energy limit (TeV) [0.1]
+   Upper energy limit (TeV) [100.0]
+   Background subtraction method (NONE|IRF|RING) [IRF] RING
+   Source region radius for estimating on-counts (degrees) [0.2]
+   Inner ring radius (degrees) [0.6]
+   Outer ring radius (degrees) [0.8]
+   Output skymap file [skymap_irf.fits] skymap_ring.fits
+
+The figure below shows the resulting sky map.
+
+.. figure:: first_skymap_ring.png
+   :width: 400px
+   :align: center
+
+   *Ring background subtracted sky map of the events recorded around the Galactic Centre during the Galactic Plane Survey*
+
+Note the dark zones above and below the Galactic centre that due to pixels
+that have bright sources in the rings that are used for their background
+estimation.
+This dark zones can be avoided by specifying so-called exclusion regions for
+the bright sources in the sky map (see the section :ref:`Generating a sky map <start_skymap>`).

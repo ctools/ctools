@@ -18,18 +18,18 @@ You do this with the :ref:`csresmap` script by providing the output
 
    $ csresmap
    Input event list, counts cube, or observation definition XML file [events.fits] cntcube.fits
-   Input model cube file (generated with ctmodel) [expcube.fits] NONE
-   Input exposure cube file (only needed for stacked analysis) [NONE] expcube.fits
-   Input PSF cube file (only needed for stacked analysis) [NONE] psfcube.fits
-   Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits
-   Input model definition XML file [$CTOOLS/share/models/crab.xml] stacked_results_cutoff.xml
+   Input model cube file (generated with ctmodel) [NONE]
+   Input exposure cube file [NONE] expcube.fits
+   Input PSF cube file [NONE] psfcube.fits
+   Input background cube file [NONE] bkgcube.fits
+   Input model definition XML file [$CTOOLS/share/models/crab.xml] results_stacked_eplaw.xml
    Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT|SIGNIFICANCE) [SIGNIFICANCE]
    Output residual map file [resmap.fits]
 
 This produces the file ``resmap.fits`` that contains a residual map that
 you can display for example with `ds9 <http://ds9.si.edu>`_.
-The figure below shows the map, with the fitted source positions overlayed
-as green circles.
+The figure below shows the map with a linear color scaling and the fitted source
+positions overlayed as green circles.
 
 .. figure:: first_skymap_residual.png
    :width: 400px

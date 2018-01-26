@@ -80,18 +80,18 @@ reduced event data that were procuded for the
 and that were stored into FITS files.
 Event data are split into :ref:`observations <glossary_obs>` with a fixed
 pointing direction (observations are also known as runs).
-The duration of an observation is 25 minutes for the Extragalactic Survey
-and 30 minutes for the Galactic Plane and Centre surveys and the AGN monitoring
-program.
+The duration of an observation is 25 minutes for the Extragalactic Survey,
+30 minutes for the Galactic Plane and Centre surveys, and 15 min for the AGN
+monitoring program.
 The properties of the event data for all simulations are summarised in the
 table below:
 
    +-----------------------------------+------------------+------------------+------------------+-----------------+
    | Parameter                         |        GPS       |         GC       |      EGAL        |       AGN       |
    +===================================+==================+==================+==================+=================+
-   | Number of observations            |             3270 |             1671 |             1271 |            1920 |
+   | Number of observations            |             3270 |             1671 |             1271 |            3840 |
    +-----------------------------------+------------------+------------------+------------------+-----------------+
-   | Duration of each observation      |           1800 s |           1800 s |           1500 s |          1800 s |
+   | Duration of each observation      |           1800 s |           1800 s |           1500 s |           900 s |
    +-----------------------------------+------------------+------------------+------------------+-----------------+
    | Deadtime fraction                 |               2% |               2% |               2% |              2% |
    +-----------------------------------+------------------+------------------+------------------+-----------------+

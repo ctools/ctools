@@ -14,7 +14,7 @@ Stacking the data
      since for many cases the effect of the energy dispersion is negligible,
      and taking energy dispersion into account is computationally intensive. If
      you want to learn how to take the energy dispersion into account please
-     read :ref:`this section <howto_edisp>`.
+     read :ref:`this section <start_edisp>`.
 
 To analyse the selected observations, we recommend to stack the events into
 a counts cube. You do this using the :ref:`ctbin` tool:
@@ -24,7 +24,7 @@ a counts cube. You do this using the :ref:`ctbin` tool:
    $ ctbin
    Input event list or observation definition XML file [events.fits] obs_selected.xml
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 0.0
-   Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 0.0
+   Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.51] 0.0
    Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR]
    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] GAL
    Image scale (in degrees/pixel) [0.02]
@@ -75,7 +75,7 @@ that are queried by the tool.
    interpolation from the values stored in the exposure cube file. The same
    is true for the point spread function and background cubes that are
    described below, or the energy dispersion cube that is described
-   :ref:`here <howto_edisp>`.
+   :ref:`here <start_edisp>`.
 
 Next, :ref:`ctpsfcube` computes the weighted Point Spread Function of the
 stacked counts cube.
@@ -87,16 +87,17 @@ You run :ref:`ctpsfcube` as follows:
    Input event list or observation definition XML file [NONE] obs_selected.xml
    Input counts cube file to extract PSF cube definition [NONE]
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 0.0
-   Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 0.0
-   Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR]
+   Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.51] 0.0
+   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] GAL
-   Image scale (in degrees/pixel) [1.0]
-   Size of the X axis in pixels [10]
-   Size of the Y axis in pixels [10]
-   Lower energy limit (TeV) [0.1]
-   Upper energy limit (TeV) [100.0]
-   Number of energy bins [20] 30
-   Output PSF cube file [psfcube.fits]
+   Image scale (in degrees/pixel) [1.0] 
+   Size of the X axis in pixels [10] 
+   Size of the Y axis in pixels [10] 
+   Algorithm for defining energy bins (FILE|LIN|LOG) [LOG] 
+   Lower energy limit (TeV) [0.1] 
+   Upper energy limit (TeV) [100.0] 
+   Number of energy bins (1-200) [20] 30
+   Output PSF cube file [psfcube.fits] 
 
 This produces a
 :ref:`point spread function cube <glossary_psfcube>`
@@ -122,7 +123,7 @@ You run :ref:`ctbkgcube` as follows:
    Input counts cube file to extract background cube definition [NONE] cntcube.fits
    Input model definition XML file [NONE] models.xml
    Output background cube file [bkgcube.fits]
-   Output model definition XML file [NONE] stacked_models.xml
+   Output model definition XML file [NONE] bkgcube.xml
 
 This produces a
 :ref:`background cube <glossary_bkgcube>`

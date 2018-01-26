@@ -20,7 +20,7 @@ We also assume that you have read the section about
 :ref:`the data organisation <1dc_data_organisation>`.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    first_select_obs
    first_select_events
@@ -30,4 +30,4 @@ We also assume that you have read the section about
    first_fitting
    first_improving
    first_unbinned
-   classical_analysis
+   first_onoff
