@@ -14,7 +14,7 @@ the variation in the effective area and the background template of the response
 functions. The script takes either an observation definition XML file or a
 specific instrument response function on input.
 
-csebins writes an energy boundary extension into a FITS file.
+:ref:`csebins` writes an energy boundary extension into a FITS file.
 
 
 General parameters
@@ -25,7 +25,7 @@ General parameters
 
 ``caldb [string]``
     Calibration database.
- 	 	 
+
 ``irf [string]``
     Instrumental response function.
 
@@ -34,7 +34,7 @@ General parameters
 
 ``emin [real]``
     Lower energy limit of energy boundaries (in TeV).
- 	 	 
+
 ``emax [real]``
     Upper energy limit of energy boundaries (in TeV).
 
@@ -53,23 +53,23 @@ Standard parameters
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether an existing energy boundaries output file should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = csebins.log) [filename]``
     Log filename.

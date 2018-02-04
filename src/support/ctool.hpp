@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -32,6 +32,12 @@
 #include "GCTALib.hpp"
 
 /* __Definitions _________________________________________________________ */
+
+/* __ Constants __________________________________________________________ */
+namespace ctools {
+    const GTimeReference time_reference =
+          GTimeReference(G_CTA_MJDREF, "s", "TT", "LOCAL");
+}
 
 
 /***********************************************************************//**
@@ -75,7 +81,6 @@ protected:
     void                  copy_members(const ctool& app);
     void                  free_members(void);
     const bool&           read_ahead(void) const;
-    const GTimeReference& time_reference(void) const;
 
     // Protected high-level setup methods
     void setup_observations(GObservations& obs, const bool& response = true,
@@ -151,7 +156,6 @@ protected:
     
     // Protected members
     bool            m_use_xml;  //!< Use XML file instead of FITS file for observations
-    GTimeReference  m_cta_ref;  //!< CTA time reference
 };
 
 
@@ -169,18 +173,6 @@ inline
 const bool& ctool::read_ahead(void) const
 {
     return (m_read_ahead);
-}
-
-
-/***********************************************************************//**
- * @brief Return time reference
- *
- * @return Reference to time reference
- ***************************************************************************/
-inline
-const GTimeReference& ctool::time_reference(void) const
-{
-    return (m_cta_ref);
 }
 
 

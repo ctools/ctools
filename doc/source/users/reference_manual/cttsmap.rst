@@ -19,7 +19,7 @@ that excludes the specified source. The square-root of the TS values
 corresponds roughly to the pre-trial detection significance of the source (in
 Gaussian sigma).
 
-cttsmap generates a FITS file comprising a sky map of TS values followed by 
+:ref:`cttsmap` generates a FITS file comprising a sky map of TS values followed by
 one extension per free parameter that contains sky maps of the fitted 
 parameter values. To save computation time, the errors are not computed by
 default. Specifying the hidden parameter ``errors=yes`` will switch on the
@@ -104,7 +104,7 @@ General parameters
 ``(binmax = -1) [integer]``
     Last bin to compute.
 
-``(logLO = -1) [real]``
+``(logL0 = -1) [real]``
     LogLikelihood value of null hypothesis.
 
 
@@ -117,23 +117,23 @@ Standard parameters
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether an existing output TS map file should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = cttsmap.log) [string]``
     Name of log file.

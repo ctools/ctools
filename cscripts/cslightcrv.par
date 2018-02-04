@@ -16,14 +16,14 @@
 #
 # Input and output parameters
 #============================
-inobs,        f, a, events.fits,,, "Input event list or observation definition XML file"
-inmodel,      f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
-srcname,      s, a, Crab,,, "Source name"
-caldb,        s, a, prod2,,, "Calibration database"
-irf,          s, a, South_0.5h,,, "Instrument response function"
-inexclusion,  f, h, NONE,,, "Sky map of exclusion regions for On/Off analysis"
-edisp,     b, h, no,,, "Apply energy dispersion in Cube analysis?"
-outfile,   f, a, lightcurve.fits,,, "Output light curve file"
+inobs,       f, a, events.fits,,, "Input event list or observation definition XML file"
+inmodel,     f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
+srcname,     s, a, Crab,,, "Source name"
+caldb,       s, a, prod2,,, "Calibration database"
+irf,         s, a, South_0.5h,,, "Instrument response function"
+inexclusion, f, h, NONE,,, "Sky map of exclusion regions for On/Off analysis"
+edisp,       b, h, no,,, "Apply energy dispersion in Cube analysis?"
+outfile,     f, a, lightcurve.fits,,, "Output light curve file"
 
 #
 # Script parameters
@@ -40,7 +40,7 @@ enumbins,  i, a, 0,0,100, "Number of energy bins for binned (0=unbinned for 3D a
 coordsys,  s, a, CEL,CEL|GAL,, "Coordinate System"
 proj,      s, a, CAR,AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN,, "Projection method"
 xref,      r, a, 83.63,0,360, "First coordinate of image/source region center in degrees (RA or galactic l)"
-yref,      r, a, 22.01,-90,90, "Second coordinate of image/source region center in degrees (DEC or galactic b)"
+yref,      r, a, 22.51,-90,90, "Second coordinate of image/source region center in degrees (DEC or galactic b)"
 nxpix,     i, a, 200,,, "Size of the X axis in pixels"
 nypix,     i, a, 200,,, "Size of the Y axis in pixels"
 binsz,     r, a, 0.02,,, "Pixel size (deg/pixel)"
@@ -64,7 +64,7 @@ fix_bkg,   b, h, no,,, "Fix background model parameters?"
 publish, b, h, no,,, "Publish light curve on VO Hub?"
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
-debug,   b, h, no,,, "Debugging mode activated"
+debug,   b, h, no,,, "Activate debugging mode?"
 mode,    s, h, ql,,, "Mode of automatic parameters"
 logfile, f, h, cslightcrv.log,,, "Log filename"
 

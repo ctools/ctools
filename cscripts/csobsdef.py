@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generation of an observation definition file
 #
-# Copyright (C) 2015-2017 Juergen Knoedlseder
+# Copyright (C) 2015-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -274,9 +274,9 @@ class csobsdef(ctools.cscript):
                 duration = self['duration'].real()
             tmin       = self._tmin
             tmax       = self._tmin + duration
-            gti        = gammalib.GGti(self._time_reference())
-            tstart     = gammalib.GTime(tmin, self._time_reference())
-            tstop      = gammalib.GTime(tmax, self._time_reference())
+            gti        = gammalib.GGti(ctools.time_reference)
+            tstart     = gammalib.GTime(tmin, ctools.time_reference)
+            tstop      = gammalib.GTime(tmax, ctools.time_reference)
             self._tmin = tmax
             gti.append(tstart, tstop)
             obs.ontime(gti.ontime())

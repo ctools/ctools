@@ -2,7 +2,7 @@
 # ==========================================================================
 # Performs unit tests for the ctools example scripts
 #
-# Copyright (C) 2016-2017 Juergen Knoedlseder
+# Copyright (C) 2016-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -89,26 +89,8 @@ class Test(gammalib.GPythonTestSuite):
         self.name('examples')
 
         # Append tests
-        #self.append(self.test_generate_prod3_irfs,
-        #            'Test generate_prod3_irfs.py')
         self.append(self.test_make_pointings,
                     'Test make_pointings.py')
-        #self.append(self.test_make_spectrum,
-        #            'Test make_spectrum.py')
-        #self.append(self.test_make_ts_distributions,
-        #            'Test make_ts_distributions.py')
-        #self.append(self.test_pipeline_binned_disk,
-        #            'Test pipeline_binned_disk.py')
-        #self.append(self.test_pipeline_binned_mem,
-        #            'Test pipeline_binned_mem.py')
-        #self.append(self.test_pipeline_stacked_disk,
-        #            'Test pipeline_stacked_disk.py')
-        #self.append(self.test_pipeline_stacked_mem,
-        #            'Test pipeline_stacked_mem.py')
-        #self.append(self.test_pipeline_unbinned_disk,
-        #            'Test pipeline_unbinned_disk.py')
-        #self.append(self.test_pipeline_unbinned_mem,
-        #            'Test pipeline_unbinned_mem.py')
         self.append(self.test_show_butterfly,
                     'Test show_butterfly.py')
         self.append(self.test_show_irf,
@@ -123,6 +105,8 @@ class Test(gammalib.GPythonTestSuite):
                     'Test show_pull_evolution.py')
         self.append(self.test_show_pull_histogram,
                     'Test show_pull_histogram.py')
+        self.append(self.test_show_residuals,
+                    'Test show_residuals.py')
         self.append(self.test_show_response,
                     'Test show_response.py')
         self.append(self.test_show_sensitivity,
@@ -380,6 +364,27 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute script
         self._execute_python('show_pull_histogram', args=args)
+
+        # Return
+        return
+
+    # Test show_residuals
+    def test_show_residuals(self):
+        """
+        Test show_residuals
+        """
+        # Set arguments
+        args = '-p example_show_residuals.eps %s/residual.fits' % self._datadir
+
+        # Execute script
+        self._execute_python('show_residuals', args=args)
+
+        # Set arguments
+        args = ('-p example_show_residuals_onoff.eps %s/residual_onoff.fits' %
+                self._datadir)
+
+        # Execute script
+        self._execute_python('show_residuals', args=args)
 
         # Return
         return

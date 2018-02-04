@@ -76,13 +76,11 @@ protected:
                             const GEbounds& ebounds) const;
     std::string check_infile(const std::string& filename,
                              const std::string& evtname) const;
-    std::string set_outfile_name(const std::string& filename) const;
     void        save_fits(void);
     void        save_xml(void);
 
     // User parameters
     std::string m_outobs;     //!< Output event list or XML file
-    std::string m_prefix;     //!< Prefix for multiple event lists
     GGti        m_gti;        //!< Time selection
     double      m_emin;       //!< Lower energy
     double      m_emax;       //!< Upper energy

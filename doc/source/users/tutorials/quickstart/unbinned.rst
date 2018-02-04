@@ -16,11 +16,7 @@ Doing an unbinned analysis
 
      An unbinned analysis is generally preferred over a binned analysis for
      short observation times (a few tens of hours) or if you want to assure
-     that the analysis results are not biased by the selected binning. Also
-     the fitting of a light or phase curve is only be possible with an
-     unbinned maximum likelihood analysis
-     (see :ref:`light curve <1dc_howto_ligthcurve>` and
-     :ref:`phase curve <1dc_howto_phasecurve>` fitting).
+     that the analysis results are not biased by the selected binning.
 
 An alternative analysis technique consists of working directly on the event
 list without binning the events in a counts cube.
@@ -29,7 +25,7 @@ You do this with the :ref:`ctlike` tool as follows:
 .. code-block:: bash
 
    $ ctlike
-   Input event list, counts cube or observation definition XML file [selected_events.fits]
+   Input event list, counts cube or observation definition XML file [cntcube.fits] selected_events.fits
    Calibration database [prod2]
    Instrument response function [South_0.5h]
    Input model definition XML file [models.xml] $CTOOLS/share/models/crab.xml
@@ -38,7 +34,7 @@ You do this with the :ref:`ctlike` tool as follows:
 You will recognise that :ref:`ctlike` runs much faster in unbinned mode
 compared to binned mode.
 This is understandable as the selected event list contains
-only 21991 events, while the binned counts cube you used before had
+only 20877 events, while the binned counts cube you used before had
 200 x 200 x 20 = 800000 bins. As unbinned maximum likelihood fitting loops
 over the events (while binned maximum likelihood loops over the bins),
 there are much less operations to perform in unbinned than in binned mode
@@ -60,67 +56,57 @@ the same events for both analyses.
 
 .. code-block:: none
 
-   2017-08-08T20:56:27: +=================================+
-   2017-08-08T20:56:27: | Maximum likelihood optimisation |
-   2017-08-08T20:56:27: +=================================+
-   2017-08-08T20:56:27:  >Iteration   0: -logL=140091.731, Lambda=1.0e-03
-   2017-08-08T20:56:28:  >Iteration   1: -logL=140089.754, Lambda=1.0e-03, delta=1.977, step=1.0e+00, max(|grad|)=5.681267 [Index:3]
-   2017-08-08T20:56:28:  >Iteration   2: -logL=140089.751, Lambda=1.0e-04, delta=0.003, step=1.0e+00, max(|grad|)=0.255879 [Index:3]
-   2017-08-08T20:56:28:
-   2017-08-08T20:56:28: +=========================================+
-   2017-08-08T20:56:28: | Maximum likelihood optimisation results |
-   2017-08-08T20:56:28: +=========================================+
-   2017-08-08T20:56:28: === GOptimizerLM ===
-   2017-08-08T20:56:28:  Optimized function value ..: 140089.751
-   2017-08-08T20:56:28:  Absolute precision ........: 0.005
-   2017-08-08T20:56:28:  Acceptable value decrease .: 2
-   2017-08-08T20:56:28:  Optimization status .......: converged
-   2017-08-08T20:56:28:  Number of parameters ......: 10
-   2017-08-08T20:56:28:  Number of free parameters .: 4
-   2017-08-08T20:56:28:  Number of iterations ......: 2
-   2017-08-08T20:56:28:  Lambda ....................: 1e-05
-   2017-08-08T20:56:28:  Maximum log likelihood ....: -140089.751
-   2017-08-08T20:56:28:  Observed events  (Nobs) ...: 21991.000
-   2017-08-08T20:56:28:  Predicted events (Npred) ..: 21990.996 (Nobs - Npred = 0.00358908515045187)
-   2017-08-08T20:56:28: === GModels ===
-   2017-08-08T20:56:28:  Number of models ..........: 2
-   2017-08-08T20:56:28:  Number of parameters ......: 10
-   2017-08-08T20:56:28: === GModelSky ===
-   2017-08-08T20:56:28:  Name ......................: Crab
-   2017-08-08T20:56:28:  Instruments ...............: all
-   2017-08-08T20:56:28:  Instrument scale factors ..: unity
-   2017-08-08T20:56:28:  Observation identifiers ...: all
-   2017-08-08T20:56:28:  Model type ................: PointSource
-   2017-08-08T20:56:28:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
-   2017-08-08T20:56:28:  Number of parameters ......: 6
-   2017-08-08T20:56:28:  Number of spatial par's ...: 2
-   2017-08-08T20:56:28:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
-   2017-08-08T20:56:28:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
-   2017-08-08T20:56:28:  Number of spectral par's ..: 3
-   2017-08-08T20:56:28:   Prefactor ................: 5.69800719463692e-16 +/- 9.95311294944208e-18 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
-   2017-08-08T20:56:28:   Index ....................: -2.46101639180337 +/- 0.0145278326558106 [-0,-5]  (free,scale=-1,gradient)
-   2017-08-08T20:56:28:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
-   2017-08-08T20:56:28:  Number of temporal par's ..: 1
-   2017-08-08T20:56:28:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-   2017-08-08T20:56:28: === GCTAModelIrfBackground ===
-   2017-08-08T20:56:28:  Name ......................: CTABackgroundModel
-   2017-08-08T20:56:28:  Instruments ...............: CTA
-   2017-08-08T20:56:28:  Instrument scale factors ..: unity
-   2017-08-08T20:56:28:  Observation identifiers ...: all
-   2017-08-08T20:56:28:  Model type ................: "PowerLaw" * "Constant"
-   2017-08-08T20:56:28:  Number of parameters ......: 4
-   2017-08-08T20:56:28:  Number of spectral par's ..: 3
-   2017-08-08T20:56:28:   Prefactor ................: 1.00310957843794 +/- 0.0134585839142799 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
-   2017-08-08T20:56:28:   Index ....................: 0.00814622034405194 +/- 0.00817635016295375 [-5,5]  (free,scale=1,gradient)
-   2017-08-08T20:56:28:   PivotEnergy ..............: 1000000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
-   2017-08-08T20:56:28:  Number of temporal par's ..: 1
-   2017-08-08T20:56:28:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2018-01-24T14:42:49: +=========================================+
+   2018-01-24T14:42:49: | Maximum likelihood optimisation results |
+   2018-01-24T14:42:49: +=========================================+
+   2018-01-24T14:42:49: === GOptimizerLM ===
+   2018-01-24T14:42:49:  Optimized function value ..: 139993.152
+   2018-01-24T14:42:49:  Absolute precision ........: 0.005
+   2018-01-24T14:42:49:  Acceptable value decrease .: 2
+   2018-01-24T14:42:49:  Optimization status .......: converged
+   2018-01-24T14:42:49:  Number of parameters ......: 10
+   2018-01-24T14:42:49:  Number of free parameters .: 4
+   2018-01-24T14:42:49:  Number of iterations ......: 2
+   2018-01-24T14:42:49:  Lambda ....................: 1e-05
+   2018-01-24T14:42:49:  Maximum log likelihood ....: -139993.152
+   2018-01-24T14:42:49:  Observed events  (Nobs) ...: 21974.000
+   2018-01-24T14:42:49:  Predicted events (Npred) ..: 21973.998 (Nobs - Npred = 0.00192004605924012)
+   2018-01-24T14:42:49: === GModels ===
+   2018-01-24T14:42:49:  Number of models ..........: 2
+   2018-01-24T14:42:49:  Number of parameters ......: 10
+   2018-01-24T14:42:49: === GModelSky ===
+   2018-01-24T14:42:49:  Name ......................: Crab
+   2018-01-24T14:42:49:  Instruments ...............: all
+   2018-01-24T14:42:49:  Instrument scale factors ..: unity
+   2018-01-24T14:42:49:  Observation identifiers ...: all
+   2018-01-24T14:42:49:  Model type ................: PointSource
+   2018-01-24T14:42:49:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
+   2018-01-24T14:42:49:  Number of parameters ......: 6
+   2018-01-24T14:42:49:  Number of spatial par's ...: 2
+   2018-01-24T14:42:49:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
+   2018-01-24T14:42:49:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
+   2018-01-24T14:42:49:  Number of spectral par's ..: 3
+   2018-01-24T14:42:49:   Prefactor ................: 5.84749807744844e-16 +/- 1.02060247557839e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+   2018-01-24T14:42:49:   Index ....................: -2.48831941472059 +/- 0.0150002799717933 [-0,-5]  (free,scale=-1,gradient)
+   2018-01-24T14:42:49:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
+   2018-01-24T14:42:49:  Number of temporal par's ..: 1
+   2018-01-24T14:42:49:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2018-01-24T14:42:49: === GCTAModelIrfBackground ===
+   2018-01-24T14:42:49:  Name ......................: CTABackgroundModel
+   2018-01-24T14:42:49:  Instruments ...............: CTA
+   2018-01-24T14:42:49:  Instrument scale factors ..: unity
+   2018-01-24T14:42:49:  Observation identifiers ...: all
+   2018-01-24T14:42:49:  Model type ................: "PowerLaw" * "Constant"
+   2018-01-24T14:42:49:  Number of parameters ......: 4
+   2018-01-24T14:42:49:  Number of spectral par's ..: 3
+   2018-01-24T14:42:49:   Prefactor ................: 1.00311308345777 +/- 0.0134769768119516 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
+   2018-01-24T14:42:49:   Index ....................: 0.00710999567642649 +/- 0.00818686036300859 [-5,5]  (free,scale=1,gradient)
+   2018-01-24T14:42:49:   PivotEnergy ..............: 1000000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
+   2018-01-24T14:42:49:  Number of temporal par's ..: 1
+   2018-01-24T14:42:49:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
-..
-
-  .. note::
-
-     Many tools or scripts can also be used in unbinned mode, including
-     :ref:`csresmap`, :ref:`ctbutterfly` and :ref:`csspec` that were used
-     earlier. It is sufficient to replace the input counts cube by an event
-     list to activate unbinned mode for these tools.
+.. note::
+   Many tools or scripts can also be used in unbinned mode, including
+   :ref:`csresmap`, :ref:`ctbutterfly` and :ref:`csspec` that were used
+   earlier. It is sufficient to replace the input counts cube by an event
+   list to activate unbinned mode for these tools.

@@ -1,7 +1,7 @@
 # ==========================================================================
 # Python base class for unit tests
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -55,6 +55,16 @@ class test(gammalib.GPythonTestSuite):
     def _script(self, name):
         """
         Set script name
+
+        Parameters
+        ----------
+        name : str
+            Script name
+
+        Returns
+        -------
+        script : str
+            Script name including path
         """
         # Set script name dependent on whether the software is installed or
         # not. If the software is not installed the 'TEST_BUILDDIR' environment
@@ -72,6 +82,16 @@ class test(gammalib.GPythonTestSuite):
     def _tool(self, name):
         """
         Set tool name
+
+        Parameters
+        ----------
+        name : str
+            Tool name
+
+        Returns
+        -------
+        tool : str
+            Tool name including path
         """
         # Set tool name dependent on whether the software is installed or
         # not. If the software is not installed the 'TEST_BUILDDIR' environment
@@ -85,15 +105,38 @@ class test(gammalib.GPythonTestSuite):
         return tool
 
     # Execute command and catch any exception
-    def _execute(self, cmd):
+    def _execute(self, cmd, success=True):
         """
         Execute command
+
+        Parameters
+        ----------
+        cmd : str
+            Command string to be executed
+        success : bool
+            True if success is expected, False otherwise
+
+        Returns
+        -------
+        rc : int
+            Return code
         """
         # Execute command, make sure we catch any exception
         try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
+            rc = os.system(cmd+' > ctools_test_output.dmp 2>&1')
         except:
             rc = -1
+
+        # If an exception occured then put output on screen
+        if success and rc != 0 or not success and rc == 0:
+            print('\n*** Unexpected exception (%d) for command %s:' % (rc, cmd))
+            f = open('ctools_test_output.dmp', 'r')
+            for line in f:
+                print(line.rstrip('\n'))
+            f.close()
+
+        # Remove test output
+        os.remove('ctools_test_output.dmp')
 
         # Return return code
         return rc
@@ -105,7 +148,7 @@ class test(gammalib.GPythonTestSuite):
 
         Returns
         -------
-        obs : `~gammalib.gammalib.GObservations`
+        obs : `~gammalib.GObservations`
             Observations container
         """
         # Load CTA event list
@@ -138,7 +181,7 @@ class test(gammalib.GPythonTestSuite):
 
         Returns
         -------
-        obs : `~gammalib.gammalib.GObservations`
+        obs : `~gammalib.GObservations`
             Observations container
         """
         # Load CTA event list
@@ -168,6 +211,12 @@ class test(gammalib.GPythonTestSuite):
     # Check
     def _check_help(self, tool):
         """
+        Check for help text
+
+        Parameters
+        ----------
+        name : str
+            Tool name
         """
         # Setup tool --help option
         cmd = tool+' --help'
@@ -178,7 +227,7 @@ class test(gammalib.GPythonTestSuite):
             self.test_value(self._execute(cmd), 0,
                  'Check successful execution with --help option')
         else:
-            self.test_assert(self._execute(cmd) != 0,
+            self.test_assert(self._execute(cmd, success=False) != 0,
                  'Check execution failure with --help option')
 
         # Return

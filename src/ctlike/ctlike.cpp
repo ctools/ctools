@@ -360,7 +360,7 @@ void ctlike::save(void)
         // Log filename
         log_value(NORMAL, "Covariance matrix file", m_outcovmat.url());
 
-        // Save covarianve matrix
+        // Save covariance matrix
         m_obs.function().save(m_outcovmat);
 
     }

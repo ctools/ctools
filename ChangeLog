@@ -1,10 +1,21 @@
-2017-11-28
+2018-01-25
 
         * Version 1.5.0 released
         ========================
 
+        Correct diffuse map cube upper limit computation in ctulimit (#2298)
+        Add tmin and tmax parameters to csobsselect (#2297)
+        Change DATE_OBS, DATE_END, TIME_OBS and TIME_END FITS keywords into DATA-OBS,
+          DATE-END, TIME-OBS and TIME-END
+        Add CUSTOM background method to csphagen script (#2284)
+        Add csresspec script (#2289)
+        Add ctools::time_reference constant and remove ctools::time_reference()
+          method (#2295)
+        Correctly strip .gz suffix from output filenames (#2287)
         Support On/Off analysis in cslightcrv and csphasecrv (#2273)
+        ctselect informs about non-overlapping time interval (#2272)
         Add tutorial for classical analysis (#2267)
+        In case of an error, test output is now written into log file (#2264)
         Fix chatter level handling in ctpsfcube (#2262)
         Handle On/Off observations by cspull (#2260)
         Add "statistic" parameter to all likelihood tools and scripts (#2237)
@@ -14,9 +25,13 @@
         Add RING background method to ctskymap (#2207)
         Add keywords to sky maps produced by ctskymap (#2194)
         Enhance efficiency of computations in ctmodel (#2189)
+        cscripts::execute() no longer creates log files (#2182)
         Add csmodelsois script (#2180)
         Add "NODES" method to csspec to support non-CTA analysis (#1927)
         Use t-type parameters for all "tmin" and "tmax" parameters (#1864)
+        Set OBS_ID in ctobssim (#1836)
+        Revise cstsdist parameters (#1567)
+        Add ctbutterfly::butterfly() method (#1512)
 
 
 2017-07-28

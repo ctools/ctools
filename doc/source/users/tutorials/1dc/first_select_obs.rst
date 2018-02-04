@@ -41,6 +41,7 @@ You do this with the :ref:`csobsselect` script by typing:
    Galactic longitude of selection centre (deg) (0-360) [184.56] 0.0
    Galactic latitude of selection centre (deg) (-90-90) [-5.79] 0.0
    Radius of selection circle (deg) (0-180) [5.0] 3.0
+   Start time (UTC string, JD, MJD or MET in seconds) [NONE] 
    Output observation definition XML file [outobs.xml] obs.xml
 
 You selected ``CIRCLE`` as the shape of the pointing selection region,
@@ -60,7 +61,6 @@ observations into the console:
    Output DS9 region file [ds9.reg]
 
 .. note::
-
    The ``debug=yes`` attribute instructs :ref:`csobsinfo` to direct the log
    file output also to the console. Duplication of log file output into
    the console using the ``debug=yes`` attribute works for any tool or script.
@@ -69,30 +69,30 @@ The output of :ref:`csobsinfo` is shown below. :ref:`csobsselect` selected
 57 observations from the Galactic Plane Survey data containing a total of
 6 045 130 events.
 
-.. code-block:: bash
+.. code-block:: none
 
-   2017-07-27T09:58:12: +=========+
-   2017-07-27T09:58:12: | Summary |
-   2017-07-27T09:58:12: +=========+
-   2017-07-27T09:58:12: === Observations ===
-   2017-07-27T09:58:12:  Unbinned observations .....: 57
-   2017-07-27T09:58:12:  Binned observations .......: 0
-   2017-07-27T09:58:12: === Events ===
-   2017-07-27T09:58:12:  Number of events ..........: 6045130
-   2017-07-27T09:58:12:  Number of bins ............: 0
-   2017-07-27T09:58:12: === Pointings ===
-   2017-07-27T09:58:12:  Mean offset angle .........: Unknown
-   2017-07-27T09:58:12:  Mean zenith angle .........: 0.00 deg
-   2017-07-27T09:58:12:  Mean azimuth angle ........: 0.00 deg
-   2017-07-27T09:58:12: === Energy range ===
-   2017-07-27T09:58:12:  Minimum energy ............: 30 GeV
-   2017-07-27T09:58:12:  Maximum energy ............: 160 TeV
-   2017-07-27T09:58:12: === Time range ===
-   2017-07-27T09:58:12:  MJD (days) ................: 59235.500 - 59276.921
-   2017-07-27T09:58:12:  UTC .......................: 2021-01-21T11:58:51 - 2021-03-03T22:04:51
-   2017-07-27T09:58:12:  MET (seconds) .............: 664502400.000 - 668081160.000
-   2017-07-27T09:58:12:  Total ontime ..............: 102600.00 s = 1710.00 min = 28.50 h
-   2017-07-27T09:58:12:  Total livetime ............: 100548.00 s = 1675.80 min = 27.93 h
+   2018-01-26T10:30:20: +=========+
+   2018-01-26T10:30:20: | Summary |
+   2018-01-26T10:30:20: +=========+
+   2018-01-26T10:30:20: === Observations ===
+   2018-01-26T10:30:20:  Unbinned observations .....: 57
+   2018-01-26T10:30:20:  Binned observations .......: 0
+   2018-01-26T10:30:20: === Events ===
+   2018-01-26T10:30:20:  Number of events ..........: 6045130
+   2018-01-26T10:30:20:  Number of bins ............: 0
+   2018-01-26T10:30:20: === Pointings ===
+   2018-01-26T10:30:20:  Mean offset angle .........: Unknown
+   2018-01-26T10:30:20:  Mean zenith angle .........: 0.00 deg
+   2018-01-26T10:30:20:  Mean azimuth angle ........: 0.00 deg
+   2018-01-26T10:30:20: === Energy range ===
+   2018-01-26T10:30:20:  Minimum energy ............: 30 GeV
+   2018-01-26T10:30:20:  Maximum energy ............: 160 TeV
+   2018-01-26T10:30:20: === Time range ===
+   2018-01-26T10:30:20:  MJD (days) ................: 59235.500 - 59276.921
+   2018-01-26T10:30:20:  UTC .......................: 2021-01-21T11:58:51 - 2021-03-03T22:04:51
+   2018-01-26T10:30:20:  MET (seconds) .............: 664502400.000 - 668081160.000
+   2018-01-26T10:30:20:  Total ontime ..............: 102600.00 s = 1710.00 min = 28.50 h
+   2018-01-26T10:30:20:  Total livetime ............: 100548.00 s = 1675.80 min = 27.93 h
 
 The resulting
 :ref:`observation definition file <glossary_obsdef>`

@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates the TS distribution for a particular model
 #
-# Copyright (C) 2011-2017 Juergen Knoedlseder
+# Copyright (C) 2011-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class cstsdist(ctools.csobservation):
     # Constructor
     def __init__(self, *argv):
         """
-        Constructor.
+        Constructor
         """
         # Initialise application by calling the appropriate class constructor
         self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
@@ -45,6 +45,7 @@ class cstsdist(ctools.csobservation):
         # Initialise some members
         self._srcname     = ''
         self._log_clients = False
+        self._model       = None
 
         # Return
         return
@@ -65,13 +66,6 @@ class cstsdist(ctools.csobservation):
         # Get source name
         self._srcname = self['srcname'].string()
 
-        # Query parameters for binned if requested
-        if self['enumbins'].integer() != 0:
-            self['npix'].integer()
-            self['binsz'].real()
-            self['coordsys'].string()
-            self['proj'].string()
-
         # Set models if we have none
         if self.obs().models().size() == 0:
             self.obs().models(self['inmodel'].filename())
@@ -79,14 +73,72 @@ class cstsdist(ctools.csobservation):
         # Query parameters
         self['edisp'].boolean()
         self['ntrials'].integer()
-        self['outfile'].filename()
+        
         self['debug'].boolean()
+
+        # Read ahead output parameters
+        #if self._read_ahead():
+        #    self['outfile'].filename()
+        self['outfile'].filename()
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
 
         # Return
         return
+
+    def _sim(self, seed):
+        """
+        Return a simulated observation container
+
+        Parameters
+        ----------
+        seed : int
+            Random number generator seed
+
+        Returns
+        -------
+        sim : `~gammalib.GObservations`
+            Simulated observation container
+        """
+        # If observation is a counts cube then simulate events from the counts
+        # cube model ...
+        if self.obs().size() == 1 and self.obs()[0].eventtype() == 'CountsCube':
+
+            # If no counts cube model exists then compute it now
+            if self._model == None:
+                model            = ctools.ctmodel(self.obs())
+                model['debug']   = self['debug'].boolean()
+                model['chatter'] = self['chatter'].integer()
+                model.run()
+                self._model = model.cube().copy() # Save copy for persistence
+
+            # Allocate random number generator
+            ran = gammalib.GRan()
+
+            # Get copy of model map
+            counts = self._model.counts().copy()
+
+            # Randomize counts
+            for i in range(counts.npix()):
+                counts[i] = ran.poisson(counts[i])
+
+            # Copy observations
+            sim = self.obs().copy()
+
+            # Set counts map
+            sim[0].events().counts(counts)
+
+        # ... otherwise simuate events from the observation container (works
+        # only for event lists
+        else:
+            sim = obsutils.sim(self.obs(),
+                               seed  = seed,
+                               log   = self._log_clients,
+                               debug = self['debug'].boolean())
+
+        # Return simulated observation
+        return sim
 
     def _trial(self, seed):
         """
@@ -105,29 +157,8 @@ class cstsdist(ctools.csobservation):
         # Write header
         self._log_header2(gammalib.EXPLICIT, 'Trial %d' % (seed+1))
 
-        # Set default binned parameters
-        coordsys = 'CEL'
-        proj     = 'TAN'
-        npix     = 0
-        binsz    = 0.0
-
-        # If binned analysis is requested the read the binned parameters
-        if self['enumbins'].integer() != 0:
-            npix     = self['npix'].integer()
-            binsz    = self['binsz'].real()
-            coordsys = self['coordsys'].string()
-            proj     = self['proj'].string()
-
         # Simulate events
-        sim = obsutils.sim(self.obs(),
-                           nbins = self['enumbins'].integer(),
-                           seed  = seed,
-                           proj  = proj,
-                           coord = coordsys,
-                           binsz = binsz,
-                           npix  = npix,
-                           log   = self._log_clients,
-                           debug = self['debug'].boolean())
+        sim = self._sim(seed)
 
         # Determine number of events in simulation
         nevents = 0.0
@@ -160,7 +191,7 @@ class cstsdist(ctools.csobservation):
             for model in models:
                 self._log_value(gammalib.EXPLICIT, 'Model', model.name())
                 for par in model:
-                    self._log_string(gammalib.EXPLICIT, str(par)+'\n')
+                    self._log_string(gammalib.EXPLICIT, str(par))
         elif self._logNormal():
             name  = 'Trial %d' % seed
             value = 'TS=%.3f  Prefactor=%e +/- %e' % \

@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for models                                                       #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2018 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -20,7 +20,17 @@
 #############################################################################
 
 # Models to install
-models = crab.xml \
+models = 1dc_howto.xml \
+         1dc_howto_unbinned.xml \
+         1dc_howto_vela.xml \
+         1dc_howto_velapsr.xml \
+         bkg_irf.xml \
+         bkg_cube.xml \
+         test_irf.xml \
+         test_cube.xml \
+         crab.xml \
+         crab_beyond.xml \
+         crab_2bkg.xml \
          crab_poly.xml \
          crab_profile.xml \
          disk.xml \

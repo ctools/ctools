@@ -1,7 +1,7 @@
 .. _1.5:
 
-ctools 1.5 release
-==================
+ctools 1.5 release (28 January 2018)
+====================================
 
 Overview
 --------
@@ -12,11 +12,20 @@ In particular, this release provides:
 
 * Support of classical IACT analysis
 * Specifcation of times in various formats (UTC, MJD, JD, MET)
+* Spectrum generation for non-IACT data
+* Generation of residual spectra
+* Jupyter notebooks
 
 
 Bug fixes
 ---------
 
+* [`2298 <https://cta-redmine.irap.omp.eu/issues/2298>`_] -
+  Correct diffuse map cube upper limit computation in :ref:`ctulimit`
+* Change ``DATE_OBS``, ``DATE_END``, ``TIME_OBS`` and ``TIME_END`` FITS keywords
+  into ``DATA-OBS``, ``DATE-END``, ``TIME-OBS`` and ``TIME-END``
+* [`2287 <https://cta-redmine.irap.omp.eu/issues/2287>`_] -
+  Correctly strip .gz suffix from output filenames
 * [`2262 <https://cta-redmine.irap.omp.eu/issues/2262>`_] -
   Fix chatter level handling in :ref:`ctpsfcube`
 
@@ -24,14 +33,25 @@ Bug fixes
 Improvements
 ------------
 
+* [`2297 <https://cta-redmine.irap.omp.eu/issues/2297>`_] -
+  Add ``tmin`` and ``tmax`` parameters to :ref:`csobsselect`
+* [`2295 <https://cta-redmine.irap.omp.eu/issues/2295>`_] -
+  Add ``ctools::time_reference`` constant and remove ``ctools::time_reference()``
+  method
+* [`2284 <https://cta-redmine.irap.omp.eu/issues/2284>`_] -
+  Add ``CUSTOM`` background method to :ref:`csphagen` script
 * [`2273 <https://cta-redmine.irap.omp.eu/issues/2273>`_] -
   Support On/Off analysis in :ref:`cslightcrv` and :ref:`csphasecrv`
+* [`2272 <https://cta-redmine.irap.omp.eu/issues/2272>`_] -
+  :ref:`ctselect` informs about non-overlapping time interval
 * [`2267 <https://cta-redmine.irap.omp.eu/issues/2267>`_] -
   Add tutorial for classical analysis
+* [`2264 <https://cta-redmine.irap.omp.eu/issues/2264>`_] -
+  In case of an error, test output is now written into log file
 * [`2260 <https://cta-redmine.irap.omp.eu/issues/2260>`_] -
   Handle On/Off observations by :ref:`cspull`
 * [`2237 <https://cta-redmine.irap.omp.eu/issues/2237>`_] -
-  Add ``statistic`` parameters to :ref:`ctbutterfly`, :ref:`cterror`,
+  Add ``statistic`` parameter to :ref:`ctbutterfly`, :ref:`cterror`,
   :ref:`cttsmap`, :ref:`ctulimit`, :ref:`cslightcrv`, :ref:`csphasecrv`,
   :ref:`cspull`, :ref:`cssens`, :ref:`csspec`, :ref:`cstsdist` and
   :ref:`cstsmapsplit`
@@ -43,19 +63,28 @@ Improvements
   Add keywords to sky maps produced by :ref:`ctskymap`
 * [`2189 <https://cta-redmine.irap.omp.eu/issues/2189>`_] -
   Enhance efficiency of computations in :ref:`ctmodel`
+* [`2182 <https://cta-redmine.irap.omp.eu/issues/2182>`_] -
+  ``cscripts::execute()`` no longer creates log files
 * [`1927 <https://cta-redmine.irap.omp.eu/issues/1927>`_] -
   Add ``NODES`` method to :ref:`csspec` to support non-CTA analysis
+* [`1836 <https://cta-redmine.irap.omp.eu/issues/1836>`_] -
+  Set ``OBS_ID`` in :ref:`ctobssim`
+* [`1512 <https://cta-redmine.irap.omp.eu/issues/1512>`_] -
+  Add ``ctbutterfly::butterfly()`` method to return butterfly diagram
 
 
 New features
 ------------
 
+* [`2289 <https://cta-redmine.irap.omp.eu/issues/2289>`_] -
+  Add :ref:`csresspec` script
 * [`2208 <https://cta-redmine.irap.omp.eu/issues/2208>`_] -
   Add :ref:`csphagen` script
 * [`2180 <https://cta-redmine.irap.omp.eu/issues/2180>`_] -
   Add :ref:`csmodelsois` script
 * [`1864 <https://cta-redmine.irap.omp.eu/issues/1864>`_] -
   Use t-type parameters for all ``tmin`` and ``tmax`` parameters
+
 
 Clean up
 --------
@@ -66,3 +95,5 @@ Clean up
   Derive :ref:`cslightcrv`, :ref:`csphasecrv`, :ref:`cspull`, :ref:`cssens`,
   :ref:`csspec` and :ref:`cstsdist` scripts from ``cslikelihood`` base
   class
+* [`1567 <https://cta-redmine.irap.omp.eu/issues/1567>`_] -
+  Revise :ref:`cstsdist` parameters

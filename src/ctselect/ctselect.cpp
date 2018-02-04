@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctselect - Data selection tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -367,7 +367,7 @@ void ctselect::run(void)
  *
  * If m_use_xml is true, all selected event list(s) will be saved into FITS
  * files, where the output filenames are constructued from the input
- * filenames by prepending the m_prefix string to name. Any path information
+ * filenames by prepending the @a prefix string to name. Any path information
  * will be stripped form the input name, hence event files will be written
  * into the local working directory (unless some path information is present
  * in the prefix). In addition, an XML file will be created that gathers
@@ -465,7 +465,6 @@ void ctselect::init_members(void)
 {
     // Initialise parameters
     m_outobs.clear();
-    m_prefix.clear();
     m_gti.clear();
     m_emin   = 0.0;
     m_emax   = 0.0;
@@ -497,7 +496,6 @@ void ctselect::copy_members(const ctselect& app)
 {
     // Copy parameters
     m_outobs   = app.m_outobs;
-    m_prefix   = app.m_prefix;
     m_gti      = app.m_gti;
     m_emin     = app.m_emin;
     m_emax     = app.m_emax;
@@ -653,7 +651,7 @@ void ctselect::get_parameters(void)
     // dumped into the log file
     if (read_ahead()) {
         m_outobs = (*this)["outobs"].filename();
-        m_prefix = (*this)["prefix"].string();
+        (*this)["prefix"].string();
     }
 
     // Set time interval with input times given in CTA reference
@@ -754,25 +752,37 @@ void ctselect::select_events(GCTAObservation*   obs,
     // Make time selection
     if (!m_gti.is_empty()) {
 
-        // Extract effective time interval in the reference time of the
-        // event list. We get this reference time from gti.reference().
-        double tmin = gti.tstart().convert(gti.reference());
-        double tmax = gti.tstop().convert(gti.reference());
+        // If there are no GTIs then request removal of all events
+        if (list->gti().is_empty()) {
+            remove_all = true;
+            log_value(NORMAL, "Time range", "None. There is no overlap "
+                      "between existing and requested time interval.");
+        }
 
-        // Format time with sufficient accuracy and add to selection string
-        char cmin[80];
-        char cmax[80];
-        sprintf(cmin, "%.8f", tmin);
-        sprintf(cmax, "%.8f", tmax);
-        selection = "TIME >= "+std::string(cmin)+" && TIME <= "+std::string(cmax);
-        add       = " && ";
-        log_value(NORMAL, "Time range (MJD)",
-                  gammalib::str(gti.tstart().mjd())+" - "+
-                  gammalib::str(gti.tstop().mjd())+" days");
-        log_value(NORMAL, "Time range (UTC)",
-                  gti.tstart().utc()+" - "+gti.tstop().utc());
-        log_value(NORMAL, "Time range (MET)",
-                  gammalib::str(tmin)+" - "+gammalib::str(tmax)+" seconds");
+        // ... otherwise set time interval
+        else {
+
+            // Extract effective time interval in the reference time of the
+            // event list. We get this reference time from gti.reference().
+            double tmin = gti.tstart().convert(gti.reference());
+            double tmax = gti.tstop().convert(gti.reference());
+
+            // Format time with sufficient accuracy and add to selection string
+            char cmin[80];
+            char cmax[80];
+            sprintf(cmin, "%.8f", tmin);
+            sprintf(cmax, "%.8f", tmax);
+            selection = "TIME >= "+std::string(cmin)+" && TIME <= "+std::string(cmax);
+            add       = " && ";
+            log_value(NORMAL, "Time range (MJD)",
+                      gammalib::str(gti.tstart().mjd())+" - "+
+                      gammalib::str(gti.tstop().mjd())+" days");
+            log_value(NORMAL, "Time range (UTC)",
+                      gti.tstart().utc()+" - "+gti.tstop().utc());
+            log_value(NORMAL, "Time range (MET)",
+                      gammalib::str(tmin)+" - "+gammalib::str(tmax)+" seconds");
+
+        } // endelse: set time interval
 
     } // endif: made time selection
 
@@ -1253,35 +1263,6 @@ std::string ctselect::check_infile(const std::string& filename,
 
 
 /***********************************************************************//**
- * @brief Set output file name.
- *
- * @param[in] filename Input file name.
- *
- * Converts an input file name into an output filename by prepending the
- * prefix stored in the member m_prefix to the input file name. Any path as
- * well as extension will be stripped from the input file name. Also a
- * trailing ".gz" will be stripped as one cannot write into gzipped files.
- ***************************************************************************/
-std::string ctselect::set_outfile_name(const std::string& filename) const
-{
-    // Create filename
-    GFilename fname(filename);
-
-    // Split input filename without any extensions into path elements
-    std::vector<std::string> elements = gammalib::split(fname.url(), "/");
-
-    // The last path element is the filename
-    std::string outname = m_prefix + elements[elements.size()-1];
-
-    // Strip any ".gz"
-    outname = gammalib::strip_chars(outname, ".gz");
-    
-    // Return output filename
-    return outname;
-}
-
-
-/***********************************************************************//**
  * @brief Save event list in FITS format.
  *
  * Save the event list as a FITS file. The file name of the FITS file is
@@ -1351,7 +1332,6 @@ void ctselect::save_xml(void)
 {
     // Get output filename and prefix
     m_outobs = (*this)["outobs"].filename();
-    m_prefix = (*this)["prefix"].string();
 
     // Issue warning if output filename has no .xml suffix
     log_string(TERSE, warn_xml_suffix(m_outobs));

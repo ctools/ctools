@@ -24,12 +24,16 @@ typing:
    Output model definition XML file [crab_results.xml]
 
 The data are fitted in *binned* mode, which means that the events
-have been binned into a counts cube and the fit computes the log-likelihood
+have been binned into a 3D counts cube and the fit computes the log-likelihood
 function by summing over all 200 x 200 x 20 bins of the counts cube. There is
 an alternative method, the so called *unbinned* mode, where the events are
 not binned into a counts cube and the log-likelihood is computed directly by
 summing over all events.
-:ref:`We will explore the unbinned mode later <start_unbinned>`.
+:ref:`We will explore the unbinned mode later <start_unbinned>`. Yet a
+third alternative method (*On/Off* mode) consists in binning the events only in energy
+integrating over arrival direction within a Source (On) and one or
+more Background (Off) regions to minimise the dependency on the IRF
+background model. :ref:`We will explore the On/Off mode later <start_onoff>`
 
 The :ref:`ctlike` tool produced a
 :ref:`model definition XML output file <glossary_moddef>`
@@ -49,8 +53,8 @@ that was produced by the run:
    <source_library title="source library">
      <source name="Crab" type="PointSource">
        <spectrum type="PowerLaw">
-         <parameter name="Prefactor" value="5.61368377731832" error="0.0982975197293023" scale="1e-16" min="1e-07" max="1000" free="1" />
-         <parameter name="Index" value="2.45569249143075" error="0.0145471260625612" scale="-1" min="0" max="5" free="1" />
+         <parameter name="Prefactor" value="5.76059824355157" error="0.100804418203193" scale="1e-16" min="1e-07" max="1000" free="1" />
+         <parameter name="Index" value="2.48246178370535" error="0.0150306767905499" scale="-1" min="0" max="5" free="1" />
          <parameter name="PivotEnergy" value="0.3" scale="1000000" min="0.01" max="1000" free="0" />
        </spectrum>
        <spatialModel type="PointSource">
@@ -60,12 +64,12 @@ that was produced by the run:
      </source>
      <source name="BackgroundModel" type="CTACubeBackground" instrument="CTA,HESS,MAGIC,VERITAS">
        <spectrum type="PowerLaw">
-         <parameter name="Prefactor" value="0.945994938701748" error="0.0148673466828289" scale="1" min="0.01" max="100" free="1" />
-         <parameter name="Index" value="0.0198073832868029" error="0.00948925246912034" scale="1" min="-5" max="5" free="1" />
+         <parameter name="Prefactor" value="1.00863986588954" error="0.0159030370642366" scale="1" min="0.01" max="100" free="1" />
+         <parameter name="Index" value="0.0113292722406164" error="0.00951929088334377" scale="1" min="-5" max="5" free="1" />
          <parameter name="PivotEnergy" value="1" scale="1000000" free="0" />
        </spectrum>
      </source>
-  </source_library>
+   </source_library>
 
 In this example, the ``Prefactor`` and ``Index`` of the spectral model for the
 Crab nebula as well as the ``Prefactor`` and ``Index`` of the background spectral
@@ -76,86 +80,83 @@ adjusted by the fit. Obviously, in this example the adjustment compensates only
 for the statistical fluctuations of the background, but with real data, the
 adjustment may account also for some of the systematic uncertainties.
 
-  .. warning::
+.. warning::
+   As good practice, the amplitude of the background model should always be
+   left as a free parameter of the fit. Otherwise, any uncertainty in the
+   background rate will immediately propagate into the flux estimate of the
+   source.
 
-     As good practice, the amplitude of the background model should always be
-     left as a free parameter of the fit. Otherwise, any uncertainty in the
-     background rate will immediately propagate into the flux estimate of the
-     source.
-
-  .. warning::
-
-     You may have recognized the ``scale`` and ``value`` attributes in the
-     :ref:`model definition XML file <glossary_moddef>`. The value of each
-     parameter is obtained by multiplying ``value`` with ``scale``. This allows
-     for a pre-scaling of the parameters, and **you should make use of this
-     capability to have the value attributes of all parameters that are fitted
-     of about the same order, typically 1**. This is necessary to assure a
-     proper convergence of the fitting algorithm.
+.. warning::
+   You may have recognized the ``scale`` and ``value`` attributes in the
+   :ref:`model definition XML file <glossary_moddef>`. The value of each
+   parameter is obtained by multiplying ``value`` with ``scale``. This allows
+   for a pre-scaling of the parameters, and **you should make use of this
+   capability to have the value attributes of all parameters that are fitted
+   of about the same order, typically 1**. This is necessary to assure a
+   proper convergence of the fitting algorithm.
 
 To get more details about the model fitting you can inspect the log file.
 Below the last lines of the log file that was produced by this run:
 
 .. code-block:: none
 
-   2017-08-08T20:24:06: +=================================+
-   2017-08-08T20:24:06: | Maximum likelihood optimisation |
-   2017-08-08T20:24:06: +=================================+
-   2017-08-08T20:24:07:  >Iteration   0: -logL=56488.484, Lambda=1.0e-03
-   2017-08-08T20:24:07:  >Iteration   1: -logL=56431.025, Lambda=1.0e-03, delta=57.459, step=1.0e+00, max(|grad|)=128.772103 [Index:7]
-   2017-08-08T20:24:08:  >Iteration   2: -logL=56430.794, Lambda=1.0e-04, delta=0.232, step=1.0e+00, max(|grad|)=0.505741 [Index:7]
-   2017-08-08T20:24:09:  >Iteration   3: -logL=56430.794, Lambda=1.0e-05, delta=0.000, step=1.0e+00, max(|grad|)=0.017423 [Index:3]
-   2017-08-08T20:24:09:
-   2017-08-08T20:24:09: +=========================================+
-   2017-08-08T20:24:09: | Maximum likelihood optimisation results |
-   2017-08-08T20:24:09: +=========================================+
-   2017-08-08T20:24:09: === GOptimizerLM ===
-   2017-08-08T20:24:09:  Optimized function value ..: 56430.794
-   2017-08-08T20:24:09:  Absolute precision ........: 0.005
-   2017-08-08T20:24:09:  Acceptable value decrease .: 2
-   2017-08-08T20:24:09:  Optimization status .......: converged
-   2017-08-08T20:24:09:  Number of parameters ......: 10
-   2017-08-08T20:24:09:  Number of free parameters .: 4
-   2017-08-08T20:24:09:  Number of iterations ......: 3
-   2017-08-08T20:24:09:  Lambda ....................: 1e-06
-   2017-08-08T20:24:09:  Maximum log likelihood ....: -56430.794
-   2017-08-08T20:24:09:  Observed events  (Nobs) ...: 18827.000
-   2017-08-08T20:24:09:  Predicted events (Npred) ..: 18827.000 (Nobs - Npred = 1.92705083463807e-05)
-   2017-08-08T20:24:09: === GModels ===
-   2017-08-08T20:24:09:  Number of models ..........: 2
-   2017-08-08T20:24:09:  Number of parameters ......: 10
-   2017-08-08T20:24:09: === GModelSky ===
-   2017-08-08T20:24:09:  Name ......................: Crab
-   2017-08-08T20:24:09:  Instruments ...............: all
-   2017-08-08T20:24:09:  Instrument scale factors ..: unity
-   2017-08-08T20:24:09:  Observation identifiers ...: all
-   2017-08-08T20:24:09:  Model type ................: PointSource
-   2017-08-08T20:24:09:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
-   2017-08-08T20:24:09:  Number of parameters ......: 6
-   2017-08-08T20:24:09:  Number of spatial par's ...: 2
-   2017-08-08T20:24:09:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
-   2017-08-08T20:24:09:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
-   2017-08-08T20:24:09:  Number of spectral par's ..: 3
-   2017-08-08T20:24:09:   Prefactor ................: 5.61368377731832e-16 +/- 9.82975197293023e-18 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
-   2017-08-08T20:24:09:   Index ....................: -2.45569249143075 +/- 0.0145471260625612 [-0,-5]  (free,scale=-1,gradient)
-   2017-08-08T20:24:09:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
-   2017-08-08T20:24:09:  Number of temporal par's ..: 1
-   2017-08-08T20:24:09:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-   2017-08-08T20:24:09: === GCTAModelCubeBackground ===
-   2017-08-08T20:24:09:  Name ......................: BackgroundModel
-   2017-08-08T20:24:09:  Instruments ...............: CTA, HESS, MAGIC, VERITAS
-   2017-08-08T20:24:09:  Instrument scale factors ..: unity
-   2017-08-08T20:24:09:  Observation identifiers ...: all
-   2017-08-08T20:24:09:  Model type ................: "PowerLaw" * "Constant"
-   2017-08-08T20:24:09:  Number of parameters ......: 4
-   2017-08-08T20:24:09:  Number of spectral par's ..: 3
-   2017-08-08T20:24:09:   Prefactor ................: 0.945994938701748 +/- 0.0148673466828289 [0.01,100] ph/cm2/s/MeV (free,scale=1,gradient)
-   2017-08-08T20:24:09:   Index ....................: 0.0198073832868029 +/- 0.00948925246912034 [-5,5]  (free,scale=1,gradient)
-   2017-08-08T20:24:09:   PivotEnergy ..............: 1000000 MeV (fixed,scale=1000000,gradient)
-   2017-08-08T20:24:09:  Number of temporal par's ..: 1
-   2017-08-08T20:24:09:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2018-01-24T14:29:51: +=================================+
+   2018-01-24T14:29:51: | Maximum likelihood optimisation |
+   2018-01-24T14:29:51: +=================================+
+   2018-01-24T14:29:51:  >Iteration   0: -logL=56469.945, Lambda=1.0e-03
+   2018-01-24T14:29:52:  >Iteration   1: -logL=56468.674, Lambda=1.0e-03, delta=1.271, step=1.0e+00, max(|grad|)=-1.725465 [Prefactor:6]
+   2018-01-24T14:29:53:  >Iteration   2: -logL=56468.674, Lambda=1.0e-04, delta=0.000, step=1.0e+00, max(|grad|)=-0.020159 [Index:7]
+   2018-01-24T14:29:53:
+   2018-01-24T14:29:53: +=========================================+
+   2018-01-24T14:29:53: | Maximum likelihood optimisation results |
+   2018-01-24T14:29:53: +=========================================+
+   2018-01-24T14:29:53: === GOptimizerLM ===
+   2018-01-24T14:29:53:  Optimized function value ..: 56468.674
+   2018-01-24T14:29:53:  Absolute precision ........: 0.005
+   2018-01-24T14:29:53:  Acceptable value decrease .: 2
+   2018-01-24T14:29:53:  Optimization status .......: converged
+   2018-01-24T14:29:53:  Number of parameters ......: 10
+   2018-01-24T14:29:53:  Number of free parameters .: 4
+   2018-01-24T14:29:53:  Number of iterations ......: 2
+   2018-01-24T14:29:53:  Lambda ....................: 1e-05
+   2018-01-24T14:29:53:  Maximum log likelihood ....: -56468.674
+   2018-01-24T14:29:53:  Observed events  (Nobs) ...: 18799.000
+   2018-01-24T14:29:53:  Predicted events (Npred) ..: 18798.998 (Nobs - Npred = 0.00197278879204532)
+   2018-01-24T14:29:53: === GModels ===
+   2018-01-24T14:29:53:  Number of models ..........: 2
+   2018-01-24T14:29:53:  Number of parameters ......: 10
+   2018-01-24T14:29:53: === GModelSky ===
+   2018-01-24T14:29:53:  Name ......................: Crab
+   2018-01-24T14:29:53:  Instruments ...............: all
+   2018-01-24T14:29:53:  Instrument scale factors ..: unity
+   2018-01-24T14:29:53:  Observation identifiers ...: all
+   2018-01-24T14:29:53:  Model type ................: PointSource
+   2018-01-24T14:29:53:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
+   2018-01-24T14:29:53:  Number of parameters ......: 6
+   2018-01-24T14:29:53:  Number of spatial par's ...: 2
+   2018-01-24T14:29:53:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
+   2018-01-24T14:29:53:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
+   2018-01-24T14:29:53:  Number of spectral par's ..: 3
+   2018-01-24T14:29:53:   Prefactor ................: 5.76059824355157e-16 +/- 1.00804418203193e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+   2018-01-24T14:29:53:   Index ....................: -2.48246178370535 +/- 0.0150306767905499 [-0,-5]  (free,scale=-1,gradient)
+   2018-01-24T14:29:53:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
+   2018-01-24T14:29:53:  Number of temporal par's ..: 1
+   2018-01-24T14:29:53:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2018-01-24T14:29:53: === GCTAModelCubeBackground ===
+   2018-01-24T14:29:53:  Name ......................: BackgroundModel
+   2018-01-24T14:29:53:  Instruments ...............: CTA, HESS, MAGIC, VERITAS
+   2018-01-24T14:29:53:  Instrument scale factors ..: unity
+   2018-01-24T14:29:53:  Observation identifiers ...: all
+   2018-01-24T14:29:53:  Model type ................: "PowerLaw" * "Constant"
+   2018-01-24T14:29:53:  Number of parameters ......: 4
+   2018-01-24T14:29:53:  Number of spectral par's ..: 3
+   2018-01-24T14:29:53:   Prefactor ................: 1.00863986588954 +/- 0.0159030370642366 [0.01,100] ph/cm2/s/MeV (free,scale=1,gradient)
+   2018-01-24T14:29:53:   Index ....................: 0.0113292722406164 +/- 0.00951929088334377 [-5,5]  (free,scale=1,gradient)
+   2018-01-24T14:29:53:   PivotEnergy ..............: 1000000 MeV (fixed,scale=1000000,gradient)
+   2018-01-24T14:29:53:  Number of temporal par's ..: 1
+   2018-01-24T14:29:53:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
-The maximum likelihood optimizer required 3 iterations to converge. This
+The maximum likelihood optimizer required 2 iterations to converge. This
 is pretty fast, but recall that you used the same model file for the simulation
 and for fitting, hence the initial parameter values were already very close
 to the best fitting values. To see the impact of the initial parameters on
@@ -166,48 +167,46 @@ fitted. You will see that the optimizer requires a couple of more iterations,
 but it should converge to the same solution (provided that the initial values
 are not too far from the best fitting values).
 
-  .. note::
+.. note::
+   As sanity check you should verify that the predicted number of events
+   (Npred) is equal to the observed number of events (Nobs). To facilitate
+   this comparison, :ref:`ctlike` provides the difference Nobs - Npred in
+   the log file. In real life situations, this difference may not always be
+   small, in particular if the source model is too constrained. You may
+   then free some of the model parameters so that the fit can correctly
+   describe the data.
 
-     As sanity check you should verify that the predicted number of events
-     (Npred) is equal to the observed number of events (Nobs). To facilitate
-     this comparison, :ref:`ctlike` provides the difference Nobs - Npred in
-     the log file. In real life situations, this difference may not always be
-     small, in particular if the source model is too constrained. You may
-     then free some of the model parameters so that the fit can correctly
-     describe the data.
+.. note::
+   The :ref:`ctlike` tool has the ability to estimate the detection
+   significance for sources in the XML model. This is done by computing
+   the Test Statistic value which is defined as twice the log-likelihood
+   difference between fitting a source at a given position on top of a
+   (background) model or fitting no source. As a rule of thumb, the square
+   root of the Test Statistic value gives the source detection significance
+   in Gaussian sigmas, although the actual conversion depends somewhat on
+   the formulation of the statistical problem and the number of
+   degrees of freedom associated with the source.
 
-  .. note::
+   To instruct :ref:`ctlike` to compute the Test Statistic value for a
+   given source you need to add the attribute ``tscalc="1"`` to the XML
+   file:
 
-     The :ref:`ctlike` tool has the ability to estimate the detection
-     significance for sources in the XML model. This is done by computing
-     the Test Statistic value which is defined as twice the log-likelihood
-     difference between fitting a source at a given position on top of a
-     (background) model or fitting no source. Roughly speaken, the square
-     root of the Test Statistic value gives the source detection significance
-     in Gaussian sigmas, although the exact relation depends somewhat on
-     the formulation of the statistical problem.
+   .. code-block:: xml
 
-     To instruct :ref:`ctlike` to compute the Test Statistic value for a
-     given source you need to add the attribute ``tscalc="1"`` to the XML
-     file:
+      <source name="Crab" type="PointSource" tscalc="1">
 
-     .. code-block:: xml
+   :ref:`ctlike` will then compute the Test Statistic value for that
+   source and dump the result in the log file:
 
-        <source name="Crab" type="PointSource" tscalc="1">
+   .. code-block:: none
 
-     :ref:`ctlike` will then compute the Test Statistic value for that
-     source and dump the result in the log file:
+      2018-01-24T14:32:49:  Name ......................: Crab
+      2018-01-24T14:32:49:  Instruments ...............: all
+      2018-01-24T14:32:49:  Test Statistic ............: 21626.0036468824
 
-     .. code-block:: none
+   The Test Statistic value will also be added as new attribute
+   ``ts`` to the XML result file:
 
-        2017-08-08T20:34:29: === GModelSky ===
-        2017-08-08T20:34:29:  Name ......................: Crab
-        2017-08-08T20:34:29:  Instruments ...............: all
-        2017-08-08T20:34:29:  Test Statistic ............: 21873.9558591403
+   .. code-block:: xml
 
-     The Test Statistic value will also be added as new attribute
-     ``ts`` to the XML result file:
-
-     .. code-block:: xml
-
-        <source name="Crab" type="PointSource" ts="21873.956" tscalc="1">
+      <source name="Crab" type="PointSource" ts="21626.004" tscalc="1">

@@ -2,7 +2,7 @@
 # ==========================================================================
 # Dump information about observation into log file
 #
-# Copyright (C) 2015-2017 Michael Mayer
+# Copyright (C) 2015-2018 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -291,8 +291,8 @@ class csobsinfo(ctools.csobservation):
         # Log time range
         mjd = '%.3f - %.3f' % (self._gti.tstart().mjd(),  self._gti.tstop().mjd())
         utc = '%s - %s'     % (self._gti.tstart().utc(),  self._gti.tstop().utc())
-        met = '%.3f - %.3f' % (self._gti.tstart().convert(self._time_reference()),
-                               self._gti.tstop().convert(self._time_reference()))
+        met = '%.3f - %.3f' % (self._gti.tstart().convert(ctools.time_reference),
+                               self._gti.tstop().convert(ctools.time_reference))
         self._log_header3(gammalib.NORMAL, 'Time range')
         self._log_value(gammalib.NORMAL, 'MJD (days)', mjd)
         self._log_value(gammalib.NORMAL, 'UTC',  utc)

@@ -9,5 +9,4 @@ User Manual
    introduction
    response
    models
-   plotting
 

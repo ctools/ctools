@@ -75,9 +75,7 @@ for comparison.
    :align: center
 
    *Spectrum of the Crab derived using a node function*
-..
 
-  .. note::
-
-     The ``NodeFunction`` spectral models implements a piece-wise power law
-     that is defined by the intensity values at each node.
+.. note::
+   The ``NodeFunction`` spectral models implements a piece-wise power law
+   that is defined by the intensity values at each node.

@@ -24,18 +24,18 @@ characteristics of the simulation:
 
 .. code-block:: bash
 
-  $ ctobssim
-  RA of pointing (degrees) (0-360) [83.63] 
-  Dec of pointing (degrees) (-90-90) [22.01] 
-  Radius of FOV (degrees) (0-180) [5.0] 
-  Start time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:00:00]
-  Stop time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:30:00] 2020-01-01T01:00:00
-  Lower energy limit (TeV) [0.03]
-  Upper energy limit (TeV) [200.0]
-  Calibration database [prod2] 
-  Instrument response function [South_0.5h] 
-  Input model XML file [$CTOOLS/share/models/crab.xml] 
-  Output event data file or observation definition XML file [events.fits]
+   $ ctobssim
+   RA of pointing (degrees) (0-360) [83.63]
+   Dec of pointing (degrees) (-90-90) [22.51]
+   Radius of FOV (degrees) (0-180) [5.0]
+   Start time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:00:00]
+   Stop time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:30:00] 2020-01-01T01:00:00
+   Lower energy limit (TeV) [0.1] 0.03
+   Upper energy limit (TeV) [100.0] 150.0
+   Calibration database [prod2]
+   Instrument response function [South_0.5h]
+   Input model definition XML file [$CTOOLS/share/models/crab.xml]
+   Output event data file or observation definition XML file [events.fits]
 
 Each line represents a query for one parameter value.
 The line starts with a short description of the parameter, followed by 
@@ -46,20 +46,22 @@ Otherwise, the specified value will overwrite the default value.
 The round brackets ``( )`` indicate the range of possible parameter
 values (if applicable).
 
-  .. note::
+In the example above the stop time and the energy range were specified, for the
+remaining parameters the default value was used.
 
-     Times can be entered in various formats in ctools. Times can be provided
-     as
+.. note::
+   Times can be entered in various formats in ctools. Times can be provided
+   as
 
-     * UTC date strings (e.g. ``"2020-01-01T00:00:00"``)
-     * Modified Julian days (e.g. ``"MJD 58849.0"``)
-     * Julian days (e.g. ``"JD 2458849.5"``)
-     * Mission elapsed time in seconds, counted from ``2000-01-01T12:00:00``
-       (e.g. ``"631108869.18"``)
+   * UTC date strings (e.g. ``"2020-01-01T00:00:00"``)
+   * Modified Julian days (e.g. ``"MJD 58849.0"``)
+   * Julian days (e.g. ``"JD 2458849.5"``)
+   * Mission elapsed time in seconds, counted from ``2000-01-01T12:00:00``
+     (e.g. ``"631108869.18"``)
 
-     Usually times are given in Terrestial Time (``TT``) but may also be
-     specified as ``TAI`` or ``UTC`` (e.g. ``"MJD 58849.0 (TAI)"`` or
-     ``"MJD 58849.0 (UTC)"``).
+   Usually times are given in Terrestial Time (``TT``) but may also be
+   specified as ``TAI`` or ``UTC`` (e.g. ``"MJD 58849.0 (TAI)"`` or
+   ``"MJD 58849.0 (UTC)"``).
 
 You may have recognised that the environment variable ``$CTOOLS`` has 
 been used in the path name of the model. ctools will automatically expand
@@ -70,21 +72,20 @@ The CTA
 is taken from the ``prod2`` database. The response for the southern array
 using the cuts optimised for 0.5 hours of observing time is used.
 
-  .. note::
-
-     ctools comes bundled with CTA
-     :ref:`instrument response functions <glossary_irf>` for the northern and
-     the southern array. The IRFs are based on a ``prod2``
-     analysis with cuts optimised for 0.5 hours, 5 hours and 50 hours of
-     observing time. **Be aware that these times do not need to correspond
-     to the actual observing time that is simulated.** IRFs optimised for
-     short observation times correspond to ``loose`` cuts that keep more
-     photons but also more background events, while IRFs optimised for
-     long observation times correspond to ``hard`` cuts that limit the
-     number of background events at the expense of loosing some photons.
-     The following IRFs are available:
-     ``North_0.5h``, ``North_5h``, ``North_50h``,
-     ``South_0.5h``, ``South_5h``, and ``South_50h``.
+.. note::
+   ctools comes bundled with CTA
+   :ref:`instrument response functions <glossary_irf>` for the northern and
+   the southern array. The IRFs are based on a ``prod2``
+   analysis with cuts optimised for 0.5 hours, 5 hours and 50 hours of
+   observing time. **Be aware that these times do not need to correspond
+   to the actual observing time that is simulated.** IRFs optimised for
+   short observation times correspond to ``loose`` cuts that keep more
+   photons but also more background events, while IRFs optimised for
+   long observation times correspond to ``hard`` cuts that limit the
+   number of background events at the expense of loosing some photons.
+   The following IRFs are available:
+   ``North_0.5h``, ``North_5h``, ``North_50h``,
+   ``South_0.5h``, ``South_5h``, and ``South_50h``.
 
 Events are simulated based on the
 :ref:`instrument response function <glossary_irf>`
@@ -153,12 +154,16 @@ where the parameters in the XML definition have the following mappings:
 * :math:`\gamma` = ``Index``
 * :math:`E_0` = ``PivotEnergy``
 
-..
+.. warning::
+   **Energies are given in the XML file in MeV units.** This is a GammaLib
+   convention that can not be modified. So make sure you always use
+   MeV as energy unit in an XML file.
 
-  .. warning::
-     **Energies are given in the XML file in MeV units.** This is a GammaLib
-     convention that can not be modified. So make sure you always use
-     MeV as energy unit in an XML file.
+.. note::
+   As customary for IACT observations, the pointing direction
+   was slightly offset from the source of interest, i.e.,
+   the Crab. This makes it possible to better handle systematics due
+   to the limited knowledge of the instrumental background.
 
 The instrumental background of CTA is modelled using the background
 information provided in the
@@ -181,14 +186,11 @@ To use for example a seed value of 41 you should type:
 
   $ ctobssim seed=41
 
-..
-
-  .. note::
-
-     Hidden parameters are parameters that are not queried by a tool since
-     in general their values is not expected to change frequently. To change
-     hidden parameters they have to be given as arguments on the command line.
-     Multiple hidden parameters need to be separated by a white space.
+.. note::
+   Hidden parameters are parameters that are not queried by a tool since
+   in general their values is not expected to change frequently. To change
+   hidden parameters they have to be given as arguments on the command line.
+   Multiple hidden parameters need to be separated by a white space.
 
 :ref:`ctobssim` will write two files in the working directory: ``events.fits``
 and ``ctobssim.log``. The first file contains the simulated events in FITS 
@@ -205,52 +207,51 @@ from this file are shown here:
 
 .. code-block:: none
 
-   2017-08-08T19:28:54: === CTA observation ===
-   2017-08-08T19:28:54:  Simulation cone ...........: RA=83.63 deg, Dec=22.01 deg, radius=5.5 deg
-   2017-08-08T19:28:54:  Time interval .............: 6.31109e+08 - 6.31112e+08 s
-   2017-08-08T19:28:54:  Photon energy range .......: 30 GeV - 72.3622611060088 GeV
-   2017-08-08T19:28:54:  Event energy range ........: 30 GeV - 72.3622611060088 GeV
-   2017-08-08T19:28:54:   Simulation area ..........: 1.97769e+09 cm2
-   2017-08-08T19:28:54:   Use model ................: Crab
-   2017-08-08T19:28:54:   Normalization ............: 1 [Crab]
-   2017-08-08T19:28:54:   Flux .....................: 2.5413e-09 [Crab] photons/cm2/s
-   2017-08-08T19:28:54:   Normalized flux ..........: 2.5413e-09 [Crab] photons/cm2/s
-   2017-08-08T19:28:54:   Photon rate ..............: 5.0259 photons/s [Crab]
-   2017-08-08T19:28:54:   MC source photons ........: 18186 [Crab]
-   2017-08-08T19:28:54:   MC source events .........: 4175 [Crab]
-   2017-08-08T19:28:54:   MC source events .........: 4175 (all source models)
-   2017-08-08T19:28:54:  Photon energy range .......: 72.3622611060088 GeV - 174.543227745807 GeV
+   2018-01-24T14:01:30: === CTA observation ===
+   2018-01-24T14:01:30:  Simulation cone ...........: RA=83.63 deg, Dec=22.51 deg, radius=5.5 deg
+   2018-01-24T14:01:30:  Time interval .............: 6.31109e+08 - 6.31112e+08 s
+   2018-01-24T14:01:30:  Photon energy range .......: 30 GeV - 70.310187347763 GeV
+   2018-01-24T14:01:30:  Event energy range ........: 30 GeV - 70.310187347763 GeV
+   2018-01-24T14:01:30:   Simulation area ..........: 1.90195e+09 cm2
+   2018-01-24T14:01:30:   Use model ................: Crab
+   2018-01-24T14:01:30:   Normalization ............: 1 [Crab]
+   2018-01-24T14:01:30:   Flux .....................: 2.50006e-09 [Crab] photons/cm2/s
+   2018-01-24T14:01:30:   Normalized flux ..........: 2.50006e-09 [Crab] photons/cm2/s
+   2018-01-24T14:01:30:   Photon rate ..............: 4.75499 photons/s [Crab]
+   2018-01-24T14:01:30:   MC source photons ........: 17169 [Crab]
+   2018-01-24T14:01:30:   MC source events .........: 3870 [Crab]
+   2018-01-24T14:01:30:   MC source events .........: 3870 (all source models)
+   2018-01-24T14:01:30:  Photon energy range .......: 70.310187347763 GeV - 164.784081495918 GeV
    ...
-   2017-08-08T19:28:54:  MC source photons .........: 47371 [Crab]
-   2017-08-08T19:28:54:  MC source events ..........: 13227 [Crab]
-   2017-08-08T19:29:02:  MC events outside ROI .....: 0
-   2017-08-08T19:29:02:  MC background events ......: 189539
-   2017-08-08T19:29:02:  MC identifier 1 ...........: Crab
-   2017-08-08T19:29:02:  MC identifier 2 ...........: CTABackgroundModel
-   2017-08-08T19:29:02:  MC events .................: 202766 (all models)
+   2018-01-24T14:01:30:  MC source photons .........: 46368 [Crab]
+   2018-01-24T14:01:30:  MC source events ..........: 12749 [Crab]
+   2018-01-24T14:01:38:  MC events outside ROI .....: 0
+   2018-01-24T14:01:38:  MC background events ......: 189461
+   2018-01-24T14:01:38:  MC identifier 1 ...........: Crab
+   2018-01-24T14:01:38:  MC identifier 2 ...........: CTABackgroundModel
+   2018-01-24T14:01:38:  MC events .................: 202210 (all models)
 
 Each line starts with the UTC time at which the line has been written. In
-this run, 47371 Crab photons have been thrown. 13227 of these photons have been
-registered by CTA as events. In the same time interval, 189539 background
+this run, 46368 Crab photons have been thrown. 12749 of these photons have been
+registered by CTA as events. In the same time interval, 189461 background
 events have been registred by CTA.
 
-  .. note::
-
-     :ref:`ctobssim` will split the simulated energy range into a number of
-     slices, controlled via the hidden ``eslices`` parameter (ten energy slices
-     are used by default). For each energy slice, the simulation area
-     will be adapted to the effective area of the array in that energy slice,
-     which helps to keep the computing time low. The log file will provide
-     information about the simulation in each slice. In the example above, the
-     simulation results for the first energy slice are shown, followed by a
-     summary of the results for all slices.
+.. note::
+   :ref:`ctobssim` will split the simulated energy range into a number of
+   slices, controlled via the hidden ``eslices`` parameter (ten energy slices
+   are used by default). For each energy slice, the simulation area
+   will be adapted to the effective area of the array in that energy slice,
+   which helps to keep the computing time low. The log file will provide
+   information about the simulation in each slice. In the example above, the
+   simulation results for the first energy slice are shown, followed by a
+   summary of the results for all slices.
 
 You may change the name of the log file using the hidden parameter 
 ``logfile``:
 
 .. code-block:: bash
 
-  $ ctobssim logfile=my-private-log-file
+   $ ctobssim logfile=my-private-log-file
 
 Furthermore, you may decide on the amount of information provided in the 
 log file (the chattiness of the executable) using the hidden parameter 
@@ -258,7 +259,7 @@ log file (the chattiness of the executable) using the hidden parameter
 
 .. code-block:: bash
 
-  $ ctobssim chatter=4
+   $ ctobssim chatter=4
 
 ``chatter`` can vary between 0 and 4, 0 providing no information while 4 
 provides the most detailed information.
@@ -270,16 +271,13 @@ the hidden ``debug`` parameter to yes:
 
 .. code-block:: bash
 
-  $ ctobssim debug=yes
+   $ ctobssim debug=yes
 
-..
-
-  .. note::
-
-     All tools have the hidden parameters ``logfile``, ``chatter``, and
-     ``debug`` and you can use these parameters to control the log file
-     output. In addition, all tools have the hidden parameter ``clobber``
-     that allows to overwrite existing files (set to ``yes`` by default)
-     and ``mode`` that defines the mode of automatic parameters (set to
-     ``ql`` for *query and learn* by default).
+.. note::
+   All tools have the hidden parameters ``logfile``, ``chatter``, and
+   ``debug`` and you can use these parameters to control the log file
+   output. In addition, all tools have the hidden parameter ``clobber``
+   that allows to overwrite existing files (set to ``yes`` by default)
+   and ``mode`` that defines the mode of automatic parameters (set to
+   ``ql`` for *query and learn* by default).
 

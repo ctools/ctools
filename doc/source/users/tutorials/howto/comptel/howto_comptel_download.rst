@@ -54,9 +54,8 @@ and a 3-dimensional counts cube exists for each of these energy intervals.
 Counts cubes are always suffixed ``_dre``, exposures ``_drx`` and geometry
 factors ``_drg``.
 
-  .. warning::
-
-     The files in the HEASARC archive have a ``.gz`` extension but apparently
-     the files are not gzipped. You may however leave the file names as they
-     are and specify later the file names without the ``.gz`` extension since
-     reading of gzipped files is transparent for ctools.
+.. warning::
+   The files in the HEASARC archive have a ``.gz`` extension but apparently
+   the files are not gzipped. You may however leave the file names as they
+   are and specify later the file names without the ``.gz`` extension since
+   reading of gzipped files is transparent for ctools.

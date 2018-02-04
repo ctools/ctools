@@ -24,7 +24,7 @@ master_indx, s, h, master.json,,, "Name of master index file"
 #====================
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
-debug,   b, h, no,,, "Debugging mode activated"
+debug,   b, h, no,,, "Activate debugging mode?"
 mode,    s, h, ql,,, "Mode of automatic parameters"
 logfile, f, h, csiactdata.log,,, "Log filename"
 

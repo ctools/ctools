@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -342,6 +342,13 @@ void ctobssim::run(void)
                 continue;
             }
 
+            // If observation identifier is not yet set then set it now
+            if (obs->id().empty()) {
+                char buffer[256];
+                std::sprintf(buffer, "%6.6d", i + m_startindex);
+                obs->id(std::string(buffer));
+            }
+
             // Remove now all events from the event list but keep the
             // event list information such as ROI, Good Time Intervals,
             // energy boundaries. This will also keep additional columns
@@ -634,13 +641,13 @@ void ctobssim::get_parameters(void)
     m_eslices     = (*this)["eslices"].integer();
     m_apply_edisp = (*this)["edisp"].boolean();
     m_max_rate    = (*this)["maxrate"].real();
+    m_startindex  = (*this)["startindex"].integer();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
         m_outevents  = (*this)["outevents"].filename();
         m_prefix     = (*this)["prefix"].string();
-        m_startindex = (*this)["startindex"].integer();
     }
 
     // Initialise random number generators. We initialise here one random
@@ -790,9 +797,9 @@ void ctobssim::simulate_source(GCTAObservation* obs,
                     wrklog->indent(indent);
                 }
                 *wrklog << gammalib::parformat("Time interval", indent);
-                *wrklog << tmin.convert(m_cta_ref);
+                *wrklog << tmin.convert(ctools::time_reference);
                 *wrklog << " - ";
-                *wrklog << tmax.convert(m_cta_ref);
+                *wrklog << tmax.convert(ctools::time_reference);
                 *wrklog << " s" << std::endl;
             }
 
@@ -1057,8 +1064,8 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
                     wrklog->indent(indent);
                 }
                 *wrklog << gammalib::parformat("Time slice", indent);
-                *wrklog << tstart.convert(m_cta_ref) << " - ";
-                *wrklog << tstop.convert(m_cta_ref) << " s";
+                *wrklog << tstart.convert(ctools::time_reference) << " - ";
+                *wrklog << tstop.convert(ctools::time_reference) << " s";
                 if (model->name().length() > 0) {
                     *wrklog << " [" << model->name() << "]";
                 }

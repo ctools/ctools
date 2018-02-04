@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for cscripts scripts                                             #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2018 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -37,6 +37,7 @@ pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/csphasecrv.py \
                 $(srcdir)/cspull.py \
                 $(srcdir)/csresmap.py \
+                $(srcdir)/csresspec.py \
                 $(srcdir)/csroot2caldb.py  \
                 $(srcdir)/cssens.py \
                 $(srcdir)/csspec.py \
@@ -71,6 +72,7 @@ parfiles = $(srcdir)/cscaldb.par \
            $(srcdir)/csphasecrv.par \
            $(srcdir)/cspull.par \
            $(srcdir)/csresmap.par \
+           $(srcdir)/csresspec.par \
            $(srcdir)/csroot2caldb.par \
            $(srcdir)/cssens.par \
            $(srcdir)/csspec.par \
@@ -102,6 +104,7 @@ linkscripts = cscaldb \
               csphasecrv \
               cspull \
               csresmap \
+              csresspec \
               csroot2caldb \
               cssens \
               csspec \
@@ -138,6 +141,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_csphasecrv.py \
               $(top_srcdir)/test/test_cspull.py \
               $(top_srcdir)/test/test_csresmap.py \
+              $(top_srcdir)/test/test_csresspec.py \
               $(top_srcdir)/test/test_csroot2caldb.py \
               $(top_srcdir)/test/test_cssens.py \
               $(top_srcdir)/test/test_csspec.py \
@@ -168,6 +172,8 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/crab_offaxis1.fits.gz \
            $(top_srcdir)/test/data/crab_offaxis2.fits.gz \
            $(top_srcdir)/test/data/crab_exclusion.fits.gz \
+           $(top_srcdir)/test/data/crab_src_reg.reg \
+           $(top_srcdir)/test/data/crab_bkg_reg.reg \
            $(top_srcdir)/test/data/tsmap_0.fits \
            $(top_srcdir)/test/data/tsmap_1.fits \
            $(top_srcdir)/test/data/exclusion.reg \
@@ -189,6 +195,8 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/sensitivity_integral.dat \
            $(top_srcdir)/test/data/skymap.fits \
            $(top_srcdir)/test/data/spectrum.fits \
+           $(top_srcdir)/test/data/residual.fits \
+           $(top_srcdir)/test/data/residual_onoff.fits \
            $(top_srcdir)/test/data/lightcurve.fits \
            $(top_srcdir)/test/data/ts.dat \
            $(top_srcdir)/test/data/models_spatial.xml \

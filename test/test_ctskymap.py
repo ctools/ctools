@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctskymap tool.
 #
-# Copyright (C) 2014-2017 Juergen Knoedlseder
+# Copyright (C) 2014-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -73,10 +73,6 @@ class Test(test):
                        ' xref=83.63 yref=22.01 bkgsubtract="NONE"'+ \
                        ' logfile="ctskymap_cmd1.log" chatter=1'
 
-        # Check if execution of wrong command fails
-        self.test_assert(self._execute('command_that_does_not_exist') != 0,
-             'Self test of test script')
-
         # Check if execution was successful
         self.test_assert(self._execute(cmd) == 0,
              'Check successful execution from command line')
@@ -93,7 +89,7 @@ class Test(test):
                        ' logfile="ctskymap_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
-        self.test_assert(self._execute(cmd) != 0,
+        self.test_assert(self._execute(cmd, success=False) != 0,
              'Check invalid input file when executed from command line')
 
         # Check ctskymap --help

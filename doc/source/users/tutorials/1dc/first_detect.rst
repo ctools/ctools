@@ -20,9 +20,9 @@ You do this using the :ref:`cssrcdetect` script:
 .. code-block:: bash
 
    $ cssrcdetect
-   Input sky map file [skymap.fits] skymap_bkgsubtract.fits
+   Input sky map file [skymap.fits] skymap_irf.fits
    Source model type (POINT) [POINT]
-   Background model type (NONE|IRF|AEFF|CUBE) [NONE] IRF
+   Background model type (NONE|IRF|AEFF|CUBE) [NONE]
    Detection threshold (Gaussian sigma) [5.0] 10.0
    Output model definition XML file [models.xml]
    Output DS9 region file [ds9.reg]
@@ -50,7 +50,7 @@ sources were detected.
    :width: 400px
    :align: center
 
-   *Background subtracted sky map of the events recorded around the Galactic Centre during the Galactic Plane Survey with the detected sources overlaid*
+   *IRF background subtracted sky map of the events recorded around the Galactic Centre during the Galactic Plane Survey with the detected sources overlaid*
 
 Below is the content of the
 :ref:`model definition file <glossary_moddef>`

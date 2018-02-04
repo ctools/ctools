@@ -19,7 +19,7 @@ General parameters
 ``infile [file]``
     Input ROOT performance file file.
 
-``(outdir = ) [string]``
+``(outdir = "") [string]``
     Output CALDB directory.
 
 ``inst [string]``
@@ -46,17 +46,17 @@ General parameters
 ``(emax = UNDEF) [real]``
     Maximum energy threshold (TeV).
 
-``(psftype = Gauss) [string]``
+``(psftype = Gauss) <Gauss|King> [string]``
     Point spread function type.
 
 ``(split = no) [boolean]``
-    Split IRF components into different files.
+    Split IRF components into different files?
 
 ``(norm1d = no) [boolean]``
-    Normalize on 1D histograms.
+    Normalize on 1D histograms?
 
 ``(rebin = no) [boolean]``
-    Rebin.
+    Rebin?
 
 ``(eascale = 1.0) [real]``
     Scaling factor for effective areas.
@@ -71,7 +71,7 @@ General parameters
     Energy above which to replace background by power law (TeV).
 
 ``(bgdinfill = no) [boolean]``
-    Infill of background template?.
+    Infill of background template?
 
 
 Standard parameters
@@ -80,23 +80,23 @@ Standard parameters
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether an existing output file should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = csroot2caldb.log) [filename]``
     Log filename.

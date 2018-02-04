@@ -50,22 +50,20 @@ create the following
        <parameter name="OAD" file="$COMDATA/phase01/vp0016_0/m20789_oad.fits"/>
      </observation>
    </observation_list>
-..
 
-  .. note::
+.. note::
+   There exist two formats for the
+   :ref:`observation definition file <glossary_obsdef>`
+   for COMPTEL data, one that describes the locations of the COMPTEL
+   data space cubes and response functions, and one that desribes
+   the location of an ``EVP`` event list, a ``TIM`` Good Time
+   Interval file, and an arbitrary number of ``OAD`` Orbit Aspect
+   Data files. In general there exists one ``OAD`` per day, while
+   there is one ``EVP`` event file and one ``TIM`` Good Time Interval
+   file per viewing period.
 
-     There exist two formats for the
-     :ref:`observation definition file <glossary_obsdef>`
-     for COMPTEL data, one that describes the locations of the COMPTEL
-     data space cubes and response functions, and one that desribes
-     the location of an ``EVP`` event list, a ``TIM`` Good Time
-     Interval file, and an arbitrary number of ``OAD`` Orbit Aspect
-     Data files. In general there exists one ``OAD`` per day, while
-     there is one ``EVP`` event file and one ``TIM`` Good Time Interval
-     file per viewing period.
-
-     In the example above, the environment variable ``$COMDATA`` was set
-     to the root directory of the COMPTEL archive.
+   In the example above, the environment variable ``$COMDATA`` was set
+   to the root directory of the COMPTEL archive.
 
 Now you are ready to generate the ``DRE``, ``DRG``, ``DRB``, ``DRX`` and
 ``IAQ`` datasets that you need for a ctools analysis of COMPTEL data.
@@ -157,13 +155,11 @@ that should look as follows:
        <parameter name="IAQ" value="iaq.fits"/>
      </observation>
    </observation_list>
-..
 
-  .. warning::
-
-     Be aware that the attribute for the ``IAQ`` parameter is ``value`` and
-     not ``file`` since the ``IAQ`` parameter is not necessarily a file
-     but can be also a response name of the calibration database.
+.. warning::
+   Be aware that the attribute for the ``IAQ`` parameter is ``value`` and
+   not ``file`` since the ``IAQ`` parameter is not necessarily a file
+   but can be also a response name of the calibration database.
 
 Before doing a model fit you need a model. Create the following
 :ref:`model definition file <glossary_moddef>`:

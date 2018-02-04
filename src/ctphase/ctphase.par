@@ -16,11 +16,11 @@
 #
 # General parameters
 #===================
-inobs,   f, a, "events.fits",,, "Input event list or observation definition XML file"
-outobs,  f, a, "phased_events.fits",,, "Output event list or observation definition XML file"
-prefix,  s, h, "phased_",,, "Prefix for event lists in observation definition XML file"
-inmodel, f, a, "$CTOOLS/share/models/crab.xml",,, "Model definition XML file"
-srcname, s, a, "Crab",,, "Source in model definition XML file to use for phase computation"
+inobs,   f, a, events.fits,,, "Input event list or observation definition XML file"
+outobs,  f, a, phased_events.fits,,, "Output event list or observation definition XML file"
+prefix,  s, h, phased_,,, "Prefix for event lists in observation definition XML file"
+inmodel, f, a, $CTOOLS/share/models/crab.xml,,, "Model definition XML file"
+srcname, s, a, Crab,,, "Source in model definition XML file to use for phase computation"
 
 #
 # Phase information parameters
@@ -37,6 +37,6 @@ f2,    r, a, 0.01,,, "Second frequency derivative at reference MJD (s^-3)"
 publish, b, h, no,,, "Publish event list on VO Hub?"
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
-debug,   b, h, no,,, "Debugging mode activated"
-mode,    s, h, "ql",,, "Mode of automatic parameters"
-logfile, f, h, "ctphase.log",,, "Log filename"
+debug,   b, h, no,,, "Activate debugging mode?"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, ctphase.log,,, "Log filename"

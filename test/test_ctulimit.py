@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctulimit tool.
 #
-# Copyright (C) 2015-2017 Michael Mayer
+# Copyright (C) 2015-2018 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-#import gammalib
 import ctools
 from testing import test
 
@@ -70,10 +69,6 @@ class Test(test):
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' logfile="ctulimit_cmd1.log" chatter=1'
 
-        # Check if execution of wrong command fails
-        self.test_assert(self._execute('command_that_does_not_exist') != 0,
-             'Self test of test script')
-
         # Check if execution was successful
         self.test_assert(self._execute(cmd) == 0,
              'Check successful execution from command line')
@@ -85,7 +80,7 @@ class Test(test):
                        ' logfile="ctulimit_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
-        self.test_assert(self._execute(cmd) != 0,
+        self.test_assert(self._execute(cmd, success=False) != 0,
              'Check invalid input file when executed from command line')
 
         # Setup ctulimit command
@@ -95,7 +90,7 @@ class Test(test):
                        ' logfile="ctulimit_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
-        self.test_assert(self._execute(cmd) != 0,
+        self.test_assert(self._execute(cmd, success=False) != 0,
              'Check invalid source name when executed from command line')
 
         # Check ctulimit --help

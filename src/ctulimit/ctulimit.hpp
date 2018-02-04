@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2016 by Michael Mayer                               *
+ *  copyright (C) 2015-2018 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -70,12 +70,13 @@ public:
 
 protected:
     // Protected methods
-    void   init_members(void);
-    void   copy_members(const ctulimit& app);
-    void   free_members(void);
-    void   get_parameters(void);
-    void   get_model_parameter(void);
-    void   ulimit_bisection(const double& parmin, const double& parmax);
+    void init_members(void);
+    void copy_members(const ctulimit& app);
+    void free_members(void);
+    void get_parameters(void);
+    void get_model_parameter(void);
+    void ulimit_bisection(const double& parmin, const double& parmax);
+    void compute_ulimit(void);
 
     // User parameters
     std::string   m_srcname;      //!< Name of source which is moved around

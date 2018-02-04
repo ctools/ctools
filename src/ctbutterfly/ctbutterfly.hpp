@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctbutterfly - butterfly calculation tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2017 by Michael Mayer                               *
+ *  copyright (C) 2014-2018 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -66,9 +66,10 @@ public:
     ctbutterfly& operator=(const ctbutterfly& app);
 
     // Methods
-    void clear(void);
-    void run(void);
-    void save(void);
+    void        clear(void);
+    void        run(void);
+    void        save(void);
+    const GCsv& butterfly(void) const;
 
 protected:
     // Protected methods
@@ -78,8 +79,6 @@ protected:
     void get_parameters(void);
     void gaussian_error_propagation(GModels& models);
     void ellipsoid_boundary(GModels& models);
-
-
     void check_model(void);
     void eigenvectors(const double& a,
                       const double& b,
@@ -89,6 +88,7 @@ protected:
                       double*       lambda2,
                       GVector*      vector1,
                       GVector*      vector2);
+    void set_csv(void);
 
     // User parameters
     std::string m_srcname;      //!< Name of source to compute butterfly
@@ -107,7 +107,19 @@ protected:
     std::vector<double> m_intensities;     //!< Power law intensity
     std::vector<double> m_min_intensities; //!< Minimum intensities
     std::vector<double> m_max_intensities; //!< Maximum intensities
+    GCsv                m_csv;             //!< CSV table filled by run() method
 };
 
+
+/***********************************************************************//**
+ * @brief Return butterfly
+ *
+ * @return Butterfly as CSV table.
+ ***************************************************************************/
+inline
+const GCsv& ctbutterfly::butterfly(void) const
+{
+    return (m_csv);
+}
 
 #endif /* CTBUTTERFLY_HPP */

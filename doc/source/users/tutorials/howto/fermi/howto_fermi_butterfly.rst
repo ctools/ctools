@@ -34,15 +34,13 @@ representation of the envelope.
    :align: center
 
    *Butterfly diagram of the fitted Vela pulsar spectrum*
-..
 
-  .. note::
+.. note::
+   The figure was created using the ``show_butterfly.py`` script that is
+   located in the ctools example folder. The example script requires the
+   `matplotlib <http://matplotlib.org>`_ Python module for display.
+   You may reproduce the plot by typing
 
-     The figure was created using the ``show_butterfly.py`` script that is
-     located in the ctools example folder. The example script requires the
-     `matplotlib <http://matplotlib.org>`_ Python module for display.
-     You may reproduce the plot by typing
+   .. code-block:: bash
 
-     .. code-block:: bash
-
-        $ $CTOOLS/share/examples/python/show_butterfly.py butterfly.txt
+      $ $CTOOLS/share/examples/python/show_butterfly.py butterfly.txt

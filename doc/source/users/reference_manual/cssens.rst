@@ -10,33 +10,30 @@ Synopsis
 --------
 
 This script computes the differential or integrated CTA sensitivity using
-maximum likelihood fitting of a test source. The differential sensitivity
-is determined for a number of energy bins, the integral sensitivity is 
-determined for a number of energy thresholds. The test source is fitted to
-simulated data using :doc:`ctlike` to determine it's detection significance
-as a function of source flux. The source flux is then varied until the
-source significance achieves a given level, specified by the (hidden)
-significance parameter ``sigma``. To damp variations between individual
-Monte Carlo simulations, a sliding average is applied in the significance
-computation (controlled by hidden ``num_avg`` parameter).
+maximum likelihood fitting of a test source. The differential sensitivity is
+determined for a number of energy bins, the integral sensitivity is determined
+for a number of energy thresholds. The test source is fitted to simulated data
+using :doc:`ctlike` to determine it's detection significance as a function of
+source flux. The source flux is then varied until the source significance
+achieves a given level, specified by the (hidden) significance parameter
+``sigma``.
 
-The significance is estimated using the Test Statistic value, defined as 
-twice the log-likelihood difference that is obtained when fitting the 
-simulated data with and without the test source. The simplified assumption
-is made that the significance (in Gaussian sigma) is the square root of
-the Test Statistic.
+The significance is estimated using the Test Statistic value, defined as twice
+the log-likelihood difference that is obtained when fitting the simulated data
+with and without the test source. The simplified assumption is made that the
+significance (in Gaussian sigma) is the square root of the Test Statistic.
 
-cssens will generate an ASCII file in comma-separated value (CSV) format 
-containing the sensitivity as function of energy. The first row is a header
-row providing the column names. The following rows provide the mean
-logarithmic energy and the boundaries of the energy bin for which the
-sensitivity was computed. They also provide the flux within the energy bin
-in Crab units, in photons (ph/cm2/s) and in energy (erg/cm2/s). Finally, 
-the sensitivity is given as the test source spectrum evaluated at the mean 
-logarithmic energy multiplied by the energy squared (erg/cm2/s).
+:ref:`cssens` will generate an ASCII file in comma-separated value (CSV) format
+containing the sensitivity as function of energy. The first row is a header row
+providing the column names. The following rows provide the mean logarithmic
+energy and the boundaries of the energy bin for which the sensitivity was
+computed. They also provide the flux within the energy bin in Crab units, in
+photons (ph/cm2/s) and in energy (erg/cm2/s). Finally, the sensitivity is given
+as the test source spectrum evaluated at the mean logarithmic energy multiplied
+by the energy squared (erg/cm2/s).
 
-The sensitivity can be displayed using the ``show_sensitivity.py`` script 
-in the example folder. Matplotlib is required to execute the script.
+The sensitivity can be displayed using the ``show_sensitivity.py`` script in the
+example folder. Matplotlib is required to execute the script.
 
 
 General parameters
@@ -61,7 +58,7 @@ General parameters
 ``(edisp = no) [boolean]``
     Apply energy dispersion to response computation?
 
-``(deadc = 0.95) [real]``
+``(deadc = 0.98) [real]``
     Average deadtime correction factor.
 
 ``outfile [file]``
@@ -86,7 +83,7 @@ General parameters
     Number of energy bins for sensitivity computation.
 
 ``(enumbins = 0) [integer]``
-    Number of energy bins (0=unbinned).
+    Number of energy bins for binned analysis (``0`` = unbinned analysis).
 
 ``(npix = 200) [integer]``
     Number of pixels for binned analysis.
@@ -135,7 +132,7 @@ Standard parameters
     output to the console.
 
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = cssens.log) [filename]``
     Log filename.

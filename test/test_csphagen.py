@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csphagen script.
 #
-# Copyright (C) 2017 Luigi Tibaldo
+# Copyright (C) 2017-2018 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -48,10 +48,11 @@ class Test(test):
         self._exclusion      = self._datadir + '/crab_exclusion.fits'
         self._nreg_with_excl = 5
         self._nreg_wo_excl   = 8
+        self._nreg_bkg_reg   = 5
         self._nreg_mul       = [self._nreg_with_excl, 6]
         self._nbins          = 10
-        # number of expected background regions with/wo exclusion,
-        # and for two different runs
+        self._regfile_src    = self._datadir + '/crab_src_reg.reg'
+        self._regfile_bkg    = self._datadir + '/crab_bkg_reg.reg'
 
         # Return
         return
@@ -88,12 +89,9 @@ class Test(test):
                          ' coordsys="CEL" ra=83.633 dec=22.0145' + \
                          ' rad=0.2 stack="no" inexclusion="' + \
                          self._exclusion + \
-                         '" outobs="csphagen_cmd1.xml" prefix="csphagen_cmd1" ' + \
+                         '" bkgmethod="REFLECTED" '+ \
+                         'outobs="csphagen_cmd1.xml" prefix="csphagen_cmd1" ' + \
                          'logfile="csphagen_cmd1.log" chatter=2'
-
-        # Check if execution of wrong command fails
-        self.test_assert(self._execute('command_that_does_not_exist') != 0,
-                         'Self test of test script')
 
         # Check if execution was successful
         self.test_assert(self._execute(cmd) == 0,
@@ -112,12 +110,13 @@ class Test(test):
                          ' coordsys="CEL" ra=83.633 dec=22.0145' + \
                          ' rad=0.2 stack="no" inexclusion="' + \
                          self._exclusion + \
-                         '" outobs="csphagen_cmd2.xml" prefix="csphagen_cmd2" ' + \
+                         '" bkgmethod="REFLECTED" '+ \
+                         'outobs="csphagen_cmd2.xml" prefix="csphagen_cmd2" ' + \
                          'logfile="csphagen_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
-        self.test_assert(self._execute(cmd) != 0,
-                         'Check invalid input file when executed from command line')
+        self.test_assert(self._execute(cmd, success=False) != 0,
+             'Check invalid input file when executed from command line')
 
         # Check csphagen --help
         self._check_help(csphagen)
@@ -144,6 +143,7 @@ class Test(test):
         phagen['rad']         = 0.2
         phagen['stack']       = False
         phagen['inexclusion'] = self._exclusion
+        phagen['bkgmethod']   = 'REFLECTED'
         phagen['etruemin']    = 0.05
         phagen['etruemax']    = 150.0
         phagen['etruebins']   = 5
@@ -152,7 +152,7 @@ class Test(test):
         phagen['logfile']     = 'csphagen_py1.log'
         phagen['chatter']     = 1
 
-        # Run script
+        # Execute script
         phagen.execute()
 
         # Check output
@@ -173,6 +173,7 @@ class Test(test):
         phagen['dec']       = 22.0145
         phagen['rad']       = 0.2
         phagen['stack']     = False
+        phagen['bkgmethod'] = 'REFLECTED'
         phagen['etruemin']  = 0.05
         phagen['etruemax']  = 150.0
         phagen['etruebins'] = 5
@@ -181,7 +182,7 @@ class Test(test):
         phagen['logfile']   = 'csphagen_py2.log'
         phagen['chatter']   = 2
 
-        # Run script
+        # Execute script
         phagen.execute()
 
         # Check output
@@ -209,6 +210,7 @@ class Test(test):
         phagen['rad']         = 0.2
         phagen['stack']       = False
         phagen['inexclusion'] = self._exclusion
+        phagen['bkgmethod']   = 'REFLECTED'
         phagen['etruemin']    = 0.05
         phagen['etruemax']    = 150.0
         phagen['etruebins']   = 5
@@ -226,8 +228,7 @@ class Test(test):
                                self._nreg_mul[s])
         self._check_outobs('csphagen_py3', 2)
 
-        # Setup csphagen for test with multiple input observations and
-        # stacking
+        # Setup csphagen for test with multiple input observations and stacking
         phagen = cscripts.csphagen(obs)
         phagen['ebinalg']     = 'LOG'
         phagen['emin']        = 0.1
@@ -239,6 +240,7 @@ class Test(test):
         phagen['rad']         = 0.2
         phagen['stack']       = True
         phagen['inexclusion'] = self._exclusion
+        phagen['bkgmethod']   = 'REFLECTED'
         phagen['etruemin']    = 0.05
         phagen['etruemax']    = 150.0
         phagen['etruebins']   = 5
@@ -247,7 +249,7 @@ class Test(test):
         phagen['logfile']     = 'csphagen_py4.log'
         phagen['chatter']     = 4
 
-        # Run script
+        # Execute script
         phagen.execute()
 
         # Check output
@@ -255,6 +257,66 @@ class Test(test):
             self._check_output('csphagen_py4_stacked', self._nbins,
                                0, check_regions=False)
         self._check_outobs('csphagen_py4', 1)
+
+        # Setup csphagen for test with custom On and Off regions provided
+        phagen = cscripts.csphagen()
+        phagen['inobs']      = self._myevents1
+        phagen['caldb']      = self._caldb
+        phagen['irf']        = self._irf
+        phagen['ebinalg']    = 'LOG'
+        phagen['emin']       = 0.1
+        phagen['emax']       = 100.0
+        phagen['enumbins']   = self._nbins
+        phagen['bkgmethod']  = 'CUSTOM'
+        phagen['srcregfile'] = self._regfile_src
+        phagen['bkgregfile'] = self._regfile_bkg
+        phagen['etruemin']   = 0.05
+        phagen['etruemax']   = 150.0
+        phagen['etruebins']  = 5
+        phagen['stack']      = False
+        phagen['outobs']     = 'csphagen_py5.xml'
+        phagen['prefix']     = 'csphagen_py5'
+        phagen['logfile']    = 'csphagen_py5.log'
+        phagen['chatter']    = 2
+
+        # Execute script
+        phagen.execute()
+
+        # Check output
+        self._check_output('csphagen_py5', self._nbins, self._nreg_bkg_reg)
+        self._check_outobs('csphagen_py5', 1)
+
+        # Append off regions to observation container
+        for run in obs:
+            run.off_regions(gammalib.GSkyRegions(self._regfile_bkg))
+
+        # Setup csphagen for test with multiple input observations and stacking
+        phagen = cscripts.csphagen(obs)
+        phagen['ebinalg']     = 'LOG'
+        phagen['emin']        = 0.1
+        phagen['emax']        = 100.0
+        phagen['enumbins']    = self._nbins
+        phagen['coordsys']    = 'CEL'
+        phagen['stack']       = True
+        phagen['inexclusion'] = self._exclusion
+        phagen['bkgmethod']   = 'CUSTOM'
+        phagen['srcregfile']  = self._regfile_src
+        phagen['etruemin']    = 0.05
+        phagen['etruemax']    = 150.0
+        phagen['etruebins']   = 5
+        phagen['outobs']      = 'csphagen_py6.xml'
+        phagen['prefix']      = 'csphagen_py6'
+        phagen['logfile']     = 'csphagen_py6.log'
+        phagen['chatter']     = 4
+
+        # Execute script
+        phagen.execute()
+
+        # Check output
+        for s in range(2):
+            self._check_output('csphagen_py6_stacked', self._nbins,
+                               0, check_regions=False)
+        self._check_outobs('csphagen_py6', 1)
 
         # Return
         return
@@ -309,7 +371,7 @@ class Test(test):
             self.test_assert(table.contains(col),
                              'FITS file contains "' + col + '" column')
 
-        # Check SPECTRUM table
+        # Check EBOUNDS table
         table = fits['EBOUNDS']
         self._check_ebounds(table, bins)
 
@@ -433,3 +495,26 @@ class Test(test):
 
         # Return
         return
+
+    def _read_pha_counts(self, filename):
+        """
+        Read and integrate the counts in a pha file.
+        Pha file structure already tested in _check_pha()
+        """
+        # Open FITS file
+        fits = gammalib.GFits(filename)
+
+        # Get SPECTRUM table
+        table = fits['SPECTRUM']
+
+        # Integrate counts
+        counts_col = table['COUNTS']
+        counts     = 0
+        for channel in range( counts_col.nrows() ):
+            counts += counts_col[channel]
+
+        # Close FITS file
+        fits.close()
+
+        # Return
+        return counts

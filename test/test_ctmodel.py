@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctmodel tool.
 #
-# Copyright (C) 2014-2017 Juergen Knoedlseder
+# Copyright (C) 2014-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -72,14 +72,11 @@ class Test(test):
                       ' inmodel="'+self._model+'"'+ \
                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' rad=5.0 ra=83.63 dec=22.01 tmin=0.0 tmax=1800'+ \
-                      ' emin=0.1 emax=100.0 enumbins=10 nxpix=40 nypix=40'+ \
+                      ' emin=0.1 emax=100.0 enumbins=10  ebinalg="LOG"'+ \
+                      ' nxpix=40 nypix=40'+ \
                       ' binsz=0.1 coordsys="CEL" proj="CAR"'+ \
                       ' xref=83.63 yref=22.01'+ \
                       ' logfile="ctmodel_cmd1.log" chatter=1'
-
-        # Check if execution of wrong command fails
-        self.test_assert(self._execute('command_that_does_not_exist') != 0,
-             'Self test of test script')
 
         # Check if execution was successful
         self.test_assert(self._execute(cmd) == 0,
@@ -95,13 +92,14 @@ class Test(test):
                       ' inmodel="model_that_does_not_exist.xml"'+ \
                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' rad=5.0 ra=83.63 dec=22.01 tmin=0.0 tmax=1800'+ \
-                      ' emin=0.1 emax=100.0 enumbins=10 nxpix=40 nypix=40'+ \
+                      ' emin=0.1 emax=100.0 enumbins=10  ebinalg="LOG"'+ \
+                      ' nxpix=40 nypix=40'+ \
                       ' binsz=0.1 coordsys="CEL" proj="CAR"'+ \
                       ' xref=83.63 yref=22.01'+ \
                       ' logfile="ctmodel_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
-        self.test_assert(self._execute(cmd) != 0,
+        self.test_assert(self._execute(cmd, success=False) != 0,
              'Check invalid input file when executed from command line')
 
         # Check ctmodel --help
@@ -146,6 +144,7 @@ class Test(test):
         model['dec']      = 22.01
         model['tmin']     = 0
         model['tmax']     = 1800
+        model['ebinalg']  = 'LOG'
         model['emin']     = 0.1
         model['emax']     = 100.0
         model['enumbins'] = 10

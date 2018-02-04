@@ -21,22 +21,22 @@ using the :ref:`ctbin` tool as follows:
    $ ctbin
    Input event list or observation definition XML file [events.fits] selected_events.fits
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63]
-   Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01]
+   Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.51]
    Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Image scale (in degrees/pixel) [0.02]
    Size of the X axis in pixels [200]
    Size of the Y axis in pixels [200]
    Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
-   Start value for first energy bin in TeV [0.1]
-   Stop value for last energy bin in TeV [100.0]
+   Lower energy limit (TeV) [0.1]
+   Upper energy limit (TeV) [100.0]
    Number of energy bins (1-200) [20]
    Output counts cube file [cntcube.fits]
 
-In this example the events from file ``events.fits`` will be binned into
-a counts cube stored into the file ``cntcube.fits``. The counts cube
-is centred on the location of the Crab nebula (Right Ascension 83.63 deg,
-Declination 22.01 deg). A cartesian projection aligned in celestial
+In this example the events from file ``selected_events.fits`` will be binned
+into a counts cube stored into the file ``cntcube.fits``. The counts cube
+is centred on the pointing direction (Right Ascension 83.63 deg,
+Declination 22.51 deg). A cartesian projection aligned in celestial
 coordinates is used and the counts cube has
 200 x 200 spatial pixels of 0.02 x 0.02 degrees in size, covering
 an area of 4 deg x 4 deg, and 20 logarithmically spaced energy bins, covering
@@ -80,17 +80,17 @@ reproduced below:
 
 .. code-block:: none
 
-   2017-08-08T20:17:06: +=================+
-   2017-08-08T20:17:06: | Bin observation |
-   2017-08-08T20:17:06: +=================+
-   2017-08-08T20:17:06: === CTA observation ===
-   2017-08-08T20:17:06:  Events in list ............: 21991
-   2017-08-08T20:17:06:  Events in cube ............: 18827
-   2017-08-08T20:17:06:  Events outside RoI ........: 0
-   2017-08-08T20:17:06:  Events with invalid WCS ...: 0
-   2017-08-08T20:17:06:  Events outside cube area ..: 3164
-   2017-08-08T20:17:06:  Events outside energy bins : 0
+   2018-01-24T14:23:03: +=================+
+   2018-01-24T14:23:03: | Bin observation |
+   2018-01-24T14:23:03: +=================+
+   2018-01-24T14:23:03: === CTA observation (id=000001) ===
+   2018-01-24T14:23:03:  Events in list ............: 21974
+   2018-01-24T14:23:03:  Events in cube ............: 18799
+   2018-01-24T14:23:03:  Events outside RoI ........: 0
+   2018-01-24T14:23:03:  Events with invalid WCS ...: 0
+   2018-01-24T14:23:03:  Events outside cube area ..: 3175
+   2018-01-24T14:23:03:  Events outside energy bins : 0
 
-From the 21991 events that have been simulated and stored in the
-``events.fits`` file, 18827 lie within the cube boundaries and are thus put
-into the resulting counts cube.
+From the 21974 events that were simulated and stored in the
+``selected_events.fits`` file, 18799 lie within the cube boundaries and are thus
+put into the resulting counts cube.

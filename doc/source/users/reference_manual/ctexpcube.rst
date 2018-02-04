@@ -15,7 +15,7 @@ Declination or Galactic latitude, and energy, that gives the exposure
 as function of true sky direction and energy. The energy binning of the cube 
 may be either linear, logarithmic, or custom defined using an input file.
 
-ctexpcube requires on input the event list or observation definition file 
+:ref:`ctexpcube` requires on input the event list or observation definition file
 that has been used in the generation of the counts cube using :doc:`ctbin`.
 
 The binning of an exposure cube does not need to correspond to the binning
@@ -36,7 +36,7 @@ Note that there should at least be 25 bins per energy decade in the exposure
 cube to assure that the energy dependence of the exposure is sufficiently
 well sampled (in particular at low energies).
 
-ctexpcube generates an exposure cube FITS file comprising three extensions.
+:ref:`ctexpcube` generates an exposure cube FITS file comprising three extensions.
 The primary extension contains a 3-dimensional image that contains the 
 exposure values. The next extension named ``ENERGIES`` contains a binary table
 that defines the energies of the exposure cube. The last extension named ``GTI``
@@ -63,44 +63,51 @@ General parameters
     Output exposure cube file.
 
 ``ebinalg <FILE|LIN|LOG> [string]``
-    Algorithm for defining energy bins.
- 	 	 
+    Algorithm for defining energy bins. For ``FILE``, the energy bins are defined
+    in a FITS file that is specified by the ``ebinfile`` parameter, for ``LIN``
+    and ``LOG`` there will be ``enumbins`` energy bins spaced linearly or
+    logarithmically between ``emin`` and ``emax``, respectively.
+
 ``emin [real]``
-    Lower energy value for first energy bin (in TeV).
- 	 	 
+    Lower energy value for first energy bin (in TeV) if ``LIN`` or ``LOG``
+    energy binning algorithms are used.
+
 ``emax [real]``
-    Upper energy value for last energy bin (in TeV).
- 	 	 
+    Upper energy value for last energy bin (in TeV) if ``LIN`` or ``LOG``
+    energy binning algorithms are used.
+
 ``enumbins [integer]``
-    Number of energy bins.
- 	 	 
+    Number of energy bins if ``LIN`` or ``LOG`` energy binning algorithms are
+    used.
+
 ``ebinfile [file]``
-    Name of the file containing the energy bin definition.
+    Name of the file containing the energy binning definition if ``ebinalg=FILE``.
+    You may use :ref:`csebins` to generate a file with appropriate energy binning.
 
 ``(addbounds = no) [boolean]``
     Add energies to the exposure cube at the observation energy boundaries?
 
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for cube centre instead of xref/yref parameters?
- 	 	 
+
 ``nxpix [integer]``
     Number of cube bins in Right Ascension or Galactic longitude.
- 	 	 
+
 ``nypix [integer]``
     Number of cube bins in Declination or Galactic latitude.
- 	 	 
+
 ``binsz [real]``
     Cube bin size (in degrees/pixel).
- 	 	 
+
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
- 	 	 
+
 ``proj <AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN> [string]``
     Projection method.
 
 ``xref [real]``
     Right Ascension / Galactic longitude of cube centre (J2000, in degrees).
- 	 	 
+
 ``yref [real]``
     Declination / Galactic latitude of cube centre (J2000, in degrees). 	 	 
 
@@ -114,23 +121,23 @@ Standard parameters
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether an existing output exposure cube file should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = ctexpcube.log) [string]``
     Name of log file.

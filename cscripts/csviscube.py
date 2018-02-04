@@ -2,7 +2,7 @@
 # ==========================================================================
 # Compute a visibility cube
 #
-# Copyright (C) 2016-2017 Juergen Knoedlseder
+# Copyright (C) 2016-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -260,8 +260,8 @@ class csviscube(ctools.cscript):
         #geolon = self['geolon'].real()
 
         # Get time interval
-        tmin = self['tmin'].time(self._time_reference())
-        tmax = self['tmax'].time(self._time_reference())
+        tmin = self['tmin'].time(ctools.time_reference)
+        tmax = self['tmax'].time(ctools.time_reference)
 
         # Initialise hour angle list
         hour_angles = []

@@ -1,6 +1,4 @@
-New Features and Important Changes in ctools 1.5.0
-
-28 November 2017
+25 January 2018
 
 
 Introduction
@@ -11,7 +9,10 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-None
+In case of an error, test output is now written into log file (#2264).
+
+The cscripts::execute() method no longer creates log files, making the
+cscripts behaviour compliant with that of ctools (#2182).
 
 
 Python interface
@@ -22,6 +23,12 @@ None
 Support model
 -------------
 None
+
+
+Base classes
+------------
+Add ctools::time_reference constant and remove ctools::time_reference() method
+(#2295).
 
 
 ctbin - CTA event binning
@@ -37,6 +44,8 @@ None
 ctbutterfly - Generate butterfly diagrams
 -----------------------------------------
 Add "statistic" parameter to allow setting of optimizer statistic (#2237).
+
+Add butterfly() method to return the butterfly diagram as CSV object (#1512).
 
 
 ctcubemask - CTA cube filtering
@@ -85,6 +94,9 @@ ctobssim - CTA observation simulation
 Use t-type parameters for "tmin" and "tmax" to all specifying times in various
 formats (#1864).
 
+Set the OBS_ID keyword to the number that is used for creating the FITS file
+(#1836).
+
 
 ctphase - Event phase computation
 ---------------------------------
@@ -103,6 +115,12 @@ The chatter level is now correctly forwarded to the PSF cube fill method (#2262)
 
 ctselect - CTA event selection
 ------------------------------
+Any .gz suffix is now correctly stripped from the event filenames when creating
+the output filenames (#2287).
+
+ctselect now informs about non-overlapping time interval; before the time interval
+was set to [0,0] which was disturbing and eventually incorrect (#2272).
+
 Use t-type parameters for "tmin" and "tmax" to all specifying times in various
 formats (#1864).
 
@@ -124,11 +142,18 @@ Add "statistic" parameter to allow setting of optimizer statistic (#2237).
 
 ctulimit - Compute upper limit
 ------------------------------
+The tool now also computes correct upper flux limits for diffuse map cubes
+for which the spectral component is a normalization of the spectral information
+available in the map cube (#2298).
+
 Add "statistic" parameter to allow setting of optimizer statistic (#2237).
 
 
 support - Support classes
 -------------------------
+Change DATE_OBS, DATE_END, TIME_OBS and TIME_END FITS keywords into DATA-OBS,
+DATE-END, TIME-OBS and TIME-END.
+
 Add ctobservation.obs() method to set an observation container.
 
 
@@ -214,11 +239,16 @@ None
 
 csobsselect - Select observations
 ---------------------------------
-None
+Add tmin and tmax parameters to allow selection of observation by time (#2297).
 
 
 csphagen - Generate On/Off observations
 ---------------------------------------
+The CUSTOM background method was added to allow specifying On and Off regions
+from a region file or FITS WCS map. For multiple observations, a custom Off
+region per observation can be specified in the observation definition XML file
+using the OffRegions parameter (#2284).
+
 The script was added to allow the generation of PHA, ARF and RMF datasets for classical On/Off IACT analysis (#2208).
 
 
@@ -250,6 +280,11 @@ formats (#1864).
 csresmap - Generate residual map
 --------------------------------
 None
+
+
+csresspec - Generate residual spectrum
+--------------------------------------
+Add script to generate a residual spectrum (#2289)
 
 
 csroot2caldb - Generates calibration database from ROOT file
@@ -291,8 +326,14 @@ The script now derives from the csobservation base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the Test
 Statistic distribution generation (#2237).
 
-Use t-type parameters for "tmin" and "tmax" to all specifying times in various
-formats (#1864).
+The parameter interface was considerably revised, in particular the following
+parameters were removed: "ra", "dec", "rad", "coordsys", "proj", "emin",
+"emax", "enumbins", "tmin", "tmax", "npix" and "binsz". The "inobs" parameter
+is now always queried. The script now reads in an observation or an observation
+container and derives the TS distribution for a source based on that observation
+container. So far the script supports unbinned, binned and stacked observations.
+If an observation definition XML file is specified the script assumes that all
+observations are event lists (#1567).
 
 
 cstsmapmerge - Merge Test Statistic maps

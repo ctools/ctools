@@ -3,6 +3,7 @@
 User Contributed Material
 =========================
 
-This section of the manual provides examples and Jupyter Notebooks contributed
-by ctools users.
+This section provides examples and Jupyter Notebooks contributed by ctools
+users. Feel free to send your material to ctools@irap.omp.eu so that it can
+be integrated into the documentation.
 

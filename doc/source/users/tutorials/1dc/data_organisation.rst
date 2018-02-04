@@ -80,18 +80,18 @@ reduced event data that were procuded for the
 and that were stored into FITS files.
 Event data are split into :ref:`observations <glossary_obs>` with a fixed
 pointing direction (observations are also known as runs).
-The duration of an observation is 25 minutes for the Extragalactic Survey
-and 30 minutes for the Galactic Plane and Centre surveys and the AGN monitoring
-program.
+The duration of an observation is 25 minutes for the Extragalactic Survey,
+30 minutes for the Galactic Plane and Centre surveys, and 15 min for the AGN
+monitoring program.
 The properties of the event data for all simulations are summarised in the
 table below:
 
    +-----------------------------------+------------------+------------------+------------------+-----------------+
    | Parameter                         |        GPS       |         GC       |      EGAL        |       AGN       |
    +===================================+==================+==================+==================+=================+
-   | Number of observations            |             3270 |             1671 |             1271 |            1920 |
+   | Number of observations            |             3270 |             1671 |             1271 |            3840 |
    +-----------------------------------+------------------+------------------+------------------+-----------------+
-   | Duration of each observation      |           1800 s |           1800 s |           1500 s |          1800 s |
+   | Duration of each observation      |           1800 s |           1800 s |           1500 s |           900 s |
    +-----------------------------------+------------------+------------------+------------------+-----------------+
    | Deadtime fraction                 |               2% |               2% |               2% |              2% |
    +-----------------------------------+------------------+------------------+------------------+-----------------+
@@ -134,44 +134,43 @@ have been simulated (see figure below).
    :align: center
 
    *Header of an event list*
-..
 
-  .. warning::
-     Only the following header keywords in the ``EVENTS`` table have meaningful
-     values:
+.. warning::
+   Only the following header keywords in the ``EVENTS`` table have meaningful
+   values:
 
-     * ``DSTYPx`` - Data sub-space type
-     * ``DSUNIx`` - Data sub-space unit
-     * ``DSVALx`` - Data sub-space value
-     * ``DSREFx`` - Data sub-space reference
-     * ``NDSKEYS`` - Number of data sub-space keys
-     * ``NMCIDS`` - Number of Monte Carlo identifiers
-     * ``MIDxxxxx`` - Monte Carlo identifier
-     * ``MMNxxxxx`` - Model name for Monte Carlo identifier
-     * ``OBS_ID`` - Observation identifier
-     * ``DATE_OBS`` - start date of observation (UTC)
-     * ``TIME_OBS`` - start time of observation (UTC)
-     * ``DATE_END`` - end date of observation (UTC)
-     * ``TIME_END`` - end time of observation (UTC)
-     * ``TSTART`` - start time of observation, counted from time reference (s)
-     * ``TSTOP`` - stop time of observation, counted from time reference (s)
-     * ``MJDREFI`` - integer part of time reference MJD (days)
-     * ``MJDREFF`` - fractional part of time reference MJD (days)
-     * ``TIMEUNIT`` - time unit
-     * ``TIMESYS`` - time system
-     * ``TIMEREF`` - time reference
-     * ``TELAPSE`` - elapsed time (s)
-     * ``ONTIME`` - exposure time (s)
-     * ``LIVETIME`` - livetime (s)
-     * ``DEADC`` - deadtime correction factor, livetime / exposure time
-     * ``TIMEDEL`` - time resolution
-     * ``RA_PNT`` - Right Ascension of pointing direction (deg)
-     * ``DEC_PNT`` - Declination of pointing direction (deg)
-     * ``RADECSYS`` - Coordinate system
-     * ``EQUINOX`` - Coordinate epoch
+   * ``DSTYPx`` - Data sub-space type
+   * ``DSUNIx`` - Data sub-space unit
+   * ``DSVALx`` - Data sub-space value
+   * ``DSREFx`` - Data sub-space reference
+   * ``NDSKEYS`` - Number of data sub-space keys
+   * ``NMCIDS`` - Number of Monte Carlo identifiers
+   * ``MIDxxxxx`` - Monte Carlo identifier
+   * ``MMNxxxxx`` - Model name for Monte Carlo identifier
+   * ``OBS_ID`` - Observation identifier
+   * ``DATE_OBS`` - start date of observation (UTC)
+   * ``TIME_OBS`` - start time of observation (UTC)
+   * ``DATE_END`` - end date of observation (UTC)
+   * ``TIME_END`` - end time of observation (UTC)
+   * ``TSTART`` - start time of observation, counted from time reference (s)
+   * ``TSTOP`` - stop time of observation, counted from time reference (s)
+   * ``MJDREFI`` - integer part of time reference MJD (days)
+   * ``MJDREFF`` - fractional part of time reference MJD (days)
+   * ``TIMEUNIT`` - time unit
+   * ``TIMESYS`` - time system
+   * ``TIMEREF`` - time reference
+   * ``TELAPSE`` - elapsed time (s)
+   * ``ONTIME`` - exposure time (s)
+   * ``LIVETIME`` - livetime (s)
+   * ``DEADC`` - deadtime correction factor, livetime / exposure time
+   * ``TIMEDEL`` - time resolution
+   * ``RA_PNT`` - Right Ascension of pointing direction (deg)
+   * ``DEC_PNT`` - Declination of pointing direction (deg)
+   * ``RADECSYS`` - Coordinate system
+   * ``EQUINOX`` - Coordinate epoch
 
-     All remaining header keywords have arbitrary values and should not be
-     used for the analysis.
+   All remaining header keywords have arbitrary values and should not be
+   used for the analysis.
 
 Each row of the ``EVENTS`` table corresponds to a single event.
 Each event is characterised by
@@ -203,11 +202,10 @@ An example of an ``EVENTS`` table is shown below.
    :align: center
 
    *Content of an event list*
-..
 
-  .. warning::
-     The time stamps in the ``TIME`` column are **not** necessarily in ascending
-     order.
+.. warning::
+   The time stamps in the ``TIME`` column are **not** necessarily in ascending
+   order.
 
 
 Observation Definition Files
@@ -235,10 +233,10 @@ identical.
 The other files in the folder are ASCII and FITS files containing spectral,
 temporal and spatial information that was used in the simulations.
 
-  .. warning::
-     The ASCII and FITS files should always reside in the same folder as the
-     :ref:`model definition XML files <glossary_moddef>`
-     since the latter reference the former.
+.. warning::
+   The ASCII and FITS files should always reside in the same folder as the
+   :ref:`model definition XML files <glossary_moddef>`
+   since the latter reference the former.
 
 
 

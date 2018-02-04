@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctbutterfly - butterfly calculation tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2017 by Michael Mayer                               *
+ *  copyright (C) 2014-2018 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -299,6 +299,9 @@ void ctbutterfly::run(void)
         ellipsoid_boundary(models);
     }
 
+    // Set CSV table
+    set_csv();
+
     // Write header into logger
     log_header1(TERSE, "Results");
 
@@ -311,7 +314,7 @@ void ctbutterfly::run(void)
                 gammalib::str(m_min_intensities[k])+", "+
                 gammalib::str(m_max_intensities[k])+") ph/cm2/s/MeV");
 
-    } //endfor: loop over energy bin  
+    } // endfor: loop over energy bin
 
     // Restore energy dispersion flag for all CTA observations
     for (int i = 0; i < m_obs.size(); ++i) {
@@ -329,7 +332,7 @@ void ctbutterfly::run(void)
 /***********************************************************************//**
  * @brief Save butterfly diagram
  *
- * Saves the butterfly diagram into an ascii file using a column separated
+ * Saves the butterfly diagram into an ASCII file using a column separated
  * value (CSV) format with blanks as separators.
  ***************************************************************************/
 void ctbutterfly::save(void)
@@ -346,19 +349,8 @@ void ctbutterfly::save(void)
         // Log butterfly diagram file name
         log_value(NORMAL, "Butterfly file", m_outfile.url());
 
-        // Create CSV table with 4 columns
-        GCsv table(m_energies.size(), 4);
-
-        // Fill CSV table
-        for (int i = 0; i < m_energies.size(); ++i) {
-            table.real(i, 0, m_energies[i]);
-            table.real(i, 1, m_intensities[i]);
-            table.real(i, 2, m_min_intensities[i]);
-            table.real(i, 3, m_max_intensities[i]);
-        }
-
         // Save CSV table
-        table.save(m_outfile.url(), " ", clobber());
+        m_csv.save(m_outfile.url(), " ", clobber());
 
     }
 
@@ -395,6 +387,7 @@ void ctbutterfly::init_members(void)
     m_intensities.clear();
     m_min_intensities.clear();
     m_max_intensities.clear();
+    m_csv.clear();
 
     // Set optimizer parameters
     m_opt.max_iter(m_max_iter);
@@ -429,6 +422,7 @@ void ctbutterfly::copy_members(const ctbutterfly& app)
     m_intensities     = app.m_intensities;
     m_min_intensities = app.m_min_intensities;
     m_max_intensities = app.m_max_intensities;
+    m_csv             = app.m_csv;
 
     // Return
     return;
@@ -851,13 +845,13 @@ void ctbutterfly::check_model(void)
  * http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
  ***************************************************************************/
 void ctbutterfly::eigenvectors(const double& a,
-        const double& b,
-        const double& c,
-        const double& d,
-        double*       lambda1,
-        double*       lambda2,
-        GVector*      vector1,
-        GVector*      vector2)
+                               const double& b,
+                               const double& c,
+                               const double& d,
+                               double*       lambda1,
+                               double*       lambda2,
+                               GVector*      vector1,
+                               GVector*      vector2)
 {
     // Compute trace and determinant
     double trace = a + d;
@@ -892,6 +886,29 @@ void ctbutterfly::eigenvectors(const double& a,
     // Normalize eigenvectors
     *vector1 /= norm(*vector1);
     *vector2 /= norm(*vector2);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Set CSV object
+ *
+ * Set CSV object with results.
+ ***************************************************************************/
+void ctbutterfly::set_csv(void)
+{
+    // Create CSV table with 4 columns
+    m_csv = GCsv(m_energies.size(), 4);
+
+    // Fill CSV table
+    for (int i = 0; i < m_energies.size(); ++i) {
+        m_csv.real(i, 0, m_energies[i]);
+        m_csv.real(i, 1, m_intensities[i]);
+        m_csv.real(i, 2, m_min_intensities[i]);
+        m_csv.real(i, 3, m_max_intensities[i]);
+    }
 
     // Return
     return;

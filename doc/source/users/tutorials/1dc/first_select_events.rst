@@ -20,7 +20,7 @@ observations. You do this with the :ref:`ctselect` tool by typing:
 
    $ ctselect
    Input event list or observation definition XML file [events.fits] obs.xml
-   RA for ROI centre (degrees) (0-360) [83.63] UNDEFINED
+   RA for ROI centre (degrees) (0-360) [83.63] NONE
    Start time (UTC string, JD, MJD or MET in seconds) [NONE]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
@@ -44,30 +44,30 @@ and that will be used for the further analysis. Running
 displays a summary of the content of this new
 :ref:`observation definition file <glossary_obsdef>`:
 
-.. code-block:: bash
+.. code-block:: none
 
-   2017-07-27T10:02:26: +=========+
-   2017-07-27T10:02:26: | Summary |
-   2017-07-27T10:02:26: +=========+
-   2017-07-27T10:02:26: === Observations ===
-   2017-07-27T10:02:26:  Unbinned observations .....: 57
-   2017-07-27T10:02:26:  Binned observations .......: 0
-   2017-07-27T10:02:26: === Events ===
-   2017-07-27T10:02:26:  Number of events ..........: 3084595
-   2017-07-27T10:02:26:  Number of bins ............: 0
-   2017-07-27T10:02:26: === Pointings ===
-   2017-07-27T10:02:26:  Mean offset angle .........: Unknown
-   2017-07-27T10:02:26:  Mean zenith angle .........: 0.00 deg
-   2017-07-27T10:02:26:  Mean azimuth angle ........: 0.00 deg
-   2017-07-27T10:02:26: === Energy range ===
-   2017-07-27T10:02:26:  Minimum energy ............: 100 GeV
-   2017-07-27T10:02:26:  Maximum energy ............: 100 TeV
-   2017-07-27T10:02:26: === Time range ===
-   2017-07-27T10:02:26:  MJD (days) ................: 59235.500 - 59276.921
-   2017-07-27T10:02:26:  UTC .......................: 2021-01-21T11:58:51 - 2021-03-03T22:04:51
-   2017-07-27T10:02:26:  MET (seconds) .............: 664502400.000 - 668081160.000
-   2017-07-27T10:02:26:  Total ontime ..............: 102600.00 s = 1710.00 min = 28.50 h
-   2017-07-27T10:02:26:  Total livetime ............: 100548.00 s = 1675.80 min = 27.93 h
+   2018-01-26T10:33:15: +=========+
+   2018-01-26T10:33:15: | Summary |
+   2018-01-26T10:33:15: +=========+
+   2018-01-26T10:33:15: === Observations ===
+   2018-01-26T10:33:15:  Unbinned observations .....: 57
+   2018-01-26T10:33:15:  Binned observations .......: 0
+   2018-01-26T10:33:15: === Events ===
+   2018-01-26T10:33:15:  Number of events ..........: 3084595
+   2018-01-26T10:33:15:  Number of bins ............: 0
+   2018-01-26T10:33:15: === Pointings ===
+   2018-01-26T10:33:15:  Mean offset angle .........: Unknown
+   2018-01-26T10:33:15:  Mean zenith angle .........: 0.00 deg
+   2018-01-26T10:33:15:  Mean azimuth angle ........: 0.00 deg
+   2018-01-26T10:33:15: === Energy range ===
+   2018-01-26T10:33:15:  Minimum energy ............: 100 GeV
+   2018-01-26T10:33:15:  Maximum energy ............: 100 TeV
+   2018-01-26T10:33:15: === Time range ===
+   2018-01-26T10:33:15:  MJD (days) ................: 59235.500 - 59276.921
+   2018-01-26T10:33:15:  UTC .......................: 2021-01-21T11:58:51 - 2021-03-03T22:04:51
+   2018-01-26T10:33:15:  MET (seconds) .............: 664502400.000 - 668081160.000
+   2018-01-26T10:33:15:  Total ontime ..............: 102600.00 s = 1710.00 min = 28.50 h
+   2018-01-26T10:33:15:  Total livetime ............: 100548.00 s = 1675.80 min = 27.93 h
 
 There are still 57 observations in the
 :ref:`observation definition file <glossary_obsdef>`

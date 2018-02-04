@@ -1,0 +1,64 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      csresspec.par                                                 #
+#                                                                           #
+#  Author:    Luigi Tibaldo                                                 #
+#             luigi.tibaldo@irap.omp.eu                                     #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the csresspec script                       #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,     f, a, events.fits,,, "Input event list, counts cube, or observation definition XML file"
+inmodel,   f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
+modcube,   f, a, NONE,,, "Input model cube file (generated with ctmodel)"           
+expcube,   f, a, NONE,,, "Input exposure cube file"
+psfcube,   f, a, NONE,,, "Input PSF cube file"
+edispcube, f, a, NONE,,, "Input energy dispersion cube file"
+bkgcube,   f, a, NONE,,, "Input background cube file"
+caldb,     s, a, prod2,,, "Calibration database"
+irf,       s, a, South_0.5h,,, "Instrument response function"
+edisp,     b, h, no,,, "Apply energy dispersion?"
+outfile,   f, a, resspec.fits,,, "Output residual spectrum file"
+
+#
+# Script parameters
+#==================
+statistic, s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statistic"
+components,b, h, no,,, "Calculate model for individual components?"
+ebinalg,   s, a, LOG,FILE|LIN|LOG,, "Algorithm for defining energy bins"
+emin,      r, a, 0.1,,, "Start value for first energy bin in TeV"
+emax,      r, a, 100.0,,, "Stop value for last energy bin in TeV"
+enumbins,  i, a, 20,1,200, "Number of energy bins"
+ebinfile,  f, a, NONE,,, "Name of the file containing the energy bin definition"
+stack,     b, a, no,,, "Stack observations?"
+coordsys,  s, a, CEL,CEL|GAL,, "Coordinate System"
+proj,      s, a, CAR,AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN,, "Projection method"
+xref,      r, a, 83.63,0,360, "First coordinate of image/source region center in degrees (RA or galactic l)"
+yref,      r, a, 22.51,-90,90, "Second coordinate of image/source region center in degrees (DEC or galactic b)"
+nxpix,     i, a, 200,,, "Size of the X axis in pixels"
+nypix,     i, a, 200,,, "Size of the Y axis in pixels"
+binsz,     r, a, 0.02,,, "Pixel size (deg/pixel)"
+mask,      b, a, no,,, "Mask data to calculate residuals in ROI?"
+ra,        r, a, 83.63,0,360, "RA for ROI centre (degrees)"
+dec,       r, a, 22.01,-90,90, "Dec for ROI centre (degrees)"
+rad,       r, a, 3.0,0,180, "Radius of ROI (degrees)"
+regfile,   f, a, NONE,,, "Input exclusion region file in ds9 format"
+algorithm, s, a, SIGNIFICANCE,SUB|SUBDIV|SUBDIVSQRT|SIGNIFICANCE,, "Residuals computation algorithm"
+
+#
+# Standard parameters
+#====================
+publish, b, h, no,,, "Publish residual map on VO Hub?"
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Activate debugging mode?"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, csresspec.log,,, "Log filename"

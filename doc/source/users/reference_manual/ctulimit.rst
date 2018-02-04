@@ -16,10 +16,11 @@ to a decrease of the likelihood that corresponds to a given confidence level.
 By default a confidence level of 95% is used, but this level can be adjusted
 using the hidden ``confidence`` parameter.
 
-ctulimit writes the differential upper flux limit at a given reference 
+:ref:`ctulimit` writes the differential upper flux limit at a given reference
 energy (specified by the hidden parameter ``eref``) and the integrated 
 upper flux limit (specified by the hidden parameters ``emin`` and ``emax``)
-into the log file.
+into the log file. This information can also be accessed using the ``diff_ulimit()``,
+``flux_ulimit()``, and ``eflux_ulimit()`` methods.
 
 
 General parameters
@@ -97,24 +98,24 @@ Standard parameters
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether an existing output file should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file
     output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = ctulimit.log) [string]``
     Name of log file.

@@ -33,13 +33,12 @@ function of sky position and energy. In the example above you extracted the
 binning of the exposure cube from the counts cube, which considerably reduces
 the number of parameters that are queried by the tool.
 
-  .. note::
-
-     The binning of the exposure cube does not need to correspond to the
-     binning of the counts cube. In any case, exposure values will be
-     determined by interpolation from the values stored in the exposure cube
-     file. The same is true for the point spread function and background cubes
-     that are described below.
+.. note::
+   The binning of the exposure cube does not need to correspond to the
+   binning of the counts cube. In any case, exposure values will be
+   determined by interpolation from the values stored in the exposure cube
+   file. The same is true for the point spread function and background cubes
+   that are described below.
 
 Next, we use the :ref:`ctpsfcube` tool to compute the
 :ref:`point spread function (PSF) cube <glossary_psfcube>` for the counts
@@ -54,15 +53,16 @@ You run :ref:`ctpsfcube` as follows:
    Instrument response function [South_0.5h]
    Input counts cube file to extract PSF cube definition [NONE]
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63]
-   Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01]
+   Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.51]
    Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Image scale (in degrees/pixel) [1.0]
    Size of the X axis in pixels [10]
    Size of the Y axis in pixels [10]
+   Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
-   Number of energy bins [20]
+   Number of energy bins (1-200) [20]
    Output PSF cube file [psfcube.fits]
 
 This produces the FITS file ``psfcube.fits`` that contains the point spread

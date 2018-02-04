@@ -15,10 +15,10 @@ function of Right Ascension or Galactic longitude, Declination or Galactic
 latitude, and energy. The energy binning may be either linear, logarithmic,
 or custom defined using an input file.
 
-ctmodel requires on input either a counts cube, an event list or an observation
+:ref:`ctmodel` requires on input either a counts cube, an event list or an observation
 definition file.
 
-If a counts cube is provided, ctmodel will use the definition of this cube
+If a counts cube is provided, :ref:`ctmodel` will use the definition of this cube
 (such as sky coordinates and projection, number of pixels, pixel scale,
 energy binning) to compute a model cube. In case that the counts cube combines
 multiple observations (i.e. for a so-called "stacked cube"), an exposure cube,
@@ -26,17 +26,17 @@ a point spread function cube and a background cube have to be provided
 (otherwise you may just enter ``NONE`` when the names of these files are
 queried).
 
-If an event list is provided, ctmodel will query for a counts cube to 
+If an event list is provided, :ref:`ctmodel` will query for a counts cube to
 extract the model cube definition (parameter ``incube``). If no counts cube
-is  provided (``incube=NONE``), ctmodel tools will query for cube definition
+is  provided (``incube=NONE``), :ref:`ctmodel` will query for cube definition
 parameters.
 
-If an observation definition file is provided, ctmodel will query for a counts
+If an observation definition file is provided, :ref:`ctmodel` will query for a counts
 cube to extract the model cube definition, unless the observation definition
 file contains a single binned observation (in that case, the counts cube of
 that observation will be used to extract the model cube definition).
 
-ctmodel generates a model cube FITS file comprising three extensions. The
+:ref:`ctmodel` generates a model cube FITS file comprising three extensions. The
 primary extension contains a 3-dimensional image that contains the model 
 cube values. The next extension named ``EBOUNDS`` contains a binary table
 that defines the energy boundaries of the background cube. The last extension
@@ -70,73 +70,80 @@ General parameters
 
 ``caldb [string]``
     Calibration database.
- 	 	 
+
 ``irf [string]``
     Instrument response function.
- 	 	 
+
 ``(edisp = no) [boolean]``
     Apply energy dispersion to response computation.
 
 ``outcube [file]``
     Output model cube file.
- 	 	 
+
 ``ra [real]``
     Right Ascension of pointing (J2000, in degrees).
- 	 	 
+
 ``dec [real]``
     Declination of pointing (J2000, in degrees).
 
 ``rad [real]``
     Radius of field of view (in degrees).
- 	 	 
+
 ``tmin [time]``
     Start time (UTC string, JD, MJD or MET in seconds).
- 	 	 
+
 ``tmax [time]``
     Stop time (UTC string, JD, MJD or MET in seconds).
- 	 	 
+
 ``(deadc = 0.95) [real]``
     Average deadtime correction factor.
 
-``(ebinalg = LOG) <FILE|LIN|LOG> [string]``
-    Algorithm for defining energy bins.
- 	 	 
+``ebinalg <FILE|LIN|LOG> [string]``
+    Algorithm for defining energy bins. For ``FILE``, the energy bins are defined
+    in a FITS file that is specified by the ``ebinfile`` parameter, for ``LIN``
+    and ``LOG`` there will be ``enumbins`` energy bins spaced linearly or
+    logarithmically between ``emin`` and ``emax``, respectively.
+
 ``emin [real]``
-    Lower energy value for first energy bin (in TeV).
- 	 	 
+    Lower energy value for first energy bin (in TeV) if ``LIN`` or ``LOG``
+    energy binning algorithms are used.
+
 ``emax [real]``
-    Upper energy value for last energy bin (in TeV).
- 	 	 
+    Upper energy value for last energy bin (in TeV) if ``LIN`` or ``LOG``
+    energy binning algorithms are used.
+
 ``enumbins [integer]``
-    Number of energy bins.
- 	 	 
-``(ebinfile = NONE) [file]``
-    Name of the file containing the energy bin definition.
+    Number of energy bins if ``LIN`` or ``LOG`` energy binning algorithms are
+    used.
+
+``ebinfile [file]``
+    Name of the file containing the energy binning definition if ``ebinalg=FILE``.
+    You may use :ref:`csebins` to generate a file with appropriate energy binning.
 
 ``(usepnt = no) [boolean]``
     Use pointing instead of xref/yref parameters?
- 	 	 
+
 ``nxpix [integer]``
     Size of the Right Ascension / Galactic longitude axis (in pixels).
- 	 	 
+
 ``nypix [integer]``
     Size of the Declination / Galactic latitude axis (in pixels).
- 	 	 
+
 ``binsz [real]``
     Pixel size (in degrees/pixel).
- 	 	 
+
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
- 	 	 
+
 ``proj <AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN> [string]``
     Projection method.
 
 ``xref [real]``
     Right Ascension / Galactic longitude of image centre (J2000, in degrees).
- 	 	 
+
 ``yref [real]``
     Declination / Galactic latitude of image centre (J2000, in degrees).
- 	 	 
+
 
 Standard parameters
 -------------------
@@ -147,23 +154,23 @@ Standard parameters
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether an existing output model cube file should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = ctmodel.log) [string]``
     Name of log file.

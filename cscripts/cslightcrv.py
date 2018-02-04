@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a lightcurve.
 #
-# Copyright (C) 2014-2017 Michael Mayer
+# Copyright (C) 2014-2018 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -107,7 +107,6 @@ class cslightcrv(ctools.csobservation):
         # Set On/Off analysis flag and query relevant user parameters
         self._onoff = self._is_onoff()
 
-        # If cube analysis is selected
         # Set stacked analysis flag and query relevant user parameters
         if not self._onoff:
             self._stacked = self._is_stacked()
@@ -174,8 +173,8 @@ class cslightcrv(ctools.csobservation):
         elif algorithm == 'LIN':
 
             # Get start and stop time and number of time bins
-            time_min = self['tmin'].time(self._time_reference())
-            time_max = self['tmax'].time(self._time_reference())
+            time_min = self['tmin'].time(ctools.time_reference)
+            time_max = self['tmax'].time(ctools.time_reference)
             nbins    = self['tbins'].integer()
 
             # Compute time step in seconds and setup the GTIs
@@ -386,8 +385,8 @@ class cslightcrv(ctools.csobservation):
         select = ctools.ctselect(self.obs())
         select['emin'] = self['emin'].real()
         select['emax'] = self['emax'].real()
-        select['tmin'] = tmin.convert(self._time_reference())
-        select['tmax'] = tmax.convert(self._time_reference())
+        select['tmin'] = tmin.convert(ctools.time_reference)
+        select['tmax'] = tmax.convert(ctools.time_reference)
         select['rad']  = 'UNDEFINED'
         select['ra']   = 'UNDEFINED'
         select['dec']  = 'UNDEFINED'
@@ -445,8 +444,8 @@ class cslightcrv(ctools.csobservation):
             select = ctools.ctselect(self.obs())
             select['emin'] = self['emin'].real()
             select['emax'] = self['emax'].real()
-            select['tmin'] = tmin.convert(self._time_reference())
-            select['tmax'] = tmax.convert(self._time_reference())
+            select['tmin'] = tmin.convert(ctools.time_reference)
+            select['tmax'] = tmax.convert(ctools.time_reference)
             select['rad']  = 'UNDEFINED'
             select['ra']   = 'UNDEFINED'
             select['dec']  = 'UNDEFINED'
@@ -558,12 +557,12 @@ class cslightcrv(ctools.csobservation):
             # fill results table with zeros
             else:
                 self._log_value(gammalib.TERSE, 'Warning',
-                                'No observations available in this time bin',
-                                'Skip bin.')
+                                'No observations available in this time bin, '
+                                'skip bin.')
 
                 # Set all results to 0
                 for par in pars:
-                    result['values'][par] = 0.0
+                    result['values'][par]        = 0.0
                     result['values']['e_' + par] = 0.0
 
                 # Append result

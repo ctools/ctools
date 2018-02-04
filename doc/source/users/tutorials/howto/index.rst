@@ -1,27 +1,44 @@
-.. _1dc_howto:
+.. _howto:
 
-Analysis cookbook
-=================
+ctools How-tos
+==============
 
 The following sections teach you how to use ctools to address some typical
-science analysis. The sections provide examples that are based on the data
-distributed within the CTA Consortium for the
-:ref:`first CTA Data Challenge <glossary_1dc>`.
-These examples can be easily adapted to any data you have at your disposal.
+science analysis.
+
+CTA data analysis
+-----------------
 
 .. toctree::
    :maxdepth: 1
 
-   howto_display
+   howto_combine_observations
+   howto_stacked_analysis
+   howto_advanced_python_fitting
+   howto_connect_irfs
+   howto_connect_models
+
+
+CTA first Data Challenge data analysis
+--------------------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   howto_prepare_1dc
    howto_ts
    howto_tsmap
    howto_extent
    howto_ulimit
-   howto_edisp
    howto_lightcurve
    howto_phasecurve
    howto_exclude
+   howto_display
    howto_vo
+
+
+Analysis of data from other instruments
+---------------------------------------
 
 .. toctree::
    :maxdepth: 1
@@ -29,3 +46,4 @@ These examples can be easily adapted to any data you have at your disposal.
    How to analyse Fermi-LAT data with ctools? <fermi/index>
    How to analyse COMPTEL data with ctools? <comptel/index>
    How to analyse H.E.S.S. data with ctools? <iact/index>
+   howto_combine_instruments

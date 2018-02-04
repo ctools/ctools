@@ -3,24 +3,56 @@
 csphagen
 ========
 
-Creates files necessary to perform a classical region-based spectral analysis
-on IACT data, i.e., source and background PHA files, ARF and RMF files.
+Creates files necessary to perform a region-based spectral On/Off analysis.
 
 
 Synopsis
 --------
 
-This script can be used to derive from an observation or a set of observations
-the count spectra in a source region and in background regions, as well as the
-detector response (effective area, energy redistribution matrix), that can be
-used to perform a classical 1D spectral analysis. The output files are saved in
-the OGIP format normally used in X-ray astronomy (PHA, ARF, RMF).
-`See here <https://heasarc.gsfc.nasa.gov/docs/heasarc/ofwg/docs/spectra/ogip_92_007/node5.html>`__.
+This script generates the files that are necessary for a region-based spectral
+On/Off analysis from one or several event lists. The output files are saved in
+the OGIP format normally used in X-ray astronomy (PHA, ARF, RMF),
+`see here for a description of the format <https://heasarc.gsfc.nasa.gov/docs/heasarc/ofwg/docs/spectra/ogip_92_007/node5.html>`__.
 
-The outputs are:
+If the ``bkgmethod`` parameter is ``REFLECTED``, the script will use an On region
+shape defined by the ``srcshape`` parameter and generate reflected regions by
+placing regions of the same shape that are reflected with respect to the pointing
+direction. So far only circular regions are supported, with a center that is
+specified by the ``ra`` and ``dec`` parameters if ``coordsys=CEL`` or the ``glon``
+and ``glat`` parameters if ``coordsys=GAL``, and a radius that is specified by the
+``rad`` parameter. Reflected regions are only generated for offset angles with
+respect to the pointing direction that are smaller than the value specified by
+the ``maxoffset`` parameter. If less than ``bkgregmin`` reflected regions can be
+found because the offset angle between source and pointing direction is too small,
+the observation will be skipped. Regions to be excluded for background
+determination can be specified using a mask file that is specified using the
+``inexclusion`` parameter. A mask file is a sky map where all pixel values that
+differ from zero will be used as exclusion region.
 
-1) the PHA, ARF, RMF files, either separately for each observation, or stacked
-   for a set of observations,
+Alternatively, if ``bkgmethod=CUSTOM`` is specified, the source and background
+regions will be specified using the ``srcregfile`` and ``bkgregfile`` parameters,
+respectively. Both parameters accept either a ds9 region file or a sky map where
+all non-zero pixel values define a region. In case that an observation definition
+XML file is specified as input using the ``inobs``, background region files can
+be specified separately for each observation using the ``OffRegions`` parameter
+in the format
+
+.. code-block:: xml
+
+   <observation name="Crab" id="00001" instrument="CTA">
+     <parameter name="OffRegions" file="ds9.reg"/>
+     ...
+   </observation>
+
+The :ref:`csphagen` script will produce on output an observation definition XML
+file that points to all relevant files. All relevant files will be prefixed with
+the string specified by the ``prefix`` parameter. If several observations are
+contained in the input observation definition XML file the script can either
+generate region based files for each of the observations or stack all
+observations into single files (controlled via the ``stack`` parameter). The
+script will write out:
+
+1) the PHA, ARF, RMF files;
 2) DS9 regions files listing the source and background regions for each
    observation;
 3) a new observation definition XML file.
@@ -39,8 +71,8 @@ General parameters
     Instrument response function.
 
 ``(inexclusion = NONE) [file]``
-    Optional FITS file containing a WCS map in the first hdu that defines sky
-    regions not to be used for background estimation (where map value != 0).
+    Optional FITS file containing a WCS map in the first extension that defines
+    sky regions not to be used for background estimation (where map value != 0).
 
 ``outobs [string]``
     Output observation definition XML file.
@@ -48,52 +80,70 @@ General parameters
 ``(prefix = onoff) [string]``
     Prefix of the file name for output PHA, ARF, RMF, XML, and DS9 region files.
 
+``ebinalg <FILE|LIN|LOG> [string]``
+    Algorithm for defining energy bins. For ``FILE``, the energy bins are defined
+    in a FITS file that is specified by the ``ebinfile`` parameter, for ``LIN``
+    and ``LOG`` there will be ``enumbins`` energy bins spaced linearly or
+    logarithmically between ``emin`` and ``emax``, respectively.
+
 ``emin [real]``
-    Lower energy limit (TeV) if ``LIN`` or ``LOG`` binning algorithms are used.
+    Lower energy value for first energy bin (in TeV) if ``LIN`` or ``LOG``
+    energy binning algorithms are used.
 
 ``emax [real]``
-    Upper energy limit (TeV) if ``LIN`` or ``LOG`` binning algorithms are used.
+    Upper energy value for last energy bin (in TeV) if ``LIN`` or ``LOG``
+    energy binning algorithms are used.
 
 ``enumbins [integer]``
-    Number of energy bins. At least 30 bins per decade are recommended for
-    proper evaluation of the instrument response.
-
-``ebinalg [string]``
-    Energy binning algorithm:
-    ``LOG`` : logarithmically spaced energy bins;
-    ``LIN`` : linearly spaced energy bins;
-    ``FILE``: energy bounds retrieved from file.
+    Number of energy bins if ``LIN`` or ``LOG`` energy binning algorithms are used.
+    At least 30 bins per decade are recommended for proper evaluation of the
+    instrument response.
 
 ``ebinfile [file]``
-    Name of the file containing the energy bin definition if ``FILE`` algorithm
-    is used.
+    Name of the file containing the energy binning definition if ``ebinalg=FILE``.
+    You may use :ref:`csebins` to generate a file with appropriate energy binning.
 
-``(srcshape = CIRCLE) [string]``
-    Shape of the source region.
-    ``CIRCLE``: circular region around given position.
+``(srcshape = CIRCLE) <CIRCLE> [string]``
+    Shape of the source region. So far only ``CIRCLE`` exists which defines a
+    circular region around given position.
 
-``coordsys [string]``
-    Coordinate system (``CEL`` - celestial, ``GAL`` - galactic)
+``coordsys <CEL|GAL> [string]``
+    Coordinate system (CEL - celestial, GAL - galactic).
 
 ``ra [real]``
-    Right Ascension of source region centre (deg)
+    Right Ascension of source region centre (deg).
 
 ``dec [real]``
-    Declination of source region centre (deg)
+    Declination of source region centre (deg).
 
 ``glon [real]``
-    Galactic longitude of source region centre (deg)
+    Galactic longitude of source region centre (deg).
 
 ``glat [real]``
-    Galactic latitude of source region centre (deg)
+    Galactic latitude of source region centre (deg).
 
 ``rad [real]``
-    Radius of source region circle (deg)
+    Radius of source region circle (deg).
 
-``(bkgmethod = REFLECTED) [string]``
-    Method for background estimation.
-    ``REFLECTED:`` background evaluated in regions with the same shape as
-    source region reflected w.r.t. pointing direction for each observation.
+``srcregfile [file]``
+    Source region file (ds9 or FITS WCS map).
+
+``bkgmethod <REFLECTED|CUSTOM> [string]``
+    Method for background estimation:
+
+    - ``REFLECTED``: background is evaluated in regions with the same shape as
+      the source region reflected w.r.t. pointing direction for each observation
+
+    - ``CUSTOM``: background is evaluated in regions specified by user. For an
+      event list or a single observation in the observation definition XML file
+      a region file will be queried (see ``bkgregfile`` parameter). For multiple
+      observations specified in the observation definition XML file the name of
+      the region file will be extracted from the ``OffRegions`` parameter that
+      needs to be specified for each observation in the observation definition
+      XML file. Off region files can be either ds9 region files or FITS WCS maps.
+
+``bkgregfile [file]``
+    Background regions file (ds9 or FITS WCS map).
 
 ``(bkgregmin = 2) [integer]``
     Minimum number of background regions that are required for an observation.
@@ -124,26 +174,31 @@ Standard parameters
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether an existing output runlist should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file
     output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = csphagen.log) [filename]``
     Log filename.
 
+
+Related tools or scripts
+------------------------
+
+None
 
