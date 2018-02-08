@@ -1,4 +1,4 @@
-25 January 2018
+8 February 2018
 
 
 Introduction
@@ -9,10 +9,7 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-In case of an error, test output is now written into log file (#2264).
-
-The cscripts::execute() method no longer creates log files, making the
-cscripts behaviour compliant with that of ctools (#2182).
+None
 
 
 Python interface
@@ -27,8 +24,7 @@ None
 
 Base classes
 ------------
-Add ctools::time_reference constant and remove ctools::time_reference() method
-(#2295).
+None
 
 
 ctbin - CTA event binning
@@ -43,9 +39,7 @@ None
 
 ctbutterfly - Generate butterfly diagrams
 -----------------------------------------
-Add "statistic" parameter to allow setting of optimizer statistic (#2237).
-
-Add butterfly() method to return the butterfly diagram as CSV object (#1512).
+None
 
 
 ctcubemask - CTA cube filtering
@@ -60,7 +54,7 @@ None
 
 cterror - Likelihood profile error computation
 ----------------------------------------------
-Add "statistic" parameter to allow setting of optimizer statistic (#2237).
+None
 
 
 ctexpcube - CTA exposure cube generation
@@ -70,7 +64,7 @@ None
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
-Rename "stats" parameter to "statistic" (#2237).
+None
 
 
 ctmapcube - CTA map cube generation
@@ -80,22 +74,12 @@ None
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
-Use t-type parameters for "tmin" and "tmax" to all specifying times in various
-formats (#1864).
-
-The tool now also checks which models actually overlap with the RoI of a given
-observation and then only use these models to compute the model cube. The
-parallelization of the tool has also been optimised so that diffuse models are
-not loaded over and over again (#2189).
+None
 
 
 ctobssim - CTA observation simulation
 -------------------------------------
-Use t-type parameters for "tmin" and "tmax" to all specifying times in various
-formats (#1864).
-
-Set the OBS_ID keyword to the number that is used for creating the FITS file
-(#1836).
+None
 
 
 ctphase - Event phase computation
@@ -110,51 +94,32 @@ None
 
 ctpsfcube - CTA point spread function cube generation
 -----------------------------------------------------
-The chatter level is now correctly forwarded to the PSF cube fill method (#2262).
+None
 
 
 ctselect - CTA event selection
 ------------------------------
-Any .gz suffix is now correctly stripped from the event filenames when creating
-the output filenames (#2287).
-
-ctselect now informs about non-overlapping time interval; before the time interval
-was set to [0,0] which was disturbing and eventually incorrect (#2272).
-
-Use t-type parameters for "tmin" and "tmax" to all specifying times in various
-formats (#1864).
+None
 
 
 ctskymap - CTA sky mapping
 --------------------------
-Header keywords informing about the dates and times covered by the observations
-used to generate the skymap, as well as the event energy range, are now appended
-as header keywords to the FITS file (#2194).
-
-Add the RING background method, which is a classical analysis methods for IACT
-data analysis, for background subtraction (#2207).
+None
 
 
 cttsmap - Generation of Test Statistic map
 ------------------------------------------
-Add "statistic" parameter to allow setting of optimizer statistic (#2237).
+None
 
 
 ctulimit - Compute upper limit
 ------------------------------
-The tool now also computes correct upper flux limits for diffuse map cubes
-for which the spectral component is a normalization of the spectral information
-available in the map cube (#2298).
-
-Add "statistic" parameter to allow setting of optimizer statistic (#2237).
+None
 
 
 support - Support classes
 -------------------------
-Change DATE_OBS, DATE_END, TIME_OBS and TIME_END FITS keywords into DATA-OBS,
-DATE-END, TIME-OBS and TIME-END.
-
-Add ctobservation.obs() method to set an observation container.
+None
 
 
 cscaldb - Inspect calibration database
@@ -189,16 +154,7 @@ None
 
 cslightcrv - Generate light curve
 ---------------------------------
-The script now also supports the handling of On/Off observations. For that
-purpose parameters were added that are needed for the execution of the
-csphagen script (#2273).
-
-The script now derives from the csobservation base class. A "statistic"
-parameter was added to allow setting the optimizer statistic for the light
-curve generation (#2237).
-
-Use t-type parameters for "tmin" and "tmax" to all specifying times in various
-formats (#1864).
+None
 
 
 csmodelinfo - Return model information
@@ -218,8 +174,7 @@ None
 
 csmodelsois - Puts selected sources in diffuse model cube
 ---------------------------------------------------------
-Add script that replaces selected models in a model container by a diffuse
-map cube (#2180).
+None
 
 
 csobs2caldb - Generate calibration database entry for an IACT observation
@@ -239,42 +194,22 @@ None
 
 csobsselect - Select observations
 ---------------------------------
-Add tmin and tmax parameters to allow selection of observation by time (#2297).
+None
 
 
 csphagen - Generate On/Off observations
 ---------------------------------------
-The CUSTOM background method was added to allow specifying On and Off regions
-from a region file or FITS WCS map. For multiple observations, a custom Off
-region per observation can be specified in the observation definition XML file
-using the OffRegions parameter (#2284).
-
-The script was added to allow the generation of PHA, ARF and RMF datasets for classical On/Off IACT analysis (#2208).
+Enable using the script also for HESS, VERITAS and MAGIC observations (#2307).
 
 
 csphasecrv - Generate phase curve
 ---------------------------------
-The script now also supports the handling of On/Off observations. For that
-purpose parameters were added that are needed for the execution of the
-csphagen script (#2273).
-
-The script now derives from the csobservation base class. A "statistic"
-parameter was added to allow setting the optimizer statistic for the light
-curve generation (#2237).
+None
 
 
 cspull - Generate pull distributions
 ------------------------------------
-The script now handles On/Off observation. The parameters "onsrc" and "onrad"
-were added to allow specifying the On region test source and On region radius
-(#2260).
-
-The script now derives from the csobservation base class. A "statistic"
-parameter was added to allow setting the optimizer statistic for the pull
-distribution generation (#2237).
-
-Use t-type parameters for "tmin" and "tmax" to all specifying times in various
-formats (#1864).
+None
 
 
 csresmap - Generate residual map
@@ -284,7 +219,7 @@ None
 
 csresspec - Generate residual spectrum
 --------------------------------------
-Add script to generate a residual spectrum (#2289)
+None
 
 
 csroot2caldb - Generates calibration database from ROOT file
@@ -294,25 +229,12 @@ None
 
 cssens - Computes sensitivity curve
 -----------------------------------
-The script now derived from the csobservation base class. A "statistic"
-parameter was added to allow setting the optimizer statistic for the sensitivity
-computation (#2237).
+None
 
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-The script now derives from the csobservation base class. A "statistic"
-parameter was added to allow setting the optimizer statistic for the spectrum
-generation (#2237).
-
-The script now can also handle On/Off spectra for SED generation (#2231).
-
-The script now can also handle non-CTA data. For that purpose a "method"
-parameter has been introduced that allows to selected between slicing of the data
-(method="SLICE"), which is only supported for CTA observations, and replacing of
-the spectral model by a node function (method="NODES"). If method="AUTO" the tool
-will use "SLICE" for observations containing only CTA data and "NODES" for observations
-containing other data (#1927).
+None
 
 
 cssrcdetect - Detects sources in sky map
@@ -322,18 +244,7 @@ None
 
 cstsdist - Computes Test Statistic distribution
 -----------------------------------------------
-The script now derives from the csobservation base class. A "statistic"
-parameter was added to allow setting the optimizer statistic for the Test
-Statistic distribution generation (#2237).
-
-The parameter interface was considerably revised, in particular the following
-parameters were removed: "ra", "dec", "rad", "coordsys", "proj", "emin",
-"emax", "enumbins", "tmin", "tmax", "npix" and "binsz". The "inobs" parameter
-is now always queried. The script now reads in an observation or an observation
-container and derives the TS distribution for a source based on that observation
-container. So far the script supports unbinned, binned and stacked observations.
-If an observation definition XML file is specified the script assumes that all
-observations are event lists (#1567).
+None
 
 
 cstsmapmerge - Merge Test Statistic maps
@@ -343,14 +254,12 @@ None
 
 cstsmapsplit - Prepare split Test Statistic computation
 -------------------------------------------------------
-A "statistic" parameter was added to allow setting the optimizer statistic for
-the TS map generation (#2237).
+None
 
 
 csviscube - Generate visibility cube
 ------------------------------------
-Use t-type parameters for "tmin" and "tmax" to all specifying times in various
-formats (#1864).
+None
 
 
 csworkflow - Execute workflow
