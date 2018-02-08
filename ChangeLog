@@ -1,4 +1,10 @@
-2018-01-25
+2018-02-08
+
+        * Bug fix version 1.5.1 released
+        ================================
+
+        Enable using csphagen for HESS, VERITAS and MAGIC observations (#2307)
+
 
         * Version 1.5.0 released
         ========================
