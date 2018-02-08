@@ -1,3 +1,5 @@
+New Features and Important Changes in ctools 1.6.0
+
 8 February 2018
 
 
@@ -199,7 +201,7 @@ None
 
 csphagen - Generate On/Off observations
 ---------------------------------------
-Enable using the script also for HESS, VERITAS and MAGIC observations (#2307).
+None
 
 
 csphasecrv - Generate phase curve
