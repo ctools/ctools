@@ -22,7 +22,8 @@ Bug fixes
 Improvements
 ------------
 
-* ...
+* [`2309 <https://cta-redmine.irap.omp.eu/issues/2309>`_] -
+  Accelerate `IRF` and `RING` background methods in :ref:`ctskymap`
 
 
 New features

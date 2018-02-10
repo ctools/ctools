@@ -1,7 +1,9 @@
-2018-02-08
+2018-02-10
 
         * Version 1.6.0 released
         ========================
+
+        Accelerate IRF and RING background methods in ctskymap (#2309)
 
 
         * Bug fix version 1.5.1 released

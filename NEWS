@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-8 February 2018
+10 February 2018
 
 
 Introduction
@@ -106,7 +106,7 @@ None
 
 ctskymap - CTA sky mapping
 --------------------------
-None
+Accelerate the IRF and RING background methods (#2309).
 
 
 cttsmap - Generation of Test Statistic map

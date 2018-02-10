@@ -1,7 +1,7 @@
 /***************************************************************************
  *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -30,7 +30,6 @@
 #endif
 #include <cstdio>
 #include "ctskymap.hpp"
-#include "GSkyRegions.hpp"
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                          "ctskymap::get_parameter()"
@@ -694,15 +693,14 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
         throw GException::invalid_value(G_MAP_BACKGROUND_IRF, msg);
     }
 
-    // Compute natural logarithm of energy range in MeV
-    double lnEmin = std::log(m_emin * 1.0e6);
-    double lnEmax = std::log(m_emax * 1.0e6);
+    // Set minimum and maximum energy as GEnergy instances
+    GEnergy emin(m_emin, "TeV");
+    GEnergy emax(m_emax, "TeV");
 
     // Extract region of interest from observation
     GCTARoi roi = obs->roi();
 
     // Initialise statistics
-    int    calls = 0;
     double total = 0.0;
 
     // Loop over all background map pixels
@@ -720,20 +718,9 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
             continue;
         }
 
-        // Setup integration function
-        ctskymap::irf_kern integrand(bkg, &instdir);
-        GIntegral          integral(&integrand);
+        // Compute background value
+        double value = bkg->rate_ebin(instdir, emin, emax);
 
-        // Set precision (has been carefully adjusted using a test simulation
-        // over the energy range 20 GeV - 120 TeV)
-        integral.eps(1.0e-6);
-
-        // Do Romberg integration
-        double value = integral.romberg(lnEmin, lnEmax);
-
-        // Update number of background function calls
-        calls += integral.calls();
-        
         // Multiply background rate with livetime and solid angle
         value *= obs->livetime() * m_solidangle[i];
 
@@ -747,7 +734,6 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
 
     // Log background subtraction results
     log_value(NORMAL, "Events in background", int(total+0.5));
-    log_value(NORMAL, "Background evaluations", calls);
 
     // Return
     return;
@@ -794,15 +780,14 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
         throw GException::invalid_value(G_MAP_BACKGROUND_RING, msg);
     }
 
-    // Compute natural logarithm of energy range in MeV
-    double lnEmin = std::log(m_emin * 1.0e6);
-    double lnEmax = std::log(m_emax * 1.0e6);
+    // Set minimum and maximum energy as GEnergy instances
+    GEnergy emin(m_emin, "TeV");
+    GEnergy emax(m_emax, "TeV");
 
     // Extract region of interest from observation
     GCTARoi roi = obs->roi();
 
-    // Initialise statistics
-    int    calls    = 0;
+    // Extract exposure
     double exposure = obs->livetime();
 
     // Loop over all map pixels
@@ -820,29 +805,14 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
             continue;
         }
 
-        // Setup integration function
-        ctskymap::irf_kern integrand(bkg, &instdir);
-        GIntegral          integral(&integrand);
-
-        // Set precision
-        integral.eps(1.0e-6);
-
-        // Do Romberg integration to get the sensitivity (note: this assumes
-        // the background IRF is a good approximation for the radial
-        // sensitivity)
-        m_alphamap(i,0) += integral.romberg(lnEmin, lnEmax) * 
+        // Compute background value
+        m_alphamap(i,0) += bkg->rate_ebin(instdir, emin, emax) *
                            m_solidangle[i] * exposure;
 
         // Store the counts in this bin
         m_onmap(i,0) += m_skymap(i,0);
 
-        // Update number of background function calls
-        calls += integral.calls();
-
     } // endfor: Loop for caching bkg IRF sensitivity
-
-    // Log background subtraction results
-    log_value(NORMAL, "Alpha map evaluations", calls);
 
     // Zero out the counts map to prepare it for the next observation
     m_skymap = 0.0;
@@ -995,10 +965,14 @@ void ctskymap::compute_ring_values(const GSkyMap& counts,
     double alpha_on  = 0.0;
     double alpha_off = 0.0;
 
-    // Define the regions necessary to do the pixel checks
-    GSkyRegionCircle roi_reg(position, m_roiradius);
-    GSkyRegionCircle inner_reg(position, m_inradius);
-    GSkyRegionCircle outer_reg(position, m_outradius);
+    // Compute cosine of radii. We use the cosine of the radius here to
+    // mimimize as much as possible the trigonometric computations. Note that
+    // the cosine of an angle is maximal for an angle of zero. This explains
+    // later why we chose ">=" to test whether an angle is smaller than a
+    // given radius.
+    double cos_roiradius = std::cos(m_roiradius * gammalib::deg2rad);
+    double cos_inradius  = std::cos(m_inradius  * gammalib::deg2rad);
+    double cos_outradius = std::cos(m_outradius * gammalib::deg2rad);
 
     // Loop over every pixel in the observation to compute Non, Noff
     for (int j = 0; j < counts.npix(); ++j) {
@@ -1006,28 +980,32 @@ void ctskymap::compute_ring_values(const GSkyMap& counts,
         // Get the index and sky direction of this pixel
         GSkyDir& skydir = m_dirs[j];
 
-        // Check if pixel is inside the background region
-        if ((m_exclmap(j,0) == 0.0) && outer_reg.contains(skydir) &&
-            !inner_reg.contains(skydir)) {
+        // Only consider pixels within the outer radius of the background region
+        if (position.cos_dist(skydir) >= cos_outradius) {
 
-            // Update n_off
-            noff += counts(j,0);
+            // Check if pixel is inside the background region
+            if ((m_exclmap(j,0) == 0.0) && position.cos_dist(skydir) < cos_inradius) {
 
-            // Update alpha_off
-            alpha_off += sensitivity(j,0);
+                // Update n_off
+                noff += counts(j,0);
 
-        }
+                // Update alpha_off
+                alpha_off += sensitivity(j,0);
 
-        // ... otherwise check if pixel is inside source region
-        else if (roi_reg.contains(skydir)) {
+            }
 
-            // Update n_on for significance computation
-            non += counts(j,0);
+            // ... otherwise check if pixel is inside source region
+            else if (position.cos_dist(skydir) >= cos_roiradius) {
 
-            // Update alpha_on
-            alpha_on += sensitivity(j,0);
+                // Update n_on for significance computation
+                non += counts(j,0);
 
-        } // endif: source and background region check
+                // Update alpha_on
+                alpha_on += sensitivity(j,0);
+
+            } // endif: source and background region check
+
+        } // endif: pixel is within outer radius of background region
 
     } // endfor: looped over pixels
 
