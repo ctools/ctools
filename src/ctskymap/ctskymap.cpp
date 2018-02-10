@@ -958,8 +958,8 @@ void ctskymap::map_significance_ring(void)
         double n_off = 0.0;
         double alpha = 0.0;
 
-        // Update user about progress
-        if (i % n_logpix == 0) {
+        // Update user about progress (only if there are more than 10000 pixels)
+        if (i % n_logpix == 0 && n_logpix > 10000) {
             #pragma omp critical(ctskymap_map_significance_ring)
             log_value(NORMAL, "Pixels remaining", m_skymap.npix()-i);
         }
