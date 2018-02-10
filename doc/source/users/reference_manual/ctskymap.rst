@@ -82,13 +82,13 @@ Background subtraction configuration parameters
     Background subtraction method.
 
 ``roiradius [real]``
-    Source region radius for estimating on-counts (in degrees).
+    Source region radius for ``RING`` subtraction (in degrees).
 
 ``inradius [real]``
-    Inner ring radius for RING subtraction (in degrees).
+    Inner background ring radius for ``RING`` subtraction (in degrees).
 
 ``outradius [real]``
-    Outer ring radius for RING subtraction (in degrees).
+    Outer background ring radius for ``RING`` subtraction (in degrees).
 
 ``(inexclusion = NONE) [file]``
     Exclusion region file as either a FITS map or DS9 region file.
