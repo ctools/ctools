@@ -397,9 +397,10 @@ void ctskymap::publish(const std::string& name)
  ***************************************************************************/
 void ctskymap::init_members(void)
 {
-    // Initialise members
+    // Initialise User parameters
     m_outmap.clear();
     m_inexclusion.clear();
+    m_binsz       = 0.0;
     m_emin        = 0.0;
     m_emax        = 0.0;
     m_bkgsubtract = "NONE";
@@ -409,7 +410,7 @@ void ctskymap::init_members(void)
     m_publish     = false;
     m_chatter     = static_cast<GChatter>(2);
 
-    // Initialise maps
+    // Initialise members
     m_skymap.clear();
     m_bkgmap.clear();
     m_sigmap.clear();
@@ -418,6 +419,9 @@ void ctskymap::init_members(void)
     // Initialise cache
     m_solidangle.clear();
     m_dirs.clear();
+    m_cos_roiradius = 1.0;
+    m_cos_inradius  = 1.0;
+    m_cos_outradius = 1.0;
 
     // Return
     return;
@@ -431,9 +435,10 @@ void ctskymap::init_members(void)
  ***************************************************************************/
 void ctskymap::copy_members(const ctskymap& app)
 {
-    // Copy members
+    // Copy User parameters
     m_outmap      = app.m_outmap;
     m_inexclusion = app.m_inexclusion;
+    m_binsz       = app.m_binsz;
     m_emin        = app.m_emin;
     m_emax        = app.m_emax;
     m_bkgsubtract = app.m_bkgsubtract;
@@ -443,15 +448,18 @@ void ctskymap::copy_members(const ctskymap& app)
     m_publish     = app.m_publish;
     m_chatter     = app.m_chatter;
 
-    // Copy maps
-    m_skymap      = app.m_skymap;
-    m_bkgmap      = app.m_bkgmap;
-    m_sigmap      = app.m_sigmap;
-    m_exclmap     = app.m_exclmap;
+    // Copy members
+    m_skymap  = app.m_skymap;
+    m_bkgmap  = app.m_bkgmap;
+    m_sigmap  = app.m_sigmap;
+    m_exclmap = app.m_exclmap;
 
     // Copy cache
-    m_solidangle  = app.m_solidangle;
-    m_dirs        = app.m_dirs;
+    m_solidangle    = app.m_solidangle;
+    m_dirs          = app.m_dirs;
+    m_cos_roiradius = app.m_cos_roiradius;
+    m_cos_inradius  = app.m_cos_inradius;
+    m_cos_outradius = app.m_cos_outradius;
 
     // Return
     return;
@@ -487,6 +495,7 @@ void ctskymap::get_parameters(void)
     m_skymap = create_map(m_obs);
 
     // Get further parameters
+    m_binsz       = (*this)["binsz"].real();
     m_emin        = (*this)["emin"].real();
     m_emax        = (*this)["emax"].real();
     m_bkgsubtract = (*this)["bkgsubtract"].string();
@@ -566,6 +575,13 @@ void ctskymap::setup_maps(void)
         }
 
     } // endif: background subtraction selected
+
+    // Compute cosine of ring radii for RING background method
+    if (m_bkgsubtract == "RING") {
+        m_cos_roiradius = std::cos(m_roiradius * gammalib::deg2rad);
+        m_cos_inradius  = std::cos(m_inradius  * gammalib::deg2rad);
+        m_cos_outradius = std::cos(m_outradius * gammalib::deg2rad);
+    }
 
     // Return
     return;
@@ -964,11 +980,8 @@ void ctskymap::map_significance_ring(void)
             log_value(NORMAL, "Pixels remaining", m_skymap.npix()-i);
         }
 
-        // Get bin coordinates
-        GSkyDir& skydir = m_dirs[i];
-
         // Compute the alpha and counts for this bin
-        compute_ring_values(m_skymap, m_bkgmap, skydir, n_on, n_off, alpha);
+        compute_ring_values(i, m_skymap, m_bkgmap, n_on, n_off, alpha);
 
         // Store the On and alpha-weighted Off-counts
         onmap(i)  = n_on;
@@ -1020,74 +1033,107 @@ void ctskymap::map_significance_ring(void)
 /***********************************************************************//**
  * @brief Computes Non, Noff and alpha for a counts map and sensitivity map
  *
- * @param[in]  counts      Counts map
- * @param[in]  background  Background map
- * @param[in]  position    Position of the ring & roi centers
- * @param[out] non         Returned estimate of ON counts
- * @param[out] noff        Returned estimate of OFF counts
- * @param[out] alpha       Returned estimate of alpha
+ * @param[in]  ipixel      Sky map pixel to consider.
+ * @param[in]  counts      Counts map.
+ * @param[in]  background  Background map.
+ * @param[out] non         Returned estimate of On-counts.
+ * @param[out] noff        Returned estimate of Off-counts.
+ * @param[out] alpha       Returned estimate of alpha.
  * 
- * This method computes the Non counts Noff values at a given position. It 
- * also computes the alpha parameter from the passed sensitivity map.
+ * Computes the On- and Off-counts values at a given position from in counts
+ * map and the alpha parameter from the background map.
+ *
+ * To speed-up the computations the method considers only the pixels within
+ * a bounding box that comprises the outer background ring radius. The method
+ * considers wrapping around of pixel indices in the Right Ascension /
+ * Galactic longitude direction.
+ *
+ * If the alpha of the ring region is zero the values of @p non, @p noff,
+ * and @p alpha will be set to zero.
  ***************************************************************************/
-void ctskymap::compute_ring_values(const GSkyMap& counts, 
+void ctskymap::compute_ring_values(const int&     ipixel,
+                                   const GSkyMap& counts,
                                    const GSkyMap& background,
-                                   const GSkyDir& position,
                                    double&        non,
                                    double&        noff,
                                    double&        alpha)
 {
-    // Reset Non and Noff
-    non  = 0.0;
-    noff = 0.0;
+    // Initialise return values (non, noff and alpha)
+    non   = 0.0;
+    noff  = 0.0;
+    alpha = 0.0;
 
     // Initialise On and Off alpha
     double alpha_on  = 0.0;
     double alpha_off = 0.0;
 
-    // Compute cosine of radii. We use the cosine of the radius here to
-    // mimimize as much as possible the trigonometric computations. Note that
-    // the cosine of an angle is maximal for an angle of zero. This explains
-    // later why we chose ">=" to test whether an angle is smaller than a
-    // given radius.
-    double cos_roiradius = std::cos(m_roiradius * gammalib::deg2rad);
-    double cos_inradius  = std::cos(m_inradius  * gammalib::deg2rad);
-    double cos_outradius = std::cos(m_outradius * gammalib::deg2rad);
+    // Get sky direction of pixel
+    GSkyDir& position = m_dirs[ipixel];
 
-    // Loop over every pixel in the observation to compute Non, Noff
-    for (int j = 0; j < counts.npix(); ++j) {
+    // Get pixel bounding box
+    int ix_start;
+    int ix_stop;
+    int iy_start;
+    int iy_stop;
+    ring_bounding_box(ipixel, ix_start, ix_stop, iy_start, iy_stop);
 
-        // Get the index and sky direction of this pixel
-        GSkyDir& skydir = m_dirs[j];
+    // Get number of x pixels in sky map
+    int nx = counts.nx();
 
-        // Only consider pixels within the outer radius of the background region
-        if (position.cos_dist(skydir) >= cos_outradius) {
+    // Loop over x pixels of bounding box
+    for (int ix_nowrap = ix_start; ix_nowrap < ix_stop; ++ix_nowrap) {
 
-            // Check if pixel is inside the background region
-            if ((m_exclmap(j) == 0.0) && position.cos_dist(skydir) < cos_inradius) {
+        // Compute x pixel index by wrapping the pixel index into the
+        // interval [0,nx[
+        int ix = ix_nowrap;
+        if (ix < 0) {
+            ix += nx;
+        }
+        else if (ix >= nx) {
+            ix -= nx;
+        }
 
-                // Update n_off
-                noff += counts(j);
+        // Initialise pixel index
+        int i = ix + iy_start * nx;
 
-                // Update alpha_off
-                alpha_off += background(j);
+        // Loop over y pixels of bounding box
+        for (int iy = iy_start; iy < iy_stop; ++iy, i += nx) {
 
-            }
+            // Get the index and sky direction of this pixel
+            GSkyDir& skydir = m_dirs[i];
 
-            // ... otherwise check if pixel is inside source region
-            else if (position.cos_dist(skydir) >= cos_roiradius) {
+            // Only consider pixels within the outer radius of the background
+            // region
+            if (position.cos_dist(skydir) >= m_cos_outradius) {
 
-                // Update n_on for significance computation
-                non += counts(j);
+                // Check if pixel is inside the background region
+                if ((m_exclmap(i) == 0.0) &&
+                    (position.cos_dist(skydir) < m_cos_inradius)) {
 
-                // Update alpha_on
-                alpha_on += background(j);
+                    // Update n_off
+                    noff += counts(i);
 
-            } // endif: source and background region check
+                    // Update alpha_off
+                    alpha_off += background(i);
 
-        } // endif: pixel is within outer radius of background region
+                }
 
-    } // endfor: looped over pixels
+                // ... otherwise check if pixel is inside source region
+                else if (position.cos_dist(skydir) >= m_cos_roiradius) {
+
+                    // Update n_on
+                    non += counts(i);
+
+                    // Update alpha_on
+                    alpha_on += background(i);
+
+                } // endif: source and background region check
+
+            } // endif: pixel is within outer radius of background region
+
+        } // endfor: looped over y pixels
+
+    } // endfor: looped over x pixels
 
     // Compute alpha. If the off region does not have any sensitivity then
     // set Non = Noff = 0
@@ -1098,6 +1144,95 @@ void ctskymap::compute_ring_values(const GSkyMap& counts,
     }
     else {
         alpha = alpha_on / alpha_off;
+    }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Computes bounding box for RING background computation
+ *
+ * @param[in]  ipixel Sky map pixel to consider.
+ * @param[out] ix1    Index of first pixel in x.
+ * @param[out] ix2    Index after last pixel in x.
+ * @param[out] iy1    Index of first pixel in y.
+ * @param[out] iy2    Index after last pixel in y.
+ *
+ * Computes the bounding box that contained the background ring for a
+ * specific pixel for the RING background method.
+ *
+ * The method determines the local pixel scale for the requested pixel and
+ * draws a bounding box with 1.5 times the outer background ring radius
+ * around the pixel. In the x direction the pixel indices are unconstrained,
+ * and the client has to assure that the pixel value is comprised within
+ * the validity range (this is required to handle the longitude wrap around).
+ * In the y direction the pixel indices are constrained to [0,ny], where
+ * ny is the number of y pixels in the sky map.
+ ***************************************************************************/
+void ctskymap::ring_bounding_box(const int& ipixel, int& ix1, int& ix2,
+                                                    int& iy1, int& iy2)
+{
+    // Get number of pixels in x and y direction
+    int nx = m_skymap.nx();
+    int ny = m_skymap.ny();
+
+    // Get x and y index of pixel to consider
+    int ix0 = ipixel % nx;
+    int iy0 = ipixel / nx;
+
+    // Compute pixel increment in x-direction
+    double dx = 0.0;
+    int    ix = (ix0 > 0) ? ix0 - 1 : ix0 + 1;
+    if (ix < nx) {
+        dx = m_dirs[ipixel].dist_deg(m_dirs[ix+iy0*nx]);
+    }
+    if (dx < m_binsz) {
+        dx = m_binsz;
+    }
+
+    // Compute pixel increment in y-direction
+    double dy = 0.0;
+    int    iy = (iy0 > 0) ? iy0 - 1 : iy0 + 1;
+    if (iy < ny) {
+        dx = m_dirs[ipixel].dist_deg(m_dirs[ix0+iy*nx]);
+    }
+    if (dy < m_binsz) {
+        dy = m_binsz;
+    }
+
+    // Compute bounding box half size in x and y. The outer radius is
+    // multiplied by 1.5 to have some margin in case of map distortions
+    int nx_bbox  = int(1.5 * m_outradius / dx);
+    int ny_bbox  = int(1.5 * m_outradius / dy);
+
+    // Compute index range for x. We allow that indices are smaller than 0
+    // or equal or larger than nx to handle wrap around, which needs to be
+    // done in the client method.
+    if (2*nx_bbox < nx) {
+        ix1 = ix0 - nx_bbox;
+        ix2 = ix0 + nx_bbox;
+    }
+    else {
+        ix1 = 0;
+        ix2 = nx;
+    }
+
+    // Compute index range for y. The index range is restricted to [0,ny].
+    if (2*ny_bbox < ny) {
+        iy1 = iy0 - ny_bbox;
+        iy2 = iy0 + ny_bbox;
+        if (iy1 < 0) {
+            iy1 = 0;
+        }
+        if (iy2 > ny) {
+            iy2 = ny;
+        }
+    }
+    else {
+        iy1 = 0;
+        iy2 = ny;
     }
 
     // Return

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -77,15 +77,20 @@ protected:
     void map_background_irf(GCTAObservation* obs);
     void map_significance(void);
     void map_significance_ring(void);
-    void compute_ring_values(const GSkyMap& counts,
+    void compute_ring_values(const int&     ipixel,
+                             const GSkyMap& counts,
                              const GSkyMap& background,
-                             const GSkyDir& position,
-                             double& non, double& noff, double& alpha);
+                             double&        non,
+                             double&        noff,
+                             double&        alpha);
+    void ring_bounding_box(const int& ipixel, int& ix1, int& ix2,
+                                              int& iy1, int& iy2);
     void write_hdu_keywords(GFitsHDU* hdu) const;
 
     // User parameters
     GFilename     m_outmap;      //!< Output file name
     GFilename     m_inexclusion; //!< Exclusion map file name
+    double        m_binsz;       //!< Sky map binsize
     double        m_emin;        //!< Minimum energy (TeV)
     double        m_emax;        //!< Maximum energy (TeV)
     std::string   m_bkgsubtract; //!< Background subtraction method
@@ -102,8 +107,11 @@ protected:
     GSkyMap       m_exclmap;     //!< Exclusion map for RING background
 
     // Caching variables to prevent multiple computations of the same thing
-    std::vector<double>  m_solidangle; //!< Cached pixel solid angles
-    std::vector<GSkyDir> m_dirs;       //!< Cached pixel directions
+    std::vector<double>  m_solidangle;    //!< Cached pixel solid angles
+    std::vector<GSkyDir> m_dirs;          //!< Cached pixel directions
+    double               m_cos_roiradius; //!< Cosine of RoI radius
+    double               m_cos_inradius;  //!< Cosine of inner ring radius
+    double               m_cos_outradius; //!< Cosine of outer ring radius
 };
 
 
