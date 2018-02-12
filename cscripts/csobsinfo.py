@@ -364,6 +364,18 @@ class csobsinfo(ctools.csobservation):
         Return azimuth angles
         """
         return self._azimuths
+
+    def ras(self):
+        """
+        Return pointings right ascension
+        """
+        return self._pnt_ra
+
+    def decs(self):
+        """
+        Return pointings declination
+        """
+        return self._pnt_dec
     
     def offsets(self):
         """
