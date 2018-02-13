@@ -248,6 +248,7 @@ class Test(test):
         skymap['roiradius']   = 0.1
         skymap['inradius']    = 0.6
         skymap['outradius']   = 0.8
+        skymap['iterations']  = 0
         skymap['inexclusion'] = 'NONE'
         skymap['caldb']       = self._caldb
         skymap['irf']         = self._irf
