@@ -35,6 +35,7 @@
 #define G_GET_PARAMETERS                          "ctskymap::get_parameter()"
 #define G_MAP_EVENTS                 "ctskymap::map_events(GCTAObservation*)"
 #define G_MAP_BACKGROUND_IRF "ctskymap::map_background_irf(GCTAObservation*)"
+#define G_RING_KERNEL               "ctskymap::ring_kernel(double&, double&)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -407,6 +408,7 @@ void ctskymap::init_members(void)
     m_roiradius   = 0.0;
     m_inradius    = 0.0;
     m_outradius   = 0.0;
+    m_usefft      = true;
     m_publish     = false;
     m_chatter     = static_cast<GChatter>(2);
 
@@ -445,6 +447,7 @@ void ctskymap::copy_members(const ctskymap& app)
     m_roiradius   = app.m_roiradius;
     m_inradius    = app.m_inradius;
     m_outradius   = app.m_outradius;
+    m_usefft      = app.m_usefft;
     m_publish     = app.m_publish;
     m_chatter     = app.m_chatter;
 
@@ -508,6 +511,7 @@ void ctskymap::get_parameters(void)
         m_inradius    = (*this)["inradius"].real();
         m_outradius   = (*this)["outradius"].real();
         m_inexclusion = (*this)["inexclusion"].filename();
+        m_usefft      = (*this)["usefft"].boolean();
 
         // Make sure that (roiradius < inradius < outradius)
         if (m_roiradius > m_inradius) {
@@ -911,19 +915,42 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
 
 
 /***********************************************************************//**
- * @brief Computes the bin-by-bin significance if background subtraction
+ * @brief Compute the pixel significance if background subtraction is
  *        requested
  *
- * Method computes the bin-by bin significance if a background subtraction 
- * method is specified. If method is "IRF", Poisson statistics (in the
- * Gaussian limit) are assumed. If method is "RING" a Li & Ma significance
- * is computed for each bin.
+ * Computes the pixel significance if a background subtraction method is
+ * specified.
+ *
+ * For the @c IRF method Poisson statistic (in the Gaussian limit) is
+ * assumed, and the significance \f$\sigma_i\f$ is computed using
+ *
+ * \f[\sigma_i = \frac{N_i - B_i}{\sqrt{N_i}}\f]
+ *
+ * where
+ * \f$N_i\f$ is the number of observed counts and
+ * \f$B_i\f$ is the estimated number of background counts.
+ *
+ * For the @c RING method the Li & Ma significance is computed for each
+ * pixel, using the @c roiradius, @c inradius and @c outradius parameters
+ * to specify the radius of the On region and the Off background ring,
+ * respectively. Depending on the @c usefft parameter, either an FFT is used
+ * to compute the number of events and the acceptance of the On and Off
+ * regions, or a direct computation is performed. While the former is faster
+ * it is less accurate since it assumes Euclidean distances in the sky map.
+ * The latter is slower but compute exact distance between pixels of the sky
+ * map. Use FFT if the sky map is close to a cartesian grid, and use the
+ * direct method if the sky map shows important distortions.
  ***************************************************************************/
 void ctskymap::map_significance(void)
 {
     // Compute significance from "RING" method (Li & Ma eq. 17)
     if (m_bkgsubtract == "RING") {
-        map_significance_ring();
+        if (m_usefft) {
+            map_significance_ring_fft();
+        }
+        else {
+            map_significance_ring_direct();
+        }
     }
 
     // Compute significance using Poisson statistics in the Gaussian limit
@@ -937,15 +964,16 @@ void ctskymap::map_significance(void)
 
 
 /***********************************************************************//**
- * @brief Computes the bin-by-bin significance for RING background
+ * @brief Compute the pixel significance for RING background
  *
- * Computes the a Li & Ma significance for each sky map bin and replaces
- * the sky and background maps by the On- and Off-count maps.
+ * Computes the Li & Ma significance for each sky map pixel and replaces
+ * the sky and background maps by the On- and Off-count maps. The computation
+ * is done by computing the exact distances between pixels in the sky map.
  ***************************************************************************/
-void ctskymap::map_significance_ring(void)
+void ctskymap::map_significance_ring_direct(void)
 {
     // Log message about what is being done
-    log_header1(NORMAL, "Computing Ring background map");
+    log_header1(NORMAL, "Computing ring background map (direct method)");
     log_value(NORMAL, "Total pixels to process", m_skymap.npix());
 
     // Initialise On- and Off-count maps
@@ -990,21 +1018,15 @@ void ctskymap::map_significance_ring(void)
         // If alpha is zero then increment the bad alpha counter
         if (alpha == 0.0) {
             num_bad_alpha++;
+            #pragma omp critical(ctskymap_map_significance_ring)
+            m_sigmap(i) = 0.0;
         }
 
         // ... otherwise store the results
         else {
 
             // Compute and store significance (Li & Ma eq. 17)
-            double sigma;
-            if (n_on == 0.0) {
-                sigma = -2.0 * n_off * std::log(1.0+alpha);
-            }
-            else {
-                sigma = (n_on < (alpha*n_off) ? -2.0 : 2.0) *
-                        (n_on  * std::log((1.0+alpha) * n_on / (alpha * (n_on+n_off))) +
-                         n_off * std::log((1.0+alpha) * n_off / (n_on+n_off)));
-            }
+            double sigma = sigma_li_ma(n_on, n_off, alpha);
             #pragma omp critical(ctskymap_map_significance_ring)
             m_sigmap(i) = sigma;
 
@@ -1013,7 +1035,7 @@ void ctskymap::map_significance_ring(void)
     } // endfor: looped over all pixels
 
     // Log the number of bad-alpha bins
-    log_value(NORMAL, "Bins with alpha=0", num_bad_alpha);
+    log_value(NORMAL, "Pixels with alpha=0", num_bad_alpha);
 
     // Now take the square root. Since some bins can be negative, first
     // take the absolute value of the map, square root that, then multiply
@@ -1024,6 +1046,90 @@ void ctskymap::map_significance_ring(void)
     // map as background map
     m_skymap = onmap;
     m_bkgmap = offmap;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Compute the pixel significance for RING background
+ *
+ * Computes the Li & Ma significance for each sky map pixel and replaces
+ * the sky and background maps by the On- and Off-count maps. The computation
+ * is done using a FFT.
+ ***************************************************************************/
+void ctskymap::map_significance_ring_fft(void)
+{
+    // Log message about what is being done
+    log_header1(NORMAL, "Computing ring background map (FFT method)");
+
+    // Initialise statistics
+    int num_bad_alpha = 0;
+
+    // Set-up sky and acceptance maps with excluded pixels according to the
+    // exclusion map
+    GSkyMap skymap     = m_skymap;
+    GSkyMap acceptance = m_bkgmap;
+    for (int i = 0; i < m_skymap.npix(); ++i) {
+        if (m_exclmap(i) != 0.0) {
+            skymap(i)     = 0.0;
+            acceptance(i) = 0.0;
+        }
+    }
+
+    // Convolve maps for On-region and Off-region
+    GSkyMap on_counts  = ring_convolve(skymap,     0.0,        m_roiradius);
+    GSkyMap on_alpha   = ring_convolve(acceptance, 0.0,        m_roiradius);
+    GSkyMap off_counts = ring_convolve(skymap,     m_inradius, m_outradius);
+    GSkyMap off_alpha  = ring_convolve(acceptance, m_inradius, m_outradius);
+
+    // Loop over sky map pixels
+    for (int i = 0; i < m_skymap.npix(); ++i) {
+
+        // Get On-counts, Off-counts and alpha value for this bin
+        double n_on  = on_counts(i);
+        double n_off = off_counts(i);
+        double alpha;
+        if (off_alpha(i) == 0.0) {
+            alpha = 0.0;
+            n_on  = 0.0;
+            n_off = 0.0;
+        }
+        else {
+            alpha = on_alpha(i) / off_alpha(i);
+        }
+
+        // Store the On and alpha-weighted Off-counts
+        on_counts(i)  = n_on;
+        off_counts(i) = alpha * n_off;
+
+        // If alpha is zero then increment the bad alpha counter
+        if (alpha == 0.0) {
+            m_sigmap(i) = 0.0;
+            num_bad_alpha++;
+        }
+
+        // ... otherwise compute and store the results
+        else {
+            m_sigmap(i) = sigma_li_ma(n_on, n_off, alpha);
+        }
+
+    } // endfor: looped over all pixels
+
+    // Log the number of bad-alpha bins
+    log_value(NORMAL, "Total number of pixels", m_skymap.npix());
+    log_value(NORMAL, "Pixels with alpha=0", num_bad_alpha);
+
+    // Now take the square root. Since some bins can be negative, first
+    // take the absolute value of the map, square root that, then multiply
+    // each bin by its sign to preserve the +/- significance.
+    m_sigmap = sign(m_sigmap) * sqrt(abs(m_sigmap));
+
+    // Terminate by storing the on-counts map as sky map and the off-counts
+    // map as background map
+    m_skymap = on_counts;
+    m_bkgmap = off_counts;
 
     // Return
     return;
@@ -1172,7 +1278,7 @@ void ctskymap::compute_ring_values(const int&     ipixel,
  * ny is the number of y pixels in the sky map.
  ***************************************************************************/
 void ctskymap::ring_bounding_box(const int& ipixel, int& ix1, int& ix2,
-                                                    int& iy1, int& iy2)
+                                                    int& iy1, int& iy2) const
 {
     // Get number of pixels in x and y direction
     int nx = m_skymap.nx();
@@ -1237,6 +1343,145 @@ void ctskymap::ring_bounding_box(const int& ipixel, int& ix1, int& ix2,
 
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Return FFT kernel for background ring
+ *
+ * @param[in] map  Sky map to be convolved with a background ring.
+ * @param[in] rmin Minimum ring radius (degrees).
+ * @param[in] rmax Maximum ring radius (degrees).
+ * @return FFT kernel.
+ *
+ * Computes the FFT kernel for a backgrund ring.
+ ***************************************************************************/
+GSkyMap ctskymap::ring_convolve(const GSkyMap& map, const double& rmin,
+                                                    const double& rmax) const
+{
+    // Copy input map
+    GSkyMap conv_map = map;
+
+    // Get FFT of ring kernel
+    GFft fft_kernel(ring_kernel(rmin, rmax));
+
+    // Extract sky map into Ndarray
+    GNdarray array(conv_map.nx(), conv_map.ny());
+    double *dst = array.data();
+    for (int i = 0; i < conv_map.npix(); ++i) {
+        *dst++ = conv_map(i);
+    }
+
+    // FFT of sky map
+    GFft fft_array = GFft(array);
+
+    // Multiply FFT of sky map with FFT of kernel
+    GFft fft_smooth = fft_array * fft_kernel;
+
+    // Backward transform sky map
+    GNdarray smooth = fft_smooth.backward();
+
+    // Insert sky map
+    double *src = smooth.data();
+    for (int i = 0; i < conv_map.npix(); ++i) {
+        conv_map(i) = *src++;
+    }
+
+    // Return convolved map
+    return conv_map;
+}
+
+
+/***********************************************************************//**
+ * @brief Return FFT kernel for background ring
+ *
+ * @param[in] rmin Minimum ring radius (degrees).
+ * @param[in] rmax Maximum ring radius (degrees).
+ * @return FFT kernel.
+ *
+ * @exception GException::invalid_value
+ *            Sky map is not a WCS projection.
+ *
+ * Computes the FFT kernel for a background ring. The computation is done
+ * assuming that the sky map represents a cartesian grid, and distances are
+ * computed in that grid using Euclidean distances. The @p rmin and @p rmax
+ * arguments refer to a ring radius in these Euclidean distances.
+ ***************************************************************************/
+GNdarray ctskymap::ring_kernel(const double& rmin, const double& rmax) const
+{
+    // Get pointer on WCS projection
+    const GWcs* wcs = dynamic_cast<const GWcs*>(m_skymap.projection());
+    if (wcs == NULL) {
+        std::string msg = "Sky map is not a WCS projection. Method is only "
+                          "valid for WCS projections.";
+        throw GException::invalid_value(G_RING_KERNEL, msg);
+    }
+
+    // Get X and Y step size
+    double dx = wcs->cdelt(0);
+    double dy = wcs->cdelt(1);
+
+    // Initialise kernel
+    GNdarray kern(m_skymap.nx(), m_skymap.ny());
+
+    // Fill kernel
+    for (int ix1 = 0, ix2 = m_skymap.nx(); ix1 < m_skymap.nx(); ++ix1, --ix2) {
+        double x   = ix1 * dx;
+        double xqs = x * x;
+        for (int iy1 = 0, iy2 = m_skymap.ny(); iy1 < m_skymap.ny(); ++iy1, --iy2) {
+            double y = iy1 * dy;
+            double r = std::sqrt(xqs + y*y);
+            if ((r >= rmin) && (r <= rmax)) {
+                kern(ix1,iy1) += 1.0;
+                if (ix2 < m_skymap.nx()) {
+                    kern(ix2,iy1) += 1.0;
+                }
+                if (iy2 < m_skymap.ny()) {
+                    kern(ix1,iy2) += 1.0;
+                }
+                if ((ix2 < m_skymap.nx()) && (iy2 < m_skymap.ny())) {
+                    kern(ix2,iy2) += 1.0;
+                }
+            }
+        }
+    }
+
+    // Return kernel
+    return kern;
+}
+
+
+/***********************************************************************//**
+ * @brief Compute significance following Li & Ma
+ *
+ * @param[in] n_on Number of On-counts.
+ * @param[in] n_off Number of Off-counts.
+ * @param[in] alpha Alpha parameters.
+ * @return Significance.
+ *
+ * Computes the significance following Li & Ma, Equation (17).
+ ***************************************************************************/
+double ctskymap::sigma_li_ma(const double& n_on,
+                             const double& n_off,
+                             const double& alpha) const
+{
+    // Allocate result
+    double sigma;
+
+    // Handle special case of no On-counts
+    if (n_on == 0.0) {
+        sigma = -2.0 * n_off * std::log(1.0+alpha);
+    }
+
+    // ... otherwise handle general case
+    else {
+        sigma = (n_on < (alpha*n_off) ? -2.0 : 2.0) *
+                (n_on  * std::log((1.0+alpha) * n_on / (alpha * (n_on+n_off))) +
+                 n_off * std::log((1.0+alpha) * n_off / (n_on+n_off)));
+    }
+
+    // Return sigma
+    return sigma;
 }
 
 

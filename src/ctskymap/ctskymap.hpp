@@ -64,28 +64,35 @@ public:
 
 protected:
     // Protected methods
-    void init_members(void);
-    void copy_members(const ctskymap& app);
-    void free_members(void);
-    void get_parameters(void);
-    void setup_maps(void);
-    void map_exclusions(const GFilename& filename);
-    void map_exclusions_fits(const GFilename& filename);
-    void map_exclusions_region(const GFilename& filename);
-    void map_events(GCTAObservation* obs);
-    void map_background(GCTAObservation* obs);
-    void map_background_irf(GCTAObservation* obs);
-    void map_significance(void);
-    void map_significance_ring(void);
-    void compute_ring_values(const int&     ipixel,
-                             const GSkyMap& counts,
-                             const GSkyMap& background,
-                             double&        non,
-                             double&        noff,
-                             double&        alpha);
-    void ring_bounding_box(const int& ipixel, int& ix1, int& ix2,
-                                              int& iy1, int& iy2);
-    void write_hdu_keywords(GFitsHDU* hdu) const;
+    void     init_members(void);
+    void     copy_members(const ctskymap& app);
+    void     free_members(void);
+    void     get_parameters(void);
+    void     setup_maps(void);
+    void     map_exclusions(const GFilename& filename);
+    void     map_exclusions_fits(const GFilename& filename);
+    void     map_exclusions_region(const GFilename& filename);
+    void     map_events(GCTAObservation* obs);
+    void     map_background(GCTAObservation* obs);
+    void     map_background_irf(GCTAObservation* obs);
+    void     map_significance(void);
+    void     map_significance_ring_direct(void);
+    void     map_significance_ring_fft(void);
+    void     compute_ring_values(const int&     ipixel,
+                                 const GSkyMap& counts,
+                                 const GSkyMap& background,
+                                 double&        non,
+                                 double&        noff,
+                                 double&        alpha);
+    void     ring_bounding_box(const int& ipixel, int& ix1, int& ix2,
+                                                  int& iy1, int& iy2) const;
+    GSkyMap  ring_convolve(const GSkyMap& map, const double& rmin,
+                                               const double& rmax) const;
+    GNdarray ring_kernel(const double& rmin, const double& rmax) const;
+    double   sigma_li_ma(const double& n_on,
+                         const double& n_off,
+                         const double& alpha) const;
+    void     write_hdu_keywords(GFitsHDU* hdu) const;
 
     // User parameters
     GFilename     m_outmap;      //!< Output file name
@@ -95,8 +102,9 @@ protected:
     double        m_emax;        //!< Maximum energy (TeV)
     std::string   m_bkgsubtract; //!< Background subtraction method
     double        m_roiradius;   //!< Region of interest radius for RING bkg.
-    double        m_inradius;    //!< Inner ring radius for RING bkg.
-    double        m_outradius;   //!< Outer ring radius for RING bkg.
+    double        m_inradius;    //!< Inner ring radius for RING background
+    double        m_outradius;   //!< Outer ring radius for RING background
+    bool          m_usefft;      //!< Use FFT for RING background
     bool          m_publish;     //!< Publish sky map?
     GChatter      m_chatter;     //!< Chattiness
 

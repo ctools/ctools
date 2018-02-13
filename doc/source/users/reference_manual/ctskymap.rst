@@ -93,6 +93,13 @@ Background subtraction configuration parameters
 ``(inexclusion = NONE) [file]``
     Exclusion region file as either a FITS map or DS9 region file.
 
+``(usefft = yes) [boolean]``
+    Specifies whether a FFT should be used for ring computation. If set to
+    ``no`` the ring background will be computed directly. Direct computation is
+    more accurate since the precise angular distances between pixels are taken
+    into account, but FFT is faster, but less accurate since it assumes
+    Euclidean distances between pixels.
+
 
 Standard parameters
 -------------------

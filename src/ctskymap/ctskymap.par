@@ -47,6 +47,7 @@ roiradius,   r, a, 0.2,,, "Source region radius for estimating on-counts (degree
 inradius,    r, a, 0.6,,, "Inner background ring radius (degrees)"
 outradius,   r, a, 0.8,,, "Outer background ring radius (degrees)"
 inexclusion, f, h, NONE,,, "Exclusion map or DS9 region file name"
+usefft,      b, h,  yes,,, "Use FFT for ring computation?"
 
 #
 # Standard parameters
