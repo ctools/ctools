@@ -94,6 +94,7 @@ public:
     // Make methods private in Python by prepending an underscore
     %rename(_first_unbinned_observation) first_unbinned_observation;
     %rename(_next_unbinned_observation)  next_unbinned_observation;
+    %rename(_read_ogip_keywords)         read_ogip_keywords;
     %rename(_write_ogip_keywords)        write_ogip_keywords;
     %rename(_set_obs_statistic)          set_obs_statistic;
     %rename(_save_events_fits)           save_events_fits;

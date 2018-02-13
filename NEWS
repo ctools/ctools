@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-10 February 2018
+13 February 2018
 
 
 Introduction
@@ -106,7 +106,22 @@ None
 
 ctskymap - CTA sky mapping
 --------------------------
-Accelerate the IRF and RING background methods (#2309).
+Add the "inmap", "iterations" and "threshold" parameters. The hidden
+"inmap" parameter allows specifying a sky map file containing a "COUNTS"
+and "ACCEPTANCE" extension which avoids looping over event lists in an
+observation container. The "iterations" parameter allows the iterative
+determination of an exclusion map from the resulting significance map for
+the RING background method. The exclusion map will flag all pixels with
+significances above the "threshold" value so that they will be excluded
+in the subsequent RING background determination. Since this will impact
+the pixel significances, the procedure needs to be repeated a couple of
+times to stabilise (#2311).
+
+Accelerate the IRF and RING background methods. For the RING background
+method the computation is either performed using a FFT or using a direct
+computation. The FFT computation is faster, but assumed Euclidian
+distances for the sky map grid, the direct computation is slower, but
+accurately computes the distances between sky map pixels (#2309).
 
 
 cttsmap - Generation of Test Statistic map

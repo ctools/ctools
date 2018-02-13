@@ -19,6 +19,7 @@
 inobs,  f, a, events.fits,,, "Input event list or observation definition XML file"
 caldb,  s, a, prod2,,, "Calibration database"
 irf,    s, a, South_0.5h,,, "Instrument response function"
+inmap,  f, h, NONE,,, "Input skymap file"
 outmap, f, a, skymap.fits,,, "Output skymap file"
 
 #
@@ -46,8 +47,10 @@ bkgsubtract, s, a, NONE, NONE|IRF|RING,, "Background subtraction method"
 roiradius,   r, a, 0.2,,, "Source region radius for estimating on-counts (degrees)"
 inradius,    r, a, 0.6,,, "Inner background ring radius (degrees)"
 outradius,   r, a, 0.8,,, "Outer background ring radius (degrees)"
+iterations,  i, a, 0,0,100, "Number of iterations for exclusion regions computation"
+threshold,   r, a, 5.0,,, "Significance threshold for exclusion regions computation"
 inexclusion, f, h, NONE,,, "Exclusion map or DS9 region file name"
-usefft,      b, h,  yes,,, "Use FFT for ring computation?"
+usefft,      b, h, yes,,, "Use FFT for ring computation?"
 
 #
 # Standard parameters

@@ -319,6 +319,48 @@ const GCTAObservation* ctobservation::next_unbinned_observation(void) const
 
 
 /***********************************************************************//**
+ * @brief Read OGIP keywords from FITS HDU
+ *
+ * @param[in,out] hdu Pointer to FITS HDU.
+ *
+ * Read OGIP keywords from FITS HDU.
+ ***************************************************************************/
+void ctobservation::read_ogip_keywords(GFitsHDU* hdu) const
+{
+    // Continue only if pointer is valid
+    if (hdu != NULL) {
+
+        // Get observation information
+        m_ogip_telescope = (hdu->has_card("TELESCOP")) ? hdu->string("TELESCOP") : "";
+
+        // Get observation time information
+        std::string date_obs = (hdu->has_card("DATE-OBS")) ? hdu->string("DATE-OBS") : "";
+        std::string time_obs = (hdu->has_card("TIME-OBS")) ? hdu->string("TIME-OBS") : "";
+        std::string date_end = (hdu->has_card("DATE-END")) ? hdu->string("DATE-END") : "";
+        std::string time_end = (hdu->has_card("TIME-END")) ? hdu->string("TIME-END") : "";
+        m_ogip_telapse       = (hdu->has_card("TELAPSE"))  ? hdu->real("TELAPSE") : 0.0;
+        m_ogip_ontime        = (hdu->has_card("ONTIME"))   ? hdu->real("ONTIME") : 0.0;
+        m_ogip_livetime      = (hdu->has_card("LIVETIME")) ? hdu->real("LIVETIME") : 0.0;
+        m_ogip_exposure      = (hdu->has_card("EXPOSURE")) ? hdu->real("EXPOSURE") : 0.0;
+
+        // Get OGIP start and stop time
+        std::string tstart = date_obs + "T" + time_obs;
+        std::string tstop  = date_end + "T" + time_end;
+        if (tstart != "T") {
+            m_ogip_tstart.utc(tstart);
+        }
+        if (tstop != "T") {
+            m_ogip_tstop.utc(tstop);
+        }
+
+    } // endif: pointer was valid
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
  * @brief Write OGIP keywords in FITS HDU
  *
  * @param[in,out] hdu Pointer to FITS HDU.

@@ -69,15 +69,15 @@ protected:
     void     free_members(void);
     void     get_parameters(void);
     void     setup_maps(void);
-    void     map_exclusions(const GFilename& filename);
-    void     map_exclusions_fits(const GFilename& filename);
-    void     map_exclusions_region(const GFilename& filename);
-    void     map_events(GCTAObservation* obs);
-    void     map_background(GCTAObservation* obs);
-    void     map_background_irf(GCTAObservation* obs);
-    void     map_significance(void);
-    void     map_significance_ring_direct(void);
-    void     map_significance_ring_fft(void);
+    void     setup_exclusion_map(const GFilename& filename);
+    void     setup_exclusion_map_fits(const GFilename& filename);
+    void     setup_exclusion_map_region(const GFilename& filename);
+    void     fill_maps(void);
+    void     fill_maps_counts(GCTAObservation* obs);
+    void     fill_maps_acceptance(GCTAObservation* obs);
+    void     compute_maps(void);
+    void     compute_maps_ring_fft(void);
+    void     compute_maps_ring_direct(void);
     void     compute_ring_values(const int&     ipixel,
                                  const GSkyMap& counts,
                                  const GSkyMap& background,
@@ -92,26 +92,33 @@ protected:
     double   sigma_li_ma(const double& n_on,
                          const double& n_off,
                          const double& alpha) const;
+    void     write_map(GFits&             fits,
+                       const GSkyMap&     map,
+                       const std::string& extname) const;
     void     write_hdu_keywords(GFitsHDU* hdu) const;
 
     // User parameters
     GFilename     m_outmap;      //!< Output file name
     GFilename     m_inexclusion; //!< Exclusion map file name
-    double        m_binsz;       //!< Sky map binsize
     double        m_emin;        //!< Minimum energy (TeV)
     double        m_emax;        //!< Maximum energy (TeV)
     std::string   m_bkgsubtract; //!< Background subtraction method
     double        m_roiradius;   //!< Region of interest radius for RING bkg.
     double        m_inradius;    //!< Inner ring radius for RING background
     double        m_outradius;   //!< Outer ring radius for RING background
+    int           m_iterations;  //!< Number of iterations for RING background
+    double        m_threshold;   //!< Threshold for RING background
     bool          m_usefft;      //!< Use FFT for RING background
     bool          m_publish;     //!< Publish sky map?
     GChatter      m_chatter;     //!< Chattiness
 
     // Protected members
+    bool          m_has_inmap;   //!< Has valid input map
     GSkyMap       m_skymap;      //!< Sky map
     GSkyMap       m_bkgmap;      //!< Background map
     GSkyMap       m_sigmap;      //!< Significance map
+    GSkyMap       m_counts;      //!< Counts map
+    GSkyMap       m_acceptance;  //!< Acceptance map
     GSkyMap       m_exclmap;     //!< Exclusion map for RING background
 
     // Caching variables to prevent multiple computations of the same thing

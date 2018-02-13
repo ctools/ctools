@@ -41,6 +41,11 @@ General parameters
     Instrument response function (only required for IRF background subtraction
     if no response information is provided by ``inobs``).
 
+``(inmap = NONE) [file]``
+    Input sky map file containing a ``COUNTS`` and an ``ACCEPTANCE`` extension.
+    Such extensions are produce by a previous run of the :ref:`ctskymap` tool with
+    the ``IRF`` or ``RING`` background method.
+
 ``outmap [file]``
     Output sky map file.
 
@@ -89,6 +94,19 @@ Background subtraction configuration parameters
 
 ``outradius [real]``
     Outer background ring radius for ``RING`` subtraction (in degrees).
+
+``iterations [integer]``
+    Number of iterations for the automatic computation of exclusion regions.
+    Sky map pixels with detection significance above the value specified by the
+    ``threshold`` parameter will be defined as exclusion regions, and the ``RING``
+    background will be recomputed based on these exclusion regions. Since this
+    will likely change the significance of the pixels, the procedure can be
+    iteratively repeated, and the ``iterations`` parameter specifies how often
+    the procedure should be repeated.
+
+``threshold [real]``
+    Significance threshold above which pixels should be excluded for the
+    background computation in the ``RING`` background method.
 
 ``(inexclusion = NONE) [file]``
     Exclusion region file as either a FITS map or DS9 region file.
