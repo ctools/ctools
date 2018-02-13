@@ -61,7 +61,7 @@ class csfindobs(ctools.cscript):
         Get parameters from parfile and setup the observation.
         """
         # Get parameters
-        if self._datapath == '':
+        if self._datapath == '' or not self['datapath'].is_default():
             self._datapath = self['datapath'].string()
         
         # Expand environment
