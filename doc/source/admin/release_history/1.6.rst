@@ -22,6 +22,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`2313 <https://cta-redmine.irap.omp.eu/issues/2313>`_] -
+  Add `ras()` and `decs()` methods to :ref:`csobsinfo`
 * [`2311 <https://cta-redmine.irap.omp.eu/issues/2311>`_] -
   Allow specifying of input skymap to :ref:`ctskymap` tool
 * [`2309 <https://cta-redmine.irap.omp.eu/issues/2309>`_] -

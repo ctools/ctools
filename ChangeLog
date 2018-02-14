@@ -1,9 +1,10 @@
-2018-02-13
+2018-02-14
 
         * Version 1.6.0 released
         ========================
 
         Allow specifying of input sky map in ctskymap (#2311)
+        Add ras() and decs() methods to csobsinfo (#2313)
         Accelerate IRF and RING background methods in ctskymap (#2309)
 
 
