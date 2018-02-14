@@ -59,11 +59,11 @@ class csobsinfo(ctools.csobservation):
         """
         Get parameters from parfile and setup the observation
         """
-        # Get parameters   
+        # Get parameters
         if self.obs().size() == 0:
             self._require_inobs('csobsinfo::get_parameters')
             self.obs(self._get_observations(False))
-        
+
         # Initialise object position
         self._obj_dir = gammalib.GSkyDir()
 
@@ -83,7 +83,7 @@ class csobsinfo(ctools.csobservation):
 
         # Return
         return
-        
+
 
     # Public methods
     def run(self):
@@ -96,7 +96,7 @@ class csobsinfo(ctools.csobservation):
 
         # Get parameters
         self._get_parameters()
-        
+
         # Initialise arrays to store certain values for reuse
         # Todo, think about using a python dictionary
         self._offsets  = []
@@ -107,7 +107,7 @@ class csobsinfo(ctools.csobservation):
         self._ebounds  = gammalib.GEbounds()
         self._gti      = gammalib.GGti()
         obs_names      = []
-        
+
         # Initialise output to be filled
         ontime         = 0.0
         livetime       = 0.0
@@ -115,12 +115,12 @@ class csobsinfo(ctools.csobservation):
         n_eventbins    = 0
         n_obs_binned   = 0
         n_obs_unbinned = 0
-        
+
         # Write header
         if self._logTerse():
             self._log('\n')
             self._log.header1(gammalib.number('Observation', self.obs().size()))
-        
+
         # Loop over observations
         for obs in self.obs():
 
@@ -128,44 +128,44 @@ class csobsinfo(ctools.csobservation):
             if not obs.classname() == 'GCTAObservation':
                 self._log('Skipping '+obs.instrument()+' observation\n')
                 continue 
-            
+
             # Use observed object as observation name if name is not given
             obs_name = obs.name()
             if obs_name == '':
                 obs_name = obs.object()
-            
+
             # Logging
             if self._logExplicit():
                 self._log.header2(obs_name)
-                
+
             # Retrieve observation name
             obs_names.append(obs_name)
-            
+
             # Retrieve energy boundaries
             obs_bounds = obs.events().ebounds()
-            
+
             # Retrieve time interval
             obs_gti = obs.events().gti()
-            
+
             # Compute mean time and dead time fraction in percent
             deadfrac = (1.0-obs.deadc())*100.0
-            
+
             # Retrieve pointing and store Ra,Dec
-            pnt_dir = obs.pointing().dir()  
+            pnt_dir = obs.pointing().dir()
             self._pnt_ra.append(pnt_dir.ra_deg())
-            self._pnt_dec.append(pnt_dir.dec_deg())       
-            
+            self._pnt_dec.append(pnt_dir.dec_deg())
+
             # If avaliable append energy boundaries
             if obs_bounds.size() > 0 : 
                 self._ebounds.append(obs_bounds.emin(),obs_bounds.emax())
-            
+
             # Append time interval
             self._gti.append(obs_gti.tstart(), obs_gti.tstop())
-            
+
             # Increment global livetime and ontime
             ontime   += obs.ontime()
             livetime += obs.livetime()
-            
+
             # Bookkeeping
             if obs.eventtype() == 'CountsCube':
                 n_eventbins  += obs.events().size()
@@ -190,10 +190,10 @@ class csobsinfo(ctools.csobservation):
             if self._compute_offset:
                 offset = pnt_dir.dist_deg(self._obj_dir)
                 self._offsets.append(offset)
-                    
+
             # Optionally log details
             if self._logExplicit():
-                
+
                 # Log the observation energy range (if available)
                 self._log.parformat('Energy range')
                 if obs_bounds.size() == 0:
@@ -203,7 +203,7 @@ class csobsinfo(ctools.csobservation):
                     self._log(' - ')
                     self._log(str(obs_bounds.emax()))
                 self._log('\n')
-                
+
                 # Log observation time interval
                 self._log.parformat('Time range (MJD)')
                 if obs_gti.size() == 0:
@@ -213,7 +213,7 @@ class csobsinfo(ctools.csobservation):
                     self._log(' - ')
                     self._log(str(obs_gti.tstop().mjd()))
                 self._log('\n')
-                
+
             # Log observation information
             self._log_value(gammalib.EXPLICIT, 'Ontime', '%.3f s' %
                             obs.ontime())
@@ -233,7 +233,7 @@ class csobsinfo(ctools.csobservation):
                             zenith)
             self._log_value(gammalib.EXPLICIT, 'Azimuth angle', '%.2f deg' %
                             azimuth)
-                    
+
         # Write summary header
         self._log_header1(gammalib.NORMAL, 'Summary')
 
@@ -258,7 +258,7 @@ class csobsinfo(ctools.csobservation):
             mean_azimuth = '%.2f deg' % (sum(self._azimuths) / len(self._azimuths))
         else:
             mean_azimuth = 'Unknown'
-        
+
         # Log mean offset, azimuth and zenith angle
         self._log_header3(gammalib.NORMAL, 'Pointings')
         self._log_value(gammalib.NORMAL, 'Mean offset angle',  mean_offset)
@@ -323,42 +323,42 @@ class csobsinfo(ctools.csobservation):
 
         # Check if DS9 file is valid
         if ds9file.url() != 'NONE':
-            
+
             # Write header
             self._log_header1(gammalib.TERSE, 'Save pointings in DS9 file')
 
             # Log filename
             self._log_value(gammalib.NORMAL, 'DS9 filename', ds9file.url())
-            
-            # Open file   
+
+            # Open file
             f = open(ds9file.url(),'w')
-            
+
             # Write coordinate system
             f.write('fk5\n')
-            
+
             # Loop over pointings
             for i in range(len(self._pnt_ra)):
-                
+
                 # Create string
                 line  = 'point('
                 line += str(self._pnt_ra[i])+','+str(self._pnt_dec[i])+')'
                 line += ' # point=cross 20 width=3\n'
-                
+
                 # Write to file
                 f.write(line)
-                
+
             # Close file
             f.close()
-        
+
         # Return
-        return 
-            
+        return
+
     def zeniths(self):
         """
         Return zenith angles
         """
         return self._zeniths
-    
+
     def azimuths(self):
         """
         Return azimuth angles
@@ -376,7 +376,7 @@ class csobsinfo(ctools.csobservation):
         Return pointings declination
         """
         return self._pnt_dec
-    
+
     def offsets(self):
         """
         Return offset angles
@@ -388,13 +388,13 @@ class csobsinfo(ctools.csobservation):
         Return energy boundaries
         """
         return self._ebounds
-    
+
     def gti(self):
         """
         Return good time intervals
         """
         return self._gti
-        
+
 
 # ======================== #
 # Main routine entry point #
@@ -403,6 +403,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = csobsinfo(sys.argv)
-    
+
     # Execute application
     app.execute()

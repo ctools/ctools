@@ -112,7 +112,7 @@ class Test(test):
         obsinfo['ra']         = 83.63
         obsinfo['dec']        = 22.01
         obsinfo['logfile']    = 'csobsinfo_py1.log'
-        obsinfo['chatter']    = 2
+        obsinfo['chatter']    = 3
 
         # Run csobsinfo script and save XML file
         obsinfo.logFileOpen()   # Make sure we get a log file
@@ -122,21 +122,20 @@ class Test(test):
         # Check DS9 file
         self._check_ds9_file('csobsinfo_py1.reg')
 
-        # Set-up csobsinfo
-        obsinfo = cscripts.csobsinfo()
-        obsinfo['inobs']      = self._inobs
-        obsinfo['outds9file'] = 'csobsinfo_py2.reg'
-        obsinfo['offset']     = True
-        obsinfo['ra']         = 83.63
-        obsinfo['dec']        = 22.01
-        obsinfo['logfile']    = 'csobsinfo_py2.log'
-        obsinfo['chatter']    = 3
-
-        # Execute csobsinfo script
-        obsinfo.execute()
-
-        # Check DS9 file
-        self._check_ds9_file('csobsinfo_py2.reg')
+        # Check result access methods
+        self.test_value(len(obsinfo.zeniths()), 1, 'Test number of zenith angles')
+        self.test_value(obsinfo.zeniths()[0], 0.0, 'Test zenith angle')
+        self.test_value(len(obsinfo.azimuths()), 1, 'Test number of azimuth angles')
+        self.test_value(obsinfo.azimuths()[0], 0.0, 'Test azimuth angle')
+        self.test_value(len(obsinfo.ras()), 1, 'Test number of Right Ascensions')
+        self.test_value(obsinfo.ras()[0], 83.63, 'Test Right Ascension')
+        self.test_value(len(obsinfo.decs()), 1, 'Test number of Declinations')
+        self.test_value(obsinfo.decs()[0], 22.51, 'Test Declination')
+        self.test_value(len(obsinfo.offsets()), 1, 'Test number of offsets')
+        self.test_value(obsinfo.offsets()[0], 0.5, 'Test offset angle')
+        self.test_value(obsinfo.ebounds().size(), 1, 'Test number of energy boundaries')
+        self.test_value(obsinfo.ebounds().emin().GeV(), 100.0, 'Test minimum energy')
+        self.test_value(obsinfo.ebounds().emax().TeV(), 100.0, 'Test maximum energy')
 
         # Return
         return
@@ -151,13 +150,12 @@ class Test(test):
 
         # Expect "fk5" in first line
         line = f.readline().strip('\n')
-        self.test_assert(line == 'fk5',
-                         'Check for "fk5" in first line')
+        self.test_value(line, 'fk5',
+                         'Test for "fk5" in first line of DS9 file')
 
         # Expect "fk5" in first line
         line = f.readline().strip('\n')
-        self.test_assert(line[0:6] == 'point(',
-                         'Check for "point(" in second line')
+        self.test_value(line[0:6], 'point(', 'Test for "point(" in second line of DS9 file')
 
         # Close file
         f.close()

@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-10 February 2018
+14 February 2018
 
 
 Introduction
@@ -191,7 +191,7 @@ None
 
 csobsinfo - Return observation definition information
 -----------------------------------------------------
-None
+Add ras() and decs() methods (#2313)
 
 
 csobsselect - Select observations
