@@ -94,9 +94,15 @@ class csiactobs(ctools.cscript):
         """
         Get parameters from parfile and setup the observation
         """
-        # Set data path
-        if self._datapath == '' or not self['datapath'].is_default():
-            self._datapath = self['datapath'].string()
+        # Set datapath if not already set
+        if self['datapath'].current_value() != 'NONE':
+            # Evaluate earlier user input
+            self._datapath = self['datapath'].current_value()
+        else:
+            if self._datapath == '':
+                # Query user. Mode has to be re-set from hidden to query.
+                self['datapath'].mode( 'q' )
+                self._datapath = self['datapath'].string()
         
         # Query input parameters
         self['inmodel'].filename()

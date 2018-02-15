@@ -16,7 +16,7 @@
 #
 # Input and output parameters
 #============================
-datapath, s, a, $VHEFITS,,, "Path were data are located"
+datapath, s, q, NONE,,, "Path were data are located"
 prodname, s, a, prod-name,,, "Name of FITS production (Run csiactdata to view your options)"
 outfile,  f, a, runlist.lis,,, "Output runlist file"
 

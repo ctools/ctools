@@ -60,9 +60,15 @@ class csfindobs(ctools.cscript):
         """
         Get parameters from parfile and setup the observation.
         """
-        # Get parameters
-        if self._datapath == '' or not self['datapath'].is_default():
-            self._datapath = self['datapath'].string()
+        # Get datapath if not already set
+        if self['datapath'].current_value() != 'NONE':
+            # Evaluate earlier user input
+            self._datapath = self['datapath'].current_value()
+        else:
+            if self._datapath == '':
+                # Query user. Mode has to be re-set from hidden to query.
+                self['datapath'].mode( 'q' )
+                self._datapath = self['datapath'].string()
         
         # Expand environment
         self._datapath = gammalib.expand_env(self._datapath)

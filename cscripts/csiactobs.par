@@ -16,7 +16,7 @@
 #
 # Input and output parameters
 #============================
-datapath,    s, a, $VHEFITS,,, "Path were data is located"
+datapath,    s, q, NONE,,, "Path were data is located"
 prodname,    s, a, fits-prod-name,,, "Data storage name"
 infile,      f, a, runlist.lis,,, "Input runlist file"   
 inmodel,     f, h, NONE,,, "Input model definition XML file (optional)"
