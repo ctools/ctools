@@ -1,4 +1,4 @@
-8 February 2018
+16 February 2018
 
 
 Introduction
@@ -219,7 +219,8 @@ None
 
 csresspec - Generate residual spectrum
 --------------------------------------
-None
+The energy dispersion flag was not taken into account when modelling the the
+counts to estimate the residuals. This is now corrected (#2341). 
 
 
 csroot2caldb - Generates calibration database from ROOT file

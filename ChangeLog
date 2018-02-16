@@ -1,8 +1,9 @@
-2018-02-08
+2018-02-16
 
         * Bug fix version 1.5.1 released
         ================================
 
+        Take energy dispersion in csresspec modelling into account (#2341)
         Enable using csphagen for HESS, VERITAS and MAGIC observations (#2307)
 
 
