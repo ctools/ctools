@@ -241,14 +241,14 @@ class csresspec(ctools.csobservation):
 
         # Bin events
         cntcube = ctools.ctbin(obs)
-        cntcube['xref'] = ra
-        cntcube['yref'] = dec
-        cntcube['binsz'] = 0.02
-        cntcube['nxpix'] = npix
-        cntcube['nypix'] = npix
-        cntcube['proj'] = 'TAN'
+        cntcube['xref']     = ra
+        cntcube['yref']     = dec
+        cntcube['binsz']    = 0.02
+        cntcube['nxpix']    = npix
+        cntcube['nypix']    = npix
+        cntcube['proj']     = 'TAN'
         cntcube['coordsys'] = 'CEL'
-        cntcube['ebinalg'] = self['ebinalg'].string()
+        cntcube['ebinalg']  = self['ebinalg'].string()
         if self['ebinalg'].string() == 'FILE':
             cntcube['ebinfile'] = self['ebinfile'].filename()
         else:
@@ -356,7 +356,7 @@ class csresspec(ctools.csobservation):
     def _cube_to_spectrum(self, cube, evlist_info):
         """
         Derive from event cube a count spectrum
-        
+
         If data come from event list use only the ROI and energy range of
         the original data. Apply user defined mask if requested.
 
@@ -550,29 +550,30 @@ class csresspec(ctools.csobservation):
             # if 3D observation
             if obs[0].classname() == 'GCTAObservation':
 
-                # Prepare Observations
-
                 # If already binned set the evlist_info dictionary to have
                 # attribute was_list False
                 if obs[0].eventtype() == 'CountsCube':
                     evlist_info = {'was_list': False}
-                # Otherwise bin now
+
+                # ... otherwise bin now
                 else:
-                    # we remember if we binned an event list
-                    # so that we can mask only the ROI for residual calculation
+                    # we remember if we binned an event list so that we can
+                    # mask only the ROI for residual calculation
                     msg = 'Setting up binned observation'
                     self._log_string(gammalib.NORMAL, msg)
                     obs, evlist_info = self._bin_evlist(obs)
 
-                # Calculate Model and residuals
-                # If model cube is provided load it
+                # Calculate Model and residuals. If model cube is provided load
+                # it
                 if self._use_maps:
                     modcube = gammalib.GCTAEventCube(self['inmodel'].filename())
-                # Otherwise calculate it now
+
+                # ... otherwise calculate it now
                 else:
                     msg = 'Computing model cube'
                     self._log_string(gammalib.NORMAL, msg)
                     modelcube = ctools.ctmodel(obs)
+                    modelcube['edisp'] = self['edisp'].boolean()
                     modelcube.run()
                     modcube = modelcube.cube().copy()
 
