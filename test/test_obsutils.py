@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the obsutils module
 #
-# Copyright (C) 2017 Juergen Knoedlseder
+# Copyright (C) 2017-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -214,7 +214,7 @@ class Test(test):
         # Check simulation results
         self.test_value(res.size(), 1, 'Check number of observations')
         self.test_value(res.models().size(), 2, 'Check number of models')
-        self.test_value(res.nobserved(), 24, 'Check number of observed events')
+        self.test_value(res.nobserved(), 23, 'Check number of observed events')
         self.test_value(res.npred(), 0.0, 'Check number of predicted events')
         self.test_value(res[0].eventtype(), 'CountsCube', 'Check event type')
         self.test_value(res[0].events().ebounds().emin().TeV(), 1.0,
@@ -223,7 +223,7 @@ class Test(test):
                         'Check minimum energy')
         self.test_value(res[0].events().ebounds().size(), 5,
                         'Check number of energy bins')
-        self.test_value(res[0].events().number(), 24,
+        self.test_value(res[0].events().number(), 23,
                         'Check number of events in cube')
 
         # Check energy dispersion flag
