@@ -253,42 +253,15 @@ class csresspec(ctools.csobservation):
             cntcube['ebinfile'] = self['ebinfile'].filename()
         else:
             cntcube['enumbins'] = self['enumbins'].integer()
-            cntcube['emin'] = self['emin'].real()
-            cntcube['emax'] = self['emax'].real()
+            cntcube['emin']     = self['emin'].real()
+            cntcube['emax']     = self['emax'].real()
         cntcube.run()
 
         # Retrieve the binned observation container
         binned_obs = cntcube.obs().copy()
 
-        # Log response computation
-        self._log_string(gammalib.EXPLICIT, 'Computing binned response')
-
-        # Compute binned response
-        response = obsutils.get_stacked_response(obs, ra, dec,
-                                                 binsz=0.02,
-                                                 nxpix=npix,
-                                                 nypix=npix,
-                                                 coordsys='CEL',
-                                                 proj='TAN',
-                                                 emin=self['emin'].real(),
-                                                 emax=self['emax'].real(),
-                                                 edisp=self['edisp'].boolean())
-
-        if self['edisp'].boolean():
-            binned_obs[0].response(response['expcube'], response['psfcube'],
-                                   response['edispcube'], response['bkgcube'])
-        else:
-            binned_obs[0].response(response['expcube'], response['psfcube'],
-                                   response['bkgcube'])
-
-        # Get new models
-        models = response['models']
-
-        # Set models for observation container
-        binned_obs.models(models)
-
-        # Check if energy boundaries provided by user extend beyond
-        # the content of the event list
+        # Check if energy boundaries provided by user extend beyond the
+        # content of the event list
         if self['emin'].real() > obs[0].events().emin().TeV():
             emin = 'INDEF'
         else:
@@ -601,21 +574,24 @@ class csresspec(ctools.csobservation):
                 # Calculate models of individual components if requested
                 if self['components'].boolean():
                     for component in obs.models():
+
+                        # Log component
                         self._log_value(gammalib.NORMAL,
-                                        'Computing model for component',
+                                        'Computing model component',
                                         component.name())
-                        # Set model cube models to
-                        # individual component
+
+                        # Set model cube models to individual component
                         model_cont = gammalib.GModels()
                         model_cont.append(component)
                         modelcube.obs().models(model_cont)
 
                         # Run model cube
+                        modelcube['edisp'] = self['edisp'].boolean()
                         modelcube.run()
 
                         # Extract spectrum of individual component
                         modcube = modelcube.cube().copy()
-                        model = self._cube_to_spectrum(modcube, evlist_info)
+                        model   = self._cube_to_spectrum(modcube, evlist_info)
 
                         # append component to table
                         table = self._append_column(table, component.name(),
