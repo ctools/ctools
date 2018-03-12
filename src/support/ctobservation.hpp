@@ -1,7 +1,7 @@
 /***************************************************************************
  *             ctobservation - Base class for observation tools            *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -73,6 +73,7 @@ protected:
     GCTAObservation*       next_unbinned_observation(void);
     const GCTAObservation* first_unbinned_observation(void) const;
     const GCTAObservation* next_unbinned_observation(void) const;
+    void                   read_ogip_keywords(GFitsHDU* hdu) const;
     void                   write_ogip_keywords(GFitsHDU* hdu) const;
     void                   set_obs_statistic(const std::string& statistic);
     void                   save_events_fits(void);

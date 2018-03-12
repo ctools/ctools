@@ -1,0 +1,42 @@
+.. _1.6:
+
+ctools 1.6 release
+==================
+
+Overview
+--------
+
+ctools 1.6 is a major release that adds significant functionality.
+
+In particular, this release provides:
+
+* ...
+
+
+Bug fixes
+---------
+
+* ...
+
+
+Improvements
+------------
+
+* [`2313 <https://cta-redmine.irap.omp.eu/issues/2313>`_] -
+  Add `ras()` and `decs()` methods to :ref:`csobsinfo`
+* [`2311 <https://cta-redmine.irap.omp.eu/issues/2311>`_] -
+  Allow specifying of input skymap to :ref:`ctskymap` tool
+* [`2309 <https://cta-redmine.irap.omp.eu/issues/2309>`_] -
+  Accelerate `IRF` and `RING` background methods in :ref:`ctskymap`
+
+
+New features
+------------
+
+* ...
+
+
+Clean up
+--------
+
+* ...

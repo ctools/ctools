@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generate IRFs in CALDB format from a ROOT offaxis performance file
 #
-# Copyright (C) 2016-2017 Juergen Knoedlseder
+# Copyright (C) 2016-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -618,7 +618,7 @@ class csroot2caldb(ctools.cscript):
             ds['HDU_EA'].card('HI_THRES', emin, '[TeV] High energy threshold')
 
         # Create "EFFAREA" data column
-        self._make_2D(etrue, ds['HDU_EA'], 'EFFAREA', 'm2')
+        self._make_2D(etrue, ds['HDU_EA'], 'EFFAREA', 'm**2')
 
         # Return
         return
@@ -745,7 +745,6 @@ class csroot2caldb(ctools.cscript):
                           'Generate Gaussian point spread function extension')
 
         # Get relevant ROOT histograms
-        #r68 = tfile.Get('AngRes_offaxis')
         r68, _ = self._root2psf_get_r68_and_r80(tfile)
 
         # Extract number of bins in histogram
@@ -826,8 +825,6 @@ class csroot2caldb(ctools.cscript):
                           'Generate King point spread function extension')
 
         # Get relevant ROOT histograms
-        #r68 = tfile.Get('AngRes_offaxis')
-        #r80 = tfile.Get('AngRes80_offaxis')
         r68, r80 = self._root2psf_get_r68_and_r80(tfile)
 
         # Extract number of bins in histogram
@@ -1034,7 +1031,6 @@ class csroot2caldb(ctools.cscript):
 
         # Get relevant ROOT histograms
         matrix = self._root2edisp_get_migra(tfile)
-        #matrix = tfile.Get('EestOverEtrue_offaxis')
 
         # Write boundary keywords
         self._set_cif_keywords(ds['HDU_EDISP'], irf['EDISP_NAME'],
@@ -1087,7 +1083,7 @@ class csroot2caldb(ctools.cscript):
                                irf['BGD_BOUNDS'], irf['BGD_DESC'], irf)
 
         # Create "BGD" data column
-        self._make_3D(array, ds['HDU_BGD'], 'BGD', '1/s/MeV/sr')
+        self._make_3D(array, ds['HDU_BGD'], 'BGD', '1/(MeV s sr)')
 
         # Return
         return
@@ -1327,7 +1323,7 @@ class csroot2caldb(ctools.cscript):
                             # Log power law replacement
                             self._log_value(gammalib.NORMAL,
                                             'Power law replacement',
-                                            '%e cts/s/deg2 (E=%8.4f TeV (%d) '
+                                            '%e cts/(s deg**2) (E=%8.4f TeV (%d) '
                                             'Off=%.2f deg (%d)' %
                                             (value,engs[ieng],ieng,offset,ioff))
 
@@ -1479,7 +1475,7 @@ class csroot2caldb(ctools.cscript):
                         # Log background infill
                         self._log_value(gammalib.NORMAL,
                                         'Background infill',
-                                        '%e cts/s/deg2 (E=%8.4f TeV (%d) '
+                                        '%e cts/(s deg**2) (E=%8.4f TeV (%d) '
                                         'Off=%.2f deg (%d)' %
                                         (value,engs[ieng],ieng,offset,ioff))
 

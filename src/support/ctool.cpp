@@ -650,7 +650,11 @@ GEbounds ctool::create_ebounds(void)
  ***************************************************************************/
 GSkyMap ctool::create_map(const GObservations& obs)
 {
-    // Read task parameters
+    // Read coordinate system and projection
+    std::string coordsys = (*this)["coordsys"].string();
+    std::string proj     = (*this)["proj"].string();
+
+    // Read sky map reference
     double xref   = 0.0;
     double yref   = 0.0;
     bool   usepnt = (*this)["usepnt"].boolean();
@@ -658,11 +662,11 @@ GSkyMap ctool::create_map(const GObservations& obs)
         xref = (*this)["xref"].real();
         yref = (*this)["yref"].real();
     }
-    std::string proj     = (*this)["proj"].string();
-    std::string coordsys = (*this)["coordsys"].string();
-    double      binsz    = (*this)["binsz"].real();
-    int         nxpix    = (*this)["nxpix"].integer();
-    int         nypix    = (*this)["nypix"].integer();
+
+    // Read sky map pixel size and number of bins
+    double binsz = (*this)["binsz"].real();
+    int    nxpix = (*this)["nxpix"].integer();
+    int    nypix = (*this)["nypix"].integer();
 
     // If requested, get pointing from observations
     if (usepnt) {

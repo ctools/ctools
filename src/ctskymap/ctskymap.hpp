@@ -1,7 +1,7 @@
 /***************************************************************************
  *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -64,59 +64,69 @@ public:
 
 protected:
     // Protected methods
-    void init_members(void);
-    void copy_members(const ctskymap& app);
-    void free_members(void);
-    void get_parameters(void);
-    void map_events(GCTAObservation* obs);
-    void map_background(GCTAObservation* obs);
-    void map_background_irf(GCTAObservation* obs);
-    void map_background_ring(GCTAObservation* obs);
-    void map_significance(void);
-    void map_exclusions(const GFilename& filename);
-    void map_exclusions_fits(const GFilename& filename);
-    void map_exclusions_reg(const GFilename& filename);
-    void compute_ring_values(const GSkyMap& counts, 
-                             const GSkyMap& sensitivity,
-                             const GSkyDir& position,
-                             double& non, double& noff, double& alpha);
-    void write_hdu_keywords(GFitsHDU* hdu) const;
-
-    // Background integration kernel
-    class irf_kern : public GFunction {
-    public:
-        irf_kern(const GCTABackground* bgd,
-                 const GCTAInstDir*    dir) :
-                 m_bgd(bgd),
-                 m_dir(dir) { }
-        double eval(const double& lnE);
-    protected:
-        const GCTABackground* m_bgd;   //!< Pointer to background
-        const GCTAInstDir*    m_dir;   //!< Pointer to instrument direction
-    };
+    void     init_members(void);
+    void     copy_members(const ctskymap& app);
+    void     free_members(void);
+    void     get_parameters(void);
+    void     setup_maps(void);
+    void     setup_exclusion_map(const GFilename& filename);
+    void     setup_exclusion_map_fits(const GFilename& filename);
+    void     setup_exclusion_map_region(const GFilename& filename);
+    void     fill_maps(void);
+    void     fill_maps_counts(GCTAObservation* obs);
+    void     fill_maps_acceptance(GCTAObservation* obs);
+    void     compute_maps(void);
+    void     compute_maps_ring_fft(void);
+    void     compute_maps_ring_direct(void);
+    void     compute_ring_values(const int&     ipixel,
+                                 const GSkyMap& counts,
+                                 const GSkyMap& background,
+                                 double&        non,
+                                 double&        noff,
+                                 double&        alpha);
+    void     ring_bounding_box(const int& ipixel, int& ix1, int& ix2,
+                                                  int& iy1, int& iy2) const;
+    GSkyMap  ring_convolve(const GSkyMap& map, const double& rmin,
+                                               const double& rmax) const;
+    GNdarray ring_kernel(const double& rmin, const double& rmax) const;
+    double   sigma_li_ma(const double& n_on,
+                         const double& n_off,
+                         const double& alpha) const;
+    void     write_map(GFits&             fits,
+                       const GSkyMap&     map,
+                       const std::string& extname) const;
+    void     write_hdu_keywords(GFitsHDU* hdu) const;
 
     // User parameters
     GFilename     m_outmap;      //!< Output file name
+    GFilename     m_inexclusion; //!< Exclusion map file name
     double        m_emin;        //!< Minimum energy (TeV)
     double        m_emax;        //!< Maximum energy (TeV)
     std::string   m_bkgsubtract; //!< Background subtraction method
     double        m_roiradius;   //!< Region of interest radius for RING bkg.
-    double        m_inradius;    //!< Inner ring radius for RING bkg.
-    double        m_outradius;   //!< Outer ring radius for RING bkg.
+    double        m_inradius;    //!< Inner ring radius for RING background
+    double        m_outradius;   //!< Outer ring radius for RING background
+    int           m_iterations;  //!< Number of iterations for RING background
+    double        m_threshold;   //!< Threshold for RING background
+    bool          m_usefft;      //!< Use FFT for RING background
     bool          m_publish;     //!< Publish sky map?
     GChatter      m_chatter;     //!< Chattiness
 
     // Protected members
+    bool          m_has_inmap;   //!< Has valid input map
     GSkyMap       m_skymap;      //!< Sky map
     GSkyMap       m_bkgmap;      //!< Background map
     GSkyMap       m_sigmap;      //!< Significance map
+    GSkyMap       m_counts;      //!< Counts map
+    GSkyMap       m_acceptance;  //!< Acceptance map
     GSkyMap       m_exclmap;     //!< Exclusion map for RING background
-    GSkyMap       m_alphamap;    //!< Alpha map values for RING background
-    GSkyMap       m_onmap;       //!< On counts map for RING background
 
     // Caching variables to prevent multiple computations of the same thing
-    std::vector<double>  m_solidangle; //!< Cached pixel solid angles
-    std::vector<GSkyDir> m_dirs;       //!< Cached pixel directions
+    std::vector<double>  m_solidangle;    //!< Cached pixel solid angles
+    std::vector<GSkyDir> m_dirs;          //!< Cached pixel directions
+    double               m_cos_roiradius; //!< Cosine of RoI radius
+    double               m_cos_inradius;  //!< Cosine of inner ring radius
+    double               m_cos_outradius; //!< Cosine of outer ring radius
 };
 
 

@@ -123,7 +123,8 @@ class csphagen(ctools.csobservation):
         # Off region region the parameter 'bkgregfile' for all CTA observations
         # without Off region
         for obs in self.obs():
-            if obs.instrument() == 'CTA':
+            #if obs.instrument() == 'CTA':
+            if obs.classname() == 'GCTAObservation':
                 if obs.off_regions().is_empty():
                     filename = self['bkgregfile'].filename()
                     regions  = gammalib.GSkyRegions(filename)
@@ -263,8 +264,8 @@ class csphagen(ctools.csobservation):
         """
         Set models in observation container
 
-        The method replaces all "CTA" background models by "CTAOnOff"
-        background models.
+        The method replaces all "CTA", "HESS", "VERITAS", and "MAGIC"
+        background models by "CTAOnOff" background models.
 
         Parameters
         ----------
@@ -279,11 +280,15 @@ class csphagen(ctools.csobservation):
         # Initialise model container
         models = gammalib.GModels()
 
-        # Loop over all models and replace CTA background model by CTAOnOff
-        # background model
+        # Loop over all models and replace CTA/HESS/VERITAS/MAGIC background
+        # models by CTAOnOff background model
         for model in self.obs().models():
-            if 'GCTA' in model.classname() and 'CTA' in model.instruments():
-                model.instruments('CTAOnOff')
+            if 'GCTA' in model.classname():
+                if 'CTA'     in model.instruments() or \
+                   'HESS'    in model.instruments() or \
+                   'VERITAS' in model.instruments() or \
+                   'MAGIC'   in model.instruments():
+                    model.instruments('CTAOnOff')
             models.append(model)
 
         # Append model to observation container
@@ -399,7 +404,8 @@ class csphagen(ctools.csobservation):
         for obs in self.obs():
 
             # Skip non CTA observations
-            if obs.instrument() != 'CTA':
+            #if obs.instrument() != 'CTA':
+            if obs.classname() != 'GCTAObservation':
                 self._log_string(gammalib.NORMAL, 'Skip %s observation "%s"' % \
                                  (obs.instrument(), obs.id()))
                 continue
