@@ -10,6 +10,8 @@ ctools 1.5.1 is a bug fix release for ctools release 1.5.
 
 The following bugs were fixed:
 
+* [`2420 <https://cta-redmine.irap.omp.eu/issues/2420>`_] -
+  Fix ``MANPATH`` for Mac OS X systems
 * [`2341 <https://cta-redmine.irap.omp.eu/issues/2341>`_] -
   Take energy dispersion in :ref:`csresspec` modelling into account
 
