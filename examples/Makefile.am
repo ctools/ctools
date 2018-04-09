@@ -26,6 +26,7 @@ scripts = README.md \
           show_irf.py \
           show_model.py \
           show_pha.py \
+          show_rmf.py \
           show_pull_evolution.py \
           show_pull_histogram.py \
           show_residuals.py \
@@ -51,4 +52,4 @@ install-data-hook:
 	for p in $$list; do \
 	  chmod +x "$(DESTDIR)$(scriptsdir)/$$p"; \
 	done
-    
+

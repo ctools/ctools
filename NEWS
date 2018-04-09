@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-14 February 2018
+9 April 2018
 
 
 Introduction
@@ -306,7 +306,7 @@ None
 
 Examples
 --------
-None
+Added show_rmf.py script.
 
 
 caldb
