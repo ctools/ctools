@@ -22,6 +22,7 @@ Bug fixes
 Improvements
 ------------
 
+* Add ``show_rmf.py`` example script
 * [`2313 <https://cta-redmine.irap.omp.eu/issues/2313>`_] -
   Add `ras()` and `decs()` methods to :ref:`csobsinfo`
 * [`2311 <https://cta-redmine.irap.omp.eu/issues/2311>`_] -
