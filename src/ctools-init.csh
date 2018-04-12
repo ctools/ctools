@@ -1,4 +1,4 @@
-# Filename: ctools-init.csh
+# Filename:    ctools-init.csh
 # Description: C-shell flavor initialization for ctools
 #              runs ctools-setup to generate a temporary csh script
 #              tailored specifically to this user and ctools

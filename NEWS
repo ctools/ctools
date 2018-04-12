@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-14 February 2018
+10 April 2018
 
 
 Introduction
@@ -11,7 +11,7 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-None
+Keep existing library path in installation script on Mac OS X (#2420)
 
 
 Python interface
@@ -306,7 +306,7 @@ None
 
 Examples
 --------
-None
+Added show_rmf.py script.
 
 
 caldb

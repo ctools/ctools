@@ -16,12 +16,14 @@ In particular, this release provides:
 Bug fixes
 ---------
 
-* ...
+* [`2420 <https://cta-redmine.irap.omp.eu/issues/2420>`_] -
+  Keep existing library path in installation script on Mac OS X
 
 
 Improvements
 ------------
 
+* Add ``show_rmf.py`` example script
 * [`2313 <https://cta-redmine.irap.omp.eu/issues/2313>`_] -
   Add `ras()` and `decs()` methods to :ref:`csobsinfo`
 * [`2311 <https://cta-redmine.irap.omp.eu/issues/2311>`_] -

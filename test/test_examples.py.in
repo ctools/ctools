@@ -109,6 +109,8 @@ class Test(gammalib.GPythonTestSuite):
                     'Test show_residuals.py')
         self.append(self.test_show_response,
                     'Test show_response.py')
+        self.append(self.test_show_rmf,
+                    'Test show_rmf.py')
         self.append(self.test_show_sensitivity,
                     'Test show_sensitivity.py')
         self.append(self.test_show_spectrum,
@@ -399,6 +401,20 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute script
         self._execute_python('show_response', args=args)
+
+        # Return
+        return
+
+    # Test show_rmf
+    def test_show_rmf(self):
+        """
+        Test show_rmf
+        """
+        # Set arguments
+        args = ('-p example_show_rmf.eps %s/onoff_rmf.fits' % self._datadir)
+
+        # Execute script
+        self._execute_python('show_rmf', args=args)
 
         # Return
         return

@@ -1,18 +1,21 @@
-2018-02-14
+2018-04-10
 
         * Version 1.6.0 released
         ========================
 
+        Keep existing library path in installation script on Mac OS X (#2420)
+        Add show_rmf.py example script
         Allow specifying of input sky map in ctskymap (#2311)
         Add ras() and decs() methods to csobsinfo (#2313)
         Accelerate IRF and RING background methods in ctskymap (#2309)
 
 
-2018-02-16
+2018-03-26
 
         * Bug fix version 1.5.1 released
         ================================
 
+        Fix MANPATH for Mac OS X systems (#2420)
         Take energy dispersion in csresspec modelling into account (#2341)
         Enable using csphagen for HESS, VERITAS and MAGIC observations (#2307)
 

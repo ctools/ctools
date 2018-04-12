@@ -1,4 +1,4 @@
-# Filename: ctools-init.sh
+# Filename:    ctools-init.sh
 # Description: Bourne-shell flavor initialization for ctools.
 #              Runs ctools-setup to generate a sh script tailored
 #              specifically to this user and ctools installation,
