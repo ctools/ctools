@@ -86,7 +86,7 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventList('ctobssim_cmd1.fits')
-        self._test_list(evt, 3776)
+        self._test_list(evt, 3775)
 
         # Setup ctobssim command
         cmd = ctobssim+' inmodel="model_that_does_not_exist.xml"'+ \
@@ -152,21 +152,21 @@ class Test(test):
 
         # Check content of observation
         self._test_observation(sim)
-        self._test_list(sim.obs()[0].events(), 3776)
+        self._test_list(sim.obs()[0].events(), 3775)
 
         # Save events
         sim.save()
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventList('ctobssim_py1.fits')
-        self._test_list(evt, 3776)
+        self._test_list(evt, 3775)
 
         # Copy ctobssim tool
         cpy_sim = sim.copy()
 
         # Retrieve observation and check content of copy
         self._test_observation(cpy_sim)
-        self._test_list(cpy_sim.obs()[0].events(), 3776)
+        self._test_list(cpy_sim.obs()[0].events(), 3775)
 
         # Execute copy of ctobssim tool again, now with a higher chatter
         # level than before
@@ -179,7 +179,7 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventList('ctobssim_py2.fits')
-        self._test_list(evt, 3776)
+        self._test_list(evt, 3775)
 
         # Set-up observation container
         pnts = [{'ra': 83.63, 'dec': 21.01},
@@ -207,7 +207,7 @@ class Test(test):
         # Retrieve observation and check content
         self._test_observation(sim, nobs=2, pnts=pnts)
         self._test_list(sim.obs()[0].events(), 3569)
-        self._test_list(sim.obs()[1].events(), 3515)
+        self._test_list(sim.obs()[1].events(), 3521)
 
         # Save events
         sim.save()
@@ -217,7 +217,7 @@ class Test(test):
 
         # Retrieve observation and check content
         self._test_list(obs[0].events(), 3569)
-        self._test_list(obs[1].events(), 3515)
+        self._test_list(obs[1].events(), 3521)
 
         # Return
         return
