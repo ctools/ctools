@@ -1,0 +1,12 @@
+.. _1.5.2:
+
+ctools 1.5.2 release (26 April 2018)
+====================================
+
+Overview
+--------
+
+ctools 1.5.2 is a bug fix release for ctools release 1.5.
+
+None changes were made to the code base. The bug fix release is made for
+compliance reasons with the GammaLib 1.5.2 bug fix release.

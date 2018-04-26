@@ -7,6 +7,7 @@ Release History
    :maxdepth: 1
 
    ctools 1.6 <1.6>
+   ctools 1.5.2 <1.5.2>
    ctools 1.5.1 <1.5.1>
    ctools 1.5 <1.5>
    ctools 1.4.3 <1.4.3>
