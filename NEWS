@@ -1,4 +1,4 @@
-26 March 2018
+26 April 2018
 
 
 Introduction
@@ -199,7 +199,7 @@ None
 
 csphagen - Generate On/Off observations
 ---------------------------------------
-Enable using the script also for HESS, VERITAS and MAGIC observations (#2307).
+None
 
 
 csphasecrv - Generate phase curve
@@ -219,8 +219,7 @@ None
 
 csresspec - Generate residual spectrum
 --------------------------------------
-The energy dispersion flag was not taken into account when modelling the the
-counts to estimate the residuals. This is now corrected (#2341). 
+None
 
 
 csroot2caldb - Generates calibration database from ROOT file
