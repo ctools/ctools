@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-10 April 2018
+5 June 2018
 
 
 Introduction
@@ -236,7 +236,8 @@ None
 
 csresspec - Generate residual spectrum
 --------------------------------------
-None
+An exception occured when using a pre-computed model cube via the modcube
+parameter due to a bug in the code. This bug was fixed (#2448).
 
 
 csroot2caldb - Generates calibration database from ROOT file
