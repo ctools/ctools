@@ -539,7 +539,7 @@ class csresspec(ctools.csobservation):
                 # Calculate Model and residuals. If model cube is provided load
                 # it
                 if self._use_maps:
-                    modcube = gammalib.GCTAEventCube(self['inmodel'].filename())
+                    modcube = gammalib.GCTAEventCube(self['modcube'].filename())
 
                 # ... otherwise calculate it now
                 else:
