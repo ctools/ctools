@@ -16,7 +16,7 @@
 #
 # Input and output parameters
 #============================
-datapath,    s, a, $VHEFITS,,, "Path were data is located"
+datapath,    s, a, NONE,,, "Path were data are located (NONE uses $VHEFITS environment variable)"
 master_indx, s, h, master.json,,, "Name of master index file"
 
 #

@@ -2,7 +2,7 @@
 # ==========================================================================
 # Inspect an IACT data storage
 #
-# Copyright (C) 2015-2017 Michael Mayer
+# Copyright (C) 2015-2018 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -61,18 +61,21 @@ class csiactdata(ctools.cscript):
         """
         Get parameters from parfile and setup the observation
         """
-        
-        # Get datapath if not already set
-        if self._datapath == '':
-            self._datapath = self['datapath'].string()
-        
+        # Query datapath. If the parameter is not NONE then use it, otherwise
+        # use the datapath from the VHEFITS environment variable
+        datapath = self['datapath'].string()
+        if gammalib.toupper(datapath) != 'NONE':
+            self._datapath = datapath
+        else:
+            self._datapath = os.getenv('VHEFITS','')
+
         # Expand environment
         self._datapath = gammalib.expand_env(self._datapath)
-        
+
         # Get filename of master index file
         self._master_indx = self['master_indx'].string()
         self._master_file = os.path.join(self._datapath, self._master_indx)
-        
+
         # Check for presence of master index file
         if not os.path.isfile(self._master_file):
             raise RuntimeError('Master index file "'+self._master_file+
