@@ -2,7 +2,7 @@
 # ==========================================================================
 # Find observations from an IACT data store
 #
-# Copyright (C) 2016-2017 Michael Mayer
+# Copyright (C) 2016-2018 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -53,38 +53,36 @@ class csfindobs(ctools.cscript):
 
         # Return
         return
-    
+
 
     # Private methods
     def _get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
         """
-        # Get datapath if not already set
-        if self['datapath'].current_value() != 'NONE':
-            # Evaluate earlier user input
-            self._datapath = self['datapath'].current_value()
+        # Query datapath. If the parameter is not NONE then use it, otherwise
+        # use the datapath from the VHEFITS environment variable
+        datapath = self['datapath'].string()
+        if gammalib.toupper(datapath) != 'NONE':
+            self._datapath = datapath
         else:
-            if self._datapath == '':
-                # Query user. Mode has to be re-set from hidden to query.
-                self['datapath'].mode( 'q' )
-                self._datapath = self['datapath'].string()
-        
+            self._datapath = os.getenv('VHEFITS','')
+
         # Expand environment
         self._datapath = gammalib.expand_env(self._datapath)
-        
+
         # Get production name
         self._prodname = self['prodname'].string()
-        
+
         # Master index file name
         master_indx = self['master_indx'].string()
-        
+
         # Initialise flag if spatial selection is required
         self._select_radec = True
-        
+
         # Initialise invalid radius
         self._radius = 0.0
-        
+
         # Check for validity of spatial parameters
         if (self['ra'].is_valid() and
             self['dec'].is_valid() and 

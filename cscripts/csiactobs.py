@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates an IACT observation definition XML file
 #
-# Copyright (C) 2015-2017 Michael Mayer
+# Copyright (C) 2015-2018 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -94,25 +94,23 @@ class csiactobs(ctools.cscript):
         """
         Get parameters from parfile and setup the observation
         """
-        # Set datapath if not already set
-        if self['datapath'].current_value() != 'NONE':
-            # Evaluate earlier user input
-            self._datapath = self['datapath'].current_value()
+        # Query datapath. If the parameter is not NONE then use it, otherwise
+        # use the datapath from the VHEFITS environment variable
+        datapath = self['datapath'].string()
+        if gammalib.toupper(datapath) != 'NONE':
+            self._datapath = datapath
         else:
-            if self._datapath == '':
-                # Query user. Mode has to be re-set from hidden to query.
-                self['datapath'].mode( 'q' )
-                self._datapath = self['datapath'].string()
-        
-        # Query input parameters
-        self['inmodel'].filename()
+            self._datapath = os.getenv('VHEFITS','')
 
         # Expand environment
         self._datapath = gammalib.expand_env(self._datapath)
-        
+
+        # Query input parameters
+        self['inmodel'].filename()
+
         # Read FITS production
         self._prodname = self['prodname'].string()
-        
+
         # Read runlist file if list not already filled
         if len(self._runlist) == 0:
             
