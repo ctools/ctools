@@ -64,6 +64,14 @@ General parameters
 ``inobs [file]``
     Input event list or observation definition XML file.
 
+``inmodel [file]``
+    Input model XML file (if ``NONE`` a point source at the centre of the
+    source region is used).
+
+``srcname [string]``
+    Name of the source in the source model XML file which should be used
+    for ARF computation. Only the spatial part of the model is used.
+
 ``caldb [string]``
     Calibration database.
 

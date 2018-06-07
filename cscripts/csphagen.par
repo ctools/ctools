@@ -17,6 +17,8 @@
 # Input and output parameters
 #============================
 inobs,       f, a, obs.xml,,, "Input event list or observation definition XML file"
+inmodel,     f, a, NONE,,, "Input model definition XML file (if NONE, use point source)"
+srcname,     s, a, Crab,,, "Source name"
 caldb,       s, a, prod2,,, "Calibration database"
 irf,         s, a, South_0.5h,,, "Instrument response function"
 inexclusion, f, h, NONE,,, "Sky map of exclusion regions"

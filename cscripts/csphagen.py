@@ -45,6 +45,7 @@ class csphagen(ctools.csobservation):
         self._ebounds       = gammalib.GEbounds()
         self._src_dir       = gammalib.GSkyDir()
         self._src_reg       = gammalib.GSkyRegions()
+        self._src_model     = None
         self._bkg_regs      = []
         self._excl_reg      = None
         self._has_exclusion = False
@@ -123,7 +124,6 @@ class csphagen(ctools.csobservation):
         # Off region region the parameter 'bkgregfile' for all CTA observations
         # without Off region
         for obs in self.obs():
-            #if obs.instrument() == 'CTA':
             if obs.classname() == 'GCTAObservation':
                 if obs.off_regions().is_empty():
                     filename = self['bkgregfile'].filename()
@@ -160,6 +160,13 @@ class csphagen(ctools.csobservation):
         # allow counts cube)
         self._setup_observations(self.obs(), True, True, False)
 
+        # Get spatial component of source model if an input model is defined
+        inmodel = self['inmodel'].filename()
+        if not self['inmodel'].is_undefined():
+            models          = gammalib.GModels(inmodel)
+            name            = self['srcname'].string()
+            self._src_model = models[name].spatial().clone()
+
         # Set energy bounds
         self._ebounds = self._create_ebounds()
 
@@ -167,8 +174,9 @@ class csphagen(ctools.csobservation):
         self._src_reg = gammalib.GSkyRegions()
 
         # Exclusion map
-        if self['inexclusion'].filename().is_fits():
-            self._excl_reg = gammalib.GSkyRegionMap(self['inexclusion'].filename())
+        if not self['inexclusion'].is_undefined():
+            inexclusion         = self['inexclusion'].filename()
+            self._excl_reg      = gammalib.GSkyRegionMap(inexclusion)
             self._has_exclusion = True
         else:
             self._has_exclusion = False
@@ -400,6 +408,10 @@ class csphagen(ctools.csobservation):
         outobs         = gammalib.GObservations()
         self._bkg_regs = []
 
+        # Set spatial model
+        if self._src_model == None:
+            self._src_model = gammalib.GModelSpatialPointSource(self._src_dir)
+
         # Loop through observations and generate pha, arf, rmf files
         for obs in self.obs():
 
@@ -420,7 +432,8 @@ class csphagen(ctools.csobservation):
             # If there are background regions then create On/Off observation
             # and append it to the output container
             if bkg_reg.size() >= self['bkgregmin'].integer():
-                onoff = gammalib.GCTAOnOffObservation(obs, self._src_dir,
+                onoff = gammalib.GCTAOnOffObservation(obs,
+                                                      self._src_model,
                                                       etrue_ebounds,
                                                       self._ebounds,
                                                       self._src_reg,
