@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmodel - Model cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,6 +34,7 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                          "ctmodel::get_parameters()"
+#define G_GET_OBS                                        "ctmodel::get_obs()"
 #define G_FILL_CUBE                    "ctmodel::fill_cube(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
@@ -537,7 +538,7 @@ void ctmodel::get_parameters(void)
 
         // If the cube filename is valid the load the cube and set all cube
         // bins to zero
-        if (is_valid_filename(incube)) {
+        if ((*this)["incube"].is_valid()) {
 
             // Load cube from given file
             m_cube.load(incube);
@@ -625,17 +626,23 @@ void ctmodel::get_obs(void)
 
     // If no observation definition file has been specified then read all
     // parameters that are necessary to create an observation from scratch
-    if (!is_valid_filename(filename)) {
+    if ((*this)["inobs"].is_undefined()) {
 
         // Get response cube filenames
-        std::string expcube = (*this)["expcube"].filename();
-        std::string psfcube = (*this)["psfcube"].filename();
-        std::string bkgcube = (*this)["bkgcube"].filename();
+        GFilename   edispcube;
+        bool        query_edisp = (*this)["edisp"].boolean();
+        std::string expcube     = (*this)["expcube"].filename();
+        std::string psfcube     = (*this)["psfcube"].filename();
+        if (query_edisp) {
+            edispcube = (*this)["edispcube"].filename();
+        }
+        std::string bkgcube     = (*this)["bkgcube"].filename();
 
         // If the filenames are valid then build an observation from cube
         // response information
-        if (is_valid_filename(expcube) && is_valid_filename(psfcube) &&
-            is_valid_filename(bkgcube)) {
+        if ((*this)["expcube"].is_valid() &&
+            (*this)["psfcube"].is_valid() &&
+            (*this)["bkgcube"].is_valid()) {
 
             // Get exposure, PSF and background cubes
             GCTACubeExposure   exposure(expcube);
@@ -654,7 +661,35 @@ void ctmodel::get_obs(void)
             // Create CTA observation
             GCTAObservation cta;
             cta.events(cube);
-            cta.response(exposure, psf, background);
+
+            // If querying of energy dispersion cube is requested then
+            // query it now
+            if (query_edisp) {
+
+                // If filename is valid then use energy dispersion ...
+                if ((*this)["edispcube"].is_valid()) {
+
+                    // Load energy dispersion cube
+                    GCTACubeEdisp edisp(edispcube);
+
+                    // Set response with all four cubes
+                    cta.response(exposure, psf, edisp, background);
+
+                } // endif: energy dispersion cube was provided
+
+                // ... otherwise throw an exception
+                else {
+                    std::string msg = "Energy dispersion requested but no "
+                                      "energy dispersion cube was specified.";
+                    throw GException::invalid_value(G_GET_OBS, msg);
+                }
+            
+            } // endif: energy dispersion needed
+
+            // ... otherwise work without energy dispersion
+            else {
+                cta.response(exposure, psf, background);
+            }
 
             // Append observation to container
             m_obs.append(cta);
