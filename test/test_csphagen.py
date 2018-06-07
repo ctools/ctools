@@ -82,7 +82,8 @@ class Test(test):
 
         # Setup csphagen command
         cmd = csphagen + ' inobs="' + self._myevents1 + \
-                         '" caldb="' + self._caldb + '" irf="' + self._irf + \
+                         '" inmodel="NONE"' +\
+                         ' caldb="' + self._caldb + '" irf="' + self._irf + \
                          '" ebinalg="LOG" emin=0.1 emax=100. enumbins=' + \
                          str(self._nbins) + \
                          ' etruemin=0.05 etruemax=150 etruebins=5'+ \
@@ -103,7 +104,8 @@ class Test(test):
 
         # Setup csphagen command
         cmd = csphagen + ' inobs="events_that_do_not_exist.fits" ' + \
-                         'caldb="' + self._caldb + '" irf="' + self._irf + \
+                         'inmodel="NONE"' +\
+                         ' caldb="' + self._caldb + '" irf="' + self._irf + \
                          '" ebinalg="LOG" emin=0.1 emax=100. enumbins=' + \
                          str(self._nbins) + \
                          ' etruemin=0.05 etruemax=150 etruebins=5'+ \
@@ -131,6 +133,7 @@ class Test(test):
         # Same test as from command line
         phagen = cscripts.csphagen()
         phagen['inobs']       = self._myevents1
+        phagen['inmodel']     = 'NONE'
         phagen['caldb']       = self._caldb
         phagen['irf']         = self._irf
         phagen['ebinalg']     = 'LOG'
@@ -162,6 +165,7 @@ class Test(test):
         # Now test without exclusion region
         phagen = cscripts.csphagen()
         phagen['inobs']     = self._myevents1
+        phagen['inmodel']   = 'NONE'
         phagen['caldb']     = self._caldb
         phagen['irf']       = self._irf
         phagen['ebinalg']   = 'LOG'
@@ -200,6 +204,7 @@ class Test(test):
 
         # Setup csphagen
         phagen = cscripts.csphagen(obs)
+        phagen['inmodel']     = 'NONE'
         phagen['ebinalg']     = 'LOG'
         phagen['emin']        = 0.1
         phagen['emax']        = 100.0
@@ -230,6 +235,7 @@ class Test(test):
 
         # Setup csphagen for test with multiple input observations and stacking
         phagen = cscripts.csphagen(obs)
+        phagen['inmodel']     = 'NONE'
         phagen['ebinalg']     = 'LOG'
         phagen['emin']        = 0.1
         phagen['emax']        = 100.0
@@ -261,6 +267,7 @@ class Test(test):
         # Setup csphagen for test with custom On and Off regions provided
         phagen = cscripts.csphagen()
         phagen['inobs']      = self._myevents1
+        phagen['inmodel']    = 'NONE'
         phagen['caldb']      = self._caldb
         phagen['irf']        = self._irf
         phagen['ebinalg']    = 'LOG'
@@ -292,6 +299,7 @@ class Test(test):
 
         # Setup csphagen for test with multiple input observations and stacking
         phagen = cscripts.csphagen(obs)
+        phagen['inmodel']     = 'NONE'
         phagen['ebinalg']     = 'LOG'
         phagen['emin']        = 0.1
         phagen['emax']        = 100.0
