@@ -259,7 +259,7 @@ class Test(test):
         lcrv['rad']       = 0.2
         lcrv['etruemin']  = 0.05
         lcrv['etruemax']  = 150.0
-        lcrv['etruebins'] = 5
+        lcrv['etruebins'] = 20
         lcrv['statistic'] = 'WSTAT'
         lcrv['outfile']   = 'cslightcrv_py5.fits'
         lcrv['logfile']   = 'cslightcrv_py5.log'
