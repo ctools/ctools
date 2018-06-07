@@ -1,7 +1,7 @@
 /***************************************************************************
  *          ctprob - Computes event probability for a given model          *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2017 by Leonardo Di Venere                               *
+ *  copyright (C) 2017-2018 by Leonardo Di Venere                          *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -433,11 +433,10 @@ void ctprob::get_parameters(void)
     m_publish = (*this)["publish"].boolean();
     m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
 
-    // Optionally read ahead parameters so that they get correctly
-    // dumped into the log file
+    // If needed later, query output filename and prefix now
     if (read_ahead()) {
-        (*this)["outobs"].filename();
-        (*this)["prefix"].string();
+        (*this)["outobs"].query();
+        (*this)["prefix"].query();
     }
 
     // Write parameters into logger

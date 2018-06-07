@@ -313,11 +313,13 @@ void ctmodel::save(void)
     // Write header
     log_header1(TERSE, "Save model cube");
 
-    // Get model cube filename
-    m_outcube = (*this)["outcube"].filename();
+    // Save only if filename is valid and cube has some size
+    if ((*this)["outcube"].is_valid() && m_cube.size() > 0) {
 
-    // Save only if filename is non-empty and cube has some size
-    if (!m_outcube.is_empty() && m_cube.size() > 0) {
+        // Get model cube filename
+        m_outcube = (*this)["outcube"].filename();
+
+        // Save cube
         m_cube.save(m_outcube, clobber());
     }
 
@@ -533,12 +535,12 @@ void ctmodel::get_parameters(void)
     // should create it from scratch using the task parameters
     if (!m_has_cube) {
 
-        // Read cube definition file
-        std::string incube = (*this)["incube"].filename();
-
         // If the cube filename is valid the load the cube and set all cube
         // bins to zero
         if ((*this)["incube"].is_valid()) {
+
+            // Get cube definition filename
+            std::string incube = (*this)["incube"].filename();
 
             // Load cube from given file
             m_cube.load(incube);
@@ -564,9 +566,9 @@ void ctmodel::get_parameters(void)
     m_publish = (*this)["publish"].boolean();
     m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
 
-    // Read optionally output cube filenames
+    // If needed later, query output filename now
     if (read_ahead()) {
-        m_outcube = (*this)["outcube"].filename();
+        (*this)["outcube"].query();
     }
 
     // If cube should be appended to first observation then do that now.
@@ -621,28 +623,25 @@ void ctmodel::get_parameters(void)
  ***************************************************************************/
 void ctmodel::get_obs(void)
 {
-    // Get the filename from the input parameters
-    std::string filename = (*this)["inobs"].filename();
-
     // If no observation definition file has been specified then read all
     // parameters that are necessary to create an observation from scratch
     if ((*this)["inobs"].is_undefined()) {
-
-        // Get response cube filenames
-        GFilename   edispcube;
-        bool        query_edisp = (*this)["edisp"].boolean();
-        std::string expcube     = (*this)["expcube"].filename();
-        std::string psfcube     = (*this)["psfcube"].filename();
-        if (query_edisp) {
-            edispcube = (*this)["edispcube"].filename();
-        }
-        std::string bkgcube     = (*this)["bkgcube"].filename();
 
         // If the filenames are valid then build an observation from cube
         // response information
         if ((*this)["expcube"].is_valid() &&
             (*this)["psfcube"].is_valid() &&
             (*this)["bkgcube"].is_valid()) {
+
+            // Get response cube filenames
+            GFilename edispcube;
+            bool      query_edisp = (*this)["edisp"].boolean();
+            GFilename expcube     = (*this)["expcube"].filename();
+            GFilename psfcube     = (*this)["psfcube"].filename();
+                if (query_edisp && (*this)["edispcube"].is_valid()) {
+                edispcube = (*this)["edispcube"].filename();
+            }
+            GFilename bkgcube     = (*this)["bkgcube"].filename();
 
             // Get exposure, PSF and background cubes
             GCTACubeExposure   exposure(expcube);
@@ -720,6 +719,9 @@ void ctmodel::get_obs(void)
 
     // ... otherwise we have a file name
     else {
+
+        // Get the filename from the input parameters
+        std::string filename = (*this)["inobs"].filename();
 
         // If file is a FITS file then create an empty CTA observation
         // and load file into observation

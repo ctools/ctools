@@ -301,12 +301,12 @@ void ctbin::save(void)
     // Write header
     log_header1(TERSE, "Save counts cube");
 
-    // Get counts cube filename
-    m_outcube = (*this)["outcube"].filename();
-
-    // Save only if filename is not empty and if there is at least one
+    // Save only if filename is valid and if there is at least one
     // observation
-    if (!m_outcube.is_empty() && m_obs.size() > 0) {
+    if ((*this)["outcube"].is_valid() && m_obs.size() > 0) {
+
+        // Get counts cube filename
+        m_outcube = (*this)["outcube"].filename();
 
         // Get CTA observation from observation container
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
@@ -464,10 +464,9 @@ void ctbin::get_parameters(void)
     m_publish = (*this)["publish"].boolean();
     m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
 
-    // Optionally read ahead parameters so that they get correctly
-    // dumped into the log file
+    // If needed later, query output filename now
     if (read_ahead()) {
-        m_outcube = (*this)["outcube"].filename();
+        (*this)["outcube"].query();
     }
 
     // Cache sky directions in m_counts

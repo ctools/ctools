@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-5 June 2018
+7 June 2018
 
 
 Introduction
@@ -26,7 +26,8 @@ None
 
 Base classes
 ------------
-None
+The ctools::is_valid_filename() method was removed since the validity check
+of the filename is now done by the GApplicationPar class.
 
 
 ctbin - CTA event binning

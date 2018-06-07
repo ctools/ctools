@@ -647,11 +647,10 @@ void ctselect::get_parameters(void)
     m_usethres = (*this)["usethres"].string();
     m_chatter  = static_cast<GChatter>((*this)["chatter"].integer());
 
-    // Optionally read ahead parameters so that they get correctly
-    // dumped into the log file
+    // If needed later, query output filename and prefix now
     if (read_ahead()) {
-        m_outobs = (*this)["outobs"].filename();
-        (*this)["prefix"].string();
+        (*this)["outobs"].query();
+        (*this)["prefix"].query();
     }
 
     // Set time interval with input times given in CTA reference

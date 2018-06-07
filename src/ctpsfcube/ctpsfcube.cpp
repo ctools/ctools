@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctpsfcube - PSF cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2017 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2018 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -248,12 +248,15 @@ void ctpsfcube::save(void)
     // Write header into logger
     log_header1(TERSE, "Save PSF cube");
 
-    // Get output filename
-    m_outcube = (*this)["outcube"].filename();
+    // Save PSF cube if filename is valid and the PSF cube is not empty
+    if ((*this)["outcube"].is_valid() && !m_psfcube.cube().is_empty()) {
 
-    // Save PSF cube if filename and the PSF cube are not empty
-    if (!m_outcube.is_empty() && !m_psfcube.cube().is_empty()) {
+        // Get output filename
+        m_outcube = (*this)["outcube"].filename();
+
+        // Save PSF cube
         m_psfcube.save(m_outcube, clobber());
+
     }
 
     // Write into logger what has been done
@@ -333,17 +336,15 @@ void ctpsfcube::get_parameters(void)
     // Setup observations from "inobs" parameter. Do not accept counts cubes.
     setup_observations(m_obs, true, true, false);
 
-    // Get the incube filename
-    std::string incube = (*this)["incube"].filename();
-
     // Get additional binning parameters
     double amax     = (*this)["amax"].real();
     int    anumbins = (*this)["anumbins"].integer();
 
     // If the "incube" file name is valid then setup the PSF cube from the
     // counts cube. Otherwise create a counts cube from the user parameters
-    GCTAEventCube cube = is_valid_filename(incube) ? GCTAEventCube(incube)
-                                                   : create_cube(m_obs);
+    GCTAEventCube cube = (*this)["incube"].is_valid()
+                          ? GCTAEventCube((*this)["incube"].filename())
+                          : create_cube(m_obs);
 
     // Define PSF cube
     m_psfcube = GCTACubePsf(cube, amax, anumbins);
@@ -352,9 +353,9 @@ void ctpsfcube::get_parameters(void)
     m_addbounds = (*this)["addbounds"].boolean();
     m_chatter   = static_cast<GChatter>((*this)["chatter"].integer());
 
-    // Read output filename (if needed)
+    // If needed later, query output filename now 
     if (read_ahead()) {
-        m_outcube = (*this)["outcube"].filename();
+        (*this)["outcube"].query();
     }
 
     // Write parameters into logger

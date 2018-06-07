@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmapcube - Map cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -222,12 +222,15 @@ void ctmapcube::save(void)
     // Write header
     log_header1(TERSE, "Save map cube");
 
-    // Get map cube filename
-    m_outcube = (*this)["outcube"].filename();
+    // Save map cube if filename is valid and the map cube is not empty
+    if ((*this)["outcube"].is_valid() && !m_cube.cube().is_empty()) {
 
-    // Save map cube if filename and the map cube are not empty
-    if (!m_outcube.is_empty() && !m_cube.cube().is_empty()) {
+        // Get map cube filename
+        m_outcube = (*this)["outcube"].filename();
+
+        // Save map cube
         m_cube.save(m_outcube, clobber());
+
     }
 
     // Write into logger what has been done
@@ -365,9 +368,9 @@ void ctmapcube::get_parameters(void)
     m_publish  = (*this)["publish"].boolean();
     m_chatter  = static_cast<GChatter>((*this)["chatter"].integer());
 
-    // Read optionally output cube filenames
+    // If needed later, query output filename now
     if (read_ahead()) {
-        m_outcube = (*this)["outcube"].filename();
+        (*this)["outcube"].query();
     }
 
     // Allocate map cube

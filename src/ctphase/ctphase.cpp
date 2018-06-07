@@ -1,7 +1,7 @@
 /***************************************************************************
  *          ctphase - Append phase information to CTA events file          *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2017 by Joshua Cardenzana                                *
+ *  copyright (C) 2017-2018 by Joshua Cardenzana                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -409,9 +409,8 @@ void ctphase::get_parameters(void)
     // from a model definiton XML file specified by the "inmodel" parameter.
     // The model is only loaded of the file is valid.
     if (m_obs.models().size() == 0) {
-        GFilename inmodel = (*this)["inmodel"].filename();
-        if (is_valid_filename(inmodel)) {
-            m_obs.models(inmodel);
+        if ((*this)["inmodel"].is_valid()) {
+            m_obs.models((*this)["inmodel"].filename());
         }
     }
 
@@ -481,11 +480,10 @@ void ctphase::get_parameters(void)
 
     } // endelse: read phase curve information from User parameters
 
-    // Optionally read ahead parameters so that they get correctly
-    // dumped into the log file
+    // If needed later, query output filename and prefix now
     if (read_ahead()) {
-        (*this)["outobs"].filename();
-        (*this)["prefix"].string();
+        (*this)["outobs"].query();
+        (*this)["prefix"].query();
     }
 
     // Write parameters into logger

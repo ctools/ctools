@@ -340,11 +340,11 @@ void ctbutterfly::save(void)
     // Write header into logger
     log_header1(TERSE, "Save Butterfly diagram");
 
-    // Get output filename
-    m_outfile = (*this)["outfile"].filename();
+    // Save only if filename is valid
+    if ((*this)["outfile"].is_valid()) {
 
-    // Save only if filename is non-empty
-    if (!m_outfile.is_empty()) {
+        // Get output filename
+        m_outfile = (*this)["outfile"].filename();
 
         // Log butterfly diagram file name
         log_value(NORMAL, "Butterfly file", m_outfile.url());
@@ -465,8 +465,7 @@ void ctbutterfly::get_parameters(void)
     m_ebounds = create_ebounds();
 
     // Get matrix file name and load if possible
-    std::string matrixfilename = (*this)["matrix"].filename();
-    if (matrixfilename != "NONE") {
+    if ((*this)["matrix"].is_valid()) {
         std::string msg = "Loading of matrix from file not implemented yet. "
                           "Use filename = \"NONE\" to induce a recomputation "
                           "of the matrix internally.";
@@ -484,10 +483,9 @@ void ctbutterfly::get_parameters(void)
     // Check model name and type
     check_model();
 
-    // Optionally read ahead parameters so that they get correctly
-    // dumped into the log file
+    // If needed later, query output filename now
     if (read_ahead()) {
-        m_outfile = (*this)["outfile"].filename();
+        (*this)["outfile"].query();
     }
 
     // Write parameters into logger

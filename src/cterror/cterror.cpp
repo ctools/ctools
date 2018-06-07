@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 cterror - Parameter error calculation tool              *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2017 by Florent Forest                              *
+ *  copyright (C) 2015-2018 by Florent Forest                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -344,11 +344,11 @@ void cterror::save(void)
     // Write header
     log_header1(TERSE, "Save results");
 
-    // Get output filename
-    m_outmodel = (*this)["outmodel"].filename();
-
     // Save only if filename is valid
-    if (is_valid_filename(m_outmodel)) {
+    if ((*this)["outmodel"].is_valid()) {
+
+        // Get output filename
+        m_outmodel = (*this)["outmodel"].filename();
 
         // Log filename
         log_value(NORMAL, "Model definition file", m_outmodel.url());
@@ -472,10 +472,9 @@ void cterror::get_parameters(void)
     m_max_iter = (*this)["max_iter"].integer();
     m_chatter  = static_cast<GChatter>((*this)["chatter"].integer());
 
-    // Read ahead parameters that are only needed when the tool gets
-    // executed
+    // If needed later, query output filename now
     if (read_ahead()) {
-        m_outmodel = (*this)["outmodel"].filename();
+        (*this)["outmodel"].query();
     }
 
     // Write parameters into logger

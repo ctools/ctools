@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctcubemask - Cube filter tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2018 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -372,7 +372,6 @@ void ctcubemask::publish(const std::string& name)
 void ctcubemask::init_members(void)
 {
     // Initialise parameters
-	m_regfile.clear();
     m_outcube.clear();
 	m_prefix.clear();
     m_emin    = 0.0;
@@ -396,7 +395,6 @@ void ctcubemask::init_members(void)
 void ctcubemask::copy_members(const ctcubemask& app)
 {
     // Copy parameters
-    m_regfile = app.m_regfile;
     m_outcube = app.m_outcube;
     m_prefix  = app.m_prefix;
     m_emin    = app.m_emin;
@@ -441,8 +439,8 @@ void ctcubemask::get_parameters(void)
     // information and do not accept event lists.
     setup_observations(m_obs, false, false, true);
 
-    // Get parameters
-    m_regfile = (*this)["regfile"].filename();
+    // Query "regfile" parameter
+    (*this)["regfile"].query();
 
     // Query the RoI
     GCTARoi roi = get_roi();
@@ -460,11 +458,10 @@ void ctcubemask::get_parameters(void)
     // Get remaining parameters
     m_publish = (*this)["publish"].boolean();
 
-    // Optionally read ahead parameters so that they get correctly
-    // dumped into the log file
+    // If needed later, query output filename and prefix now
     if (read_ahead()) {
-        m_outcube = (*this)["outcube"].filename();
-        m_prefix  = (*this)["prefix"].string();
+        (*this)["outcube"].query();
+        (*this)["prefix"].query();
     }
 
     // Write parameters into logger
@@ -576,8 +573,8 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
 
         // Set all pixels inside selected energy bands and inside exclusion
         // regions to -1.0
-        if (m_regfile != "NONE") {
-            GSkyRegions regions = GSkyRegions(m_regfile);
+        if ((*this)["regfile"].is_valid()) {
+            GSkyRegions regions = GSkyRegions((*this)["regfile"].filename());
             for (int i = e_idx1; i <= e_idx2; ++i) {
                 for (int pixel = 0; pixel < npix; ++pixel) {
                     GSkyDir dir = map.inx2dir(pixel);
@@ -679,8 +676,8 @@ std::string ctcubemask::set_outfile_name(const std::string& filename) const
  ***************************************************************************/
 void ctcubemask::save_fits(void)
 {
-    // Save only if filename is non-empty and if there are observations
-    if (!m_outcube.is_empty() && m_obs.size() > 0) {
+    // Save only if there are observations
+    if (m_obs.size() > 0) {
 
         // Get CTA observation from observation container
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);

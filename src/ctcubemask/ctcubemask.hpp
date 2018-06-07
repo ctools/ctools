@@ -76,7 +76,6 @@ protected:
     void        save_xml(void);
 
     // User parameters
-	GFilename   m_regfile;    //!< ds9 region file
     GFilename   m_outcube;    //!< Output event list or XML file
 	std::string m_prefix;     //!< Prefix for multiple counts maps
     double      m_emin;       //!< Lower energy

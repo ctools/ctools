@@ -1,7 +1,7 @@
 /***************************************************************************
  *          ctedispcube - Energy dispersion cube generation tool           *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016 by Maria Haupt                                      *
+ *  copyright (C) 2016-2018 by Maria Haupt                                 *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -260,13 +260,16 @@ void ctedispcube::save(void)
     // Write header into logger
     log_header1(TERSE, "Save energy dispersion cube");
 
-    // Get output filename
-    m_outcube = (*this)["outcube"].filename();
-
     // Save energy dispersion cube if filename and the energy dispersion cube
     // are not empty
-    if (!m_outcube.is_empty() && !m_edispcube.cube().is_empty()) {
+    if ((*this)["outcube"].is_valid() && !m_edispcube.cube().is_empty()) {
+
+        // Get output filename
+        m_outcube = (*this)["outcube"].filename();
+
+        // Save energy dispersion cube
         m_edispcube.save(m_outcube, clobber());
+
     }
 
     // Write into logger what has been done
@@ -346,9 +349,6 @@ void ctedispcube::get_parameters(void)
     // Setup observations from "inobs" parameter. Do not accept counts cubes.
     setup_observations(m_obs, true, true, false);
 
-    // Get the incube filename
-    std::string incube = (*this)["incube"].filename();
-
     // Get additional binning parameters
     double migramax  = (*this)["migramax"].real();
     int    migrabins = (*this)["migrabins"].integer();
@@ -356,8 +356,9 @@ void ctedispcube::get_parameters(void)
     // If the "incube" file name is valid then setup the energy dispersion
     // cube from the counts cube. Otherwise create a counts cube from the
     // user parameters
-    GCTAEventCube cube = is_valid_filename(incube) ? GCTAEventCube(incube)
-                                                   : create_cube(m_obs);
+    GCTAEventCube cube = (*this)["incube"].is_valid()
+                         ? GCTAEventCube((*this)["incube"].filename())
+                         : create_cube(m_obs);
 
     // Define edisp cube
     m_edispcube = GCTACubeEdisp(cube, migramax, migrabins);
@@ -366,9 +367,9 @@ void ctedispcube::get_parameters(void)
     m_addbounds = (*this)["addbounds"].boolean();
     m_chatter   = static_cast<GChatter>((*this)["chatter"].integer());
 
-    // Read output filename (if needed)
+    // If needed later, query output filename now 
     if (read_ahead()) {
-        m_outcube = (*this)["outcube"].filename();
+        (*this)["outcube"].query();
     }
 
     // Write parameters into logger

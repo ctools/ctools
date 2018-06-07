@@ -69,7 +69,7 @@ protected:
     void     free_members(void);
     void     get_parameters(void);
     void     setup_maps(void);
-    void     setup_exclusion_map(const GFilename& filename);
+    void     setup_exclusion_map(void);
     void     setup_exclusion_map_fits(const GFilename& filename);
     void     setup_exclusion_map_region(const GFilename& filename);
     void     fill_maps(void);

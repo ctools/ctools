@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctexpcube - Exposure cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -256,12 +256,16 @@ void ctexpcube::save(void)
     // Write header into logger
     log_header1(TERSE, "Save exposure cube");
 
-    // Get exposure cube filename
-    m_outcube = (*this)["outcube"].filename();
+    // Save exposure cube if filename is valid and the exposure cube is not
+    // empty
+    if ((*this)["outcube"].is_valid() && !m_expcube.cube().is_empty()) {
 
-    // Save exposure cube if filename and the exposure cube are not empty
-    if (!m_outcube.is_empty() && !m_expcube.cube().is_empty()) {
+        // Get exposure cube filename
+        m_outcube = (*this)["outcube"].filename();
+
+        // Save exposure cube
         m_expcube.save(m_outcube, clobber());
+
     }
 
     // Write into logger what has been done
@@ -370,14 +374,12 @@ void ctexpcube::get_parameters(void)
     // Setup observations from "inobs" parameter. Do not accept counts cubes.
     setup_observations(m_obs, true, true, false);
 
-    // Get the incube filename
-    std::string incube = (*this)["incube"].filename();
-
     // If the "incube" file name is valid then setup the exposure cube from
     // the counts cube. Otherwise create a counts cube from the user
     // parameters
-    GCTAEventCube cube = is_valid_filename(incube) ? GCTAEventCube(incube)
-                                                   : create_cube(m_obs);
+    GCTAEventCube cube = (*this)["incube"].is_valid()
+                         ? GCTAEventCube((*this)["incube"].filename())
+                         : create_cube(m_obs);
     
     // Define exposure cube
     m_expcube = GCTACubeExposure(cube);
@@ -387,9 +389,9 @@ void ctexpcube::get_parameters(void)
     m_publish   = (*this)["publish"].boolean();
     m_chatter   = static_cast<GChatter>((*this)["chatter"].integer());
 
-    // Read output filename (if needed)
+    // If needed later, query output filename now
     if (read_ahead()) {
-        m_outcube = (*this)["outcube"].filename();
+        (*this)["outcube"].query();
     }
 
     // Write parameters into logger

@@ -255,11 +255,11 @@ void ctskymap::save(void)
     // Write header
     log_header1(TERSE, "Save sky map");
 
-    // Get sky map filename
-    m_outmap  = (*this)["outmap"].filename();
+    // Save sky map if filename is valid and sky map is not empty
+    if ((*this)["outmap"].is_valid() && !m_skymap.is_empty()) {
 
-    // Save sky map if filename and the map are not empty
-    if (!m_outmap.is_empty() && !m_skymap.is_empty()) {
+        // Get sky map filename
+        m_outmap = (*this)["outmap"].filename();
 
         // Create empty FITS file
         GFits fits;
@@ -453,9 +453,15 @@ void ctskymap::get_parameters(void)
 
     // If an input map was specified then extract try loading the COUNTS
     // and ACCEPTANCE extensions from that file
-    GFilename inmap = (*this)["inmap"].filename();
-    if (inmap != "NONE") {
+    if ((*this)["inmap"].is_valid()) {
+
+        // Read inmap filename
+        GFilename inmap = (*this)["inmap"].filename();
+
+        // Open file
         GFits fits(inmap);
+
+        // Continue only if required extensions exist
         if (fits.contains("COUNTS") && fits.contains("ACCEPTANCE")) {
 
             // Get HDUs
@@ -508,7 +514,7 @@ void ctskymap::get_parameters(void)
     // Get RING background parameters
     if (m_bkgsubtract == "RING") {
 
-        // Get parameters
+        // Get (or query) parameters
         m_roiradius   = (*this)["roiradius"].real();
         m_inradius    = (*this)["inradius"].real();
         m_outradius   = (*this)["outradius"].real();
@@ -516,7 +522,7 @@ void ctskymap::get_parameters(void)
         if (m_iterations > 0) {
             m_threshold  = (*this)["threshold"].real();
         }
-        m_inexclusion = (*this)["inexclusion"].filename();
+        (*this)["inexclusion"].query();
         m_usefft      = (*this)["usefft"].boolean();
 
         // Make sure that (roiradius < inradius < outradius)
@@ -541,9 +547,9 @@ void ctskymap::get_parameters(void)
     m_publish = (*this)["publish"].boolean();
     m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
 
-    // Read ahead parameters
+    // If needed later, query output filename now
     if (read_ahead()) {
-        m_outmap = (*this)["outmap"].filename();
+        (*this)["outmap"].query();
     }
 
     // Write parameters into logger
@@ -570,7 +576,7 @@ void ctskymap::setup_maps(void)
     if (m_bkgsubtract != "NONE") {
 
         // Setup the exclusions map
-        setup_exclusion_map(m_inexclusion);
+        setup_exclusion_map();
 
         // Cache the pixel solid angles and sky directions
         m_solidangle.reserve(m_counts.npix());
@@ -603,7 +609,7 @@ void ctskymap::setup_maps(void)
  * background estimation. Pixels with values different from 0 will be
  * excluded.
  ***************************************************************************/
-void ctskymap::setup_exclusion_map(const GFilename& filename)
+void ctskymap::setup_exclusion_map(void)
 {
     // Create exlusion map
     m_exclmap = m_counts;
@@ -611,15 +617,18 @@ void ctskymap::setup_exclusion_map(const GFilename& filename)
     // Set all pixels to 0 (no pixel excluded)
     m_exclmap = 0.0;
 
-    // Make sure the exclusions filename is valid
-    if (is_valid_filename(filename)) {
+    // Generate map only if exclusion map filename is valid
+    if ((*this)["inexclusion"].is_valid()) {
+
+        // Get exclusion map filename
+        m_inexclusion = (*this)["inexclusion"].filename();
 
         // Fill the exclusions based on the regions supplied
-        if (filename.is_fits()) {
-            setup_exclusion_map_fits(filename);
+        if (m_inexclusion.is_fits()) {
+            setup_exclusion_map_fits(m_inexclusion);
         }
         else {
-            setup_exclusion_map_region(filename);
+            setup_exclusion_map_region(m_inexclusion);
         }
 
     } // endif: filename was valid

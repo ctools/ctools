@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2017 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2018 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -351,21 +351,30 @@ void ctbkgcube::save(void)
     // Write header
     log_header1(TERSE, "Save background cube");
 
-    // Get background cube and model file names
-    m_outcube  = (*this)["outcube"].filename();
-    m_outmodel = (*this)["outmodel"].filename();
-
     // Determine whether a model definition file should be written
-    bool write_moddef = is_valid_filename(m_outmodel);
+    bool write_moddef = (*this)["outmodel"].is_valid();
 
-    // Save background cube if filename and the background cube are not empty
-    if (!m_outcube.is_empty() && !m_background.cube().is_empty()) {
+    // Save background cube if filename is valid and the background cube is
+    // not empty
+    if ((*this)["outcube"].is_valid() && !m_background.cube().is_empty()) {
+
+        // Get background cube file name
+        m_outcube  = (*this)["outcube"].filename();
+
+        // Save background cube
         m_background.save(m_outcube, clobber());
+
     }
 
     // Save model definition file if requested
     if (write_moddef) {
+
+        // Get model file name
+        m_outmodel = (*this)["outmodel"].filename();
+
+        // Save model
         m_outmdl.save(m_outmodel.url());
+
     }
 
     // Write into logger what has been done
@@ -483,14 +492,12 @@ void ctbkgcube::get_parameters(void)
     // event lists, but do not accept counts cubes.
     setup_observations(m_obs, true, true, false);
 
-    // Get the incube filename
-    std::string incube = (*this)["incube"].filename();
-
     // If the "incube" file name is valid then setup the background cube from
     // the counts cube. Otherwise create a counts cube from the user
     // parameters
-    GCTAEventCube cube = is_valid_filename(incube) ? GCTAEventCube(incube)
-                                                   : create_cube(m_obs);
+    GCTAEventCube cube = (*this)["incube"].is_valid()
+                         ? GCTAEventCube((*this)["incube"].filename())
+                         : create_cube(m_obs);
 
     // Define background cube
     m_background = GCTACubeBackground(cube);
@@ -503,10 +510,10 @@ void ctbkgcube::get_parameters(void)
     m_publish   = (*this)["publish"].boolean();
     m_chatter   = static_cast<GChatter>((*this)["chatter"].integer());
 
-    // Read output filenames (if needed)
+    // If needed later, query output filenames now
     if (read_ahead()) {
-        m_outcube  = (*this)["outcube"].filename();
-        m_outmodel = (*this)["outmodel"].filename();
+        (*this)["outcube"].query();
+        (*this)["outmodel"].query();
     }
 
     // Write parameters into logger

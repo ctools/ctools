@@ -86,8 +86,8 @@
  *
  * This constructor should be used for using a ctool from Python.
  ***************************************************************************/
-ctool::ctool(const std::string& name, const std::string& version) :
-       GApplication(name, version)
+ctool::ctool(const std::string& name,
+             const std::string& version) : GApplication(name, version)
 {
     // Initialise members
     init_members();
@@ -115,9 +115,10 @@ ctool::ctool(const std::string& name, const std::string& version) :
  * about the usage of the ctool will be shown in the console and the ctool
  * will exit. No log file will be opened in that case.
  ***************************************************************************/
-ctool::ctool(const std::string& name, const std::string& version,
-             int argc, char *argv[]) : 
-       GApplication(name, version, argc, argv)
+ctool::ctool(const std::string& name,
+             const std::string& version,
+             int                argc,
+             char*              argv[]) : GApplication(name, version, argc, argv)
 {
     // Catch --help option before doing anything else
     if (need_help()) {
@@ -179,8 +180,9 @@ ctool::~ctool(void)
  * @brief Assignment operator
  *
  * @param[in] app Application.
+ * @return Application.
  *
- * Assigns one ctool to another.
+ * Assigns one ctool application to another.
  ***************************************************************************/
 ctool& ctool::operator=(const ctool& app)
 {
@@ -250,11 +252,6 @@ void ctool::init_members(void)
     m_read_ahead = false;
     m_use_xml    = false;
 
-    // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
-    // which is defined in GCTALib.hpp. This is somehow a kluge. We need
-    // a better mechanism to implement the CTA reference MJD.
-    //m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
-
     // Set logger properties
     log.date(true);
 
@@ -276,7 +273,6 @@ void ctool::copy_members(const ctool& app)
     // Copy members
     m_read_ahead = app.m_read_ahead;
     m_use_xml    = app.m_use_xml;
-    //m_cta_ref    = app.m_cta_ref;
 
     // Return
     return;
@@ -346,18 +342,19 @@ void ctool::setup_observations(GObservations& obs,
     // Load observations if there are none in the container
     if (obs.size() == 0) {
 
-        // Get the filename from the "inobs" parameter
-        GFilename filename = (*this)["inobs"].filename();
-
         // Throw an exception if the "inobs" parameter is not a valid
         // filename
-        if (!is_valid_filename(filename)) {
-            std::string msg = "The \"inobs\" parameter \""+filename.url()+
+        if ((*this)["inobs"].is_undefined()) {
+            std::string msg = "The \"inobs\" parameter \""+
+                              (*this)["inobs"].current_value()+
                               "\" is not a valid filename. Please specify "
                               "a valid event list, counts cube or "
                               "observation definition XML file.";
             throw GException::invalid_value(G_SETUP_OBSERVATION, msg);
         }
+
+        // Get the filename from the "inobs" parameter
+        GFilename filename = (*this)["inobs"].filename();
 
         // If file does not exist then throw an exceptions
         if (!filename.exists()) {
@@ -462,17 +459,18 @@ void ctool::setup_models(GObservations&     obs,
     // observation container
     if (obs.models().size() == 0) {
 
-        // Get models XML filename
-        GFilename filename = (*this)["inmodel"].filename();
-
         // Throw an exception if the "inmodel" parameter is not a valid
         // filename
-        if (!is_valid_filename(filename)) {
-            std::string msg = "The \"inmodel\" parameter \""+filename.url()+
+        if ((*this)["inmodel"].is_undefined()) {
+            std::string msg = "The \"inmodel\" parameter \""+
+                              (*this)["inmodel"].current_value()+
                               "\" is not a valid filename. Please specify "
                               "a valid model definition XML file.";
             throw GException::invalid_value(G_SETUP_MODELS, msg);
         }
+
+        // Get models XML filename
+        GFilename filename = (*this)["inmodel"].filename();
 
         // Load model container and assign it to observations container
         obs.models(GModels(filename.url()));
@@ -816,18 +814,19 @@ GCTAObservation ctool::create_cta_obs(void)
  ***************************************************************************/
 void ctool::require_inobs(const std::string& method)
 {
-    // Get inobs filename
-    GFilename filename = (*this)["inobs"].filename();
-
     // Throw exception if no infile is given
-    if (!is_valid_filename(filename)) {
+    if ((*this)["inobs"].is_undefined()) {
         std::string msg = "A valid file needs to be specified for the "
-                          "\"inobs\" parameter, yet \""+filename.url()+
+                          "\"inobs\" parameter, yet \""+
+                          (*this)["inobs"].current_value()+
                           "\" was given."
                           " Specify a valid observation definition or "
                           "FITS file to proceed.";
         throw GException::invalid_value(method, msg);
     }
+
+    // Get inobs filename
+    GFilename filename = (*this)["inobs"].filename();
 
     // Return
     return;
@@ -845,43 +844,48 @@ void ctool::require_inobs(const std::string& method)
  ***************************************************************************/
 void ctool::require_inobs_nocube(const std::string& method)
 {
-    // Get inobs filename
-    GFilename filename = (*this)["inobs"].filename();
+    // Continues only if we have a valid filename
+    if ((*this)["inobs"].is_valid()) {
 
-    // Continue only if we have a FITS file
-    if (filename.is_fits()) {
+        // Get inobs filename
+        GFilename filename = (*this)["inobs"].filename();
 
-        // Signal no cube
-        bool is_cube = false;
+        // Continue only if we have a FITS file
+        if (filename.is_fits()) {
 
-        // Try loading file as counts cube. If this is successful then
-        // throw an exception
-        try {
+            // Signal no cube
+            bool is_cube = false;
 
-            // Load cube from file
-            GCTAEventCube cube(filename);
+            // Try loading file as counts cube. If this is successful then
+            // throw an exception
+            try {
 
-            // If we're still alive then signal that we have a cube
-            is_cube = true;
+                // Load cube from file
+                GCTAEventCube cube(filename);
 
-        }
+                // If we're still alive then signal that we have a cube
+                is_cube = true;
 
-        // Catch any exceptions
-        catch (...) {
-            ;
-        }
+            }
 
-        // If we have a counts cube then throw an exception
-        if (is_cube) {
-            std::string msg = "A counts cube has been specified for the "
-                              "\"inobs\" parameter, yet no counts cube "
-                              "can be specified as input observation."
-                              " Instead, specify an event list or an "
-                              "observation definition file.";
-            throw GException::invalid_value(method, msg);
-        }
+            // Catch any exceptions
+            catch (...) {
+                ;
+            }
 
-    } // endif: we had a FITS file
+            // If we have a counts cube then throw an exception
+            if (is_cube) {
+                std::string msg = "A counts cube has been specified for the "
+                                  "\"inobs\" parameter, yet no counts cube "
+                                  "can be specified as input observation."
+                                  " Instead, specify an event list or an "
+                                  "observation definition file.";
+                throw GException::invalid_value(method, msg);
+            }
+
+        } // endif: we had a FITS file
+
+    } // endif: filename was valid
 
     // Return
     return;
@@ -1178,8 +1182,8 @@ std::string ctool::set_outfile_name(const std::string& filename)
 bool ctool::is_stacked(void)
 {
     // First query the minimum and maximum energies
-    (*this)["emin"].real();
-    (*this)["emax"].real();
+    (*this)["emin"].query();
+    (*this)["emax"].query();
 
     // Now query the number of energy bins and set the stacked flag
     bool stacked = ((*this)["enumbins"].integer() > 0) ? true : false;
@@ -1187,13 +1191,13 @@ bool ctool::is_stacked(void)
     // If a stacked analysis is requested then query the spatial definition
     // of the cube
     if (stacked) {
-        (*this)["coordsys"].string();
-        (*this)["proj"].string();
-        (*this)["xref"].real();
-        (*this)["yref"].real();
-        (*this)["nxpix"].integer();
-        (*this)["nypix"].integer();
-        (*this)["binsz"].real();
+        (*this)["coordsys"].query();
+        (*this)["proj"].query();
+        (*this)["xref"].query();
+        (*this)["yref"].query();
+        (*this)["nxpix"].query();
+        (*this)["nypix"].query();
+        (*this)["binsz"].query();
     }
 
     // Return stacked flag
@@ -1224,23 +1228,23 @@ bool ctool::is_onoff(void)
     if (onoff) {
     
         // Query csphagen parameters
-        (*this)["inexclusion"].filename();
-        (*this)["emin"].real();
-        (*this)["emax"].real();
-        (*this)["enumbins"].integer();
-        (*this)["coordsys"].string();
-        (*this)["xref"].real();
-        (*this)["yref"].real();
+        (*this)["inexclusion"].query();
+        (*this)["emin"].query();
+        (*this)["emax"].query();
+        (*this)["enumbins"].query();
+        (*this)["coordsys"].query();
+        (*this)["xref"].query();
+        (*this)["yref"].query();
         if ((*this)["srcshape"].string() == "CIRCLE"){
-            (*this)["rad"].real();
+            (*this)["rad"].query();
         }
         if ((*this)["bkgmethod"].string() == "REFLECTED"){
-            (*this)["bkgregmin"].integer();
+            (*this)["bkgregmin"].query();
         }
-        (*this)["maxoffset"].real();
-        (*this)["etruemin"].real();
-        (*this)["etruemax"].real();
-        (*this)["etruebins"].integer();
+        (*this)["maxoffset"].query();
+        (*this)["etruemin"].query();
+        (*this)["etruemax"].query();
+        (*this)["etruebins"].query();
 
     } // endif: method was ONOFF
 
@@ -1419,38 +1423,28 @@ void ctool::set_obs_response(GCTAObservation* obs)
                 query_edisp = (*this)["edisp"].boolean();
             }
 
-            // Get filenames
-            GFilename expcube((*this)["expcube"].filename());
-            GFilename psfcube((*this)["psfcube"].filename());
-            GFilename edispcube;
-            if (query_edisp) {
-                edispcube = (*this)["edispcube"].filename();
-            }
-            GFilename bkgcube((*this)["bkgcube"].filename());
-
             // Extract stacked response information if available
-            if (is_valid_filename(expcube) && is_valid_filename(psfcube) &&
-                is_valid_filename(bkgcube)) {
+            if ((*this)["expcube"].is_valid() &&
+                (*this)["psfcube"].is_valid() &&
+                (*this)["bkgcube"].is_valid()) {
 
-                // Load exposure, PSF and background cubes
-                GCTACubeExposure   exposure(expcube);
-                GCTACubePsf        psf(psfcube);
-                GCTACubeBackground background(bkgcube);
+                // Load exposure, PSF and background cubes and query energy
+                // dispersion cube
+                GCTACubeExposure   exposure((*this)["expcube"].filename());
+                GCTACubePsf        psf((*this)["psfcube"].filename());
+                if (query_edisp && (*this)["edispcube"].is_valid()) {
+                    (*this)["edispcube"].filename();
+                }
+                GCTACubeBackground background((*this)["bkgcube"].filename());
 
-                // If querying of energy dispersion cube is requested then
-                // query it now
+                // Set response
                 if (query_edisp) {
 
-                    // If filename is valid then use energy dispersion ...
-                    if (is_valid_filename(edispcube)) {
-
-                        // Load energy dispersion cube
-                        GCTACubeEdisp edisp(edispcube);
-
-                        // Set response with all four cubes
+                    // If energy dispersion cube was provided then use it
+                    if ((*this)["edispcube"].is_valid()) {
+                        GCTACubeEdisp edisp((*this)["edispcube"].filename());
                         obs->response(exposure, psf, edisp, background);
-
-                    } // endif: energy dispersion cube was provided
+                    }
 
                     // ... otherwise work without energy dispersion
                     else {
@@ -1606,12 +1600,9 @@ GObservations ctool::get_observations(const bool& get_response)
     // Initialise empty observation container
     GObservations obs;
 
-    // Get the filename from the input parameters
-    std::string filename = (*this)["inobs"].filename();
-
     // If no observation definition file has been specified then read all
     // parameters that are necessary to create an observation from scratch
-    if (!is_valid_filename(filename)) {
+    if ((*this)["inobs"].is_undefined()) {
 
         // Setup a new CTA observation
         GCTAObservation cta_obs = create_cta_obs();
@@ -1631,6 +1622,9 @@ GObservations ctool::get_observations(const bool& get_response)
 
     // ... otherwise we have a file name
     else {
+
+        // Get the filename from the input parameters
+        std::string filename = (*this)["inobs"].filename();
 
         // If file is a FITS file then create an empty CTA observation
         // and load file into observation

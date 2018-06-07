@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the cspull script.
 #
-# Copyright (C) 2016-2017 Juergen Knoedlseder
+# Copyright (C) 2016-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -114,10 +114,6 @@ class cscript_test(ctools.cscript):
     # Check get_current_rss() method
     def check_get_current_rss(self):
         return self._get_current_rss()
-
-    # Check is_valid_filename() method
-    def check_is_valid_filename(self, filename):
-        return self._is_valid_filename(gammalib.GFilename(filename))
 
     # Check save_event_list() method
     def check_save_event_list(self, infile, evtname, gtiname, outfile):
@@ -523,14 +519,6 @@ class Test(test):
 
         # Test cube_layer_usage() method
         # TODO: implement
-
-        # Test is_valid_filename() method
-        self.test_assert(empty.check_is_valid_filename(self._model),
-                         'Check model definiton XML file')
-        self.test_assert(not empty.check_is_valid_filename(''),
-                         'Check empty filename')
-        self.test_assert(not empty.check_is_valid_filename('NONE'),
-                         'Check "NONE" filename')
 
         # Test get_gtiname() method
         # TODO: implement

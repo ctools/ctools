@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -334,12 +334,11 @@ void ctlike::save(void)
     // Write header
     log_header1(TERSE, "Save results");
 
-    // Get output filenames
-    m_outmodel  = (*this)["outmodel"].filename();
-    m_outcovmat = (*this)["outcovmat"].filename();
+    // Save model only if filename is valid
+    if ((*this)["outmodel"].is_valid()) {
 
-    // Save only if filename is valid
-    if (is_valid_filename(m_outmodel)) {
+        // Get output filename
+        m_outmodel = (*this)["outmodel"].filename();
 
         // Log filename
         log_value(NORMAL, "Model definition file", m_outmodel.url());
@@ -354,8 +353,11 @@ void ctlike::save(void)
         log_value(NORMAL, "Model definition file", "NONE");
     }
 
-    // Save covariance matrix if filename is valid
-    if (is_valid_filename(m_outcovmat)) {
+    // Save covariance matrix only if filename is valid
+    if ((*this)["outcovmat"].is_valid()) {
+
+        // Get output filenames
+        m_outcovmat = (*this)["outcovmat"].filename();
 
         // Log filename
         log_value(NORMAL, "Covariance matrix file", m_outcovmat.url());
@@ -406,11 +408,10 @@ void ctlike::get_parameters(void)
     m_fix_spat_for_ts = (*this)["fix_spat_for_ts"].boolean();
     m_chatter         = static_cast<GChatter>((*this)["chatter"].integer());
 
-    // Optionally read ahead parameters so that they get correctly
-    // dumped into the log file
+    // If needed later, query output filenames now
     if (read_ahead()) {
-        m_outmodel  = (*this)["outmodel"].filename();
-        m_outcovmat = (*this)["outcovmat"].filename();
+        (*this)["outmodel"].query();
+        (*this)["outcovmat"].query();
     }
 
     // Set optimizer logger

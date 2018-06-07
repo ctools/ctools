@@ -134,7 +134,6 @@ protected:
                                                const GCTAObservation& obs);
     std::vector<bool> cube_layer_usage(const GEbounds& cube_ebounds,
                                        const GEbounds& list_ebounds) const;
-    bool              is_valid_filename(const GFilename& filename) const;
     std::string       get_gtiname(const std::string& filename,
                                   const std::string& evtname) const;
     void              save_event_list(const GCTAObservation* obs,
@@ -173,21 +172,6 @@ inline
 const bool& ctool::read_ahead(void) const
 {
     return (m_read_ahead);
-}
-
-
-/***********************************************************************//**
- * @brief Check of a filename is valid
- *
- * @return True if filename is valid
- *
- * Checks whether a filename is not empty and not "NONE".
- ***************************************************************************/
-inline
-bool ctool::is_valid_filename(const GFilename& filename) const
-{
-    return (!filename.is_empty() &&
-            (gammalib::tolower(filename.url()) != "none"));
 }
 
 #endif /* CTOOL_HPP */

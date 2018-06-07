@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    cttsmap - TS map calculation tool                    *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2017 by Michael Mayer                               *
+ *  copyright (C) 2014-2018 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -370,12 +370,12 @@ void cttsmap::save(void)
     // Write header
     log_header1(TERSE, "Save TS map");
 
-    // Get TS map filename
-    m_outmap = (*this)["outmap"].filename();
+    // Save only if filename is valid and TS map is not empty
+    if ((*this)["outmap"].is_valid() && !m_tsmap.is_empty()) {
 
-    // Save only if filename is non-empty
-    if (!m_outmap.is_empty() && !m_tsmap.is_empty()) {
-
+        // Get TS map filename
+        m_outmap = (*this)["outmap"].filename();
+    
         // Create fits file
         GFits fits;
 
@@ -578,10 +578,9 @@ void cttsmap::get_parameters(void)
     m_logL0   = (*this)["logL0"].real();
     m_publish = (*this)["publish"].boolean();
 
-    // Optionally read ahead parameters so that they get correctly
-    // dumped into the log file
+    // If needed later, query output filename now
     if (read_ahead()) {
-        m_outmap = (*this)["outmap"].filename();
+        (*this)["outmap"].query();
     }
 
     // Write parameters into logger

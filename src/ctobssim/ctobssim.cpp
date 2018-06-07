@@ -643,11 +643,10 @@ void ctobssim::get_parameters(void)
     m_max_rate    = (*this)["maxrate"].real();
     m_startindex  = (*this)["startindex"].integer();
 
-    // Optionally read ahead parameters so that they get correctly
-    // dumped into the log file
+    // If needed later, query output filename and prefix now
     if (read_ahead()) {
-        m_outevents  = (*this)["outevents"].filename();
-        m_prefix     = (*this)["prefix"].string();
+        (*this)["outevents"].query();
+        (*this)["prefix"].query();
     }
 
     // Initialise random number generators. We initialise here one random
