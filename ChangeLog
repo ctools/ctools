@@ -3,7 +3,7 @@
         * Version 1.6.0 released
         ========================
 
-        Remove ctools::is_valid_filename() method.
+        Remove ctools::is_valid_filename() method
         Fix bug when using precomputed model in csresspec (#2448)
         Keep existing library path in installation script on Mac OS X (#2420)
         Add show_rmf.py example script

@@ -43,4 +43,4 @@ New features
 Clean up
 --------
 
-* ...
+* Remove ``ctools::is_valid_filename()`` method
