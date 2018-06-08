@@ -2,7 +2,7 @@
 # ==========================================================================
 # Puts subset of sources in diffuse model cube
 #
-# Copyright (C) 2017 Josh Cardenzana
+# Copyright (C) 2017-2018 Josh Cardenzana
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ class csmodelsois(ctools.cscript):
 
         # Read input parameters
         ptsrcsig = self['ptsrcsig'].real()
-        
+
         # Get the cube centre coordinates
         self._cubegen['coordsys'].string(self['coordsys'].string())
         if self['coordsys'].string() == 'CEL':
@@ -88,7 +88,7 @@ class csmodelsois(ctools.cscript):
         self._cubegen['nxpix'].integer(self['nxpix'].integer())
         self._cubegen['nypix'].integer(self['nypix'].integer())
         self._cubegen['proj'].string(self['proj'].string())
-        
+
         # Get the energy binning parameters
         self._cubegen['ebinalg'].string(self['ebinalg'].string())
         if self['ebinalg'].string() == 'FILE':
@@ -98,13 +98,13 @@ class csmodelsois(ctools.cscript):
             self._cubegen['emax'].real(self['emax'].real())
             self._cubegen['enumbins'].integer(self['enumbins'].integer())
 
-        # Get remaining hidden parameters
+        # Set point source significance
         self._cubegen['ptsrcsig'].real(ptsrcsig)
-        
+
         # Read optionally output cube filenames
         if self._read_ahead():
             self._cubegen['outcube'].filename(self['outcube'].filename())
-            self['outmodel'].filename()
+            self['outmodel'].query()
 
         # Write parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -185,12 +185,12 @@ class csmodelsois(ctools.cscript):
         """
         # Save the generated cube if the cube and filename are not empty
         if ((not self._cubegen.mapcube().cube().is_empty()) and
-            self._is_valid_filename(self['outcube'].filename())):
+            self['outcube'].is_valid()):
             self._cubegen.mapcube().save(self['outcube'].filename(),
-                                        self['clobber'].boolean())
+                                         self['clobber'].boolean())
         
         # If requested, save the updated list of models
-        if self._is_valid_filename(self['outmodel'].filename()):
+        if self['outmodel'].is_valid():
 
             # Generate a list of models that will be output to file
             outmodels = gammalib.GModels(self._models)

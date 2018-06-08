@@ -2,7 +2,7 @@
 # ==========================================================================
 # Merge model definition XML files
 #
-# Copyright (C) 2015-2017 Michael Mayer
+# Copyright (C) 2015-2018 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

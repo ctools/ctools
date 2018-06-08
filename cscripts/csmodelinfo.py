@@ -2,7 +2,7 @@
 # ==========================================================================
 # Shows the content of a model container
 #
-# Copyright (C) 2015-2017 Michael Mayer
+# Copyright (C) 2015-2018 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class csmodelinfo(ctools.cscript):
 
         # Query ahead DS9 filename
         if self._read_ahead():
-            self['outds9file'].filename()
+            self['outds9file'].query()
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -122,9 +122,9 @@ class csmodelinfo(ctools.cscript):
         
         # Loop over models and initialise dictionaries with model names
         for model in self._models:
-            types[model.type()] = 0 
+            types[model.type()]              = 0
             instruments[model.instruments()] = 0
-            pars_at_limit[model.name()] = []
+            pars_at_limit[model.name()]      = []
 
         # Loop over models again and fill values to be dumped
         for model in self._models:
@@ -244,12 +244,12 @@ class csmodelinfo(ctools.cscript):
         """ 
         Save models to ds9 region file
         """
-        # Get output filename
-        ds9file = self['outds9file'].filename()
-
         # Check if DS9 file is valid
-        if ds9file != '' and ds9file != 'NONE':
-            
+        if self['outds9file'].is_valid():
+
+            # Get output filename
+            ds9file = self['outds9file'].filename()
+
             # Write header
             self._log_header1(gammalib.TERSE, 'Save models in DS9 file')
             

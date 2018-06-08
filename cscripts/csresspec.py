@@ -85,9 +85,7 @@ class csresspec(ctools.csobservation):
         # components is required, query for precomputed model file and set
         # use_maps to True
         if self.obs().size() == 1 and n_binned == 1 and not components:
-            modcube = self['modcube'].filename()
-            if modcube != 'NONE':
-                self._use_maps = True
+            self._use_maps = self['modcube'].is_valid()
 
         # If there are unbinned observations query the energy binning parameters
         if n_unbinned != 0:
@@ -130,7 +128,7 @@ class csresspec(ctools.csobservation):
                 self['ra'].real()
                 self['dec'].real()
                 self['rad'].real()
-                self['regfile'].filename()
+                self['regfile'].query()
 
         # Unless all observations are On/Off, or we are using precomputed model
         # maps query whether to use energy dispersion
@@ -358,11 +356,15 @@ class csresspec(ctools.csobservation):
 
         # Apply user mask
         if self._mask:
+            if self['regfile'].is_valid():
+                regfile = self['regfile']
+            else:
+                regfile = 'NONE'
             msg = 'Masking ROI requested by user'
             self._log_string(gammalib.EXPLICIT, msg)
             cube = self._masked_cube(cube, self['ra'], self['dec'],
                                      self['rad'],
-                                     regfile=self['regfile'])
+                                     regfile=regfile)
 
         # Extract skymap and clip at 0 to null masked areas
         counts = cube.counts().copy()
@@ -688,17 +690,14 @@ class csresspec(ctools.csobservation):
         # Write header
         self._log_header1(gammalib.TERSE, 'Save residuals')
 
-        # Continue only if FITS file is valid
-        if self._fits != None:
+        # Get outfile parameter
+        outfile = self['outfile'].filename()
 
-            # Get outfile parameter
-            outfile = self['outfile'].filename()
+        # Log file name
+        self._log_value(gammalib.NORMAL, 'Residuals file', outfile.url())
 
-            # Log file name
-            self._log_value(gammalib.NORMAL, 'Residuals file', outfile.url())
-
-            # Save residuals
-            self._fits.saveto(outfile, self['clobber'].boolean())
+        # Save residuals
+        self._fits.saveto(outfile, self['clobber'].boolean())
 
         # Return
         return

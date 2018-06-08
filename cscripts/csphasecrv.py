@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates spectra as a function of phase
 #
-# Copyright (C) 2017 Rolf Buehler
+# Copyright (C) 2017-2018 Rolf Buehler
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

@@ -120,7 +120,7 @@ class cslightcrv(ctools.csobservation):
 
         # Read ahead output parameters
         if self._read_ahead():
-            self['outfile'].filename()
+            self['outfile'].query()
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -592,11 +592,11 @@ class cslightcrv(ctools.csobservation):
         # Write header
         self._log_header1(gammalib.TERSE, 'Save light curve')
 
-        # Get light curve filename
-        outfile = self['outfile'].filename()
+        # Continue only if filename is valid
+        if self['outfile'].is_valid():
 
-        # Continue only filename and residual map are valid
-        if self._fits != None:
+            # Get light curve filename
+            outfile = self['outfile'].filename()
 
             # Log file name
             self._log_value(gammalib.NORMAL, 'Light curve file', outfile.url())

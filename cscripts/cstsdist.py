@@ -73,12 +73,7 @@ class cstsdist(ctools.csobservation):
         # Query parameters
         self['edisp'].boolean()
         self['ntrials'].integer()
-        
         self['debug'].boolean()
-
-        # Read ahead output parameters
-        #if self._read_ahead():
-        #    self['outfile'].filename()
         self['outfile'].filename()
 
         #  Write input parameters into logger

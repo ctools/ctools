@@ -2,7 +2,7 @@
 # ==========================================================================
 # Copies IACT data from remote machine
 #
-# Copyright (C) 2016-2017 Michael Mayer
+# Copyright (C) 2016-2018 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -74,7 +74,8 @@ class csiactcopy(ctools.cscript):
         # Get parameters
         self._prodname = self['prodname'].string()
         self._outpath  = gammalib.expand_env(self['outpath'].string())
-        self._runlist  = self['runlist'].filename()            
+        if self['runlist'].is_valid():
+            self._runlist = self['runlist'].filename()
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -322,7 +323,7 @@ class csiactcopy(ctools.cscript):
         for i in range(local_hdu.ncols()):
             
             # Get local and remote columns
-            local_col = local_hdu[i]
+            local_col  = local_hdu[i]
             remote_col = remote_hdu[i]    
             
             # Loop over entries and merge
@@ -381,14 +382,14 @@ class csiactcopy(ctools.cscript):
             self._log_value(gammalib.NORMAL, 'Number of observations',
                             len(runs))
         
-        # ... otherwise, if the runlist file is 'NONE' then leave the
+        # ... otherwise, if the runlist filename is empty then leave the
         # run list empty. This implies copying all available data.
-        elif filename == 'NONE':
+        elif filename.is_empty():
             self._log_string(gammalib.NORMAL, 'Copy all available data')
         
         # ... otherwise raise an exception
         else:
-            msg = '*** ERROR: Runlist file "%s" not available' % filename
+            msg = '*** ERROR: Runlist file "%s" not available' % filename.url()
             raise RuntimeError(msg)
         
         # Return run list

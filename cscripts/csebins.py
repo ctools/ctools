@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates energy boundaries for stacked analysis
 #
-# Copyright (C) 2017 Juergen Knoedlseder
+# Copyright (C) 2017-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -55,13 +55,10 @@ class csebins(ctools.csobservation):
         # Initialise observation container if it is currently empty
         if self.obs().size() == 0:
 
-            # Query "inobs" parameter
-            filename = self['inobs'].filename()
-
             # If an observation definition file was provided then load it,
             # otherwise build a single observation with response information
-            if self._is_valid_filename(filename):
-                self.obs(gammalib.GObservations(filename))
+            if self['inobs'].is_valid():
+                self.obs(gammalib.GObservations(self['inobs'].filename()))
             else:
                 cta   = gammalib.GCTAObservation()
                 caldb = gammalib.GCaldb('cta', self['caldb'].string())

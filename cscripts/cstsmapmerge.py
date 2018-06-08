@@ -2,7 +2,7 @@
 # ==========================================================================
 # Merge Test Statistic maps
 #
-# Copyright (C) 2015-2017 Michael Mayer
+# Copyright (C) 2015-2018 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -274,7 +274,8 @@ class cstsmapmerge(ctools.cscript):
             if not gammalib.GFilename(fitsfile).is_fits():
                 
                 # Log message
-                self._log_value(gammalib.EXPLICIT, 'Skip file', fitsfile +' (not a FITS file)')
+                self._log_value(gammalib.EXPLICIT, 'Skip file', fitsfile +
+                                ' (not a FITS file)')
 
                 # Continue
                 continue
@@ -292,8 +293,10 @@ class cstsmapmerge(ctools.cscript):
                 file0 = fitsfile
                 
                 # Log message
-                pix_info = ' (%d TS pixels computed)' % self._get_number_of_ts_pixels(fitsfile)
-                self._log_value(gammalib.TERSE, 'Initial TS map file', fitsfile + pix_info)
+                pix_info = ' (%d TS pixels computed)' % \
+                           self._get_number_of_ts_pixels(fitsfile)
+                self._log_value(gammalib.TERSE, 'Initial TS map file',
+                                fitsfile + pix_info)
                 
                 # Leave loop
                 break
@@ -305,7 +308,8 @@ class cstsmapmerge(ctools.cscript):
                 fits.close()  
                 
                 # Info message             
-                self._log_value(gammalib.EXPLICIT, 'Skip file', fitsfile +' (no "STATUS MAP" extension)')
+                self._log_value(gammalib.EXPLICIT, 'Skip file', fitsfile +
+                                ' (no "STATUS MAP" extension)')
                 
                 # Continue
                 continue
@@ -313,10 +317,9 @@ class cstsmapmerge(ctools.cscript):
         # Signal if no suitable file was found
         if file0 == '':
             msg = 'None of the provided files seems to be a sliced ' + \
-                          'TS map file (none has a "STATUS MAP" ' + \
-                          'extension)'
+                  'TS map file (none has a "STATUS MAP" ' + \
+                  'extension)'
             raise RuntimeError(msg)
-                          
 
         # ... otherwise merge files
         else:
@@ -338,7 +341,8 @@ class cstsmapmerge(ctools.cscript):
                 
                 # Skip if file is not FITS
                 if not gammalib.GFilename(fitsfile).is_fits():
-                    self._log_value(gammalib.EXPLICIT, 'Skip file', fitsfile +' (not a FITS file)')
+                    self._log_value(gammalib.EXPLICIT, 'Skip file', fitsfile +
+                                    ' (not a FITS file)')
                     continue   
 
                 # Open FITS file
@@ -347,15 +351,18 @@ class cstsmapmerge(ctools.cscript):
                 # Skip if file does not contain status map
                 if not fits.contains('STATUS MAP'):
                     fits.close()
-                    self._log_value(gammalib.EXPLICIT, 'Skip file', fitsfile +' (no "STATUS MAP" extension)')
+                    self._log_value(gammalib.EXPLICIT, 'Skip file', fitsfile +
+                                    ' (no "STATUS MAP" extension)')
                     continue
 
                 # Close FITS file
                 fits.close()
                 
                 # Logging
-                pix_info = ' (%d TS pixels computed)' % self._get_number_of_ts_pixels(fitsfile)
-                self._log_value(gammalib.TERSE, 'Merge TS map file', fitsfile + pix_info)
+                pix_info = ' (%d TS pixels computed)' % \
+                           self._get_number_of_ts_pixels(fitsfile)
+                self._log_value(gammalib.TERSE, 'Merge TS map file',
+                                fitsfile + pix_info)
                     
                 # Merge TS map
                 self._merge_ts_map(fitsfile)

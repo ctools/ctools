@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a residual map.
 #
-# Copyright (C) 2014-2017 Michael Mayer
+# Copyright (C) 2014-2018 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -73,9 +73,7 @@ class csresmap(ctools.csobservation):
         # If we have a counts cube, then ask whether we also have a model cube.
         # If a model cube name is given then set self._use_maps=True
         if self._skip_binning:
-            modcube = self['modcube'].filename()
-            if modcube != 'NONE':
-                self._use_maps = True
+            self._use_maps = self['modcube'].is_valid()
 
         # If not two maps are given, proceed to set up observation
         if not self._use_maps:

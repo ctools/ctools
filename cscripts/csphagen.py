@@ -161,11 +161,15 @@ class csphagen(ctools.csobservation):
         self._setup_observations(self.obs(), True, True, False)
 
         # Get spatial component of source model if an input model is defined
-        inmodel = self['inmodel'].filename()
-        if not self['inmodel'].is_undefined():
+        if self['inmodel'].is_valid():
+            inmodel         = self['inmodel'].filename()
             models          = gammalib.GModels(inmodel)
             name            = self['srcname'].string()
             self._src_model = models[name].spatial().clone()
+        elif self.obs().models().size() > 0:
+            name = self['srcname'].string()
+            if self.obs().models().contains(name):
+                self._src_model = self.obs().models()[name].spatial()
 
         # Set energy bounds
         self._ebounds = self._create_ebounds()
@@ -174,7 +178,7 @@ class csphagen(ctools.csobservation):
         self._src_reg = gammalib.GSkyRegions()
 
         # Exclusion map
-        if not self['inexclusion'].is_undefined():
+        if self['inexclusion'].is_valid():
             inexclusion         = self['inexclusion'].filename()
             self._excl_reg      = gammalib.GSkyRegionMap(inexclusion)
             self._has_exclusion = True
@@ -416,7 +420,6 @@ class csphagen(ctools.csobservation):
         for obs in self.obs():
 
             # Skip non CTA observations
-            #if obs.instrument() != 'CTA':
             if obs.classname() != 'GCTAObservation':
                 self._log_string(gammalib.NORMAL, 'Skip %s observation "%s"' % \
                                  (obs.instrument(), obs.id()))

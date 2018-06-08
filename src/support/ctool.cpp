@@ -1182,8 +1182,8 @@ std::string ctool::set_outfile_name(const std::string& filename)
 bool ctool::is_stacked(void)
 {
     // First query the minimum and maximum energies
-    (*this)["emin"].query();
-    (*this)["emax"].query();
+    (*this)["emin"].real();
+    (*this)["emax"].real();
 
     // Now query the number of energy bins and set the stacked flag
     bool stacked = ((*this)["enumbins"].integer() > 0) ? true : false;
@@ -1191,13 +1191,13 @@ bool ctool::is_stacked(void)
     // If a stacked analysis is requested then query the spatial definition
     // of the cube
     if (stacked) {
-        (*this)["coordsys"].query();
-        (*this)["proj"].query();
-        (*this)["xref"].query();
-        (*this)["yref"].query();
-        (*this)["nxpix"].query();
-        (*this)["nypix"].query();
-        (*this)["binsz"].query();
+        (*this)["coordsys"].string();
+        (*this)["proj"].string();
+        (*this)["xref"].real();
+        (*this)["yref"].real();
+        (*this)["nxpix"].integer();
+        (*this)["nypix"].integer();
+        (*this)["binsz"].real();
     }
 
     // Return stacked flag
@@ -1229,22 +1229,22 @@ bool ctool::is_onoff(void)
     
         // Query csphagen parameters
         (*this)["inexclusion"].query();
-        (*this)["emin"].query();
-        (*this)["emax"].query();
-        (*this)["enumbins"].query();
-        (*this)["coordsys"].query();
-        (*this)["xref"].query();
-        (*this)["yref"].query();
+        (*this)["emin"].real();
+        (*this)["emax"].real();
+        (*this)["enumbins"].integer();
+        (*this)["coordsys"].string();
+        (*this)["xref"].real();
+        (*this)["yref"].real();
         if ((*this)["srcshape"].string() == "CIRCLE"){
-            (*this)["rad"].query();
+            (*this)["rad"].real();
         }
         if ((*this)["bkgmethod"].string() == "REFLECTED"){
-            (*this)["bkgregmin"].query();
+            (*this)["bkgregmin"].integer();
         }
-        (*this)["maxoffset"].query();
-        (*this)["etruemin"].query();
-        (*this)["etruemax"].query();
-        (*this)["etruebins"].query();
+        (*this)["maxoffset"].real();
+        (*this)["etruemin"].real();
+        (*this)["etruemax"].real();
+        (*this)["etruebins"].integer();
 
     } // endif: method was ONOFF
 

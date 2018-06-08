@@ -2,7 +2,7 @@
 # ==========================================================================
 # Detects sources in a sky map
 #
-# Copyright (C) 2016-2017 Juergen Knoedlseder
+# Copyright (C) 2016-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ class cssrcdetect(ctools.cscript):
         self['exclrad'].real()
         self['fit_pos'].boolean()
         self['fit_shape'].boolean()
-        
+
         # Query ahead output model filename
         if self._read_ahead():
             self['outmodel'].filename()

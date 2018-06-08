@@ -106,7 +106,7 @@ class csiactobs(ctools.cscript):
         self._datapath = gammalib.expand_env(self._datapath)
 
         # Query input parameters
-        self['inmodel'].filename()
+        self['inmodel'].query()
 
         # Read FITS production
         self._prodname = self['prodname'].string()
@@ -161,13 +161,17 @@ class csiactobs(ctools.cscript):
         # Open master index file and look for prodname 
         master_file = os.path.join(self._datapath, self._master_indx)
         if not os.path.isfile(master_file):
-            raise RuntimeError('FITS data store not available. No master index file found. Make sure the file is copied from the server and your datapath is set correctly.')
+            raise RuntimeError('FITS data store not available. No master '
+                               'index file found. Make sure the file is '
+                               'copied from the server and your datapath '
+                               'is set correctly.')
 
         # Open and load JSON file
         json_data = open(master_file).read()
         data      = json.loads(json_data)    
         if not 'datasets' in data:
-            raise RuntimeError('Key "datasets" not available in master index file.')
+            raise RuntimeError('Key "datasets" not available in master '
+                               'index file.')
 
         # Get configurations
         configs = data['datasets']
@@ -190,14 +194,21 @@ class csiactobs(ctools.cscript):
 
         # Check index files
         if self._hdu_index == '' or self._obs_index == '':
-            raise RuntimeError('*** ERROR: FITS data store "'+self._prodname+'" not available. Run csiactdata to get a list of available storage names')
+            raise RuntimeError('*** ERROR: FITS data store "'+self._prodname+
+                               '" not available. Run csiactdata to get a list '
+                               'of available storage names')
         
         # Check HDU names
         filename = gammalib.GFilename(self._hdu_index+'[HDU_INDEX]')
         if not filename.is_fits():
-            raise RuntimeError('*** ERROR: HDU index file "'+self._hdu_index+'[HDU_INDEX]" for FITS data store "'+self._prodname+'" not available. Check your master index file or run csiactdata to get a list of available storage names.')
+            raise RuntimeError('*** ERROR: HDU index file "'+self._hdu_index+
+                               '[HDU_INDEX]" for FITS data store "'+
+                               self._prodname+'" not available. Check your '
+                               'master index file or run csiactdata to get '
+                               'a list of available storage names.')
 
-        # Check for existence of 'BKG_SCALE' in the observation index file if required
+        # Check for existence of 'BKG_SCALE' in the observation index file if
+        # required
         if self._use_bkg_scale:
             
             # Create filename
@@ -209,7 +220,8 @@ class csiactobs(ctools.cscript):
                 # Open FITS file
                 fits = gammalib.GFits(self._obs_index)
                 
-                # Check if column "BKG_SCALE" is found and signal its possible usage
+                # Check if column "BKG_SCALE" is found and signal its possible
+                # usage
                 if not fits['OBS_INDEX'].contains('BKG_SCALE'):
                     self._use_bkg_scale = False
                     
@@ -221,8 +233,8 @@ class csiactobs(ctools.cscript):
                 self._use_bkg_scale = False
         
         # Create base data directory from hdu index file location
-        self._subdir  = os.path.dirname(self._hdu_index)  
-        self._debug   = False # Debugging in client tools
+        self._subdir = os.path.dirname(self._hdu_index)
+        self._debug  = False # Debugging in client tools
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -230,7 +242,7 @@ class csiactobs(ctools.cscript):
         # Return
         return
     
-    def _background_spectrum(self, prefactor, index, emin = 0.01, emax = 100.0):
+    def _background_spectrum(self, prefactor, index, emin=0.01, emax=100.0):
         """
         Create a background spectrum model dependent on user parameters
         
@@ -419,8 +431,10 @@ class csiactobs(ctools.cscript):
         """
         # If there are models provided by "inmodels" then append them now to
         # the model container
-        filename = self['inmodel'].filename().url()
-        if filename != '' and filename != 'NONE':
+        if self['inmodel'].is_valid():
+
+            # Get filename
+            filename = self['inmodel'].filename().url()
 
             # Log header and input model file
             self._log_header1(gammalib.TERSE, 'Append input models')
@@ -505,8 +519,7 @@ class csiactobs(ctools.cscript):
 
         # Return filename
         return filename
-    
-    
+
     def _is_present(self, filename, obs_id, filetype):
         """
         Checks if a filename is present

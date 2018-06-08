@@ -2,7 +2,7 @@
 # ==========================================================================
 # Computes the array sensitivity using the Test Statistic for a test source
 #
-# Copyright (C) 2011-2017 Juergen Knoedlseder
+# Copyright (C) 2011-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -132,8 +132,7 @@ class cssens(ctools.csobservation):
             Observation container
         """
         # If an observation was provided on input then load it from XML file
-        filename = self['inobs'].filename()
-        if filename != 'NONE' and filename != '':
+        if self['inobs'].is_valid():
             obs = self._get_observations()
 
         # ... otherwise allocate a single observation

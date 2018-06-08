@@ -107,7 +107,7 @@ class csobsdef(ctools.cscript):
 
         # Read ahead parameters
         if self._read_ahead():
-            self['outobs'].filename()
+            self['outobs'].query()
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -351,11 +351,11 @@ class csobsdef(ctools.cscript):
         # Write header and filename into logger
         self._log_header1(gammalib.TERSE, 'Save observation definition XML file')
 
-        # Get output filename in case it was not read ahead
-        outobs = self['outobs'].filename()
-
         # Check if observation definition XML file is valid
-        if outobs.url() != 'NONE':
+        if self['outobs'].is_valid():
+
+            # Get output filename in case it was not read ahead
+            outobs = self['outobs'].filename()
 
             # Log filename
             self._log_value(gammalib.NORMAL, 'Observation XML file', outobs.url())

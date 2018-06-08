@@ -120,6 +120,8 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
 
             # Allocate csphagen application and set parameters
             phagen = cscripts.csphagen(obssim.obs())
+            phagen['inmodel']     = 'NONE'
+            phagen['srcname']     = onsrc
             phagen['ebinalg']     = 'LOG'
             phagen['emin']        = emin
             phagen['emax']        = emax
@@ -187,9 +189,9 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
                 # Set stacked response
                 if edisp:
                     binning.obs()[0].response(response['expcube'],
-                                             response['psfcube'],
-                                             response['edispcube'],
-                                             response['bkgcube'])
+                                              response['psfcube'],
+                                              response['edispcube'],
+                                              response['bkgcube'])
                 else:
                     binning.obs()[0].response(response['expcube'],
                                               response['psfcube'],
@@ -787,9 +789,26 @@ def get_onoff_obs(cls, obs):
     if cls._logExplicit():
         cls._log.header3('Creating On/Off observations')
 
+    # Initialise inmodel, srcname and inexclusion
+    inmodel     = 'NONE'
+    srcname     = ''
+    inexclusion = 'NONE'
+
+    # Set inmodel, srcname and inexclusion if possible
+    if 'inmodel' in cls:
+        if cls['inmodel'].is_valid():
+            inmodel = cls['inmodel'].value()
+    if 'srcname' in cls:
+        srcname = cls['srcname'].value()
+    if 'inexclusion' in cls:
+        if cls['inexclusion'].is_valid():
+            inexclusion = cls['inexclusion'].value()
+
     # Create On/Off observations
     phagen = cscripts.csphagen(obs)
-    phagen['inexclusion'] = cls['inexclusion'].value()
+    phagen['inmodel']     = inmodel
+    phagen['srcname']     = srcname
+    phagen['inexclusion'] = inexclusion
     phagen['emin']        = cls['emin'].real()
     phagen['emax']        = cls['emax'].real()
     phagen['enumbins']    = cls['enumbins'].integer()
