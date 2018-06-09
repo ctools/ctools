@@ -418,9 +418,6 @@ class csresspec(ctools.csobservation):
 
         # Initialise FITS Table with extension set to obs id
         table = gammalib.GFitsBinTable(nrows)
-        # If name not empty add leading blank
-        if obs_id != '':
-            obs_id = ' ' + obs_id
         table.extname('RESIDUALS' + obs_id)
 
         # Add Header card to specify algorithm used for residual computation
