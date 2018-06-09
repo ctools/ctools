@@ -218,7 +218,7 @@ def plot_residuals(filename, plotfile, hdu):
     # Initialise figure
     axarr = []
     if is_onoff:
-        f   = plt.figure(figsize=(10,6))
+        f   = plt.figure(figsize=(12,7))
         ax1 = f.add_subplot(221)
         ax2 = f.add_subplot(222)
         ax3 = f.add_subplot(223)
