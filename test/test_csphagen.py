@@ -343,12 +343,12 @@ class Test(test):
                         'Check for %d rows in energy bounds table' % bins)
         for col in cols:
             self.test_assert(table.contains(col),
-                             'FITS file contains "' + col + '" column')
+                             'Test if EBOUNDS contains "' + col + '" column')
 
         # Return
         return
 
-    def _check_pha(self, filename, bins):
+    def _check_pha(self, filename, bins, ncols=8):
         """
         Check PHA file
         """
@@ -363,21 +363,21 @@ class Test(test):
         self.test_value(fits.size(), 3,
                         'Check for 3 extensions in PHA file')
         self.test_assert(fits.contains('SPECTRUM'),
-                         'FITS file contains "SPECTRUM" extension')
+                         'Test if PHA file contains "SPECTRUM" extension')
         self.test_assert(fits.contains('EBOUNDS'),
-                         'FITS file contains "EBOUNDS" extension')
+                         'Test if PHA file contains "EBOUNDS" extension')
 
         # Get SPECTRUM table
         table = fits['SPECTRUM']
 
         # Check FITS table structure
-        self.test_value(table.ncols(), len(cols),
+        self.test_value(table.ncols(), ncols,
                         'Check for %d columns in PHA table' % len(cols))
         self.test_value(table.nrows(), bins,
                         'Check for %d rows in PHA table' % bins)
         for col in cols:
             self.test_assert(table.contains(col),
-                             'FITS file contains "' + col + '" column')
+                             'Test if PHA file contains "' + col + '" column')
 
         # Check EBOUNDS table
         table = fits['EBOUNDS']
@@ -394,7 +394,7 @@ class Test(test):
         Check ARF file
         """
         # Expected column names
-        cols = ['ENERG_LO', 'ENERG_HI', 'SPECRESP', 'BACKRESP']
+        cols = ['ENERG_LO', 'ENERG_HI', 'SPECRESP']
 
         # Open FITS file
         fits = gammalib.GFits(filename)
@@ -403,7 +403,7 @@ class Test(test):
         self.test_value(fits.size(), 2,
                         'Check for 2 extensions in ARF file')
         self.test_assert(fits.contains('SPECRESP'),
-                         'FITS file contains "SPECRESP" extension')
+                         'Test if ARF file contains "SPECRESP" extension')
 
         # Get SPECRESP table
         table = fits['SPECRESP']
@@ -415,7 +415,7 @@ class Test(test):
                         'Check for %d rows in ARF table' % bins)
         for col in cols:
             self.test_assert(table.contains(col),
-                             'FITS file contains "' + col + '" column')
+                             'Test if ARF file contains "' + col + '" column')
 
         # Close FITS file
         fits.close()
@@ -437,9 +437,9 @@ class Test(test):
         self.test_value(fits.size(), 3,
                         'Check for 3 extensions in RMF file')
         self.test_assert(fits.contains('MATRIX'),
-                         'FITS file contains "MATRIX" extension')
+                         'Test if RMF file contains "MATRIX" extension')
         self.test_assert(fits.contains('EBOUNDS'),
-                         'FITS file contains "EBOUNDS" extension')
+                         'Test if RMF file contains "EBOUNDS" extension')
 
         # Get MATRIX table
         table = fits['MATRIX']
@@ -451,7 +451,7 @@ class Test(test):
                         'Check for %d rows in RMF table' % etruebins)
         for col in cols:
             self.test_assert(table.contains(col),
-                             'FITS file contains "' + col + '" column')
+                             'Test if RMF file contains "' + col + '" column')
 
         # Check EBOUNDS table
         table = fits['EBOUNDS']
@@ -469,7 +469,7 @@ class Test(test):
         """
         # OGIP files
         self._check_pha(filenameroot + '_pha_on.fits', bins)
-        self._check_pha(filenameroot + '_pha_off.fits', bins)
+        self._check_pha(filenameroot + '_pha_off.fits', bins, ncols=9)
         self._check_arf(filenameroot + '_arf.fits', 17)
         self._check_rmf(filenameroot + '_rmf.fits', bins)
 

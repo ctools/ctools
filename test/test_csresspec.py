@@ -224,7 +224,7 @@ class Test(test):
         resspec.execute()
 
         # Check result file
-        self._check_result_file('csresspec_py5.fits', 20, 8, nobs=2)
+        self._check_result_file('csresspec_py5.fits', 30, 8, nobs=2)
 
         # Set-up csresspec for On/Off observations
         # in stacked mode and with WSTAT background
@@ -242,7 +242,7 @@ class Test(test):
         resspec.execute()
 
         # Check result file
-        self._check_result_file('csresspec_py6.fits', 20, 8)
+        self._check_result_file('csresspec_py6.fits', 30, 8)
 
         # Return
         return

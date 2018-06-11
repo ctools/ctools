@@ -451,14 +451,17 @@ class csspec(ctools.csobservation):
             pha_off.areascal(idst, obs.off_spec().areascal(isrc))
             pha_off.backscal(idst, obs.off_spec().backscal(isrc))
 
-        # Extract ARF
-        arf          = gammalib.GArf(etrue)
-        arf_backresp = obs.arf()['BACKRESP']
+        # Extract BACKRESP
+        pha_backresp = obs.off_spec()['BACKRESP']
         backresp     = []
+        for idst, isrc in enumerate(ireco):
+            backresp.append(pha_backresp[isrc])
+        pha_off.append('BACKRESP', backresp)
+
+        # Extract ARF
+        arf = gammalib.GArf(etrue)
         for idst, isrc in enumerate(itrue):
             arf[idst] = obs.arf()[isrc]
-            backresp.append(arf_backresp[isrc])
-        arf.append('BACKRESP', backresp)
 
         # Extract RMF
         rmf = gammalib.GRmf(etrue, ereco)

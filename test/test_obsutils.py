@@ -280,13 +280,13 @@ class Test(test):
                         'Check minimum energy of ARF')
         self.test_value(res[0].arf().ebounds().emax().TeV(), 12.0,
                         'Check minimum energy of ARF')
-        self.test_value(res[0].arf().ebounds().size(), 42,
+        self.test_value(res[0].arf().ebounds().size(), 41,
                         'Check number of energy bins of ARF')
         self.test_value(res[0].rmf().etrue().emin().TeV(), 0.5,
                         'Check minimum true energy of RMF')
         self.test_value(res[0].rmf().etrue().emax().TeV(), 12.0,
                         'Check minimum true energy of RMF')
-        self.test_value(res[0].rmf().etrue().size(), 42,
+        self.test_value(res[0].rmf().etrue().size(), 41,
                         'Check number of true energy bins of RMF')
         self.test_value(res[0].rmf().emeasured().emin().TeV(), 1.0,
                         'Check minimum reconstructed energy of RMF')
