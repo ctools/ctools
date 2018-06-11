@@ -25,6 +25,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`2490 <https://cta-redmine.irap.omp.eu/issues/2490>`_] -
+  Change formula for number of true energy bins in :ref:`csphagen`
 * Add ``show_rmf.py`` example script
 * [`2313 <https://cta-redmine.irap.omp.eu/issues/2313>`_] -
   Add `ras()` and `decs()` methods to :ref:`csobsinfo`

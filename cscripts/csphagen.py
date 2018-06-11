@@ -328,7 +328,9 @@ class csphagen(ctools.csobservation):
 
         # Determine number of energy bins
         n_decades = (emax.log10TeV() - emin.log10TeV())
-        n_bins    = int(n_decades * float(self['etruebins'].integer())) + 1
+        n_bins    = int(n_decades * float(self['etruebins'].integer()) + 0.5)
+        if n_bins < 1:
+            n_bins = 1
 
         # Set energy boundaries
         ebounds = gammalib.GEbounds(n_bins, emin, emax)
