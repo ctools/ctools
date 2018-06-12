@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-7 June 2018
+12 June 2018
 
 
 Introduction
@@ -221,6 +221,9 @@ The true number of energy bins is now computed using
    int(bins_per_decade * num_of_decades + 0.5)
 making sure in addition that the result is at least 1. This provides better
 control over the number of energy bins (#2490).
+
+The script now produces data that are compliant with Xspec. An Xspec howto
+tutorial was added to the user documentation (#2404).
 
 
 csphasecrv - Generate phase curve

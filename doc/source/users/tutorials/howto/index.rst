@@ -17,6 +17,7 @@ CTA data analysis
    howto_advanced_python_fitting
    howto_connect_irfs
    howto_connect_models
+   howto_xspec
 
 
 CTA first Data Challenge data analysis

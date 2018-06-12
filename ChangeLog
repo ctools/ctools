@@ -1,4 +1,4 @@
-2018-06-11
+2018-06-12
 
         * Version 1.6.0 released
         ========================
@@ -7,6 +7,7 @@
         Remove ctools::is_valid_filename() method
         Fix bug when using precomputed model in csresspec (#2448)
         Keep existing library path in installation script on Mac OS X (#2420)
+        csphagen produces Xspec compliant data (#2404)
         Add show_rmf.py example script
         Allow specifying of input sky map in ctskymap (#2311)
         Add ras() and decs() methods to csobsinfo (#2313)
