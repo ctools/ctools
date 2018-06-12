@@ -505,6 +505,11 @@ class csphagen(ctools.csobservation):
                 arfname = prefix + '_arf.fits'
                 rmfname = prefix + '_rmf.fits'
 
+            # Set background and response file names in On spectrum
+            obs.on_spec().backfile(offname)
+            obs.on_spec().respfile(rmfname)
+            obs.on_spec().ancrfile(arfname)
+
             # Save files
             obs.on_spec().save(onname, clobber)
             obs.off_spec().save(offname, clobber)
