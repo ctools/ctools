@@ -106,6 +106,9 @@ General parameters
 ``tmax [time]``
     Stop time (UTC string, JD, MJD or MET in seconds).
 
+``(mjdref = 51544.5) [real]``
+    Reference Modified Julian Day (MJD) for MET.
+
 ``npix [integer]``
     Number of pixels for binned analysis.
 

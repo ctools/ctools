@@ -385,9 +385,6 @@ void ctbin::init_members(void)
     // Initialise cache members
     m_dirs.clear();
 
-    // Set CTA reference time
-    m_gti.reference(ctools::time_reference);
-
     // Return
     return;
 }
@@ -586,6 +583,12 @@ void ctbin::fill_cube(GCTAObservation* obs)
     // Update time information
     #pragma omp critical(ctbin_fill_cube)
     {
+        // If GTI is empty then set its time reference from the observation.
+        // From then on we keep that time reference
+        if (m_gti.is_empty()) {
+            m_gti.reference(events->gti().reference());
+        }
+
         // Append GTIs
         m_gti.extend(events->gti());
 

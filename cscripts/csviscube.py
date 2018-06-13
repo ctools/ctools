@@ -64,6 +64,7 @@ class csviscube(ctools.cscript):
         Get all parameters
         """
         # Query parameters
+        self['mjdref'].real()
         self['tmin'].time()
         self['tmax'].time()
         self['geolon'].real()
@@ -259,9 +260,12 @@ class csviscube(ctools.cscript):
         # Get array geographic longitude
         #geolon = self['geolon'].real()
 
+        # Get MET time reference
+        tref = gammalib.GTimeReference(self['mjdref'].real(),'s','TT','LOCAL')
+
         # Get time interval
-        tmin = self['tmin'].time(ctools.time_reference)
-        tmax = self['tmax'].time(ctools.time_reference)
+        tmin = self['tmin'].time(tref)
+        tmax = self['tmax'].time(tref)
 
         # Initialise hour angle list
         hour_angles = []

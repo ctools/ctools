@@ -34,10 +34,6 @@
 /* __Definitions _________________________________________________________ */
 
 /* __ Constants __________________________________________________________ */
-namespace ctools {
-    const GTimeReference time_reference =
-          GTimeReference(G_CTA_MJDREF, "s", "TT", "LOCAL");
-}
 
 
 /***********************************************************************//**
@@ -102,7 +98,7 @@ protected:
     // Protected methods that extract user parameters
     GCTARoi           get_roi(const GCTAPointing& pnt = GCTAPointing());
     GEbounds          get_ebounds(void);
-    GGti              get_gti(void);
+    GGti              get_gti(const GTimeReference& ref);
     GCTAPointing      get_pointing(void);
     GSkyDir           get_skydir(void);
     std::string       set_outfile_name(const std::string& filename);

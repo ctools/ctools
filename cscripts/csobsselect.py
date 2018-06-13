@@ -68,8 +68,10 @@ class csobsselect(ctools.csobservation):
             self['width'].real()
             self['height'].real()
 
-        # Query time interval
-        self._get_gti()
+        # Query time interval. The GammaLib time reference is specified as a
+        # dummy argument since the relevant intervals will be queried later
+        # using the time reference for each observation
+        self._get_gti(gammalib.GTimeReference())
 
         # Query ahead output model filename
         if self._read_ahead():
@@ -113,7 +115,7 @@ class csobsselect(ctools.csobservation):
         # Return
         return
 
-    def _select_observation(self, obs, gti):
+    def _select_observation(self, obs):
         """
         Select observation
 
@@ -121,8 +123,6 @@ class csobsselect(ctools.csobservation):
         ----------
         obs : `~gammalib.GObservation`
             Observation
-        gti : `~gammalib.GGti`
-            Good time intervals
 
         Returns
         -------
@@ -139,6 +139,10 @@ class csobsselect(ctools.csobservation):
             obs_gti = obs.gti()
             tstart  = obs_gti.tstart()
             tstop   = obs_gti.tstop()
+
+            # Get User start and stop time in the time reference of the CTA
+            # observations
+            gti = self._get_gti(obs_gti.reference())
 
             # If the observation is not within the time selection then skip it
             if gti.size() > 0 and not gti.contains(tstart) and \
@@ -294,9 +298,6 @@ class csobsselect(ctools.csobservation):
         # Get parameters
         self._get_parameters()
 
-        # Get Good Time Interval (empty if no time selection is applied)
-        gti = self._get_gti()
-
         # Initialise empty observation container for selected observations
         selected_obs = gammalib.GObservations()
 
@@ -310,7 +311,7 @@ class csobsselect(ctools.csobservation):
         for obs in self.obs():
 
             # If observation is selected then append observation
-            if self._select_observation(obs, gti):
+            if self._select_observation(obs):
                 selected_obs.append(obs)
 
         # Copy selected observations into observation

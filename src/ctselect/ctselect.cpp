@@ -465,7 +465,6 @@ void ctselect::init_members(void)
 {
     // Initialise parameters
     m_outobs.clear();
-    m_gti.clear();
     m_emin   = 0.0;
     m_emax   = 0.0;
     m_expr.clear();
@@ -476,8 +475,6 @@ void ctselect::init_members(void)
     m_infiles.clear();
     m_evtname.clear();
     m_gtiname.clear();
-    m_timemin.clear();
-    m_timemax.clear();
     m_phases.clear();
     m_select_energy = false;
     m_select_phase  = false;
@@ -496,7 +493,6 @@ void ctselect::copy_members(const ctselect& app)
 {
     // Copy parameters
     m_outobs   = app.m_outobs;
-    m_gti      = app.m_gti;
     m_emin     = app.m_emin;
     m_emax     = app.m_emax;
     m_expr     = app.m_expr;
@@ -507,8 +503,6 @@ void ctselect::copy_members(const ctselect& app)
     m_infiles       = app.m_infiles;
     m_evtname       = app.m_evtname;
     m_gtiname       = app.m_gtiname;
-    m_timemin       = app.m_timemin;
-    m_timemax       = app.m_timemax;
     m_phases        = app.m_phases;
     m_select_energy = app.m_select_energy;
     m_select_phase  = app.m_select_phase;
@@ -555,8 +549,10 @@ void ctselect::get_parameters(void)
     GCTAPointing pnt;
     GCTARoi      roi = get_roi(pnt);
 
-    // Get Good Time Intervals (empty if no selection is done)
-    m_gti = get_gti();
+    // Query Good Time Intervals. The GammaLib time reference is specified
+    // as a dummy argument since the relevant intervals will be queried later
+    // using the time reference for each observation
+    get_gti(GTimeReference());
 
     // Get energy selection parameters
     if ((*this)["emin"].is_valid() && (*this)["emax"].is_valid()) {
@@ -653,11 +649,6 @@ void ctselect::get_parameters(void)
         (*this)["prefix"].query();
     }
 
-    // Set time interval with input times given in CTA reference
-    // time (in seconds)
-    m_timemin = m_gti.tstart();
-    m_timemax = m_gti.tstop();
-
     // Write parameters into logger
     log_parameters(TERSE);
 
@@ -685,7 +676,7 @@ void ctselect::get_parameters(void)
  * observation is replaced by selected event list read from the FITS file.
  *
  * Good Time Intervals of the observation will be limited to the time
- * interval [m_timemin, m_timemax].
+ * interval specified by the User parameters tmin and tmax.
  ***************************************************************************/
 void ctselect::select_events(GCTAObservation*   obs,
                              const std::string& filename,
@@ -705,6 +696,12 @@ void ctselect::select_events(GCTAObservation*   obs,
     // Get CTA event list pointer
     GCTAEventList* list =
         static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
+
+    // Get User GTI with MET in the time reference that is specified for the
+    // observation
+    GGti  user_gti = get_gti(list->gti().reference());
+    GTime timemin  = user_gti.tstart();
+    GTime timemax  = user_gti.tstop();
 
     // Get existing Roi and energy bounds for possible later use
     // (will be empty if unavailable)
@@ -736,12 +733,12 @@ void ctselect::select_events(GCTAObservation*   obs,
     // Set time selection interval. We make sure here that the time selection
     // interval cannot be wider than the GTIs covering the data. This is done
     // using GGti's reduce() method.
-    if (!m_gti.is_empty()) {
+    if (!user_gti.is_empty()) {
 
         // Reduce GTIs to specified time interval. The complicated cast is
         // necessary here because the gti() method is declared const, so
         // we're not officially allowed to modify the GTIs.
-        ((GGti*)(&list->gti()))->reduce(m_timemin, m_timemax);
+        ((GGti*)(&list->gti()))->reduce(timemin, timemax);
 
     } // endif: time selection was required
 
@@ -749,7 +746,7 @@ void ctselect::select_events(GCTAObservation*   obs,
     GGti gti = list->gti();
 
     // Make time selection
-    if (!m_gti.is_empty()) {
+    if (!user_gti.is_empty()) {
 
         // If there are no GTIs then request removal of all events
         if (list->gti().is_empty()) {

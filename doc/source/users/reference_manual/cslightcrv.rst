@@ -77,6 +77,9 @@ General parameters
 ``tmax [time]``
     Lightcurve stop time (UTC string, JD, MJD or MET in seconds).
 
+``(mjdref = 51544.5) [real]``
+    Reference Modified Julian Day (MJD) for Mission Elapsed Time (MET).
+
 ``tbins [integer]``
     Number of time bins.
 

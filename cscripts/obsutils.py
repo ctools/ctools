@@ -224,7 +224,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
 # ======================= #
 def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.98, \
             emin=0.1, emax=100.0, rad=5.0, \
-            irf='South_50h', caldb='prod2', obsid='000000'):
+            irf='South_50h', caldb='prod2', obsid='000000', mjdref=51544.5):
     """
     Set a single CTA observation
     
@@ -283,9 +283,10 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.98, \
     roi.radius(rad)
 
     # Set GTI
-    gti = gammalib.GGti(ctools.time_reference)
-    gti.append(gammalib.GTime(tstart, ctools.time_reference),
-               gammalib.GTime(tstart+duration, ctools.time_reference))
+    ref = gammalib.GTimeReference(mjdref,'s','TT','LOCAL')
+    gti = gammalib.GGti(ref)
+    gti.append(gammalib.GTime(tstart, ref),
+               gammalib.GTime(tstart+duration, ref))
 
     # Set energy boundaries
     ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, 'TeV'),

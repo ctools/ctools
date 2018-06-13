@@ -30,6 +30,9 @@ General parameters
 ``tmax [time]``
     Stop time of observation (UTC string, JD, MJD or MET in seconds).
 
+``(mjdref = 51544.5) [real]``
+    Reference Modified Julian Day (MJD) for MET.
+
 ``geolon [real]``
     Geographic longitude of the IACT array in degrees.
 

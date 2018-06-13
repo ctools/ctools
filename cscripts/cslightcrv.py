@@ -137,8 +137,11 @@ class cslightcrv(ctools.csobservation):
         gti : `~gammalib.GGti`
             Light curve bins in form of Good Time Intervals
         """
+        # Get MET time reference
+        tref = gammalib.GTimeReference(self['mjdref'].real(),'s','TT','LOCAL')
+
         # Initialise Good Time Intervals
-        gti = gammalib.GGti()
+        gti = gammalib.GGti(tref)
 
         # Get algorithm to use for defining the time intervals. Possible
         # values are "FILE", "LIN" and "GTI". This is enforced at
@@ -173,8 +176,8 @@ class cslightcrv(ctools.csobservation):
         elif algorithm == 'LIN':
 
             # Get start and stop time and number of time bins
-            time_min = self['tmin'].time(ctools.time_reference)
-            time_max = self['tmax'].time(ctools.time_reference)
+            time_min = self['tmin'].time(tref)
+            time_max = self['tmax'].time(tref)
             nbins    = self['tbins'].integer()
 
             # Compute time step in seconds and setup the GTIs
@@ -385,8 +388,8 @@ class cslightcrv(ctools.csobservation):
         select = ctools.ctselect(self.obs())
         select['emin'] = self['emin'].real()
         select['emax'] = self['emax'].real()
-        select['tmin'] = tmin.convert(ctools.time_reference)
-        select['tmax'] = tmax.convert(ctools.time_reference)
+        select['tmin'] = tmin
+        select['tmax'] = tmax
         select['rad']  = 'UNDEFINED'
         select['ra']   = 'UNDEFINED'
         select['dec']  = 'UNDEFINED'
@@ -444,8 +447,8 @@ class cslightcrv(ctools.csobservation):
             select = ctools.ctselect(self.obs())
             select['emin'] = self['emin'].real()
             select['emax'] = self['emax'].real()
-            select['tmin'] = tmin.convert(ctools.time_reference)
-            select['tmax'] = tmax.convert(ctools.time_reference)
+            select['tmin'] = tmin
+            select['tmax'] = tmax
             select['rad']  = 'UNDEFINED'
             select['ra']   = 'UNDEFINED'
             select['dec']  = 'UNDEFINED'

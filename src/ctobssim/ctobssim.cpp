@@ -784,9 +784,10 @@ void ctobssim::simulate_source(GCTAObservation* obs,
         // Loop over all Good Time Intervals
         for (int it = 0; it < events->gti().size(); ++it) {
 
-            // Extract time interval
-            GTime tmin = events->gti().tstart(it);
-            GTime tmax = events->gti().tstop(it);
+            // Extract time interval and time reference
+            GTime          tmin = events->gti().tstart(it);
+            GTime          tmax = events->gti().tstop(it);
+            GTimeReference tref = events->gti().reference();
 
             // Log time interval. Increment indentation if there are
             // several Good Time Intervals.
@@ -796,9 +797,9 @@ void ctobssim::simulate_source(GCTAObservation* obs,
                     wrklog->indent(indent);
                 }
                 *wrklog << gammalib::parformat("Time interval", indent);
-                *wrklog << tmin.convert(ctools::time_reference);
+                *wrklog << tmin.convert(tref);
                 *wrklog << " - ";
-                *wrklog << tmax.convert(ctools::time_reference);
+                *wrklog << tmax.convert(tref);
                 *wrklog << " s" << std::endl;
             }
 
@@ -1063,8 +1064,8 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
                     wrklog->indent(indent);
                 }
                 *wrklog << gammalib::parformat("Time slice", indent);
-                *wrklog << tstart.convert(ctools::time_reference) << " - ";
-                *wrklog << tstop.convert(ctools::time_reference) << " s";
+                *wrklog << tstart.convert(obs->gti().reference()) << " - ";
+                *wrklog << tstop.convert(obs->gti().reference()) << " s";
                 if (model->name().length() > 0) {
                     *wrklog << " [" << model->name() << "]";
                 }

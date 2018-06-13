@@ -751,14 +751,18 @@ GCTAEventCube ctool::create_cube(const GObservations& obs)
  *
  * The following parameters are read
  *
- *      ra:    Right Ascension of pointing and RoI centre (deg)
- *      dec:   Declination of pointing and RoI centre (deg)
- *      rad:   Radius of RoI (deg)
- *      deadc: Deadtime correction factor
- *      tmin:  Start time
- *      tmax:  Stop time
- *      emin:  Minimum energy (TeV)
- *      emax:  Maximum energy (TeV)
+ *      ra:     Right Ascension of pointing and RoI centre (deg)
+ *      dec:    Declination of pointing and RoI centre (deg)
+ *      rad:    Radius of RoI (deg)
+ *      deadc:  Deadtime correction factor
+ *      tmin:   Start time
+ *      tmax:   Stop time
+ *      emin:   Minimum energy (TeV)
+ *      emax:   Maximum energy (TeV)
+ *      mjdref: Time reference (optional)
+ *
+ * If the time reference parametere "mjdref" is not available, the CTA time
+ * reference will be assumed.
  ***************************************************************************/
 GCTAObservation ctool::create_cta_obs(void)
 {
@@ -775,8 +779,13 @@ GCTAObservation ctool::create_cta_obs(void)
     // Set RoI
     GCTARoi roi = get_roi(pnt);
 
+    // Set time reference
+    GTimeReference ref = (has_par("mjdref"))
+                       ? GTimeReference((*this)["mjdref"].real(), "s", "TT", "LOCAL")
+                       : GTimeReference(G_CTA_MJDREF, "s", "TT", "LOCAL");
+
     // Set GTI
-    GGti gti = get_gti();
+    GGti gti = get_gti(ref);
 
     // Set energy boundaries
     GEbounds ebounds = get_ebounds();
@@ -1057,6 +1066,7 @@ GEbounds ctool::get_ebounds(void)
 /***********************************************************************//**
  * @brief Return Good Time Intervals from User parameter
  *
+ * @param[in] ref Time reference.
  * @return Good Time Intervals.
  *
  * Returns Good Time Intervals from the User parameters `tmin` and `tmax`,
@@ -1064,17 +1074,18 @@ GEbounds ctool::get_ebounds(void)
  * If one of `tmin` or `tmax` is not valid, an empty Good Time Interval
  * object is returned. If `tmin` is not valid, `tmax` is not queried.
  ***************************************************************************/
-GGti ctool::get_gti(void)
+GGti ctool::get_gti(const GTimeReference& ref)
 {
-    // Initialise Good Time Intervals with CTA reference time
-    GGti gti(ctools::time_reference);
+    // Initialise Good Time Intervals with reference time
+    GGti gti(ref);
 
     // Continue only if "tmin" has a valid time value
     if ((*this)["tmin"].is_valid() && (*this)["tmax"].is_valid()) {
 
-        // Get minimum and maximum time for CTA time reference
-        GTime tmin = (*this)["tmin"].time(ctools::time_reference);
-        GTime tmax = (*this)["tmax"].time(ctools::time_reference);
+        // Get minimum and maximum time using the time reference for MET
+        // times
+        GTime tmin = (*this)["tmin"].time(ref);
+        GTime tmax = (*this)["tmax"].time(ref);
 
         // Append GTI
         gti.append(tmin, tmax);
@@ -1630,11 +1641,8 @@ GObservations ctool::get_observations(const bool& get_response)
         // and load file into observation
         if (GFilename(filename).is_fits()) {
 
-            // Allocate empty CTA observation
-            GCTAObservation cta_obs;
-
-            // Load data
-            cta_obs.load(filename);
+            // Load CTA observation
+            GCTAObservation cta_obs(filename);
 
             // Get response if required
             if (get_response) {

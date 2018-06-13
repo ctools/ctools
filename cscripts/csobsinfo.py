@@ -289,10 +289,11 @@ class csobsinfo(ctools.csobservation):
         self._log_value(gammalib.NORMAL, 'Maximum energy', max_value)
 
         # Log time range
+        ref = obs.gti().reference()
         mjd = '%.3f - %.3f' % (self._gti.tstart().mjd(),  self._gti.tstop().mjd())
         utc = '%s - %s'     % (self._gti.tstart().utc(),  self._gti.tstop().utc())
-        met = '%.3f - %.3f' % (self._gti.tstart().convert(ctools.time_reference),
-                               self._gti.tstop().convert(ctools.time_reference))
+        met = '%.3f - %.3f' % (self._gti.tstart().convert(ref),
+                               self._gti.tstop().convert(ref))
         self._log_header3(gammalib.NORMAL, 'Time range')
         self._log_value(gammalib.NORMAL, 'MJD (days)', mjd)
         self._log_value(gammalib.NORMAL, 'UTC',  utc)

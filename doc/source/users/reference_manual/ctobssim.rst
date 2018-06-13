@@ -89,6 +89,10 @@ General parameters
 ``tmax [time]``
     Stop time (UTC string, JD, MJD or MET in seconds).
 
+``(mjdref = 51544.5) [real]``
+    Reference Modified Julian Day (MJD) for simulated events. The times in
+    seconds for each event are counted from this reference time on.
+
 ``emin [real]``
     Lower energy limit of simulated events (in TeV).
 

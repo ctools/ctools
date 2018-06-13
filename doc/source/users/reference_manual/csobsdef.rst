@@ -82,6 +82,9 @@ General parameters
 ``(deadc = 0.95) [real]``
     Average deadtime correction factor.
 
+``(mjdref = 51544.5) [real]``
+    Reference Modified Julian Day (MJD) for observations.
+
 
 Standard parameters
 -------------------

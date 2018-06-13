@@ -1,4 +1,4 @@
-2018-06-12
+2018-06-13
 
         * Version 1.6.0 released
         ========================
@@ -12,6 +12,8 @@
         Allow specifying of input sky map in ctskymap (#2311)
         Add ras() and decs() methods to csobsinfo (#2313)
         Accelerate IRF and RING background methods in ctskymap (#2309)
+        Define MET with respect to the observation time reference or "mjdref"
+          parameter (#2054)
 
 
 2018-04-26

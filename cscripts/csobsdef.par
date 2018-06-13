@@ -30,6 +30,7 @@ emin,     r, h, UNDEF,,, "Lower energy limit (TeV)"
 emax,     r, h, UNDEF,,, "Upper energy limit (TeV)"
 rad,      r, h, UNDEF,,, "Radius of ROI (degrees)"
 deadc,    r, h, 0.98,,, "Deadtime correction factor"
+mjdref,   r, h, 51544.5,,, "Reference MJD for observations"
 
 #
 # Standard parameters

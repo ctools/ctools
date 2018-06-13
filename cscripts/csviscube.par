@@ -18,6 +18,7 @@
 #===================
 tmin,       t, a, 2020-01-01T00:00:00,,, "Start time of observation (UTC string, JD, MJD or MET in seconds)"
 tmax,       t, a, 2021-01-01T00:00:00,,, "Stop time of observation (UTC string, JD, MJD or MET in seconds)"
+mjdref,     r, h, 51544.5,,, "Reference MJD for MET"
 geolon,     r, a,  79.4041,,, "Geographic longitude of array (deg)"
 geolat,     r, a, -24.6272,,, "Geographic latitude of array (deg)"
 sunzenith,  r, h, 105.0,,, "Minimum Sun zenith angle for observations (deg)"

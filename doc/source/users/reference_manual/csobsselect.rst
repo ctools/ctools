@@ -52,12 +52,16 @@ General parameters
     Height of selection box (degrees).
 
 ``tmin [time]``
-    Start time (UTC string, JD, MJD or time in seconds).
+    Start time for observation selection (UTC string, JD, MJD or MET in seconds).
+    Start times given in MET seconds are counted with respect to the time
+    reference of the input observation(s).
     If ``INDEF``, ``NONE``, ``UNDEF`` or ``UNDEFINED`` is passed as value, no time
     selection will be performed.
 
 ``tmax [time]``
-    Stop time (UTC string, JD, MJD or time in seconds).
+    Stop time for observation selection (UTC string, JD, MJD or MET in seconds).
+    Stop times given in MET seconds are counted with respect to the time
+    reference of the input observation(s).
     If ``INDEF``, ``NONE``, ``UNDEF`` or ``UNDEFINED`` is passed as value, no time
     selection will be performed.
 

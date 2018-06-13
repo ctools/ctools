@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-12 June 2018
+13 June 2018
 
 
 Introduction
@@ -26,13 +26,25 @@ None
 
 Base classes
 ------------
+The ctool::time_reference constant was removed since it is not required
+anymore. The time reference is now transparently handled by the tools, and
+if there is a choice, a "mjdref" parameter was added to the tools (#2054).
+
+The ctool::create_cta_obs() method now queries the optional "mjdref" parameter
+so that a MJD reference time can be specified by the tool. This functionality
+is now used by ctobssim (#2054).
+
+The ctools::get_gti() method now takes GTimeReference as argument to enable
+tools to retrieve Mission Elapsed Time (MET) in the time reference of the
+observation (#2054).
+
 The ctools::is_valid_filename() method was removed since the validity check
 of the filename is now done by the GApplicationPar class.
 
 
 ctbin - CTA event binning
 -------------------------
-None
+Copy the time reference from the first input observation (#2054).
 
 
 ctbkgcube - CTA background cube generation
@@ -82,7 +94,8 @@ None
 
 ctobssim - CTA observation simulation
 -------------------------------------
-None
+Add "mjdref" parameter to allow specification of the MJD reference time
+for the simulation (#2054).
 
 
 ctphase - Event phase computation
@@ -102,7 +115,8 @@ None
 
 ctselect - CTA event selection
 ------------------------------
-None
+Interpret MET specified by "tmin" and "tmax" parameters in the time reference
+of the input observations (#2054). 
 
 
 ctskymap - CTA sky mapping
@@ -172,7 +186,8 @@ None
 
 cslightcrv - Generate light curve
 ---------------------------------
-None
+Add hidden "mjdref" parameter for the specification of the MET reference
+(#2054).
 
 
 csmodelinfo - Return model information
@@ -202,7 +217,8 @@ None
 
 csobsdef - Generate observation definition XML file
 ---------------------------------------------------
-None
+Add hidden "mjdref" parameter for the specification of the MET reference
+(#2054).
 
 
 csobsinfo - Return observation definition information
@@ -212,7 +228,8 @@ Add ras() and decs() methods (#2313)
 
 csobsselect - Select observations
 ---------------------------------
-None
+Use time reference of input observations if time selection is given in MET
+(#2054).
 
 
 csphagen - Generate On/Off observations
@@ -233,7 +250,8 @@ None
 
 cspull - Generate pull distributions
 ------------------------------------
-None
+Add hidden "mjdref" parameter for the specification of the MET reference
+(#2054).
 
 
 csresmap - Generate residual map
@@ -284,7 +302,8 @@ None
 
 csviscube - Generate visibility cube
 ------------------------------------
-None
+Add hidden "mjdref" parameter for the specification of the MET reference
+(#2054).
 
 
 csworkflow - Execute workflow
@@ -309,7 +328,7 @@ None
 
 obsutils - Observation utilities
 --------------------------------
-None
+Add "mjdref" parameter to set_obs() function (#2054).
 
 
 Examples

@@ -272,11 +272,12 @@ class csobsdef(ctools.cscript):
                 duration = float(self._pntdef[row, header.index('duration')])
             else:
                 duration = self['duration'].real()
+            tref       = gammalib.GTimeReference(self['mjdref'].real(),'s')
             tmin       = self._tmin
             tmax       = self._tmin + duration
-            gti        = gammalib.GGti(ctools.time_reference)
-            tstart     = gammalib.GTime(tmin, ctools.time_reference)
-            tstop      = gammalib.GTime(tmax, ctools.time_reference)
+            gti        = gammalib.GGti(tref)
+            tstart     = gammalib.GTime(tmin, tref)
+            tstop      = gammalib.GTime(tmax, tref)
             self._tmin = tmax
             gti.append(tstart, tstop)
             obs.ontime(gti.ontime())
