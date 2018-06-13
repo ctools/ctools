@@ -198,7 +198,7 @@ class csobsinfo(ctools.csobservation):
                 self._log.parformat('Energy range')
                 if obs_bounds.size() == 0:
                     self._log('undefined')
-                else:    
+                else:
                     self._log(str(obs_bounds.emin()))
                     self._log(' - ')
                     self._log(str(obs_bounds.emax()))
@@ -208,7 +208,7 @@ class csobsinfo(ctools.csobservation):
                 self._log.parformat('Time range (MJD)')
                 if obs_gti.size() == 0:
                     self._log('undefined')
-                else:    
+                else:
                     self._log(str(obs_gti.tstart().mjd()))
                     self._log(' - ')
                     self._log(str(obs_gti.tstop().mjd()))
@@ -289,15 +289,11 @@ class csobsinfo(ctools.csobservation):
         self._log_value(gammalib.NORMAL, 'Maximum energy', max_value)
 
         # Log time range
-        ref = obs.gti().reference()
         mjd = '%.3f - %.3f' % (self._gti.tstart().mjd(),  self._gti.tstop().mjd())
         utc = '%s - %s'     % (self._gti.tstart().utc(),  self._gti.tstop().utc())
-        met = '%.3f - %.3f' % (self._gti.tstart().convert(ref),
-                               self._gti.tstop().convert(ref))
         self._log_header3(gammalib.NORMAL, 'Time range')
         self._log_value(gammalib.NORMAL, 'MJD (days)', mjd)
         self._log_value(gammalib.NORMAL, 'UTC',  utc)
-        self._log_value(gammalib.NORMAL, 'MET (seconds)', met)
 
         # Log ontime and livetime in different units
         on_time   = '%.2f s = %.2f min = %.2f h' % \
