@@ -258,13 +258,17 @@ void ctool::init_members(void)
     // Set language to english to make sure that a dot is a dot
     std::setlocale(LC_ALL, "en_US.UTF-8");
 
-    // Set parameter syspfiles and reload parameter file
+    // If CTOOLS environment variable is set and if a parameter exists in
+    // the syspfiles folder then set syspfiles folder and reload parameter file
     char* ptr = std::getenv("CTOOLS");
     if (ptr != NULL) {
-        std::string path = std::string(ptr) + "/syspfiles";
-        m_pars.clear();
-        m_pars.syspfiles(path);
-        m_pars.load(par_filename());
+        std::string path     = std::string(ptr) + "/syspfiles";
+        std::string filename = path +  "/" + par_filename();
+        if (access(filename.c_str(), R_OK) == 0) {
+            m_pars.clear();
+            m_pars.syspfiles(path);
+            m_pars.load(par_filename());
+        }
     }
 
     // Return
