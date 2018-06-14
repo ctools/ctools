@@ -373,9 +373,9 @@ class csspec(ctools.csobservation):
                 for i in range(spectrum.nodes()):
                     par     = spectrum[i*2+1]
                     value   = par.value()
-                    minimum = 1.0e-30 * value
+                    minimum = 1.0e-20 * value
                     if minimum <= 0.0:
-                        minimum = 1.0e-50
+                        minimum = 1.0e-40
                         if minimum < value:
                             value = minimum
                     par.value(value)
@@ -759,7 +759,7 @@ class csspec(ctools.csobservation):
 
                 # Set intensity of node to tiny value
                 par = obs.models()[self['srcname'].string()].spectral()[i*2+1]
-                value = 1.0e-30 * par.value()
+                value = 1.0e-20 * par.value()
                 if par.min() > value:
                     par.min(value)
                 par.value(value)
