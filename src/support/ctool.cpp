@@ -92,6 +92,20 @@ ctool::ctool(const std::string& name,
     // Initialise members
     init_members();
 
+    // If CTOOLS environment variable is set and if a parameter exists in
+    // the syspfiles folder then set syspfiles folder and reload parameter
+    // file
+    char* ptr = std::getenv("CTOOLS");
+    if (ptr != NULL) {
+        std::string path     = std::string(ptr) + "/syspfiles";
+        std::string filename = path +  "/" + par_filename();
+        if (access(filename.c_str(), R_OK) == 0) {
+            m_pars.clear();
+            m_pars.syspfiles(path);
+            m_pars.load(par_filename());
+        }
+    }
+
     // Return
     return;
 }
@@ -125,9 +139,23 @@ ctool::ctool(const std::string& name,
         provide_help();
         exit(0);
     }
-    
+
     // Initialise members
     init_members();
+
+    // If CTOOLS environment variable is set and if a parameter exists in
+    // the syspfiles folder then set syspfiles folder and reload parameter
+    // file
+    char* ptr = std::getenv("CTOOLS");
+    if (ptr != NULL) {
+        std::string path     = std::string(ptr) + "/syspfiles";
+        std::string filename = path +  "/" + par_filename();
+        if (access(filename.c_str(), R_OK) == 0) {
+            m_pars.clear();
+            m_pars.syspfiles(path);
+            m_pars.load(par_filename(), m_args);
+        }
+    }
 
     // Open the log file
     logFileOpen();
@@ -257,19 +285,6 @@ void ctool::init_members(void)
 
     // Set language to english to make sure that a dot is a dot
     std::setlocale(LC_ALL, "en_US.UTF-8");
-
-    // If CTOOLS environment variable is set and if a parameter exists in
-    // the syspfiles folder then set syspfiles folder and reload parameter file
-    char* ptr = std::getenv("CTOOLS");
-    if (ptr != NULL) {
-        std::string path     = std::string(ptr) + "/syspfiles";
-        std::string filename = path +  "/" + par_filename();
-        if (access(filename.c_str(), R_OK) == 0) {
-            m_pars.clear();
-            m_pars.syspfiles(path);
-            m_pars.load(par_filename());
-        }
-    }
 
     // Return
     return;
@@ -610,7 +625,7 @@ GEbounds ctool::create_ebounds(void)
             }
 
         } // endelse: loaded energy boundaries from table extension
-        
+
     } // endif: ebinalg was "FILE"
 
     // ... otherwise use a linear or a logarithmically-spaced energy binning
@@ -681,7 +696,7 @@ GSkyMap ctool::create_map(const GObservations& obs)
 
     // If requested, get pointing from observations
     if (usepnt) {
-    
+
         // Get mean pointing
         GSkyDir pnt = get_mean_pointing(obs);
 
@@ -1247,10 +1262,10 @@ bool ctool::is_onoff(void)
 {
     // Set onoff flag
     bool onoff = ((*this)["method"].string() == "ONOFF");
-    
+
     // Query analysis method chosen
     if (onoff) {
-    
+
         // Query csphagen parameters
         (*this)["inexclusion"].query();
         (*this)["emin"].real();
