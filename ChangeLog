@@ -1,8 +1,9 @@
-2018-06-13
+2018-06-14
 
         * Version 1.6.0 released
         ========================
 
+        Transparently update parameter files (#2513)
         Change formula for number of true energy bins in csphagen (#2490)
         Remove ctools::is_valid_filename() method
         Fix bug when using precomputed model in csresspec (#2448)

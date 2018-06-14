@@ -11,6 +11,7 @@ ctools 1.6 is a major release that adds significant functionality.
 In particular, this release provides:
 
 * Support for Xspec spectral analysis
+* Improved computation speed for :ref:`ctskymap` and :ref:`csphagen`
 
 
 Bug fixes
@@ -25,6 +26,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`2513 <https://cta-redmine.irap.omp.eu/issues/2513>`_] -
+  Transparently update parameter files
 * [`2490 <https://cta-redmine.irap.omp.eu/issues/2490>`_] -
   Change formula for number of true energy bins in :ref:`csphagen`
 * [`2404 <https://cta-redmine.irap.omp.eu/issues/2404>`_] -

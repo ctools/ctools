@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-13 June 2018
+14 June 2018
 
 
 Introduction
@@ -26,6 +26,11 @@ None
 
 Base classes
 ------------
+The ctool base class now loads the application parameters from the file provided
+in the "syspfiles" folder and updates parameter values using the file found in
+the user's "pfiles" folder, so that any change to the parameter file structure
+is handled transparently and no longer leads to an exception (#2513).
+
 The ctool::time_reference constant was removed since it is not required
 anymore. The time reference is now transparently handled by the tools, and
 if there is a choice, a "mjdref" parameter was added to the tools (#2054).
