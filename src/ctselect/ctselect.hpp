@@ -81,7 +81,6 @@ protected:
 
     // User parameters
     std::string m_outobs;     //!< Output event list or XML file
-    //GGti        m_gti;        //!< Time selection
     double      m_emin;       //!< Lower energy
     double      m_emax;       //!< Upper energy
     std::string m_expr;       //!< Selection expression
@@ -93,8 +92,6 @@ protected:
     std::vector<std::string> m_infiles;       //!< Input event filenames
     std::vector<std::string> m_evtname;       //!< Event extension names
     std::vector<std::string> m_gtiname;       //!< GTI extension names
-    //GTime                    m_timemin;       //!< Earliest time
-    //GTime                    m_timemax;       //!< Latest time
     GPhases                  m_phases;        //!< Phase intervals
     bool                     m_select_energy; //!< Perform energy selection
     bool                     m_select_phase;  //!< Perform phase selection

@@ -478,7 +478,7 @@ void ctselect::init_members(void)
     m_phases.clear();
     m_select_energy = false;
     m_select_phase  = false;
-    m_forcesel = false;
+    m_forcesel      = false;
 
     // Return
     return;
@@ -507,7 +507,7 @@ void ctselect::copy_members(const ctselect& app)
     m_phases        = app.m_phases;
     m_select_energy = app.m_select_energy;
     m_select_phase  = app.m_select_phase;
-    m_forcesel  = app.m_forcesel;
+    m_forcesel      = app.m_forcesel;
 
     // Return
     return;
@@ -550,9 +550,10 @@ void ctselect::get_parameters(void)
     // Query the RoI
     GCTAPointing pnt;
     GCTARoi      roi = get_roi(pnt);
-    // Signal whether the RoI selection should be enforced
-    // even when leading to invalid RoI
-    m_forcesel = (has_par("forcesel") && (*this)["forcesel"].boolean());
+
+    // Signal whether the RoI selection should be enforced even when leading
+    // to invalid RoI
+    m_forcesel = (*this)["forcesel"].boolean();
 
     // Query Good Time Intervals. The GammaLib time reference is specified
     // as a dummy argument since the relevant intervals will be queried later
@@ -735,7 +736,8 @@ void ctselect::select_events(GCTAObservation*   obs,
     // Signal that RoI selection should be performed
     bool select_roi = roi.is_valid();
 
-    //Create boolean to remember if RoI selection is enforced regardless of its validity
+    // Create boolean to remember if RoI selection is enforced regardless of
+    // its validity
     bool enforced_roi = false;
 
     // Set time selection interval. We make sure here that the time selection
@@ -921,37 +923,44 @@ void ctselect::select_events(GCTAObservation*   obs,
             GSkyDir centre;
             centre.radec_deg(ra, dec);
             double distance = centre.dist_deg(roi_centre);
-            // If the requested RoI and selected RoI are centred at the same position
-            // and the requested RoI is bigger then the original
+
+            // If the requested RoI and selected RoI are centred at the same
+            // position and the requested RoI is bigger then the original
             // keep original radius
             // RoIs same centre = distance < 1.e-4
             // to cope with numerical precision limitations
-            if (distance < 1.e-4 && rad > roi_radius) {
+            if ((distance < 1.e-4) && (rad > roi_radius)) {
                 rad = roi_radius;
             }
-            //Otherwise, check if requested RoI is enclosed within original RoI
-            else {
-                if (distance + rad > roi_radius) {
-                    //If selection is enforced log warning and store
-                    if (m_forcesel){
+
+            // ... otherwise, check if requested RoI is enclosed within
+            // original RoI
+            else if ((distance + rad) > roi_radius) {
+
+                // If selection is enforced log warning and store
+                if (m_forcesel) {
                     enforced_roi = true;
-                    log_string(TERSE, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    log_string(TERSE,"Enforced RoI selection leading to inconsistent RoI. "\
-                                "RoI of data: Centre(RA,DEC)=("+gammalib::str(ra)+", "+
-                                gammalib::str(dec)+") deg, Radius="+gammalib::str(rad)+
-                                " deg. Requested RoI: Centre(RA,DEC)=("+
-                                gammalib::str(roi_centre.ra_deg())+", "+
-                                gammalib::str(roi_centre.dec_deg())+") deg, Radius="+
-                                gammalib::str(roi_radius)+" deg. The resulting event list "\
-                                "file is not usable for likelihood analysis");
-                    log_string(TERSE, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    }
-                    // Otherwise, throw an exception
-                    else {
-                    std::string message;
-                    message = "Invalid RoI selection: the new RoI must be enclosed in the original RoI";
-                    throw GException::invalid_value(G_RUN, message);
-                    }
+                    std::string msg = \
+                        "WARNING: Enforced RoI selection leading to inconsis" \
+                        "tent RoI.\n" \
+                        "         RoI of data: Centre(RA,DEC)=("+ \
+                        gammalib::str(ra)+", "+gammalib::str(dec)+") deg, " \
+                        "Radius="+gammalib::str(rad)+" deg.\n" \
+                        "         Requested RoI: Centre(RA,DEC)=("+ \
+                        gammalib::str(roi_centre.ra_deg())+", "+ \
+                        gammalib::str(roi_centre.dec_deg())+") deg, " \
+                        "Radius="+gammalib::str(roi_radius)+" deg.\n" \
+                        "         The resulting event list file is not usable " \
+                        "for likelihood analysis";
+                    log_string(TERSE, msg);
+                }
+
+                // ... otherwise, throw an exception
+                else {
+                    std::string msg = \
+                        "Invalid RoI selection: the new RoI must be enclosed "
+                        "in the original RoI";
+                    throw GException::invalid_value(G_RUN, msg);
                 }
             }
         }
@@ -971,7 +980,7 @@ void ctselect::select_events(GCTAObservation*   obs,
                       gammalib::str(ra)+", "+gammalib::str(dec)+") deg, "
                       "Radius="+gammalib::str(rad)+" deg");
         }
-        
+
         // Format RoI selection
         char cra[80];
         char cdec[80];
@@ -1049,7 +1058,8 @@ void ctselect::select_events(GCTAObservation*   obs,
     // closed later
     list->fetch();
 
-    // If RoI selection has been applied without forcing then set the event list RoI
+    // If RoI selection has been applied without forcing then set the event
+    // list RoI
     if (select_roi && !enforced_roi) {
         GCTAInstDir instdir;
         instdir.dir().radec_deg(ra, dec);
