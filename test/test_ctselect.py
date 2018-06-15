@@ -72,7 +72,7 @@ class Test(test):
         # Setup ctselect command
         cmd = ctselect+' inobs="'+self._events+'"'+ \
                        ' outobs="ctselect_cmd1.fits"'+ \
-                       ' ra=83.63 dec=22.01 rad=2.0'+ \
+                       ' rad=2.0'+ \
                        ' tmin=2020-01-01T00:01:10 tmax=2020-01-01T00:03:40'+ \
                        ' emin=0.2 emax=80.0'+ \
                        ' logfile="ctselect_cmd1.log" chatter=1'
@@ -87,7 +87,7 @@ class Test(test):
         # Setup ctselect command
         cmd = ctselect+' inobs="event_file_that_does_not_exist.fits"'+ \
                        ' outobs="ctselect_cmd2.fits"'+ \
-                       ' ra=83.63 dec=22.01 rad=2.0'+ \
+                       ' rad=2.0'+ \
                        ' tmin=2020-01-01T00:01:10 tmax=2020-01-01T00:03:40'+ \
                        ' emin=0.2 emax=80.0'+ \
                        ' logfile="ctselect_cmd2.log" debug=yes chatter=1'
@@ -126,8 +126,6 @@ class Test(test):
 
         # Now set ctselect parameters
         select['inobs']   = self._events
-        select['ra']      = 83.63
-        select['dec']     = 22.01
         select['rad']     = 2.0
         select['tmin']    = '2020-01-01T00:01:10'
         select['tmax']    = '2020-01-01T00:03:40'
@@ -155,8 +153,6 @@ class Test(test):
         # level than before and without any selection. Since the tools
         # still holds the same selected observation container from before
         # the number of events will be identical.
-        cpy_select['ra']      = 'NONE'
-        cpy_select['dec']     = 'NONE'
         cpy_select['rad']     = 'NONE'
         cpy_select['tmin']    = 'NONE'
         cpy_select['tmax']    = 'NONE'
@@ -172,11 +168,13 @@ class Test(test):
         # Check result file
         self._check_result_file('ctselect_py2.fits')
 
-        # Execute again the copy of ctselect tool again, now using the pointing
-        # information in the input observation. We also set the minimum values
+        # Execute again the copy of ctselect tool again, now manually specifying the
+        # RoI centres. We also set the minimum values
         # to valid event selections, but since the maximum values are still
         # 'NONE', no event selections should occur.
-        cpy_select['usepnt']   = True
+        cpy_select['usepnt']   = False
+        cpy_select['ra']       = 83.63
+        cpy_select['dec']      = 22.01
         cpy_select['tmin']     = '2020-01-01T00:01:10'
         cpy_select['emin']     = 0.2
         cpy_select['usethres'] = 'USER'
@@ -207,8 +205,6 @@ class Test(test):
         # beyond the energies covered in the event file is specified, hence
         # an empty event list will be saved.
         select = ctools.ctselect(obs)
-        select['ra']       = 83.63
-        select['dec']      = 22.01
         select['rad']      = 2.0
         select['tmin']     = '2020-01-01T00:01:10'
         select['tmax']     = '2020-01-01T00:03:40'
@@ -230,8 +226,6 @@ class Test(test):
         # Setup ctselect tool for an invalid event file
         select = ctools.ctselect()
         select['inobs']   = self._invalid_events
-        select['ra']      = 83.63
-        select['dec']     = 22.01
         select['rad']     = 2.0
         select['tmin']    = '2020-01-01T00:01:10'
         select['tmax']    = '2020-01-01T00:03:40'
@@ -254,8 +248,6 @@ class Test(test):
         # value should be ignored.
         select = ctools.ctselect()
         select['inobs']   = self._events+'[EVENTS]'
-        select['ra']      = 83.63
-        select['dec']     = 22.01
         select['rad']     = 2.0
         select['tmin']    = '2020-01-01T00:01:10'
         select['tmax']    = '2020-01-01T00:03:40'
@@ -275,8 +267,6 @@ class Test(test):
         # Now ignore the "emin" value.
         select = ctools.ctselect()
         select['inobs']   = self._events+'[EVENTS]'
-        select['ra']      = 83.63
-        select['dec']     = 22.01
         select['rad']     = 2.0
         select['tmin']    = '2020-01-01T00:01:10'
         select['tmax']    = '2020-01-01T00:03:40'
@@ -291,7 +281,7 @@ class Test(test):
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py7.fits', nevents=1460)
+        self._check_result_file('ctselect_py7.fits', nevents=1504)
 
         # Now set "emin > emax"
         select['emin']    = 150.0
@@ -308,10 +298,10 @@ class Test(test):
         self._check_result_file('ctselect_py8.fits', nevents=0)
 
         # Setup ctselect tool with an RoI that is displaced and of the same
-        # size as the original RoI. This should reduce the RoI radius
-        # automatically.
+        # size as the original RoI. This should cause an exception to occur
         select = ctools.ctselect()
         select['inobs']   = self._events
+        select['usepnt']  = False
         select['ra']      = 83.63
         select['dec']     = 24.01
         select['rad']     = 3.0
@@ -325,18 +315,39 @@ class Test(test):
 
         # Execute tool
         select.logFileOpen()  # Needed to get a new log file
+        self.test_try('Testing selection of invalid RoI')
+        try:
+            select.execute()
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
+
+        # Now force selection and verify that the execution succeeds
+        select['forcesel'] = True
+        select['outobs']  = 'ctselect_py10.fits'
+        select['logfile'] = 'ctselect_py10.log'
+
+        # Execute tool
+        select.logFileOpen()  # Needed to get a new log file
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py9.fits', nevents=240, dec=24.01,
-                                rad=1.5)
+        self._check_result_file('ctselect_py10.fits', nevents=833, rad=3.)
 
-        # Now put the RoI outside the existing RoI. This should leave to
-        # an empty event list.
-        select['ra']      =  83.63
-        select['dec']     = -22.01
-        select['outobs']  = 'ctselect_py10.fits[EVENTS;GTI]'
-        select['logfile'] = 'ctselect_py10.log'
+        # Finally test a custom defined RoI
+        # enclosed in the original one
+        select = ctools.ctselect()
+        select['inobs'] = self._events
+        select['usepnt'] = False
+        select['ra'] = 83.63
+        select['dec'] = 24.01
+        select['rad'] = 1.0
+        select['tmin'] = '2020-01-01T00:01:10'
+        select['tmax'] = '2020-01-01T00:03:40'
+        select['emin'] = 0.2
+        select['emax'] = 80.0
+        select['outobs'] = 'ctselect_py11.fits'
+        select['logfile'] = 'ctselect_py11.log'
         select['chatter'] = 3
 
         # Execute tool
@@ -344,42 +355,17 @@ class Test(test):
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py10.fits', nevents=0, dec=-22.01,
-                                rad=3.0)
+        self._check_result_file('ctselect_py11.fits', nevents=117, dec=24.01, rad=1.)
 
         # Now test phase cut
         select = ctools.ctselect()
         select['inobs']   = self._phased_events
-        select['ra']      = 83.63
-        select['dec']     = 22.01
         select['rad']     = 2.0
         select['tmin']    = 'INDEF'
         select['tmax']    = 'INDEF'
         select['emin']    = 0.1
         select['emax']    = 100.0
         select['phase']   = '0.1:0.4,0.6:0.8'
-        select['outobs']  = 'ctselect_py11.fits'
-        select['logfile'] = 'ctselect_py11.log'
-        select['chatter'] = 2
-
-        # Run ctselect tool
-        select.logFileOpen()   # Make sure we get a log file
-        select.execute()
-
-        # Check result file
-        self._check_result_file('ctselect_py11.fits', nevents=1909)
-
-        # Now test another phase cut
-        select = ctools.ctselect()
-        select['inobs']   = self._phased_events
-        select['ra']      = 83.63
-        select['dec']     = 22.01
-        select['rad']     = 2.0
-        select['tmin']    = 'INDEF'
-        select['tmax']    = 'INDEF'
-        select['emin']    = 0.1
-        select['emax']    = 100.0
-        select['phase']   = '0.8:0.3'
         select['outobs']  = 'ctselect_py12.fits'
         select['logfile'] = 'ctselect_py12.log'
         select['chatter'] = 2
@@ -389,14 +375,34 @@ class Test(test):
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py12.fits', nevents=1995)
+        self._check_result_file('ctselect_py12.fits', nevents=1909, dec = 22.01)
+
+        # Now test another phase cut
+        select = ctools.ctselect()
+        select['inobs']   = self._phased_events
+        select['rad']     = 2.0
+        select['tmin']    = 'INDEF'
+        select['tmax']    = 'INDEF'
+        select['emin']    = 0.1
+        select['emax']    = 100.0
+        select['phase']   = '0.8:0.3'
+        select['outobs']  = 'ctselect_py13.fits'
+        select['logfile'] = 'ctselect_py13.log'
+        select['chatter'] = 2
+
+        # Run ctselect tool
+        select.logFileOpen()   # Make sure we get a log file
+        select.execute()
+
+        # Check result file
+        self._check_result_file('ctselect_py13.fits', nevents=1995, dec = 22.01)
 
         # Test invalid minimum phase value
         self.test_try('Test invalid minimum phase value')
         try:
             select['phase']   = '-0.1:0.3'
-            select['outobs']  = 'ctselect_py13.fits'
-            select['logfile'] = 'ctselect_py13.log'
+            select['outobs']  = 'ctselect_py14.fits'
+            select['logfile'] = 'ctselect_py14.log'
             select.logFileOpen()
             select.execute()
             self.test_try_failure('Exception not thrown for "-0.1:0.3"')
@@ -407,8 +413,8 @@ class Test(test):
         self.test_try('Test invalid minimum phase value')
         try:
             select['phase']   = '1.1:0.3'
-            select['outobs']  = 'ctselect_py14.fits'
-            select['logfile'] = 'ctselect_py14.log'
+            select['outobs']  = 'ctselect_py15.fits'
+            select['logfile'] = 'ctselect_py15.log'
             select.logFileOpen()
             select.execute()
             self.test_try_failure('Exception not thrown for "1.1:0.3"')
@@ -419,8 +425,8 @@ class Test(test):
         self.test_try('Test invalid maximum phase value')
         try:
             select['phase']   = '0.1:-0.3'
-            select['outobs']  = 'ctselect_py15.fits'
-            select['logfile'] = 'ctselect_py15.log'
+            select['outobs']  = 'ctselect_py16.fits'
+            select['logfile'] = 'ctselect_py16.log'
             select.logFileOpen()
             select.execute()
             self.test_try_failure('Exception not thrown for "0.1:-0.3"')
@@ -431,8 +437,8 @@ class Test(test):
         self.test_try('Test invalid maximum phase value')
         try:
             select['phase']   = '0.1:1.1'
-            select['outobs']  = 'ctselect_py16.fits'
-            select['logfile'] = 'ctselect_py16.log'
+            select['outobs']  = 'ctselect_py17.fits'
+            select['logfile'] = 'ctselect_py17.log'
             select.logFileOpen()
             select.execute()
             self.test_try_failure('Exception not thrown for "0.1:1.1"')
@@ -443,8 +449,8 @@ class Test(test):
         self.test_try('Test invalid phase string')
         try:
             select['phase']   = '0.1:'
-            select['outobs']  = 'ctselect_py17.fits'
-            select['logfile'] = 'ctselect_py17.log'
+            select['outobs']  = 'ctselect_py18.fits'
+            select['logfile'] = 'ctselect_py18.log'
             select.logFileOpen()
             select.execute()
             self.test_try_failure('Exception not thrown for "0.1:"')
@@ -455,8 +461,8 @@ class Test(test):
         self.test_try('Test invalid phase string')
         try:
             select['phase']   = ':1.0'
-            select['outobs']  = 'ctselect_py18.fits'
-            select['logfile'] = 'ctselect_py18.log'
+            select['outobs']  = 'ctselect_py19.fits'
+            select['logfile'] = 'ctselect_py19.log'
             select.logFileOpen()
             select.execute()
             self.test_try_failure('Exception not thrown for ":1.0"')
@@ -467,8 +473,8 @@ class Test(test):
         self.test_try('Test invalid phase string')
         try:
             select['phase']   = '0.1-1.0'
-            select['outobs']  = 'ctselect_py19.fits'
-            select['logfile'] = 'ctselect_py19.log'
+            select['outobs']  = 'ctselect_py20.fits'
+            select['logfile'] = 'ctselect_py20.log'
             select.logFileOpen()
             select.execute()
             self.test_try_failure('Exception not thrown for "0.1-1.0"')
@@ -479,7 +485,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, nevents=719, dec=22.01, rad=2.0):
+    def _check_result_file(self, filename, nevents=744, dec=22.51, rad=2.0):
         """
         Check result file
 
@@ -504,7 +510,7 @@ class Test(test):
         return
 
     # Check observation and event list
-    def _check_obs(self, obs, nobs=1, nevents=719):
+    def _check_obs(self, obs, nobs=1, nevents=744):
         """
         Check observation and event list
 
@@ -529,7 +535,7 @@ class Test(test):
         return
 
     # Check events
-    def _check_events(self, events, nevents=719, dec=22.01, rad=2.0):
+    def _check_events(self, events, nevents=744, dec=22.51, rad=2.0):
         """
         Check event list
 
