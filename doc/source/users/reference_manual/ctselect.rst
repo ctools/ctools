@@ -14,6 +14,11 @@ is based on a circular acceptance region, a time interval and an energy
 interval. In addition, any expression following the cfitsio syntax can be 
 used for event selection.
 
+The circular acceptance region is centred by default at the pointing direction
+of each observation, but the user can specify a custom direction. To obtain in
+output a valid region of interest (ROI) for subsequent analysis, the requested
+ROI must be enclosed in the one of the original observation.
+
 Optionally, ctselect may also apply energy thresholds. If ``usethres=DEFAULT``
 is specified, ctselect will extract any save thresholds from the instrument
 response functions, and if they exist, will apply them to the respective 
@@ -47,7 +52,7 @@ General parameters
 ``(prefix = "selected_") [string]``
     Prefix for output event lists in observation definition file.
 
-``(usepnt = no) [boolean]``
+``(usepnt = yes) [boolean]``
     Use pointing instead of RA/DEC parameters?
 
 ``ra [real]``
@@ -61,9 +66,12 @@ General parameters
     selection will be performed.
 
 ``rad [real]``
-    Radius of acceptance cone (or ROI) centre (in degrees).
+    Radius of acceptance cone (or ROI) (in degrees).
     If ``INDEF``, ``NONE``, ``UNDEF`` or ``UNDEFINED`` is passed as value, no ROI
     selection will be performed.
+
+``(forcesel = no) [boolean]``
+    Force ROI selection even if it produces invalid ROI?
 
 ``tmin [time]``
     Start time for event selection (UTC string, JD, MJD or MET in seconds).
