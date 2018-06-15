@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-14 June 2018
+15 June 2018
 
 
 Introduction
@@ -282,7 +282,9 @@ None
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-None
+csspec now properly computes the Test Statistic for an On/Off analysis using
+the "wstat" statistic in the case that the input model definition XML file
+did not contain a background model (#2312).
 
 
 cssrcdetect - Detects sources in sky map

@@ -35,6 +35,8 @@ Improvements
 * Add ``show_rmf.py`` example script
 * [`2313 <https://cta-redmine.irap.omp.eu/issues/2313>`_] -
   Add `ras()` and `decs()` methods to :ref:`csobsinfo`
+* [`2312 <https://cta-redmine.irap.omp.eu/issues/2312>`_] -
+  Also compute TS in :ref:`csspec` for On/Off analysis using wstat statistic
 * [`2311 <https://cta-redmine.irap.omp.eu/issues/2311>`_] -
   Allow specifying of input skymap to :ref:`ctskymap` tool
 * [`2309 <https://cta-redmine.irap.omp.eu/issues/2309>`_] -

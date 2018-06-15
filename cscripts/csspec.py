@@ -369,13 +369,15 @@ class csspec(ctools.csobservation):
                 spectrum = gammalib.GModelSpectralNodes(model.spectral(), energies)
                 spectrum.autoscale()
 
-                # Make sure that all nodes are positive
+                # Make sure that all nodes are positive. Autoscale all
+                # parameters so that their nominal value is unity.
                 for i in range(spectrum.nodes()):
                     par     = spectrum[i*2+1]
+                    par.autoscale()
                     value   = par.value()
                     minimum = 1.0e-20 * value
                     if minimum <= 0.0:
-                        minimum = 1.0e-40
+                        minimum = 1.0e-20
                         if minimum < value:
                             value = minimum
                     par.value(value)
@@ -383,6 +385,10 @@ class csspec(ctools.csobservation):
 
                 # Set spectral component of source model
                 model.spectral(spectrum)
+
+                # Make sure that TS computation is disabled (makes computation
+                # faster)
+                model.tscalc(False)
 
                 # Append model
                 models.append(model)
@@ -590,13 +596,14 @@ class csspec(ctools.csobservation):
         # Write header for fitting
         self._log_header3(gammalib.EXPLICIT, 'Performing fit')
 
-        # Perform maximum likelihood fit
+        # Perform maximum likelihood fit. Skip bins that have no events.
         like          = ctools.ctlike(obs)
         like['edisp'] = self['edisp'].boolean()
-        like.run()
+        if like.obs().nobserved() > 0:
+            like.run()
 
         # Continue only if log-likelihood is non-zero
-        if like.obs().logL() != 0.0:
+        if like.obs().logL() != 0.0 and like.obs().nobserved() > 0:
 
             # Get results
             fitted_models = like.obs().models()
@@ -726,7 +733,7 @@ class csspec(ctools.csobservation):
         # Extract fit results
         model    = like.obs().models()[self['srcname'].string()]
         spectrum = model.spectral()
-        ts       = model.ts()
+        logL0    = like.obs().logL()
 
         # Loop over all nodes
         for i in range(spectrum.nodes()):
@@ -757,12 +764,13 @@ class csspec(ctools.csobservation):
                 # Copy observation container
                 obs = like.obs().copy()
 
-                # Set intensity of node to tiny value
+                # Set intensity of node to tiny value by scaling the value
+                # by a factor 1e-8.
                 par = obs.models()[self['srcname'].string()].spectral()[i*2+1]
-                value = 1.0e-20 * par.value()
-                if par.min() > value:
-                    par.min(value)
-                par.value(value)
+                par.autoscale()
+                par.factor_min(1.0e-8)
+                par.factor_value(1.0e-8)
+                par.autoscale()
                 par.fix()
 
                 # Perform maximum likelihood fit
@@ -772,7 +780,8 @@ class csspec(ctools.csobservation):
 
                 # Store Test Statistic
                 model        = tslike.obs().models()[self['srcname'].string()]
-                result['TS'] = ts - model.ts()
+                logL1        = tslike.obs().logL()
+                result['TS'] = 2.0 * (logL1 - logL0)
 
             # Log information
             value = '%e +/- %e' % (result['flux'], result['flux_err'])
