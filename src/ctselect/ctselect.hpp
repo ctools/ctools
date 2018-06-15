@@ -87,6 +87,7 @@ protected:
     std::string m_expr;       //!< Selection expression
     std::string m_usethres;   //!< Energy threshold type
     GChatter    m_chatter;    //!< Chattiness
+    bool        m_forcesel;   //!< Enforce RoI selection
 
     // Protected members
     std::vector<std::string> m_infiles;       //!< Input event filenames
