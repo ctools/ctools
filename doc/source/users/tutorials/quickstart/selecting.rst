@@ -10,7 +10,7 @@ Selecting event data
 
 As next step you may want to select some events from the simulated event data.
 You may want to restrict the events to a region of interest (ROI) of 3 degrees
-around the Crab nebula, you may want to extract a 30 minutes time slice
+around the pointing direction, you may want to extract a 30 minutes time slice
 from the data, and you may want to limit the energy range of the events
 to 0.1 - 100 TeV.
 You do this event selection using the :ref:`ctselect` tool as follows:
@@ -19,9 +19,7 @@ You do this event selection using the :ref:`ctselect` tool as follows:
 
    $ ctselect
    Input event list or observation definition XML file [events.fits]
-   RA for ROI centre (degrees) (0-360) [83.63]
-   Dec for ROI centre (degrees) (-90-90) [22.51]
-   Radius of ROI (degrees) (0-180) [3.0]
+   Radius of ROI around pointing or specified RA/DEC (0-180) [3.0]
    Start time (UTC string, JD, MJD or MET in seconds) [NONE] 2020-01-01T00:10:00
    Stop time (UTC string, JD, MJD or MET in seconds) [NONE] 2020-01-01T00:40:00
    Lower energy limit (TeV) [0.1]
