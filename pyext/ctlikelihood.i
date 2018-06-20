@@ -1,7 +1,7 @@
 /***************************************************************************
  *              ctlikelihood - Base class for likelihood tools             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -42,14 +42,22 @@
 class cslikelihood : public ctlikelihood  {
 public:
     // Constructors and destructors
-    cslikelihood(const std::string& name, const std::string& version) :
+    cslikelihood(const std::string& name,
+                 const std::string& version) :
                  ctlikelihood(name, version) {}
-    cslikelihood(const std::string& name, const std::string& version,
+    cslikelihood(const std::string&   name,
+                 const std::string&   version,
                  const GObservations& obs) :
                  ctlikelihood(name, version, obs) {}
-    cslikelihood(const std::string& name, const std::string& version,
-                 int argc, char* argv[]) :
-                 ctlikelihood(name, version, argc, argv){}
+    cslikelihood(const std::string&              name,
+                 const std::string&              version,
+                 const std::vector<std::string>& args) :
+                 ctlikelihood(name, version, args) {}
+    cslikelihood(const std::string& name,
+                 const std::string& version,
+                 int                argc,
+                 char*              argv[]) :
+                 ctlikelihood(name, version, argc, argv) {}
     cslikelihood(const cslikelihood& app) : ctlikelihood(app) {}
     virtual ~cslikelihood(void) {}
 
@@ -74,11 +82,18 @@ class ctlikelihood : public ctobservation {
 
 public:
     // Constructors and destructors
-    ctlikelihood(const std::string& name, const std::string& version);
-    ctlikelihood(const std::string& name, const std::string& version,
+    ctlikelihood(const std::string& name,
+                 const std::string& version);
+    ctlikelihood(const std::string&   name,
+                 const std::string&   version,
                  const GObservations& obs);
-    ctlikelihood(const std::string& name, const std::string& version,
-                 int argc, char* argv[]);
+    ctlikelihood(const std::string&              name,
+                 const std::string&              version,
+                 const std::vector<std::string>& args);
+    ctlikelihood(const std::string& name,
+                 const std::string& version,
+                 int                argc,
+                 char*              argv[]);
     ctlikelihood(const ctlikelihood& app);
     virtual ~ctlikelihood(void);
 
@@ -108,11 +123,18 @@ public:
 class cslikelihood : public ctlikelihood  {
 public:        
     // Constructors and destructors
-    cslikelihood(const std::string& name, const std::string& version);
-    cslikelihood(const std::string& name, const std::string& version,
+    cslikelihood(const std::string& name,
+                 const std::string& version);
+    cslikelihood(const std::string&   name,
+                 const std::string&   version,
                  const GObservations& obs);
-    cslikelihood(const std::string& name, const std::string& version,
-                 int ARGC, char **ARGV);
+    cslikelihood(const std::string&              name,
+                 const std::string&              version,
+                 const std::vector<std::string>& args);
+    cslikelihood(const std::string& name,
+                 const std::string& version,
+                 int                ARGC,
+                 char               **ARGV);
     cslikelihood(const cslikelihood& app);
     virtual ~cslikelihood(void);
 
@@ -133,6 +155,21 @@ public:
 /***********************************************************************//**
  * @brief Likelihood tool base class Python extensions
  ***************************************************************************/
+%extend cslikelihood {
+%pythoncode {
+    def __getstate__(self):
+        state = (ctool.__getstate__(self), self.obs())
+        return state
+    def __setstate__(self, state):
+        ctool.__setstate__(self, state[0])
+        self.obs(state[1])
+}
+}
+
+
+/***********************************************************************//**
+ * @brief Likelihood tool base class Python extensions
+ ***************************************************************************/
 %pythoncode %{
 
 # Initialise application by calling the appropriate base class constructor.
@@ -143,7 +180,10 @@ def _init_cslikelihood(self, name, version, argv):
     if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
         cslikelihood.__init__(self, name, version, argv[0])
     elif len(argv) > 0:
-        cslikelihood.__init__(self, name, version, *argv)
+        if len(argv) == 3 and argv[0] == name and argv[1] == version:
+            cslikelihood.__init__(self, name, version, argv[2])
+        else:
+            cslikelihood.__init__(self, name, version, *argv)
     else:
         cslikelihood.__init__(self, name, version)
     # Set logger properties

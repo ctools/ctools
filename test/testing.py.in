@@ -18,6 +18,8 @@
 #
 # ==========================================================================
 import os
+import sys
+import pickle
 import gammalib
 
 
@@ -232,3 +234,36 @@ class test(gammalib.GPythonTestSuite):
 
         # Return
         return
+
+    # Test pickeling
+    def _pickeling(self, object):
+        """
+        Test class pickeling
+
+        Parameters
+        ----------
+        object : `~gammalib.GBase`
+            Class instance
+        """
+        # Get class name
+        name = object.__class__.__name__
+    
+        # Start exception catching
+        self.test_try('Test pickeling of "%s" class.' % name)
+
+        # Test if pickling results in an exception
+        try:
+            dump       = pickle.dumps(object)
+            obj        = pickle.loads(dump)
+            dump_again = pickle.dumps(obj)
+            self.test_assert(dump == dump_again,
+                             'Check pickled dump of "%s\n%s\n%s"' %
+                             (name, str(object), str(obj)))
+            self.test_try_success()
+        except:
+            _, e, _ = sys.exc_info()
+            self.test_try_failure('Error in pickeling "%s" (%s).' %
+                                  (name, str(e)))
+
+        # Return
+        return obj

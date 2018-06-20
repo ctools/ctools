@@ -758,6 +758,42 @@ class csspec(ctools.csobservation):
             result['flux']     = spectrum[i*2+1].value() * norm
             result['flux_err'] = spectrum[i*2+1].error() * norm
 
+            # Compute upper flux limit
+            ulimit_value = -1.0
+            if self['calc_ulim'].boolean():
+
+                # Logging information
+                self._log_header3(gammalib.EXPLICIT, 'Computing upper limit')
+
+                # Copy observation container
+                obs = like.obs().copy()
+
+                # Fix intensities of all nodes
+                spectral = obs.models()[self['srcname'].string()].spectral()
+                for par in spectral:
+                    par.fix()
+
+                # Create upper limit object  
+                ulimit = ctools.ctulimit(obs)
+                ulimit['srcname'] = self['srcname'].string()
+                ulimit['parname'] = 'Intensity%d' % i
+                ulimit['eref']    = elogmean.TeV()
+                ulimit['tol']     = 1.0e-3
+
+                # Try to run upper limit and catch exceptions
+                try:
+                    ulimit.run()
+                    ulimit_value = ulimit.diff_ulimit()
+                except:
+                    self._log_string(gammalib.EXPLICIT, 'Upper limit '
+                                     'calculation failed.')
+                    ulimit_value = -1.0
+
+                # Compute upper limit
+                if ulimit_value > 0.0:
+                    result['ulimit'] = ulimit_value * elogmean.MeV() * \
+                                       elogmean.MeV() * gammalib.MeV2erg
+
             # Compute TS
             if self['calc_ts'].boolean():
 

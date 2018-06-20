@@ -50,9 +50,15 @@
 class ctool : public GApplication  {
 public:
     // Constructors and destructors
-    ctool(const std::string& name, const std::string& version);
-    ctool(const std::string& name, const std::string& version,
-          int argc, char* argv[]);
+    ctool(const std::string& name,
+          const std::string& version);
+    ctool(const std::string&              name,
+          const std::string&              version,
+          const std::vector<std::string>& args);
+    ctool(const std::string& name,
+          const std::string& version,
+          int                argc,
+          char*              argv[]);
     ctool(const ctool& app);
     virtual ~ctool(void);
 

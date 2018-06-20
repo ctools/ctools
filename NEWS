@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-20 June 2018
+29 June 2018
 
 
 Introduction
@@ -11,12 +11,12 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-Keep existing library path in installation script on Mac OS X (#2420)
+Keep existing library path in installation script on Mac OS X (#2420).
 
 
 Python interface
 ----------------
-None
+ctools and cscripts can now be pickled from Python (#1938).
 
 
 Support model
@@ -287,6 +287,10 @@ csspec - Generates Spectral Energy Distribution
 csspec now properly computes the Test Statistic for an On/Off analysis using
 the "wstat" statistic in the case that the input model definition XML file
 did not contain a background model (#2312).
+
+csspec now computes upper limits also for the NODES method by fixing all node
+intensities and varying each node until the log-likelihood increases by a
+certain amount (#2233).
 
 
 cssrcdetect - Detects sources in sky map

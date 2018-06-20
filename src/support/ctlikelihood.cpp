@@ -1,7 +1,7 @@
 /***************************************************************************
  *              ctlikelihood - Base class for likelihood tools             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -78,7 +78,30 @@ ctlikelihood::ctlikelihood(const std::string& name,
 ctlikelihood::ctlikelihood(const std::string&   name,
                            const std::string&   version,
                            const GObservations& obs) :
-              ctobservation(name, version, obs)
+                           ctobservation(name, version, obs)
+{
+    // Initialise members
+    init_members();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Command line constructor
+ *
+ * @param[in] name Likelihood tool name.
+ * @param[in] version Likelihood tool version.
+ * @param[in] args Arguments vector.
+ *
+ * Constructs a likelihood tool from the @p name, @p version and command
+ * line arguments. See the equivalent ctool constructor for details.
+ ***************************************************************************/
+ctlikelihood::ctlikelihood(const std::string&              name,
+                           const std::string&              version,
+                           const std::vector<std::string>& args) :
+                           ctobservation(name, version, args)
 {
     // Initialise members
     init_members();
@@ -103,7 +126,7 @@ ctlikelihood::ctlikelihood(const std::string& name,
                            const std::string& version,
                            int   argc,
                            char *argv[]) :
-              ctobservation(name, version, argc, argv)
+                           ctobservation(name, version, argc, argv)
 {
     // Initialise members
     init_members();

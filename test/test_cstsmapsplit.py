@@ -56,6 +56,7 @@ class Test(test):
         # Append tests
         self.append(self._test_cmd, 'Test cstsmapsplit on command line')
         self.append(self._test_python, 'Test cstsmapsplit from Python')
+        self.append(self._test_pickeling, 'Test cstsmapsplit pickeling')
 
         # Return
         return
@@ -174,6 +175,46 @@ class Test(test):
 
         # Check command file
         self._check_cmdfile('cstsmapsplit_py3.dat')
+
+        # Return
+        return
+
+    # Test cstsmapsplit pickeling
+    def _test_pickeling(self):
+        """
+        Test cstsmapsplit pickeling
+        """
+        # Perform pickeling tests of empty class
+        self._pickeling(cscripts.cstsmapsplit())
+
+        # Set-up cstsmapsplit
+        tsmapsplit = cscripts.cstsmapsplit()
+        tsmapsplit['inobs']        = self._events
+        tsmapsplit['inmodel']      = self._model
+        tsmapsplit['srcname']      = 'Crab'
+        tsmapsplit['caldb']        = self._caldb
+        tsmapsplit['irf']          = self._irf
+        tsmapsplit['outmap']       = 'tsmap.fits'
+        tsmapsplit['bins_per_job'] = 5
+        tsmapsplit['compute_null'] = False
+        tsmapsplit['outfile']      = 'cstsmapsplit_py1_pickle.dat'
+        tsmapsplit['nxpix']        = 5
+        tsmapsplit['nypix']        = 5
+        tsmapsplit['binsz']        = 0.05
+        tsmapsplit['coordsys']     = 'CEL'
+        tsmapsplit['xref']         = 83.6331
+        tsmapsplit['yref']         = 22.01
+        tsmapsplit['proj']         = 'CAR'
+        tsmapsplit['logfile']      = 'cstsmapsplit_py1_pickle.log'
+        tsmapsplit['chatter']      = 2
+
+        # Perform pickeling tests of filled class
+        obj = self._pickeling(tsmapsplit)
+
+        # Run cstsmapsplit script and save the commands
+        obj.logFileOpen()   # Make sure we get a log file
+        obj.run()
+        obj.save()
 
         # Return
         return

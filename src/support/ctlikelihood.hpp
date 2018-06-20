@@ -1,7 +1,7 @@
 /***************************************************************************
  *              ctlikelihood - Base class for likelihood tools             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -42,11 +42,18 @@ class ctlikelihood : public ctobservation {
 
 public:
     // Constructors and destructors
-    ctlikelihood(const std::string& name, const std::string& version);
-    ctlikelihood(const std::string& name, const std::string& version,
+    ctlikelihood(const std::string& name,
+                 const std::string& version);
+    ctlikelihood(const std::string&   name,
+                 const std::string&   version,
                  const GObservations& obs);
-    ctlikelihood(const std::string& name, const std::string& version,
-                 int argc, char* argv[]);
+    ctlikelihood(const std::string&              name,
+                 const std::string&              version,
+                 const std::vector<std::string>& args);
+    ctlikelihood(const std::string& name,
+                 const std::string& version,
+                 int                argc,
+                 char*              argv[]);
     ctlikelihood(const ctlikelihood& app);
     virtual ~ctlikelihood(void);
 

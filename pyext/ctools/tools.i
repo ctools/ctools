@@ -1,7 +1,7 @@
 /***************************************************************************
  *                           ctools - SWIG file                            *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -36,11 +36,13 @@
 
 /* __ Include standard typemaps for vectors and strings __________________ */
 %include stl.i
-%include "std_vector.i"
+%include std_string.i
+%include std_vector.i
 namespace std {
    %template(vector_int)    vector<int>;
    %template(vector_double) vector<double>;
    %template(vector_bool)   vector<bool>;
+   %template(vector_sring)  vector<std::string>;
 };
 
 /* __ Make sure that exceptions are catched ______________________________ */

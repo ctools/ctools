@@ -36,9 +36,15 @@
 class cscript : public ctool  {
 public:
     // Constructors and destructors
-    cscript(const std::string& name, const std::string& version) : ctool(name, version) {}
-    cscript(const std::string& name, const std::string& version,
-            int argc, char* argv[]) : ctool(name, version, argc, argv) {}
+    cscript(const std::string& name,
+            const std::string& version) : ctool(name, version) {}
+    cscript(const std::string&              name,
+            const std::string&              version,
+            const std::vector<std::string>& args)  : ctool(name, version, args) {}
+    cscript(const std::string& name,
+            const std::string& version,
+            int                argc,
+            char*              argv[]) : ctool(name, version, argc, argv) {}
     cscript(const ctool& app) : ctool(app) {}
     virtual ~cscript(void) {}
 
@@ -67,9 +73,15 @@ public:
 class ctool : public GApplication  {
 public:
     // Constructors and destructors
-    ctool(const std::string& name, const std::string& version);
-    ctool(const std::string& name, const std::string& version,
-          int ARGC, char **ARGV);
+    ctool(const std::string& name,
+          const std::string& version);
+    ctool(const std::string&              name,
+          const std::string&              version,
+          const std::vector<std::string>& args);
+    ctool(const std::string& name,
+          const std::string& version,
+          int                ARGC,
+          char               **ARGV);
     ctool(const ctool& app);
     virtual ~ctool(void);
 
@@ -219,7 +231,27 @@ public:
         self->m_read_ahead = flag;
         return;
     }
+%pythoncode {
+    def __getstate__(self):
+        state = (gammalib.GApplication.__getstate__(self),)
+        return state
+    def __setstate__(self, state):
+        gammalib.GApplication.__setstate__(self, state[0])
 }
+};
+
+/***********************************************************************//**
+ * @brief ctool base class Python extensions
+ ***************************************************************************/
+%extend cscript {
+%pythoncode {
+    def __getstate__(self):
+        state = (gammalib.GApplication.__getstate__(self),)
+        return state
+    def __setstate__(self, state):
+        gammalib.GApplication.__setstate__(self, state[0])
+}
+};
 
 
 /***********************************************************************//**
@@ -246,6 +278,8 @@ def _init_cscript(self, name, version, argv):
         cscript.__init__(self, name, version)
     elif len(argv) == 1:
         cscript.__init__(self, name, version, *argv)
+    elif len(argv) == 3:
+        cscript.__init__(self, name, version, argv[2])
     else:
         raise TypeError('Invalid number of arguments given.')
     # Set logger properties
