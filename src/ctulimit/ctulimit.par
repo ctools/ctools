@@ -19,6 +19,7 @@
 inobs,    f, a, events.fits,,, "Input event list, counts cube or observation definition XML file"
 inmodel,  f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
 srcname,  s, a, Crab,,, "Source of interest"
+parname,  s, h, ,,, "Parameter name (optional)"
 expcube,  f, a, NONE,,, "Input exposure cube file"
 psfcube,  f, a, NONE,,, "Input PSF cube file"
 edispcube,f, a, NONE,,, "Input energy dispersion cube file"

@@ -75,11 +75,13 @@ protected:
     void free_members(void);
     void get_parameters(void);
     void get_model_parameter(void);
+    void get_parameter_brackets(double& parmin, double& parmax);
     void ulimit_bisection(const double& parmin, const double& parmax);
     void compute_ulimit(void);
 
     // User parameters
-    std::string   m_srcname;      //!< Name of source which is moved around
+    std::string   m_srcname;      //!< Name of source for upper limit computation
+    std::string   m_parname;      //!< Name of parameter for upper limit computation
     double        m_confidence;   //!< Confidence level
     double        m_sigma_min;    //!< Starting value minimum (multiple fit errors above fit values)
     double        m_sigma_max;    //!< Starting value maximum (multiple fit errors above fit values)

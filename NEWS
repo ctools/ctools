@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-15 June 2018
+20 June 2018
 
 
 Introduction
@@ -151,7 +151,9 @@ None
 
 ctulimit - Compute upper limit
 ------------------------------
-None
+Add "parname" parameter to allow upper limit computations also for a node
+function spectral model. In addition, it is now checked that the parameter
+values actually bracket the upper limit (#2233).
 
 
 support - Support classes

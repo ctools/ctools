@@ -35,6 +35,8 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_MODEL_PARAMETER               "ctulimit::get_model_parameter()"
+#define G_GET_PARAMETER_BRACKETS "ctulimit::get_parameter_brackets(double&, "\
+                                                                   "double&)"
 #define G_UL_BISECTION             "ctulimit::ul_bisection(double&, double&)"
 
 /* __ Debug definitions __________________________________________________ */
@@ -266,24 +268,10 @@ void ctulimit::run(void)
 
     } // endif: likelihood was zero
 
-    // Extract current value and error
-    double value = m_model_par->factor_value();
-    double error = m_model_par->factor_error();
-
-    // If parameter error is zero then take parameter value as error
-    if (error == 0) {
-        error = value;
-    }
-
-    // Compute parameter bracketing
-    double parmin = value - m_sigma_min * error;
-    double parmax = value + m_sigma_max * error;
-    if (m_model_par->has_min() && m_model_par->factor_min() > parmin) {
-        parmin = m_model_par->factor_min();
-    }
-    if (m_model_par->has_max() && m_model_par->factor_max() < parmax) {
-        parmax = m_model_par->factor_max();
-    }
+    // Get parameter brackets
+    double parmin;
+    double parmax;
+    get_parameter_brackets(parmin, parmax);
 
     // Write header into logger
     log_header1(TERSE, "Compute upper limit");
@@ -363,6 +351,7 @@ void ctulimit::init_members(void)
 {
     // Initialise user parameters
     m_srcname.clear();
+    m_parname.clear();
     m_confidence  = 0.95;
     m_sigma_min   = 0.0;
     m_sigma_max   = 0.0;
@@ -401,6 +390,7 @@ void ctulimit::copy_members(const ctulimit& app)
 {
     // Copy user parameters
     m_srcname     = app.m_srcname;
+    m_parname     = app.m_parname;
     m_confidence  = app.m_confidence;
     m_sigma_min   = app.m_sigma_min;
     m_sigma_max   = app.m_sigma_max;
@@ -453,8 +443,9 @@ void ctulimit::get_parameters(void)
     // Setup models from "inmodel" parameter
     setup_models(m_obs, (*this)["srcname"].string());
 
-    // Get name of test source
+    // Get name of test source and optional parameter
     m_srcname = (*this)["srcname"].string();
+    m_parname = (*this)["parname"].string();
 
     // Get relevant model and parameter for upper limit computation
     get_model_parameter();
@@ -532,21 +523,46 @@ void ctulimit::get_model_parameter(void)
                           "computation.";
         throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
     }
-    if (m_skymodel->spectral()->type() == "NodeFunction") {
-        std::string msg = "\"NodeFunction\" cannot be used as spectral model "
-                          "for an upper limit computation. Please specify "
-                          "another spectral model.";
-        throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
-    }
 
-    // Find appropriate model parameter and store its pointer in the
-    // m_model_par member
-    for (const char** par = pars; *par != NULL; ++par) {
-        if (m_skymodel->spectral()->has_par(*par)) {
-            m_model_par = &(m_skymodel->spectral()->operator[](*par));
-            break;
+    // If a parameter name was specified then use that parameter
+    if (!m_parname.empty()) {
+        if (m_skymodel->spectral()->has_par(m_parname)) {
+            m_model_par = &(m_skymodel->spectral()->operator[](m_parname));
+        }
+        else {
+            std::string msg = "Spectral model of source \""+m_srcname+"\" has "
+                              "no parameter \""+m_parname+"\". Please specify "
+                              "a value parameter name of leave the parameter "
+                              "name blank for autodetermination of an "
+                              "intensity- or flux-like parameter.";
+            throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
         }
     }
+
+    // ... otherwise find the appropriate model parameter
+    else {
+
+        // If a node function was specified then a valid parameter name is
+        // needed
+        if (m_skymodel->spectral()->type() == "NodeFunction") {
+            std::string msg = "Spectral model of source \""+m_srcname+"\" is "
+                              "a \"NodeFunction\" but no parameter name was "
+                              "specified. Please use the \"parname\" parameter "
+                              "to specify the parameter that should be used "
+                              "for the upper limit computation.";
+            throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
+        }
+
+        // Find appropriate model parameter and store its pointer in the
+        // m_model_par member
+        for (const char** par = pars; *par != NULL; ++par) {
+            if (m_skymodel->spectral()->has_par(*par)) {
+                m_model_par = &(m_skymodel->spectral()->operator[](*par));
+                break;
+            }
+        }
+
+    } // endelse: searched for parameter
 
     // If no model parameter was found then throw an exception
     if (m_model_par == NULL) {
@@ -569,28 +585,111 @@ void ctulimit::get_model_parameter(void)
 
 
 /***********************************************************************//**
+ * @brief Determine parameter brackets
+ *
+ * @param[out] parmin Minimum parameter value.
+ * @param[out] parmax Maximum parameter value.
+ *
+ * @exception GException::invalid_value
+ *            Exceeded maximum number of iterations in the bracket search.
+ *
+ * Determines the brackets for the parameter of interest.
+ ***************************************************************************/
+void ctulimit::get_parameter_brackets(double& parmin, double& parmax)
+{
+    // Write header into logger
+    log_header1(TERSE, "Find parameter brackets");
+
+    // Extract current value and error
+    double value = m_model_par->factor_value();
+    double error = m_model_par->factor_error();
+
+    // If parameter error is zero then take parameter value as error
+    if (error == 0) {
+        error = value;
+    }
+
+    // If parameter error is larger than parameter value then take parameter
+    // value as error
+    else if (std::abs(error) > std::abs(value)) {
+        error = value;
+    }
+
+    // Compute parameter bracketing
+    parmin = value - m_sigma_min * error;
+    parmax = value + m_sigma_max * error;
+    if (m_model_par->has_min() && m_model_par->factor_min() > parmin) {
+        parmin = m_model_par->factor_min();
+    }
+    if (m_model_par->has_max() && m_model_par->factor_max() < parmax) {
+        parmax = m_model_par->factor_max();
+    }
+
+    // Initialise iteration counter
+    int iter = 0;
+
+    // Make sure that upper limit is bracketed
+    while (true) {
+
+        // Throw exception if maximum iterations are reached
+        if (iter > m_max_iter) {
+            std::string msg = "The maximum number of "+gammalib::str(m_max_iter)+
+                              " has been reached. You may consider to increase"
+                              " the \"max_iter\" parameter and re-run ctulimit.";
+            throw GException::invalid_value(G_GET_PARAMETER_BRACKETS, msg);
+        }
+
+        // Evaluate logL at upper boundary
+        double logL     = evaluate(*m_model_par, parmax);
+        double eval_mid = logL - (m_best_logL + m_dlogL);
+
+        // Write current parameter range into logger
+        log_value(NORMAL, "Parameter range",
+                  "["+gammalib::str(parmin)+", "+gammalib::str(parmax)+"] "
+                  "logL("+gammalib::str(parmax)+")="+gammalib::str(logL));
+
+        // If the logL increase is not enough, increase maximum parameter
+        // value, otherwise break
+        if (eval_mid < 0.0) {
+            parmax *= 10.0;
+        }
+        else {
+            break;
+        }
+
+        // Increase number of iterations
+        iter++;
+
+    } // endwhile
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
  * @brief Calculate upper limit using a bisection method
  *
- * @param[in] min Minimum parameter value
- * @param[in] max Maximum parameter value
+ * @param[in] parmin Minimum parameter value
+ * @param[in] parmax Maximum parameter value
+ *
+ * @exception GException::invalid_value
+ *            Exceeded maximum number of iterations in the upper limit
+ *            search.
  *
  * Calculates the upper limit using a bisection method.
  ***************************************************************************/
-void ctulimit::ulimit_bisection(const double& min, const double& max)
+void ctulimit::ulimit_bisection(const double& parmin, const double& parmax)
 {
     // Copy values to working values
-    double wrk_min = min;
-    double wrk_max = max;
+    double wrk_min = parmin;
+    double wrk_max = parmax;
 
     // Initialise iteration counter
     int iter = 0;
 
     // Loop until breaking condition is reached
     while (true) {
-
-        // Log information
-        log_value(EXPLICIT, "Iteration "+gammalib::str(iter),
-                  "["+gammalib::str(wrk_min)+", "+gammalib::str(wrk_max)+"]");
 
         // Throw exception if maximum iterations are reached
         if (iter > m_max_iter) {
@@ -604,15 +703,23 @@ void ctulimit::ulimit_bisection(const double& min, const double& max)
         double mid = (wrk_min + wrk_max) / 2.0;
 
         // Calculate function value
-        double eval_mid = evaluate(*m_model_par, mid) - (m_best_logL + m_dlogL);
+        double logL     = evaluate(*m_model_par, mid);
+        double eval_mid = logL - (m_best_logL + m_dlogL);
+
+        // Log information
+        log_value(EXPLICIT, "Iteration "+gammalib::str(iter),
+                  "["+gammalib::str(wrk_min)+", "+gammalib::str(wrk_max)+"] "
+                  "dlogL("+gammalib::str(mid)+")="+gammalib::str(eval_mid));
 
         // Check for convergence inside tolerance
         if (std::abs(eval_mid) < m_tol) {
             break;
         }
+        /*
         if (std::abs(wrk_max-wrk_min) < m_tol) {
             break;
         }
+        */
 
         // Change boundaries for further iteration
         if (eval_mid > 0.0) {
