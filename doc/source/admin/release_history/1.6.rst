@@ -41,6 +41,8 @@ Improvements
   Allow specifying of input skymap to :ref:`ctskymap` tool
 * [`2309 <https://cta-redmine.irap.omp.eu/issues/2309>`_] -
   Accelerate `IRF` and `RING` background methods in :ref:`ctskymap`
+* [`2233 <https://cta-redmine.irap.omp.eu/issues/2233>`_] -
+  Add upper limit computation is :ref:`csspec` for ``NODES`` method
 * [`2045 <https://cta-redmine.irap.omp.eu/issues/2045>`_] -
   Define MET with respect to the observation time reference or the ``mjdref``
   user parameter (#2054)

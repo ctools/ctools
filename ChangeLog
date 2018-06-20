@@ -1,4 +1,4 @@
-2018-06-15
+2018-06-20
 
         * Version 1.6.0 released
         ========================
@@ -14,6 +14,7 @@
         Also compute TS in csspec for On/Off analysis using wstat statistic (#2312)
         Allow specifying of input sky map in ctskymap (#2311)
         Accelerate IRF and RING background methods in ctskymap (#2309)
+        Add upper limit computation is csspec for NODES method (#2233)
         Define MET with respect to the observation time reference or "mjdref"
           parameter (#2054)
 
