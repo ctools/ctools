@@ -501,3 +501,42 @@ Multiplicative model
   where :math:`M_{\rm spectral}^{(i)}(E)` is any spectral model component
   (including another composite model), and :math:`N` is the number of
   model components that are multiplied.
+
+
+Exponential model: EBL absorption
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  This spectral model component implements the exponential of an
+  arbitrary spectral model. It can be used to model a spectrum with
+  EBL absorption based on a tabulated model of opacity as a function
+  of photon energy.
+
+  .. code-block:: xml
+
+   <spectrum type="Multiplicative">
+    <spectrum type="PowerLaw">
+       <parameter name="Prefactor"   scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
+       <parameter name="Index"       scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
+       <parameter name="PivotEnergy" scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
+    </spectrum>
+    <spectrum type="Exponential">
+      <spectrum type="FileFunction" file="opacity.txt">
+	<parameter scale="-1.0" name="Normalization" min="0." max="100.0" value="1.0" free="1"/>
+      </spectrum>
+    </spectrum>
+   </spectrum>
+
+  This example corresponds to a spectrum
+
+    .. math::
+     M_{\rm spectral}(E) = k_0 \left( \frac{E}{E_0} \right)^{\gamma}
+     \times \exp\left( -\alpha \tau\left( E \right) \right)
+
+  where
+  
+  * the first block/factor corresponds to a power law;
+  * the second block/factor models EBL absorption, and it points to an
+    ASCII file with two columns containing energy in :math:`{\rm MeV}`
+    as first column and opacity :math:`\tau`  as second column, respectively;
+  * the parameter :math:`\alpha` = ``Normalization`` represents an
+    opacity scaling factor.
