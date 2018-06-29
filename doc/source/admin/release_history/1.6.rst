@@ -12,6 +12,7 @@ In particular, this release provides:
 
 * Support for Xspec spectral analysis
 * Improved computation speed for :ref:`ctskymap` and :ref:`csphagen`
+* Support for Python pickeling
 
 
 Bug fixes
@@ -51,7 +52,8 @@ Improvements
 New features
 ------------
 
-* ...
+* [`1938 <https://cta-redmine.irap.omp.eu/issues/1938>`_] -
+  Support pickeling of ctools and cscripts in Python
 
 
 Clean up

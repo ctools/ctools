@@ -93,6 +93,29 @@ ctobservation::ctobservation(const std::string&   name,
  *
  * @param[in] name Observation tool name.
  * @param[in] version Observation tool version.
+ * @param[in] args Arguments vector.
+ *
+ * Constructs a observation tool from the @p name, @p version and command
+ * line arguments. See the equivalent ctool constructor for details.
+ ***************************************************************************/
+ctobservation::ctobservation(const std::string&              name,
+                             const std::string&              version,
+                             const std::vector<std::string>& args) :
+                             ctool(name, version, args)
+{
+    // Initialise members
+    init_members();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Command line constructor
+ *
+ * @param[in] name Observation tool name.
+ * @param[in] version Observation tool version.
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
  *

@@ -33,7 +33,7 @@ class Test(test):
     This test class makes unit tests for the cslightcrv script by using it
     from the command line and from Python.
     """
-    
+
     # Constructor
     def __init__(self):
         """
@@ -60,6 +60,7 @@ class Test(test):
         # Append tests
         self.append(self._test_cmd, 'Test cslightcrv on command line')
         self.append(self._test_python, 'Test cslightcrv from Python')
+        self.append(self._test_pickeling, 'Test cslightcrv pickeling')
 
         # Return
         return
@@ -274,6 +275,45 @@ class Test(test):
         # Return
         return
 
+    # Test cslightcrv pickeling
+    def _test_pickeling(self):
+        """
+        Test cslightcrv pickeling
+        """
+        # Perform pickeling tests of empty class
+        self._pickeling(cscripts.cslightcrv())
+
+        # Set-up unbinned cslightcrv
+        lcrv = cscripts.cslightcrv()
+        lcrv['inobs']    = self._events
+        lcrv['inmodel']  = self._model
+        lcrv['srcname']  = 'Crab'
+        lcrv['caldb']    = self._caldb
+        lcrv['irf']      = self._irf
+        lcrv['tbinalg']  = 'LIN'
+        lcrv['tmin']     = '2020-01-01T00:00:00'
+        lcrv['tmax']     = '2020-01-01T00:05:00'
+        lcrv['tbins']    = 3
+        lcrv['method']   = '3D'
+        lcrv['enumbins'] = 0
+        lcrv['emin']     = 0.1
+        lcrv['emax']     = 100.0
+        lcrv['outfile']  = 'cslightcrv_py1_pickle.fits'
+        lcrv['logfile']  = 'cslightcrv_py1_pickle.log'
+        lcrv['chatter']  = 2
+        lcrv['publish']  = True
+
+        # Perform pickeling tests of filled class
+        obj = self._pickeling(lcrv)
+
+        # Run cslightcrv script and save light curve
+        obj.logFileOpen()   # Make sure we get a log file
+        obj.run()
+        obj.save()
+
+        # Return
+        return
+
     # Check light curve result file
     def _check_light_curve(self, filename, bins, prefactor=5.7e-16):
         """
@@ -312,6 +352,6 @@ class Test(test):
 
         # Close FITS file
         fits.close()
-        
+
         # Return
         return

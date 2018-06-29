@@ -1,7 +1,7 @@
 /***************************************************************************
  *             ctobservation - Base class for observation tools            *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -42,14 +42,22 @@
 class csobservation : public ctobservation  {
 public:
     // Constructors and destructors
-    csobservation(const std::string& name, const std::string& version) :
+    csobservation(const std::string& name,
+                  const std::string& version) :
                   ctobservation(name, version) {}
-    csobservation(const std::string& name, const std::string& version,
+    csobservation(const std::string&   name,
+                  const std::string&   version,
                   const GObservations& obs) :
                   ctobservation(name, version, obs) {}
-    csobservation(const std::string& name, const std::string& version,
-                  int argc, char* argv[]) :
-                  ctobservation(name, version, argc, argv){}
+    csobservation(const std::string&              name,
+                  const std::string&              version,
+                  const std::vector<std::string>& args) :
+                  ctobservation(name, version, args) {}
+    csobservation(const std::string& name,
+                  const std::string& version,
+                  int                argc,
+                  char*              argv[]) :
+                  ctobservation(name, version, argc, argv) {}
     csobservation(const csobservation& app) : ctobservation(app) {}
     virtual ~csobservation(void) {}
 
@@ -74,11 +82,18 @@ class ctobservation : public ctool {
 
 public:
     // Constructors and destructors
-    ctobservation(const std::string& name, const std::string& version);
-    ctobservation(const std::string& name, const std::string& version,
+    ctobservation(const std::string& name,
+                  const std::string& version);
+    ctobservation(const std::string&   name,
+                  const std::string&   version,
                   const GObservations& obs);
-    ctobservation(const std::string& name, const std::string& version,
-                  int ARGC, char **ARGV);
+    ctobservation(const std::string&              name,
+                  const std::string&              version,
+                  const std::vector<std::string>& args);
+    ctobservation(const std::string& name,
+                  const std::string& version,
+                  int                ARGC,
+                  char               **ARGV);
     ctobservation(const ctobservation& app);
     virtual ~ctobservation(void);
 
@@ -120,11 +135,18 @@ public:
 class csobservation : public ctobservation  {
 public:        
     // Constructors and destructors
-    csobservation(const std::string& name, const std::string& version);
-    csobservation(const std::string& name, const std::string& version,
+    csobservation(const std::string& name,
+                  const std::string& version);
+    csobservation(const std::string&   name,
+                  const std::string&   version,
                   const GObservations& obs);
-    csobservation(const std::string& name, const std::string& version,
-                  int ARGC, char **ARGV);
+    csobservation(const std::string&              name,
+                  const std::string&              version,
+                  const std::vector<std::string>& args);
+    csobservation(const std::string& name,
+                  const std::string& version,
+                  int                ARGC,
+                  char               **ARGV);
     csobservation(const csobservation& app);
     virtual ~csobservation(void);
 
@@ -145,6 +167,21 @@ public:
 /***********************************************************************//**
  * @brief Observation tool base class Python extensions
  ***************************************************************************/
+%extend csobservation {
+%pythoncode {
+    def __getstate__(self):
+        state = (ctool.__getstate__(self), self.obs())
+        return state
+    def __setstate__(self, state):
+        ctool.__setstate__(self, state[0])
+        self.obs(state[1])
+}
+}
+
+
+/***********************************************************************//**
+ * @brief Observation tool base class Python extensions
+ ***************************************************************************/
 %pythoncode %{
 
 # Initialise application by calling the appropriate base class constructor.
@@ -155,7 +192,10 @@ def _init_csobservation(self, name, version, argv):
     if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
         csobservation.__init__(self, name, version, argv[0])
     elif len(argv) > 0:
-        csobservation.__init__(self, name, version, *argv)
+        if len(argv) == 3 and argv[0] == name and argv[1] == version:
+            csobservation.__init__(self, name, version, argv[2])
+        else:
+            csobservation.__init__(self, name, version, *argv)
     else:
         csobservation.__init__(self, name, version)
     # Set logger properties

@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-20 June 2018
+29 June 2018
 
 
 Introduction
@@ -11,12 +11,12 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-Keep existing library path in installation script on Mac OS X (#2420)
+Keep existing library path in installation script on Mac OS X (#2420).
 
 
 Python interface
 ----------------
-None
+ctools and cscripts can now be pickled from Python (#1938).
 
 
 Support model

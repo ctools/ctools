@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-#import gammalib
 import cscripts
 from testing import test
 
@@ -34,7 +33,7 @@ class Test(test):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
         test.__init__(self)
@@ -45,7 +44,7 @@ class Test(test):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
         self.name('cscaldb')
@@ -53,6 +52,7 @@ class Test(test):
         # Append tests
         self.append(self._test_cmd, 'Test cscaldb on command line')
         self.append(self._test_python, 'Test cscaldb from Python')
+        self.append(self._test_pickeling, 'Test cscaldb pickeling')
 
         # Return
         return
@@ -60,7 +60,7 @@ class Test(test):
     # Test cscaldb on command line
     def _test_cmd(self):
         """
-        Test cscaldb on the command line.
+        Test cscaldb on the command line
         """
         # Set script name
         cscaldb = self._script('cscaldb')
@@ -81,7 +81,7 @@ class Test(test):
     # Test cscaldb from Python
     def _test_python(self):
         """
-        Test cscaldb from Python.
+        Test cscaldb from Python
         """
         # Set-up cscaldb
         caldb = cscripts.cscaldb()
@@ -91,6 +91,29 @@ class Test(test):
         # Run script
         caldb.logFileOpen()   # Make sure we get a log file
         caldb.run()
+
+        # Return
+        return
+
+    # Test cscaldb pickeling
+    def _test_pickeling(self):
+        """
+        Test cscaldb pickeling
+        """
+        # Perform pickeling tests of empty class
+        self._pickeling(cscripts.cscaldb())
+
+        # Set-up cscaldb
+        caldb = cscripts.cscaldb()
+        caldb['logfile'] = 'cscaldb_py1_pickle.log'
+        caldb['chatter'] = 2
+
+        # Perform pickeling tests of filled class
+        obj = self._pickeling(caldb)
+
+        # Run script
+        obj.logFileOpen()   # Make sure we get a log file
+        obj.run()
 
         # Return
         return
