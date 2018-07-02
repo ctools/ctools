@@ -114,9 +114,15 @@ def fill_cmr(row, counts, model, resid, e_counts, e_resid, c_counts, c_model,
     if algorithm == 'SUB':
         e_resid.append(err)
     elif algorithm == 'SUBDIV':
-        e_resid.append(err / c_model.real(row))
+        if c_model.real(row) > 0.:
+            e_resid.append(err / c_model.real(row))
+        else:
+            e_resid.append(0.)
     elif algorithm == 'SUBDIVSQRT':
-        e_resid.append(err / math.sqrt(c_model.real(row)))
+        if c_model.real(row) > 0.:
+            e_resid.append(err / math.sqrt(c_model.real(row)))
+        else:
+            e_resid.append(0.)
     elif algorithm == 'SIGNIFICANCE':
         e_resid.append(1.0)
     else:
