@@ -52,6 +52,7 @@ def nthreads(cls):
             cls._log_value(gammalib.EXPLICIT, 'Number of processes requested by the user',
                            cls['nthreads'].integer())
             nthr = cls['nthreads'].integer()
+
     except:
         nthr = 1
         cls._log_value(gammalib.EXPLICIT,

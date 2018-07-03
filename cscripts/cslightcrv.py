@@ -82,6 +82,7 @@ class cslightcrv(ctools.csobservation):
         # Return
         return
 
+    # State methods por pickling
     def __getstate__(self):
         """
         Extend ctools.csobservation getstate method to include some members
@@ -94,7 +95,8 @@ class cslightcrv(ctools.csobservation):
                  'srcname'  : self._srcname,
                  'tbins'    : self._tbins,
                  'stacked'  : self._stacked,
-                 'onoff'    : self._onoff}
+                 'onoff'    : self._onoff,
+                 'fits'     : self._fits}
         return state
 
     def __setstate__(self, state):
@@ -105,10 +107,11 @@ class cslightcrv(ctools.csobservation):
         """
 
         ctools.csobservation.__setstate__(self, state['base'])
-        self._srcname = state['srcname']
-        self._tbins = state['tbins']
-        self._onoff = state['onoff']
-        self._stacked = state['stacked']
+        self._srcname   = state['srcname']
+        self._tbins     = state['tbins']
+        self._onoff     = state['onoff']
+        self._stacked   = state['stacked']
+        self._fits      = state['fits']
 
     # Private methods
     def _get_parameters(self):
@@ -398,7 +401,15 @@ class cslightcrv(ctools.csobservation):
 
 
     def _timebin(self,i):
+        """
+        Run likelihood analysis in one time bin.
 
+        :param i: integer, time bin number
+        :return: dictionary,
+                results of the likelihood analysis
+        """
+
+        # Get names of free parameters
         pars = self._get_free_par_names()
 
         # Get time boundaries
@@ -589,185 +600,24 @@ class cslightcrv(ctools.csobservation):
         # Adjust model parameters dependent on user parameters
         self._adjust_model_pars()
 
-        # print('before pickling')
-        # print(self.obs().models())
-
         # Write header
         self._log_header1(gammalib.TERSE, 'Generate lightcurve')
 
+        # If using multiprocessing
         if self._nthreads > 1:
+
+            # Create pool of workers
             from multiprocessing import Pool
             pool = Pool(processes = self._nthreads)
+
+            # Run time bin analysis in parallel with map
             results = pool.map(self._timebin,range(self._tbins.size()))
+            
+        # Otherwise loop over time bins and run time bin analysis
         else:
             results = []
             for i in range(self._tbins.size()):
                 results.append(self._timebin(i))
-
-        # # Initialise list of result dictionaries
-        # results = []
-        #
-        # # Get source parameters
-        # pars = self._get_free_par_names()
-        #
-        # # Loop over time bins
-        # for i in range(self._tbins.size()):
-        #
-        #     # Get time boundaries
-        #     tmin = self._tbins.tstart(i)
-        #     tmax = self._tbins.tstop(i)
-        #
-        #     # Write time bin into header
-        #     self._log_header2(gammalib.TERSE, 'MJD %f - %f ' %
-        #                       (tmin.mjd(), tmax.mjd()))
-        #
-        #     # Compute time bin center and time width
-        #     twidth = 0.5 * (tmax - tmin) # in seconds
-        #     tmean  = tmin + twidth
-        #
-        #     # Initialise result dictionary
-        #     result = {'mjd': tmean.mjd(),
-        #               'e_mjd': twidth / gammalib.sec_in_day,
-        #               'ts': 0.0,
-        #               'ul_diff': 0.0,
-        #               'ul_flux': 0.0,
-        #               'ul_eflux': 0.0,
-        #               'pars': pars,
-        #               'values': {}}
-        #
-        #     # Log information
-        #     self._log_header3(gammalib.EXPLICIT, 'Selecting events')
-        #
-        #     # Select events
-        #     select = ctools.ctselect(self.obs())
-        #     select['emin'] = self['emin'].real()
-        #     select['emax'] = self['emax'].real()
-        #     select['tmin'] = tmin
-        #     select['tmax'] = tmax
-        #     select['rad']  = 'UNDEFINED'
-        #     select['ra']   = 'UNDEFINED'
-        #     select['dec']  = 'UNDEFINED'
-        #     select.run()
-        #
-        #     # Retrieve observation
-        #     obs = select.obs()
-        #
-        #     # Deal with stacked and On/Off Observations
-        #     if self._stacked or self._onoff:
-        #
-        #         # If a stacked analysis is requested bin the events
-        #         # and compute the stacked response functions and setup
-        #         # an observation container with a single stacked observation.
-        #         if self._stacked:
-        #             new_obs = obsutils.get_stacked_obs(self, obs)
-        #
-        #         # ... otherwise if On/Off analysis is requested generate
-        #         # the On/Off observations and response
-        #         elif self._onoff:
-        #             new_obs = obsutils.get_onoff_obs(self, obs)
-        #
-        #         # Extract models
-        #         models = new_obs.models()
-        #
-        #         # Fix background models if required
-        #         if self['fix_bkg'].boolean():
-        #             for model in models:
-        #                 if model.classname() != 'GModelSky':
-        #                     for par in model:
-        #                         par.fix()
-        #
-        #         # Put back models
-        #         new_obs.models(models)
-        #
-        #         # Continue with new oberservation container
-        #         obs = new_obs
-        #
-        #     # Header
-        #     self._log_header3(gammalib.EXPLICIT, 'Fitting the data')
-        #
-        #     # Do maximum likelihood model fitting
-        #     if obs.size() > 0:
-        #         like = ctools.ctlike(obs)
-        #         like['edisp'] = self['edisp'].boolean()
-        #         like.run()
-        #
-        #         # Skip bin if no event was present
-        #         if like.obs().logL() == 0.0:
-        #
-        #             # Signal skipping of bin
-        #             self._log_value(gammalib.TERSE, 'Warning',
-        #                             'No event in this time bin, skip bin.')
-        #
-        #             # Set all results to 0
-        #             for par in pars:
-        #                 result['values'][par]      = 0.0
-        #                 result['values']['e_'+par] = 0.0
-        #
-        #             # Append result
-        #             results.append(result)
-        #
-        #             # Continue with next time bin
-        #             continue
-        #
-        #         # Retrieve model fitting results for source of interest
-        #         source = like.obs().models()[self._srcname]
-        #
-        #         # Extract parameter values
-        #         for par in pars:
-        #             result['values'][par]      = source[par].value()
-        #             result['values']['e_'+par] = source[par].error()
-        #
-        #         # Calculate upper limit (-1 if not computed)
-        #         #ul_diff, ul_flux, ul_eflux = self._compute_ulimit(like.obs())
-        #         ul_diff, ul_flux, ul_eflux = self._compute_ulimit(obs)
-        #         if ul_diff > 0.0:
-        #             result['ul_diff']  = ul_diff
-        #             result['ul_flux']  = ul_flux
-        #             result['ul_eflux'] = ul_eflux
-        #
-        #         # Extract Test Statistic value
-        #         if self['calc_ts'].boolean():
-        #             result['ts'] = source.ts()
-        #
-        #         # Append result to list of dictionaries
-        #         results.append(result)
-        #
-        #         # Log results for this time bin
-        #         self._log.header3('Results')
-        #         pars = self._get_free_par_names()
-        #         for par in pars:
-        #             value = source[par].value()
-        #             error = source[par].error()
-        #             unit  = source[par].unit()
-        #             self._log_value(gammalib.NORMAL, par,
-        #                             str(value)+' +/- '+str(error)+' '+unit)
-        #         if ul_diff > 0.0:
-        #             self._log_value(gammalib.NORMAL, 'Upper flux limit',
-        #                             str(result['ul_diff'])+' ph/cm2/s/MeV')
-        #             self._log_value(gammalib.NORMAL, 'Upper flux limit',
-        #                             str(result['ul_flux'])+' ph/cm2/s')
-        #             self._log_value(gammalib.NORMAL, 'Upper flux limit',
-        #                             str(result['ul_eflux'])+' erg/cm2/s')
-        #         if self['calc_ts'].boolean():
-        #             self._log_value(gammalib.NORMAL, 'Test Statistic', result['ts'])
-        #
-        #     # Otherwise, if observations size is 0, signal bin is skipped and
-        #     # fill results table with zeros
-        #     else:
-        #         self._log_value(gammalib.TERSE, 'Warning',
-        #                         'No observations available in this time bin, '
-        #                         'skip bin.')
-        #
-        #         # Set all results to 0
-        #         for par in pars:
-        #             result['values'][par]        = 0.0
-        #             result['values']['e_' + par] = 0.0
-        #
-        #         # Append result
-        #         results.append(result)
-        #
-        #         # Continue with next time bin
-        #         continue
 
         # Create FITS table from results
         table = self._create_fits_table(results)
