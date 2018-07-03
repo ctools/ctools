@@ -26,6 +26,33 @@ from cscripts import ioutils
 from cscripts import mputils
 
 
+# ============================================ #
+# Global functions for multiprocessing support #
+# ============================================ #
+def _multiprocessing_func_wrapper(args):
+   return _multiprocessing_func(*args)
+def _multiprocessing_func(cls, i):
+
+    # Initialise thread logger
+    cls._log.clear()
+    cls._log.buffer_size(100000)
+
+    # Compute light curve bin
+    cstart  = cls.celapse()
+    result  = cls._timebin(i)
+    celapse = cls.celapse() - cstart
+    buffer  = cls._log.buffer()
+
+    # Close logger
+    cls._log.close()
+
+    # Collect thread information
+    info = {'celapse': celapse, 'log': buffer}
+
+    # Return light curve bin result and thread information
+    return result, info
+
+
 # ================ #
 # cslightcrv class #
 # ================ #
@@ -73,11 +100,12 @@ class cslightcrv(ctools.csobservation):
         self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise some members
-        self._srcname = ''
-        self._tbins   = gammalib.GGti()
-        self._onoff   = False
-        self._stacked = False
-        self._fits    = gammalib.GFits()
+        self._srcname  = ''
+        self._tbins    = gammalib.GGti()
+        self._onoff    = False
+        self._stacked  = False
+        self._fits     = gammalib.GFits()
+        self._nthreads = 0
 
         # Return
         return
@@ -87,31 +115,42 @@ class cslightcrv(ctools.csobservation):
         """
         Extend ctools.csobservation getstate method to include some members
 
-        :return: dictionary
-            state
+        Returns
+        -------
+        state : dict
+            Pickled instance
         """
-
+        # Set pickled dictionary
         state = {'base'     : ctools.csobservation.__getstate__(self),
                  'srcname'  : self._srcname,
                  'tbins'    : self._tbins,
                  'stacked'  : self._stacked,
                  'onoff'    : self._onoff,
-                 'fits'     : self._fits}
+                 'fits'     : self._fits,
+                 'nthreads' : self._nthreads}
+
+        # Return pickled dictionary
         return state
 
     def __setstate__(self, state):
         """
         Extend ctools.csobservation setstate method to include some members
 
-        :param state: dictionary of class state
+        Parameters
+        ----------
+        state : dict
+            Pickled instance
         """
-
         ctools.csobservation.__setstate__(self, state['base'])
-        self._srcname   = state['srcname']
-        self._tbins     = state['tbins']
-        self._onoff     = state['onoff']
-        self._stacked   = state['stacked']
-        self._fits      = state['fits']
+        self._srcname  = state['srcname']
+        self._tbins    = state['tbins']
+        self._onoff    = state['onoff']
+        self._stacked  = state['stacked']
+        self._fits     = state['fits']
+        self._nthreads = state['nthreads']
+
+        # Return
+        return
 
     # Private methods
     def _get_parameters(self):
@@ -399,16 +438,20 @@ class cslightcrv(ctools.csobservation):
         # Return upper limit tuple
         return ul_diff, ul_flux, ul_eflux
 
-
-    def _timebin(self,i):
+    def _timebin(self, i):
         """
-        Run likelihood analysis in one time bin.
+        Run likelihood analysis in one time bin
 
-        :param i: integer, time bin number
-        :return: dictionary,
-                results of the likelihood analysis
+        Parameters
+        ----------
+        i : int
+            time bin number
+
+        Returns
+        -------
+        result : dict
+            Results of the likelihood analysis
         """
-
         # Get names of free parameters
         pars = self._get_free_par_names()
 
@@ -611,8 +654,19 @@ class cslightcrv(ctools.csobservation):
             pool = Pool(processes = self._nthreads)
 
             # Run time bin analysis in parallel with map
-            results = pool.map(self._timebin,range(self._tbins.size()))
-            
+            args        = [(self, i) for i in range(self._tbins.size())]
+            poolresults = pool.map(_multiprocessing_func_wrapper, args)
+
+            # Close pool and join
+            pool.close()
+            pool.join()
+
+            # Construct results
+            results = []
+            for i in range(self._tbins.size()):
+                results.append(poolresults[i][0])
+                self._log_string(gammalib.TERSE, poolresults[i][1]['log'], False)
+
         # Otherwise loop over time bins and run time bin analysis
         else:
             results = []

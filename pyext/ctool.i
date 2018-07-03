@@ -222,9 +222,9 @@ public:
                            const std::string&   what = "Observation") {
         self->log_observations(GChatter(chatter), obs, what);
     }
-    void _log_models(const int&               chatter,
-                           const GModels&     models,
-                           const std::string& what = "Model") {
+    void _log_models(const int&         chatter,
+                     const GModels&     models,
+                     const std::string& what = "Model") {
         self->log_models(GChatter(chatter), models, what);
     }
     void _read_ahead(const bool& flag) {

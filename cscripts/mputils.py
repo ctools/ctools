@@ -1,7 +1,7 @@
 # ==========================================================================
 # Utility functions for multiprocessing handling
 #
-# Copyright (C) 2018- Luigi Tibaldo
+# Copyright (C) 2018 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,44 +23,50 @@ import gammalib
 # ==================== #
 # Number of processes  #
 # ==================== #
-
 def nthreads(cls):
     """
-    Determines the number of parallel processes to use,
-    based on user parameters and availability of multiprocessing module
+    Determines the number of parallel processes to use.
 
-    :param cls: `~ctools.cscript`
+    The number is based on the user parameter "nthreads" and the availability
+    of the multiprocessing module.
+
+    Parameters
+    ----------
+    cls : `~ctools.cscript`
         cscript class
-    :return: int
-        number of parallel processes
+
+    Returns
+    -------
+    nthreads : int
+        Number of parallel processes
     """
-
     # Log multiprocessing configuration
-    cls._log_header1(gammalib.NORMAL, "Multiprocessing")
+    cls._log_header1(gammalib.NORMAL, 'Multiprocessing')
 
+    # Try getting multiprocessing support
     try:
         from multiprocessing import cpu_count
         ncpus = cpu_count()
+        cls._log_value(gammalib.NORMAL, 'Multiprocessing', 'available')
         cls._log_value(gammalib.EXPLICIT, 'Number of CPUs available', ncpus)
 
         # Set processes to number of CPUs if requested by the user
         if cls['nthreads'].integer() == 0:
-            nthr = ncpus
+            nthreads = ncpus
 
-        # Otherwise use the number requested
+        # ... otherwise use the number requested
         else:
-            cls._log_value(gammalib.EXPLICIT, 'Number of processes requested by the user',
+            cls._log_value(gammalib.EXPLICIT,
+                           'Number of processes requested',
                            cls['nthreads'].integer())
-            nthr = cls['nthreads'].integer()
+            nthreads = cls['nthreads'].integer()
 
     except:
-        nthr = 1
-        cls._log_value(gammalib.EXPLICIT,
-                       'Multiprocessing not available. Number of processes', nthr)
-
+        nthreads = 1
+        cls._log_value(gammalib.NORMAL, 'Multiprocessing', 'not available')
 
     # Log number of processes
-    cls._log_value(gammalib.NORMAL, 'Number of parallel processes in use', nthr)
+    cls._log_value(gammalib.NORMAL, 'Number of processes in use', nthreads)
 
-    # return number of processes to be used
-    return nthr
+    # Return number of processes to be used
+    return nthreads
