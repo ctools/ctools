@@ -193,6 +193,9 @@ None
 
 cslightcrv - Generate light curve
 ---------------------------------
+Add hidden "nthreads" parameter and implement parallelisation of light
+curve computation (#2421).
+
 Add hidden "mjdref" parameter for the specification of the MET reference
 (#2054).
 

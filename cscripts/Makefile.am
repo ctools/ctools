@@ -54,7 +54,8 @@ pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/obsutils.py \
                 $(srcdir)/modutils.py \
                 $(srcdir)/calutils.py \
-                $(srcdir)/ioutils.py
+                $(srcdir)/ioutils.py \
+                $(srcdir)/mputils.py 	
 
 # Parfiles to be distributed in $(prefix)/syspfiles
 parfiles = $(srcdir)/cscaldb.par \
@@ -297,6 +298,7 @@ clean-local:
 		rm -rf $(top_builddir)/cscripts/modutils.py; \
 		rm -rf $(top_builddir)/cscripts/calutils.py; \
 		rm -rf $(top_builddir)/cscripts/ioutils.py; \
+                rm -rf $(top_builddir)/cscripts/mputils.py; \
 		rm -rf $(top_builddir)/cscripts/*.par; \
 	fi
 	rm -rf $(top_builddir)/cscripts/*.pyc

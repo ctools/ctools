@@ -12,6 +12,7 @@ In particular, this release provides:
 
 * Support for Xspec spectral analysis
 * Improved computation speed for :ref:`ctskymap` and :ref:`csphagen`
+* Parallelisation of :ref:`cslightcrv`
 * Support for Python pickeling
 
 
@@ -33,6 +34,8 @@ Improvements
   Transparently update parameter files
 * [`2490 <https://cta-redmine.irap.omp.eu/issues/2490>`_] -
   Change formula for number of true energy bins in :ref:`csphagen`
+* [`2421 <https://cta-redmine.irap.omp.eu/issues/2421>`_] -
+  Parallelise :ref:`cslightcrv`
 * [`2404 <https://cta-redmine.irap.omp.eu/issues/2404>`_] -
   :ref:`csphagen` produces Xspec compliant data
 * Add ``show_rmf.py`` example script
