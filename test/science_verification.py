@@ -11,7 +11,7 @@
 #
 # --------------------------------------------------------------------------
 #
-# Copyright (C) 2015-2017 Juergen Knoedlseder
+# Copyright (C) 2015-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -251,6 +251,7 @@ class sciver(gammalib.GPythonTestSuite):
         self.append(self.spec_gauss, 'Test Gaussian model')
         self.append(self.spec_filefct, 'Test file function model')
         self.append(self.spec_nodes, 'Test nodes model')
+        self.append(self.spec_exponential, 'Test exponential model')
 
         # Append spatial tests
         self.append(self.spat_ptsrc, 'Test point source model')
@@ -339,7 +340,7 @@ class sciver(gammalib.GPythonTestSuite):
         mean_max = +lim_mean
         std_min  = 1.0-lim_std
         std_max  = 1.0+lim_std
-        
+
         # Test mean
         mean  = self.results[name]['mean']
         valid = (mean >= mean_min) and (mean <= mean_max)
@@ -525,6 +526,19 @@ class sciver(gammalib.GPythonTestSuite):
         self.test('Pull_Crab_Intensity1')
         self.test('Pull_Crab_Intensity2')
         self.test('Pull_Crab_Intensity3')
+        self.test('Pull_Background_Prefactor')
+        self.test('Pull_Background_Index')
+        return
+
+    # Test exponential model
+    def spec_exponential(self):
+        """
+        Test exponential model
+        """
+        self.pull('data/sciver/crab_exponential')
+        self.test('Pull_Crab_1:Prefactor')
+        self.test('Pull_Crab_1:Index')
+        self.test('Pull_Crab_2:Normalization')
         self.test('Pull_Background_Prefactor')
         self.test('Pull_Background_Index')
         return
