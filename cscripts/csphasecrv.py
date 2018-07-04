@@ -94,6 +94,7 @@ class csphasecrv(ctools.csobservation):
         self._stacked   = False
         self._fits      = gammalib.GFits()
         self._fitmodels = {}
+        self._nthreads  = 0
 
         # Return
         return
