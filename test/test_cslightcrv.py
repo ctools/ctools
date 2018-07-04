@@ -272,6 +272,35 @@ class Test(test):
         # Check light curve
         self._check_light_curve('cslightcrv_py5.fits', 2)
 
+        # Set-up cslightcrv without multiprocessing
+        lcrv = cscripts.cslightcrv()
+        lcrv['inobs'] = self._events
+        lcrv['inmodel'] = self._model
+        lcrv['srcname'] = 'Crab'
+        lcrv['caldb'] = self._caldb
+        lcrv['irf'] = self._irf
+        lcrv['tbinalg'] = 'LIN'
+        lcrv['tmin'] = '2020-01-01T00:00:00'
+        lcrv['tmax'] = '2020-01-01T00:05:00'
+        lcrv['tbins'] = 3
+        lcrv['method'] = '3D'
+        lcrv['enumbins'] = 0
+        lcrv['emin'] = 0.1
+        lcrv['emax'] = 100.0
+        lcrv['outfile'] = 'cslightcrv_py6.fits'
+        lcrv['logfile'] = 'cslightcrv_py6.log'
+        lcrv['chatter'] = 2
+        lcrv['publish'] = True
+        lcrv['nthreads'] = 1
+
+        # Run cslightcrv script and save light curve
+        lcrv.logFileOpen()  # Make sure we get a log file
+        lcrv.run()
+        lcrv.save()
+
+        # Check light curve
+        self._check_light_curve('cslightcrv_py6.fits', 3)
+
         # Return
         return
 
