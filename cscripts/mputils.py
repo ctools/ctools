@@ -48,7 +48,7 @@ def nthreads(cls):
         from multiprocessing import cpu_count
         ncpus = cpu_count()
         cls._log_value(gammalib.NORMAL, 'Multiprocessing', 'available')
-        cls._log_value(gammalib.EXPLICIT, 'Number of CPUs available', ncpus)
+        cls._log_value(gammalib.EXPLICIT, 'CPUs available', ncpus)
 
         # Set processes to number of CPUs if requested by the user
         if cls['nthreads'].integer() == 0:
@@ -56,8 +56,7 @@ def nthreads(cls):
 
         # ... otherwise use the number requested
         else:
-            cls._log_value(gammalib.EXPLICIT,
-                           'Number of processes requested',
+            cls._log_value(gammalib.EXPLICIT, 'Processes requested',
                            cls['nthreads'].integer())
             nthreads = cls['nthreads'].integer()
 
@@ -66,7 +65,7 @@ def nthreads(cls):
         cls._log_value(gammalib.NORMAL, 'Multiprocessing', 'not available')
 
     # Log number of processes
-    cls._log_value(gammalib.NORMAL, 'Number of processes in use', nthreads)
+    cls._log_value(gammalib.NORMAL, 'Processes available', nthreads)
 
     # Return number of processes to be used
     return nthreads
