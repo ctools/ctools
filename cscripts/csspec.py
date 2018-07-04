@@ -21,6 +21,33 @@
 import sys
 import gammalib
 import ctools
+from cscripts import mputils
+
+# ============================================ #
+# Global functions for multiprocessing support #
+# ============================================ #
+def _multiprocessing_func_wrapper(args):
+   return _multiprocessing_func(*args)
+def _multiprocessing_func(cls, i):
+
+    # Initialise thread logger
+    cls._log.clear()
+    cls._log.buffer_size(100000)
+
+    # Compute light curve bin
+    cstart  = cls.celapse()
+    result  = cls._fit_energy_bin(i)
+    celapse = cls.celapse() - cstart
+    buffer  = cls._log.buffer()
+
+    # Close logger
+    cls._log.close()
+
+    # Collect thread information
+    info = {'celapse': celapse, 'log': buffer}
+
+    # Return light curve bin result and thread information
+    return result, info
 
 
 # ============ #
@@ -48,6 +75,7 @@ class csspec(ctools.csobservation):
         self._binned_mode = False
         self._onoff_mode  = False
         self._method      = 'AUTO'
+        self._nthreads    = 0
 
         # Return
         return
@@ -56,6 +84,48 @@ class csspec(ctools.csobservation):
         """
         Destructor
         """
+        # Return
+        return
+
+    # State methods por pickling
+    def __getstate__(self):
+        """
+        Extend ctools.csobservation getstate method to include some members
+
+        Returns
+        -------
+        state : dict
+            Pickled instance
+        """
+        # Set pickled dictionary
+        state = {'base'         : ctools.csobservation.__getstate__(self),
+                 'ebounds'      : self._ebounds,
+                 'fits'         : self._fits,
+                 'binned_mode'  : self._binned_mode,
+                 'onoff_mode'   : self._onoff_mode,
+                 'method'       : self._method,
+                 'nthreads'     : self._nthreads}
+
+        # Return pickled dictionary
+        return state
+
+    def __setstate__(self, state):
+        """
+        Extend ctools.csobservation setstate method to include some members
+
+        Parameters
+        ----------
+        state : dict
+            Pickled instance
+        """
+        ctools.csobservation.__setstate__(self, state['base'])
+        self._ebounds       = state['ebounds']
+        self._fits          = state['fits']
+        self._binned_mode   = state['binned_mode']
+        self._onoff_mode    = state['onoff_mode']
+        self._method        = state['method']
+        self._nthreads      = state['nthreads']
+
         # Return
         return
 
@@ -140,6 +210,9 @@ class csspec(ctools.csobservation):
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
+
+        # Set number of processes for multiprocessing
+        self._nthreads = mputils.nthreads(self)
 
         # Write spectrum method header and parameters
         self._log_header1(gammalib.TERSE, 'Spectrum method')
@@ -575,6 +648,10 @@ class csspec(ctools.csobservation):
         result : dict
             Dictionary with fit results
         """
+
+        # Write header for energy bin
+        self._log_header2(gammalib.EXPLICIT, 'Energy bin ' + str(i + 1))
+
         # Get energy boundaries
         emin      = self._ebounds.emin(i)
         emax      = self._ebounds.emax(i)
@@ -692,17 +769,35 @@ class csspec(ctools.csobservation):
         # Initialise results
         results = []
 
-        # Loop over energy bins
-        for i in range(self._ebounds.size()):
+        # If using multiprocessing
+        if self._nthreads > 1:
 
-            # Write header for energy bin
-            self._log_header2(gammalib.EXPLICIT, 'Energy bin '+str(i+1))
+            # Create pool of workers
+            from multiprocessing import Pool
+            pool = Pool(processes = self._nthreads)
 
-            # Fit energy bin
-            result = self._fit_energy_bin(i)
+            # Run energy bin analysis in parallel with map
+            args        = [(self, i) for i in range(self._ebounds.size())]
+            poolresults = pool.map(_multiprocessing_func_wrapper, args)
 
-            # Append results
-            results.append(result)
+            # Close pool and join
+            pool.close()
+            pool.join()
+
+            # Construct results
+            for i in range(self._ebounds.size()):
+                results.append(poolresults[i][0])
+                self._log_string(gammalib.TERSE, poolresults[i][1]['log'], False)
+
+        # Otherwise, loop over energy bins
+        else:
+            for i in range(self._ebounds.size()):
+
+                # Fit energy bin
+                result = self._fit_energy_bin(i)
+
+                # Append results
+                results.append(result)
 
         # Return results
         return results
