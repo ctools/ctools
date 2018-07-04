@@ -23,6 +23,33 @@ import gammalib
 import ctools
 import math
 import sys
+from cscripts import mputils
+
+# ============================================ #
+# Global functions for multiprocessing support #
+# ============================================ #
+def _multiprocessing_func_wrapper(args):
+   return _multiprocessing_func(*args)
+def _multiprocessing_func(cls, i):
+
+    # Initialise thread logger
+    cls._log.clear()
+    cls._log.buffer_size(100000)
+
+    # Compute light curve bin
+    cstart  = cls.celapse()
+    result  = cls._process_observation(i)
+    celapse = cls.celapse() - cstart
+    buffer  = cls._log.buffer()
+
+    # Close logger
+    cls._log.close()
+
+    # Collect thread information
+    info = {'celapse': celapse, 'log': buffer}
+
+    # Return light curve bin result and thread information
+    return result, info
 
 
 # =============== #
@@ -43,6 +70,7 @@ class csphagen(ctools.csobservation):
 
         # Initialise other variables
         self._ebounds       = gammalib.GEbounds()
+        self._etruebounds   = gammalib.GEbounds()
         self._src_dir       = gammalib.GSkyDir()
         self._src_reg       = gammalib.GSkyRegions()
         self._src_model     = None
@@ -51,10 +79,62 @@ class csphagen(ctools.csobservation):
         self._has_exclusion = False
         self._srcshape      = ''
         self._rad           = 0.0
+        self._nthreads      = 0
 
         # Return
         return
 
+    # State methods por pickling
+    def __getstate__(self):
+        """
+        Extend ctools.csobservation getstate method to include some members
+
+        Returns
+        -------
+        state : dict
+            Pickled instance
+        """
+        # Set pickled dictionary
+        state = {'base'         : ctools.csobservation.__getstate__(self),
+                 'ebounds'      : self._ebounds,
+                 'etruebounds'  : self._etruebounds,
+                 'src_dir'      : self._src_dir,
+                 'src_reg'      : self._src_reg,
+                 'src_model'    : self._src_model,
+                 'bkg_regs'     : self._bkg_regs,
+                 'excl_reg'     : self._excl_reg,
+                 'has_exclusion': self._has_exclusion,
+                 'srcshape'     : self._srcshape,
+                 'rad'          : self._rad,
+                 'nthreads'     : self._nthreads}
+
+        # Return pickled dictionary
+        return state
+
+    def __setstate__(self, state):
+        """
+        Extend ctools.csobservation setstate method to include some members
+
+        Parameters
+        ----------
+        state : dict
+            Pickled instance
+        """
+        ctools.csobservation.__setstate__(self, state['base'])
+        self._ebounds       = state['ebounds']
+        self._etruebounds   = state['etruebounds']
+        self._src_dir       = state['src_dir']
+        self._src_reg       = state['src_reg']
+        self._src_model     = state['src_model']
+        self._bkg_regs      = state['bkg_regs']
+        self._excl_reg      = state['excl_reg']
+        self._has_exclusion = state['has_exclusion']
+        self._srcshape      = state['srcshape']
+        self._rad           = state['rad']
+        self._nthreads      = state['nthreads']
+
+        # Return
+        return
 
     # Private methods
     def _query_src_direction(self):
@@ -204,6 +284,9 @@ class csphagen(ctools.csobservation):
 
         # Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
+
+        # Set number of processes for multiprocessing
+        self._nthreads = mputils.nthreads(self)
 
         # Return
         return
@@ -378,6 +461,80 @@ class csphagen(ctools.csobservation):
         # Return background regions
         return bkg_reg
 
+    def _process_observation(self,i):
+        """
+        Generate On/Off spectra for individual observation
+
+        :param i: int, observation number
+        :return: dictionary
+                On/Off spectra, background regions, observation id
+        """
+
+        # Retrieve observation from container
+        obs = self.obs()[i]
+
+        # Skip non CTA observations
+        if obs.classname() != 'GCTAObservation':
+            self._log_string(gammalib.NORMAL, 'Skip %s observation "%s"' % \
+                             (obs.instrument(), obs.id()))
+            onoff = 0
+            bkg_reg = 0
+
+        # Otherwise calculate On/Off spectra
+        else:
+            # Log current observation
+            self._log_string(gammalib.NORMAL, 'Process observation "%s"' % \
+                             (obs.id()))
+
+            # Set background regions for this observation
+            bkg_reg = self._set_background_regions(obs)
+
+            # If there are background regions then create On/Off observation
+            # and append it to the output container
+            if bkg_reg.size() >= self['bkgregmin'].integer():
+                onoff = gammalib.GCTAOnOffObservation(obs,
+                                                      self._src_model,
+                                                      self._etruebounds,
+                                                      self._ebounds,
+                                                      self._src_reg,
+                                                      bkg_reg)
+                onoff.id(obs.id())
+
+            else:
+                self._log_string(gammalib.NORMAL, 'Observation %s not included '
+                                 'in spectra generation' % (obs.id()))
+
+        # Construct dictionary with results
+        result = {'onoff'   : onoff,
+                  'bkg_reg' : bkg_reg,
+                  'id'      : obs.id()}
+
+        # Return results
+        return result
+
+    def _unpack_result(self,outobs,result):
+        """
+        Unpack result from calculation of On/Off regions and appends it to observation
+        container.
+
+        :param outobs: `~gammalib.GObservations`, observation container
+        :param result: dict, result to unpack
+        :return: `~gammalib.GObservations`
+                observation container with result appended
+        """
+
+        # If the results contain an On/Off observation
+        if result['onoff'].classname() == 'GCTAOnOffObservation':
+            # Append observation to observation container
+            outobs.append(result['onoff'])
+
+            # Append background regions
+            self._bkg_regs.append({'regions': result['bkg_reg'],
+                                   'id': result['id']})
+
+        # Return observation container
+        return outobs
+
 
     # Public methods
     def run(self):
@@ -395,7 +552,7 @@ class csphagen(ctools.csobservation):
         self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
 
         # Set true energy bins
-        etrue_ebounds = self._etrue_ebounds()
+        self._etruebounds = self._etrue_ebounds()
 
         # Write header
         self._log_header1(gammalib.TERSE, 'Spectral binning')
@@ -418,37 +575,32 @@ class csphagen(ctools.csobservation):
         if self._src_model == None:
             self._src_model = gammalib.GModelSpatialPointSource(self._src_dir)
 
-        # Loop through observations and generate pha, arf, rmf files
-        for obs in self.obs():
+        # If there is more than one observation and we use multiprocessing
+        if self._nthreads > 1 and self.obs().size() > 1:
 
-            # Skip non CTA observations
-            if obs.classname() != 'GCTAObservation':
-                self._log_string(gammalib.NORMAL, 'Skip %s observation "%s"' % \
-                                 (obs.instrument(), obs.id()))
-                continue
+            # Create pool of workers
+            from multiprocessing import Pool
+            pool = Pool(processes = self._nthreads)
 
-            # Log current observation
-            self._log_string(gammalib.NORMAL, 'Process observation "%s"' % \
-                             (obs.id()))
+            # Run time bin analysis in parallel with map
+            args        = [(self, i) for i in range(self.obs().size())]
+            poolresults = pool.map(_multiprocessing_func_wrapper, args)
 
-            # Set background regions for this observation
-            bkg_reg = self._set_background_regions(obs)
+            # Close pool and join
+            pool.close()
+            pool.join()
 
-            # If there are background regions then create On/Off observation
-            # and append it to the output container
-            if bkg_reg.size() >= self['bkgregmin'].integer():
-                onoff = gammalib.GCTAOnOffObservation(obs,
-                                                      self._src_model,
-                                                      etrue_ebounds,
-                                                      self._ebounds,
-                                                      self._src_reg,
-                                                      bkg_reg)
-                onoff.id(obs.id())
-                outobs.append(onoff)
-                self._bkg_regs.append({'regions': bkg_reg, 'id': obs.id()})
-            else:
-                self._log_string(gammalib.NORMAL, 'Observation %s not included '
-                                 'in spectra generation' % (obs.id()))
+            # Construct results
+            for i in range(self.obs().size()):
+                outobs = self._unpack_result(outobs,poolresults[i][0])
+                self._log_string(gammalib.TERSE, poolresults[i][1]['log'], False)
+
+        # Otherwise, loop through observations and generate pha, arf, rmf files
+        else:
+            for i in range(self.obs().size()):
+                # Process individual observation
+                result = self._process_observation(i)
+                outobs = self._unpack_result(outobs, result)
 
         # Stack observations
         if outobs.size() > 1 and self['stack'].boolean() == True:
