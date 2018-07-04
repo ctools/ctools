@@ -45,19 +45,19 @@ public:
     cslikelihood(const std::string& name,
                  const std::string& version) :
                  ctlikelihood(name, version) {}
-    cslikelihood(const std::string&   name,
-                 const std::string&   version,
-                 const GObservations& obs) :
-                 ctlikelihood(name, version, obs) {}
-    cslikelihood(const std::string&              name,
-                 const std::string&              version,
-                 const std::vector<std::string>& args) :
-                 ctlikelihood(name, version, args) {}
+    cslikelihood(const std::string&      name,
+                 const std::string&      version,
+                 const GApplicationPars& pars) :
+                 ctlikelihood(name, version, pars) {}
     cslikelihood(const std::string& name,
                  const std::string& version,
                  int                argc,
                  char*              argv[]) :
                  ctlikelihood(name, version, argc, argv) {}
+    cslikelihood(const std::string&   name,
+                 const std::string&   version,
+                 const GObservations& obs) :
+                 ctlikelihood(name, version, obs) {}
     cslikelihood(const cslikelihood& app) : ctlikelihood(app) {}
     virtual ~cslikelihood(void) {}
 
@@ -84,16 +84,16 @@ public:
     // Constructors and destructors
     ctlikelihood(const std::string& name,
                  const std::string& version);
-    ctlikelihood(const std::string&   name,
-                 const std::string&   version,
-                 const GObservations& obs);
-    ctlikelihood(const std::string&              name,
-                 const std::string&              version,
-                 const std::vector<std::string>& args);
+    ctlikelihood(const std::string&      name,
+                 const std::string&      version,
+                 const GApplicationPars& pars);
     ctlikelihood(const std::string& name,
                  const std::string& version,
                  int                argc,
                  char*              argv[]);
+    ctlikelihood(const std::string&   name,
+                 const std::string&   version,
+                 const GObservations& obs);
     ctlikelihood(const ctlikelihood& app);
     virtual ~ctlikelihood(void);
 
@@ -125,16 +125,16 @@ public:
     // Constructors and destructors
     cslikelihood(const std::string& name,
                  const std::string& version);
-    cslikelihood(const std::string&   name,
-                 const std::string&   version,
-                 const GObservations& obs);
-    cslikelihood(const std::string&              name,
-                 const std::string&              version,
-                 const std::vector<std::string>& args);
+    cslikelihood(const std::string&      name,
+                 const std::string&      version,
+                 const GApplicationPars& pars);
     cslikelihood(const std::string& name,
                  const std::string& version,
                  int                ARGC,
                  char               **ARGV);
+    cslikelihood(const std::string&   name,
+                 const std::string&   version,
+                 const GObservations& obs);
     cslikelihood(const cslikelihood& app);
     virtual ~cslikelihood(void);
 

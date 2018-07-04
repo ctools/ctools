@@ -47,16 +47,16 @@ public:
     // Constructors and destructors
     ctobservation(const std::string& name,
                   const std::string& version);
-    ctobservation(const std::string&   name,
-                  const std::string&   version,
-                  const GObservations& obs);
-    ctobservation(const std::string&              name,
-                  const std::string&              version,
-                  const std::vector<std::string>& args);
+    ctobservation(const std::string&      name,
+                  const std::string&      version,
+                  const GApplicationPars& pars);
     ctobservation(const std::string& name,
                   const std::string& version,
                   int                argc,
                   char*              argv[]);
+    ctobservation(const std::string&   name,
+                  const std::string&   version,
+                  const GObservations& obs);
     ctobservation(const ctobservation& app);
     virtual ~ctobservation(void);
 

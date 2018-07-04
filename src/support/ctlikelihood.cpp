@@ -55,7 +55,7 @@
  ***************************************************************************/
 ctlikelihood::ctlikelihood(const std::string& name,
                            const std::string& version) :
-              ctobservation(name, version)
+                           ctobservation(name, version)
 {
     // Initialise members
     init_members();
@@ -66,42 +66,20 @@ ctlikelihood::ctlikelihood(const std::string& name,
 
 
 /***********************************************************************//**
- * @brief Observations constructor
+ * @brief Application parameters constructor
  *
- * @param[in] name Likelihood tool name.
- * @param[in] version Likelihood tool version.
- * param[in] obs Observation container.
+ * @param[in] name Observation tool name.
+ * @param[in] version Observation tool version.
+ * @param[in] pars Application parameters.
  *
- * Constructs a likelihood tool from the @p name, @p version and an
- * observation container.
+ * Constructs a likelihood tool from the @p name, @p version and the
+ * application parameters @p pars. See the equivalent ctool constructor
+ * for details.
  ***************************************************************************/
-ctlikelihood::ctlikelihood(const std::string&   name,
-                           const std::string&   version,
-                           const GObservations& obs) :
-                           ctobservation(name, version, obs)
-{
-    // Initialise members
-    init_members();
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Command line constructor
- *
- * @param[in] name Likelihood tool name.
- * @param[in] version Likelihood tool version.
- * @param[in] args Arguments vector.
- *
- * Constructs a likelihood tool from the @p name, @p version and command
- * line arguments. See the equivalent ctool constructor for details.
- ***************************************************************************/
-ctlikelihood::ctlikelihood(const std::string&              name,
-                           const std::string&              version,
-                           const std::vector<std::string>& args) :
-                           ctobservation(name, version, args)
+ctlikelihood::ctlikelihood(const std::string&      name,
+                           const std::string&      version,
+                           const GApplicationPars& pars) :
+                           ctobservation(name, version, pars)
 {
     // Initialise members
     init_members();
@@ -127,6 +105,29 @@ ctlikelihood::ctlikelihood(const std::string& name,
                            int   argc,
                            char *argv[]) :
                            ctobservation(name, version, argc, argv)
+{
+    // Initialise members
+    init_members();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Observations constructor
+ *
+ * @param[in] name Likelihood tool name.
+ * @param[in] version Likelihood tool version.
+ * param[in] obs Observation container.
+ *
+ * Constructs a likelihood tool from the @p name, @p version and an
+ * observation container.
+ ***************************************************************************/
+ctlikelihood::ctlikelihood(const std::string&   name,
+                           const std::string&   version,
+                           const GObservations& obs) :
+                           ctobservation(name, version, obs)
 {
     // Initialise members
     init_members();

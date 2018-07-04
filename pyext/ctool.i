@@ -38,9 +38,9 @@ public:
     // Constructors and destructors
     cscript(const std::string& name,
             const std::string& version) : ctool(name, version) {}
-    cscript(const std::string&              name,
-            const std::string&              version,
-            const std::vector<std::string>& args)  : ctool(name, version, args) {}
+    cscript(const std::string&      name,
+            const std::string&      version,
+            const GApplicationPars& pars) : ctool(name, version, pars) {}
     cscript(const std::string& name,
             const std::string& version,
             int                argc,
@@ -75,9 +75,9 @@ public:
     // Constructors and destructors
     ctool(const std::string& name,
           const std::string& version);
-    ctool(const std::string&              name,
-          const std::string&              version,
-          const std::vector<std::string>& args);
+    ctool(const std::string&      name,
+          const std::string&      version,
+          const GApplicationPars& pars);
     ctool(const std::string& name,
           const std::string& version,
           int                ARGC,
@@ -200,9 +200,15 @@ public:
 class cscript : public ctool  {
 public:        
     // Constructors and destructors
-    cscript(const std::string& name, const std::string& version);
-    cscript(const std::string& name, const std::string& version,
-            int ARGC, char **ARGV);
+    cscript(const std::string& name,
+            const std::string& version);
+    cscript(const std::string&      name,
+            const std::string&      version,
+            const GApplicationPars& pars);
+    cscript(const std::string& name,
+            const std::string& version,
+            int                ARGC,
+            char               **ARGV);
     cscript(const ctool& app);
     virtual ~cscript(void);
 

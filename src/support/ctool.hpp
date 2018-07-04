@@ -52,9 +52,9 @@ public:
     // Constructors and destructors
     ctool(const std::string& name,
           const std::string& version);
-    ctool(const std::string&              name,
-          const std::string&              version,
-          const std::vector<std::string>& args);
+    ctool(const std::string&      name,
+          const std::string&      version,
+          const GApplicationPars& pars);
     ctool(const std::string& name,
           const std::string& version,
           int                argc,
@@ -79,10 +79,11 @@ public:
 protected:
 #endif
     // Protected methods
-    void                  init_members(void);
-    void                  copy_members(const ctool& app);
-    void                  free_members(void);
-    const bool&           read_ahead(void) const;
+    void        init_members(void);
+    void        copy_members(const ctool& app);
+    void        free_members(void);
+    void        sync_pfiles(void);
+    const bool& read_ahead(void) const;
 
     // Protected high-level setup methods
     void setup_observations(GObservations& obs, const bool& response = true,
@@ -154,7 +155,7 @@ protected:
 protected:
     // Protected methods
     void            provide_help(void) const;
-    
+
     // Protected members
     bool            m_use_xml;  //!< Use XML file instead of FITS file for observations
 };
