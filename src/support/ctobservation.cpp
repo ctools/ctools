@@ -64,44 +64,20 @@ ctobservation::ctobservation(const std::string& name,
 
 
 /***********************************************************************//**
- * @brief Observations constructor
+ * @brief Application parameters constructor
  *
  * @param[in] name Observation tool name.
  * @param[in] version Observation tool version.
- * param[in] obs Observation container.
+ * @param[in] pars Application parameters.
  *
- * Constructs a observation tool from the @p name, @p version and an
- * observation container.
+ * Constructs a observation tool from the @p name, @p version and the
+ * application parameters @p pars. See the equivalent ctool constructor
+ * for details.
  ***************************************************************************/
-ctobservation::ctobservation(const std::string&   name,
-                             const std::string&   version,
-                             const GObservations& obs) : ctool(name, version)
-{
-    // Initialise members
-    init_members();
-
-    // Set observations
-    m_obs = obs;
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Command line constructor
- *
- * @param[in] name Observation tool name.
- * @param[in] version Observation tool version.
- * @param[in] args Arguments vector.
- *
- * Constructs a observation tool from the @p name, @p version and command
- * line arguments. See the equivalent ctool constructor for details.
- ***************************************************************************/
-ctobservation::ctobservation(const std::string&              name,
-                             const std::string&              version,
-                             const std::vector<std::string>& args) :
-                             ctool(name, version, args)
+ctobservation::ctobservation(const std::string&      name,
+                             const std::string&      version,
+                             const GApplicationPars& pars) :
+                             ctool(name, version, pars)
 {
     // Initialise members
     init_members();
@@ -129,6 +105,31 @@ ctobservation::ctobservation(const std::string& name,
 {
     // Initialise members
     init_members();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Observations constructor
+ *
+ * @param[in] name Observation tool name.
+ * @param[in] version Observation tool version.
+ * param[in] obs Observation container.
+ *
+ * Constructs a observation tool from the @p name, @p version and an
+ * observation container.
+ ***************************************************************************/
+ctobservation::ctobservation(const std::string&   name,
+                             const std::string&   version,
+                             const GObservations& obs) : ctool(name, version)
+{
+    // Initialise members
+    init_members();
+
+    // Set observations
+    m_obs = obs;
 
     // Return
     return;

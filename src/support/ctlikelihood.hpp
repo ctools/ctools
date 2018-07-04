@@ -44,16 +44,16 @@ public:
     // Constructors and destructors
     ctlikelihood(const std::string& name,
                  const std::string& version);
-    ctlikelihood(const std::string&   name,
-                 const std::string&   version,
-                 const GObservations& obs);
-    ctlikelihood(const std::string&              name,
-                 const std::string&              version,
-                 const std::vector<std::string>& args);
+    ctlikelihood(const std::string&      name,
+                 const std::string&      version,
+                 const GApplicationPars& pars);
     ctlikelihood(const std::string& name,
                  const std::string& version,
                  int                argc,
                  char*              argv[]);
+    ctlikelihood(const std::string&   name,
+                 const std::string&   version,
+                 const GObservations& obs);
     ctlikelihood(const ctlikelihood& app);
     virtual ~ctlikelihood(void);
 

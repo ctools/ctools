@@ -45,19 +45,19 @@ public:
     csobservation(const std::string& name,
                   const std::string& version) :
                   ctobservation(name, version) {}
-    csobservation(const std::string&   name,
-                  const std::string&   version,
-                  const GObservations& obs) :
-                  ctobservation(name, version, obs) {}
-    csobservation(const std::string&              name,
-                  const std::string&              version,
-                  const std::vector<std::string>& args) :
-                  ctobservation(name, version, args) {}
+    csobservation(const std::string&      name,
+                  const std::string&      version,
+                  const GApplicationPars& pars) :
+                  ctobservation(name, version, pars) {}
     csobservation(const std::string& name,
                   const std::string& version,
                   int                argc,
                   char*              argv[]) :
                   ctobservation(name, version, argc, argv) {}
+    csobservation(const std::string&   name,
+                  const std::string&   version,
+                  const GObservations& obs) :
+                  ctobservation(name, version, obs) {}
     csobservation(const csobservation& app) : ctobservation(app) {}
     virtual ~csobservation(void) {}
 
@@ -84,16 +84,16 @@ public:
     // Constructors and destructors
     ctobservation(const std::string& name,
                   const std::string& version);
-    ctobservation(const std::string&   name,
-                  const std::string&   version,
-                  const GObservations& obs);
-    ctobservation(const std::string&              name,
-                  const std::string&              version,
-                  const std::vector<std::string>& args);
+    ctobservation(const std::string&      name,
+                  const std::string&      version,
+                  const GApplicationPars& pars);
     ctobservation(const std::string& name,
                   const std::string& version,
                   int                ARGC,
                   char               **ARGV);
+    ctobservation(const std::string&   name,
+                  const std::string&   version,
+                  const GObservations& obs);
     ctobservation(const ctobservation& app);
     virtual ~ctobservation(void);
 
@@ -137,16 +137,16 @@ public:
     // Constructors and destructors
     csobservation(const std::string& name,
                   const std::string& version);
-    csobservation(const std::string&   name,
-                  const std::string&   version,
-                  const GObservations& obs);
-    csobservation(const std::string&              name,
-                  const std::string&              version,
-                  const std::vector<std::string>& args);
+    csobservation(const std::string&      name,
+                  const std::string&      version,
+                  const GApplicationPars& pars);
     csobservation(const std::string& name,
                   const std::string& version,
                   int                ARGC,
                   char               **ARGV);
+    csobservation(const std::string&   name,
+                  const std::string&   version,
+                  const GObservations& obs);
     csobservation(const csobservation& app);
     virtual ~csobservation(void);
 

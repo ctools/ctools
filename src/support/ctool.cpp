@@ -92,19 +92,8 @@ ctool::ctool(const std::string& name,
     // Initialise members
     init_members();
 
-    // If CTOOLS environment variable is set and if a parameter exists in
-    // the syspfiles folder then set syspfiles folder and reload parameter
-    // file
-    char* ptr = std::getenv("CTOOLS");
-    if (ptr != NULL) {
-        std::string path     = std::string(ptr) + "/syspfiles";
-        std::string filename = path +  "/" + par_filename();
-        if (access(filename.c_str(), R_OK) == 0) {
-            m_pars.clear();
-            m_pars.syspfiles(path);
-            m_pars.load(par_filename());
-        }
-    }
+    // Synchronise parameter files
+    sync_pfiles();
 
     // Return
     return;
@@ -112,48 +101,23 @@ ctool::ctool(const std::string& name,
 
 
 /***********************************************************************//**
- * @brief Command line constructor
+ * @brief Application parameter constructor
  *
  * @param[in] name Application name.
  * @param[in] version Application version.
- * @param[in] args Arguments vector.
+ * @param[in] pars Application parameters.
  *
- * Constructs a ctool from the @p name, @p version and command line
- * arguments. The constructor uses the equivalent GApplication constructor
+ * Constructs a ctool from the @p name, @p version and application parameters
+ * @p pars. The constructor uses the equivalent GApplication constructor
  * to set the parameter filename to "<name>.par" and the log filename to
- * "<name>".log. The parameters will be loaded from the parameter file.
- * In addition, the constructor opens the log file.
- *
- * If the "--help" option is provided as command line argument a help text
- * about the usage of the ctool will be shown in the console and the ctool
- * will exit. No log file will be opened in that case.
+ * "<name>".log. The constructor opens the log file.
  ***************************************************************************/
-ctool::ctool(const std::string&              name,
-             const std::string&              version,
-             const std::vector<std::string>& args) : GApplication(name, version, args)
+ctool::ctool(const std::string&      name,
+             const std::string&      version,
+             const GApplicationPars& pars) : GApplication(name, version, pars)
 {
-    // Catch --help option before doing anything else
-    if (need_help()) {
-        provide_help();
-        exit(0);
-    }
-
     // Initialise members
     init_members();
-
-    // If CTOOLS environment variable is set and if a parameter exists in
-    // the syspfiles folder then set syspfiles folder and reload parameter
-    // file
-    char* ptr = std::getenv("CTOOLS");
-    if (ptr != NULL) {
-        std::string path     = std::string(ptr) + "/syspfiles";
-        std::string filename = path +  "/" + par_filename();
-        if (access(filename.c_str(), R_OK) == 0) {
-            m_pars.clear();
-            m_pars.syspfiles(path);
-            m_pars.load(par_filename(), m_args);
-        }
-    }
 
     // Open the log file
     logFileOpen();
@@ -195,19 +159,8 @@ ctool::ctool(const std::string& name,
     // Initialise members
     init_members();
 
-    // If CTOOLS environment variable is set and if a parameter exists in
-    // the syspfiles folder then set syspfiles folder and reload parameter
-    // file
-    char* ptr = std::getenv("CTOOLS");
-    if (ptr != NULL) {
-        std::string path     = std::string(ptr) + "/syspfiles";
-        std::string filename = path +  "/" + par_filename();
-        if (access(filename.c_str(), R_OK) == 0) {
-            m_pars.clear();
-            m_pars.syspfiles(path);
-            m_pars.load(par_filename(), m_args);
-        }
-    }
+    // Synchronise parameter files
+    sync_pfiles();
 
     // Open the log file
     logFileOpen();
@@ -364,6 +317,33 @@ void ctool::copy_members(const ctool& app)
  ***************************************************************************/
 void ctool::free_members(void)
 {
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Synchronise parameter files
+ *
+ * Make sure that the structure of the parameter files in the syspfiles
+ * folder is used as a reference.
+ ***************************************************************************/
+void ctool::sync_pfiles(void)
+{
+    // If CTOOLS environment variable is set and if a parameter file exists
+    // in the syspfiles folder then set syspfiles folder and reload
+    // parameter file
+    char* ptr = std::getenv("CTOOLS");
+    if (ptr != NULL) {
+        std::string path     = std::string(ptr) + "/syspfiles";
+        std::string filename = path +  "/" + par_filename();
+        if (access(filename.c_str(), R_OK) == 0) {
+            m_pars.clear();
+            m_pars.syspfiles(path);
+            m_pars.load(par_filename(), m_args);
+        }
+    }
+
     // Return
     return;
 }
