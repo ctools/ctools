@@ -397,7 +397,7 @@ class cspull(ctools.csobservation):
                                       result['colnames'], result['values'])
                 self._log_string(gammalib.TERSE, poolresults[seed][1]['log'], False)
 
-        # Loop over trials
+        # Otherwise, loop over trials
         for seed in range(self['ntrials'].integer()):
 
             # Make a trial and add initial seed
