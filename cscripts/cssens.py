@@ -25,6 +25,33 @@ import ctools
 from cscripts import obsutils
 from cscripts import modutils
 from cscripts import ioutils
+from cscripts import mputils
+
+# ============================================ #
+# Global functions for multiprocessing support #
+# ============================================ #
+def _multiprocessing_func_wrapper(args):
+   return _multiprocessing_func(*args)
+def _multiprocessing_func(cls, i):
+
+    # Initialise thread logger
+    cls._log.clear()
+    cls._log.buffer_size(100000)
+
+    # Compute light curve bin
+    cstart  = cls.celapse()
+    result  = cls._e_bin(i)
+    celapse = cls.celapse() - cstart
+    buffer  = cls._log.buffer()
+
+    # Close logger
+    cls._log.close()
+
+    # Collect thread information
+    info = {'celapse': celapse, 'log': buffer}
+
+    # Return light curve bin result and thread information
+    return result, info
 
 
 # ============ #
@@ -57,10 +84,57 @@ class cssens(ctools.csobservation):
         self._ra          = None
         self._dec         = None
         self._log_clients = False
+        self._models      = gammalib.GModels()
+        self._nthreads    = 0
 
         # Return
         return
 
+    # State methods por pickling
+    def __getstate__(self):
+        """
+        Extend ctools.csobservation getstate method to include some members
+
+        Returns
+        -------
+        state : dict
+            Pickled instance
+        """
+        # Set pickled dictionary
+        state = {'base'         : ctools.csobservation.__getstate__(self),
+                 'ebounds'      : self._ebounds,
+                 'obs_ebounds'  : self._obs_ebounds,
+                 'srcname'      : self._srcname,
+                 'ra'           : self._ra,
+                 'dec'          : self._dec,
+                 'log_clients'  : self._log_clients,
+                 'models'       : self._models,
+                 'nthreads' : self._nthreads}
+
+        # Return pickled dictionary
+        return state
+
+    def __setstate__(self, state):
+        """
+        Extend ctools.csobservation setstate method to include some members
+
+        Parameters
+        ----------
+        state : dict
+            Pickled instance
+        """
+        ctools.csobservation.__setstate__(self, state['base'])
+        self._ebounds     = state['ebounds']
+        self._obs_ebounds = state['obs_ebounds']
+        self._srcname     = state['srcname']
+        self._ra          = state['ra']
+        self._dec         = state['dec']
+        self._log_clients = state['log_clients']
+        self._models      = state['models']
+        self._nthreads    = state['nthreads']
+
+        # Return
+        return
 
     # Private methods
     def _get_parameters(self):
@@ -107,6 +181,10 @@ class cssens(ctools.csobservation):
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
+
+
+        # Set number of processes for multiprocessing
+        self._nthreads = mputils.nthreads(self)
 
         # Return
         return
@@ -564,6 +642,36 @@ class cssens(ctools.csobservation):
         return (crab_flux_prediction, regcoeff)
 
 
+    def _e_bin(self,ieng):
+        """
+        Determines sensivity in energy bin ieng
+        :param ieng: int, energy bin number
+        :return: dict,
+            Result dictionary
+        """
+
+        # Get sensitivity type
+        sensitivity_type = self['type'].string()
+
+        # Set energies
+        if sensitivity_type == 'Differential':
+            emin = self._ebounds.emin(ieng)
+            emax = self._ebounds.emax(ieng)
+        elif sensitivity_type == 'Integral':
+            emin = self._ebounds.emin(ieng)
+            emax = self._ebounds.emax()
+        else:
+            msg = ('Invalid sensitivity type "%s" encountered. Either '
+                   'specify "Differential" or "Integral".' %
+                   sensitivity_type)
+            raise RuntimeError(msg)
+
+        # Determine sensitivity
+        result = self._get_sensitivity(emin, emax, self._models)
+
+        # Return results
+        return result
+
     # Public methods
     def run(self):
         """
@@ -588,47 +696,53 @@ class cssens(ctools.csobservation):
         results  = []
 
         # Set test source model for this observation
-        models = modutils.test_source(self.obs().models(), self._srcname,
+        self._models = modutils.test_source(self.obs().models(), self._srcname,
                                       ra=self._ra, dec=self._dec)
 
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
         # Write models into logger
-        self._log_models(gammalib.NORMAL, models, 'Input model')
-
-        # Get sensitivity type
-        sensitivity_type = self['type'].string()
+        self._log_models(gammalib.NORMAL, self._models, 'Input model')
 
         # Write header
         self._log_header1(gammalib.TERSE, 'Sensitivity determination')
-        self._log_value(gammalib.TERSE, 'Type', sensitivity_type)
+        self._log_value(gammalib.TERSE, 'Type', self['type'].string())
 
-        # Loop over energy bins
-        for ieng in range(self._ebounds.size()):
+        # If using multiprocessing
+        if self._nthreads > 1 and self._ebounds.size() > 1:
 
-            # Set energies
-            if sensitivity_type == 'Differential':
-                emin  = self._ebounds.emin(ieng)
-                emax  = self._ebounds.emax(ieng)
-            elif sensitivity_type == 'Integral':
-                emin  = self._ebounds.emin(ieng)
-                emax  = self._ebounds.emax()
-            else:
-                msg = ('Invalid sensitivity type "%s" encountered. Either '
-                       'specify "Differential" or "Integral".' %
-                       sensitivity_type)
-                raise RuntimeError(msg)
+            # Create pool of workers
+            from multiprocessing import Pool
+            pool = Pool(processes = self._nthreads)
 
-            # Determine sensitivity
-            result = self._get_sensitivity(emin, emax, models)
+            # Run energy bin analysis in parallel with map
+            args        = [(self, ieng) for ieng in range(self._ebounds.size())]
+            poolresults = pool.map(_multiprocessing_func_wrapper, args)
 
-            # Write out trial result
+            # Close pool and join
+            pool.close()
+            pool.join()
+
+            # Construct results
+            for ieng in range(self._ebounds.size()):
+                results.append(poolresults[ieng][0])
+                self._log_string(gammalib.TERSE, poolresults[ieng][1]['log'], False)
+
+        # Otherwise, loop over energy bins
+        else:
+            for ieng in range(self._ebounds.size()):
+
+                #Run analysis in energy bin
+                result = self._e_bin(ieng)
+
+                # Append results
+                results.append(result)
+
+        # Write out trial result
+        for ieng, result in enumerate(results):
             ioutils.write_csv_row(self['outfile'].filename().url(), ieng,
                                   colnames, result)
-
-            # Append results
-            results.append(result)
 
         # Return
         return

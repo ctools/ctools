@@ -109,7 +109,7 @@ class Test(test):
         """
         Test cssens from Python
         """
-        # Set-up cssens for differential sensitivity computation
+        # Set-up cssens for differential sensitivity computation with multiprocessing
         sens = cscripts.cssens()
         sens['inobs']    = 'NONE'
         sens['inmodel']  = self._model
@@ -121,7 +121,7 @@ class Test(test):
         sens['rad']      = 3.0
         sens['emin']     = 1.0
         sens['emax']     = 10.0
-        sens['bins']     = 1
+        sens['bins']     = 2
         sens['logfile']  = 'cssens_py1.log'
         sens['chatter']  = 4
 
@@ -131,9 +131,9 @@ class Test(test):
         sens.save()
 
         # Check pull distribution file
-        self._check_result_file('cssens_py1.dat')
+        self._check_result_file('cssens_py1.dat',nrows=3)
 
-        # Set-up cssens for integral sensitivity computation
+        # Set-up cssens for integral sensitivity computation without multiprocessing
         sens = cscripts.cssens()
         sens['inobs']    = 'NONE'
         sens['inmodel']  = self._model
@@ -149,6 +149,7 @@ class Test(test):
         sens['type']     = 'Integral'
         sens['logfile']  = 'cssens_py2.log'
         sens['chatter']  = 4
+        sens['nthreads'] = 1
 
         # Execute cssens script
         sens.execute()
@@ -160,7 +161,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename):
+    def _check_result_file(self, filename, nrows=2):
         """
         Check result file
         """
@@ -168,7 +169,7 @@ class Test(test):
         results = gammalib.GCsv(filename, ',')
 
         # Check dimensions
-        self.test_value(results.nrows(), 2,
+        self.test_value(results.nrows(), nrows,
              'Check number of rows in sensitivity file')
         self.test_value(results.ncols(), 10,
              'Check number of columns in sensitivity file')
