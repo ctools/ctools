@@ -24,6 +24,33 @@ import ctools
 from cscripts import obsutils
 from cscripts import modutils
 from cscripts import ioutils
+from cscripts import mputils
+
+# ============================================ #
+# Global functions for multiprocessing support #
+# ============================================ #
+def _multiprocessing_func_wrapper(args):
+   return _multiprocessing_func(*args)
+def _multiprocessing_func(cls, i):
+
+    # Initialise thread logger
+    cls._log.clear()
+    cls._log.buffer_size(100000)
+
+    # Compute light curve bin
+    cstart  = cls.celapse()
+    result  = cls._trial(i)
+    celapse = cls.celapse() - cstart
+    buffer  = cls._log.buffer()
+
+    # Close logger
+    cls._log.close()
+
+    # Collect thread information
+    info = {'celapse': celapse, 'log': buffer}
+
+    # Return light curve bin result and thread information
+    return result, info
 
 
 # ============== #
@@ -46,10 +73,48 @@ class cstsdist(ctools.csobservation):
         self._srcname     = ''
         self._log_clients = False
         self._model       = None
+        self._nthreads    = 0
 
         # Return
         return
 
+    # State methods por pickling
+    def __getstate__(self):
+        """
+        Extend ctools.csobservation getstate method to include some members
+
+        Returns
+        -------
+        state : dict
+            Pickled instance
+        """
+        # Set pickled dictionary
+        state = {'base'         : ctools.csobservation.__getstate__(self),
+                 'srcname'      : self._srcname,
+                 'log_clients'  : self._log_clients,
+                 'model'        : self._model,
+                 'nthreads'     : self._nthreads}
+
+        # Return pickled dictionary
+        return state
+
+    def __setstate__(self, state):
+        """
+        Extend ctools.csobservation setstate method to include some members
+
+        Parameters
+        ----------
+        state : dict
+            Pickled instance
+        """
+        ctools.csobservation.__setstate__(self, state['base'])
+        self._srcname       = state['srcname']
+        self._log_clients   = state['log_clients']
+        self._model         = state['model']
+        self._nthreads      = state['nthreads']
+
+        # Return
+        return
 
     # Private methods
     def _get_parameters(self):
@@ -78,6 +143,9 @@ class cstsdist(ctools.csobservation):
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
+
+        # Set number of processes for multiprocessing
+        self._nthreads = mputils.nthreads(self)
 
         # Return
         return
@@ -258,7 +326,29 @@ class cstsdist(ctools.csobservation):
         # Write header
         self._log_header1(gammalib.TERSE, 'Generate TS distribution')
 
-        # Loop over trials
+        # If using multiprocessing
+        if self._nthreads > 1:
+
+            # Create pool of workers
+            from multiprocessing import Pool
+            pool = Pool(processes = self._nthreads)
+
+            # Run time bin analysis in parallel with map
+            args        = [(self, seed) for seed in range(self['ntrials'].integer())]
+            poolresults = pool.map(_multiprocessing_func_wrapper, args)
+
+            # Close pool and join
+            pool.close()
+            pool.join()
+
+            # Write results
+            for seed in range(self['ntrials'].integer()):
+                result = poolresults[seed][0]
+                ioutils.write_csv_row(self['outfile'].filename().url(), seed,
+                                      result['colnames'], result['values'])
+                self._log_string(gammalib.TERSE, poolresults[seed][1]['log'], False)
+
+        # Otherwise, loop over trials
         for seed in range(self['ntrials'].integer()):
 
             # Make a trial
