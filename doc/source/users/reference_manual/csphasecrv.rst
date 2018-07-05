@@ -31,6 +31,11 @@ are necessary to run internally the :ref:`csphagen` script (``inexclusion``, ``c
 ``xref``, ``yref``, ``srcshape``, ``rad``, ``bkgmethod``, ``bkgregmin``, ``maxoffset``,
 ``etruemin``, ``etruemax``, ``etruebins``).
 
+:ref:`csphasecrv` supports multiprocessing. By default the analysis in each phase bin will
+be performed in parallel over as many processes as the number of CPUs available on your
+machine. The maximum number of parallel processes can be set by the user through the
+``nthreads`` hidden parameter.
+
 The script writes the fit results into a FITS file. The script also produces one
 XML file per phase bin that contains the best-fit model for that bin.
 
@@ -153,6 +158,9 @@ General parameters
 
 Standard parameters
 -------------------
+
+``(nthreads = 0) [integer]``
+    Number of parallel processes (0=use all available CPUs).
 
 ``(publish = no) [boolean]``
     Specifies whether the phase curve should be published on VO Hub.

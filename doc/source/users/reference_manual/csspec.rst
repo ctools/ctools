@@ -42,6 +42,11 @@ are available in the data. In case that there are more energy bins in the data
 than the number of spectral bins that are requested, :ref:`csspec` will fit the
 data in all energy bins that overlap with a given spectral bin simultaneously.
 
+:ref:`csspec` supports multiprocessing for ``method=SLICE``. By default the
+analysis in each energy bin will be performed in parallel over as many processes
+as the number of CPUs available on your machine. The maximum number of parallel
+processes can be set by the user through the ``nthreads`` hidden parameter.
+
 On output, the script will provide a FITS file with the fitted source 
 spectrum in form of a binary table. Each row corresponds to a spectral bin.
 The columns are the mean as well as the boundaries of the spectral bin, 
@@ -143,6 +148,9 @@ General parameters
 
 Standard parameters
 -------------------
+
+``(nthreads = 0) [integer]``
+    Number of parallel processes (0=use all available CPUs).
 
 ``(publish = no) [boolean]``
     Specifies whether the spectrum should be published on VO Hub.

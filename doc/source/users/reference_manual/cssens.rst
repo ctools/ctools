@@ -23,6 +23,11 @@ the log-likelihood difference that is obtained when fitting the simulated data
 with and without the test source. The simplified assumption is made that the
 significance (in Gaussian sigma) is the square root of the Test Statistic.
 
+:ref:`cssens` supports multiprocessing. By default the analysis for each energy
+bin/threshold will be performed in parallel over as many processes as the number of
+CPUs available on your machine. The maximum number of parallel processes can be set
+by the user through the ``nthreads`` hidden parameter.
+
 :ref:`cssens` will generate an ASCII file in comma-separated value (CSV) format
 containing the sensitivity as function of energy. The first row is a header row
 providing the column names. The following rows provide the mean logarithmic
@@ -111,6 +116,9 @@ General parameters
 
 Standard parameters
 -------------------
+
+``(nthreads = 0) [integer]``
+    Number of parallel processes (0=use all available CPUs).
 
 ``(chatter = 2) [integer]``
     Verbosity of the executable:

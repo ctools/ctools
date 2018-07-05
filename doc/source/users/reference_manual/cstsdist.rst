@@ -15,6 +15,11 @@ sets. The Test Statistics is defined as twice the log-likelihood difference
 that is obtained when fitting simulated data with and without a given
 source model component.
 
+:ref:`cstsdist` supports multiprocessing. By default each simulation/analysis will
+be performed in parallel over as many processes as the number of CPUs available on your
+machine. The maximum number of parallel processes can be set by the user through the
+``nthreads`` hidden parameter.
+
 :ref:`cstsdist` will create an ASCII file in comma-separated value (CSV) format,
 containing one row per TS computation. The first row is a header row providing
 the column names. The following rows give the TS value, the log-likelihood 
@@ -85,6 +90,9 @@ General parameters
 
 Standard parameters
 -------------------
+
+``(nthreads = 0) [integer]``
+    Number of parallel processes (0=use all available CPUs).
 
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
