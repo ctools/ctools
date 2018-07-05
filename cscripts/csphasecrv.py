@@ -424,7 +424,7 @@ class csphasecrv(ctools.csobservation):
 
         # If an On/Off analysis is requested generate the On/Off observations
         if self._onoff:
-            obs = obsutils.get_onoff_obs(self, select.obs())
+            obs = obsutils.get_onoff_obs(self, select.obs(), nthreads=1)
 
         # ... otherwise, if stacked analysis is requested then bin the
         # events and compute the stacked response functions and setup

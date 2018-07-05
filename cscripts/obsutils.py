@@ -770,7 +770,7 @@ def get_stacked_obs(cls, obs):
 # ================================ #
 # Get On/Off observation container #
 # ================================ #
-def get_onoff_obs(cls, obs):
+def get_onoff_obs(cls, obs, nthreads=0):
     """
     Create On/Off observations container from given observations
 
@@ -835,6 +835,7 @@ def get_onoff_obs(cls, obs):
     phagen['chatter']   = cls['chatter'].integer()
     phagen['clobber']   = cls['clobber'].boolean()
     phagen['debug']     = cls['debug'].boolean()
+    phagen['nthreads']  = nthreads
     phagen.run()
 
     # Clone resulting observation container
