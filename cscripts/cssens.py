@@ -418,7 +418,8 @@ class cssens(ctools.csobservation):
                                binsz=binsz, npix=npix,
                                log=self._log_clients,
                                debug=self['debug'].boolean(),
-                               edisp=self['edisp'].boolean())
+                               edisp=self['edisp'].boolean(),
+                               nthreads=1)
 
             # Determine number of events in simulation by summing the events
             # over all observations in the observation container

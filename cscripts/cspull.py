@@ -256,8 +256,8 @@ class cspull(ctools.csobservation):
                            onsrc=onsrc, onrad=onrad,
                            addbounds=True, seed=seed,
                            binsz=binsz, npix=npix, proj=proj, coord=coordsys,
-                           edisp=edisp, log=False, debug=self._logDebug(),
-                           chatter=self['chatter'].integer())
+                           edisp=edisp, nthreads=1, log=False,
+                           debug=self._logDebug(), chatter=self['chatter'].integer())
 
         # Determine number of events in simulation
         nevents = 0.0

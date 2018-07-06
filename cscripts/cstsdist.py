@@ -196,9 +196,10 @@ class cstsdist(ctools.csobservation):
         # only for event lists
         else:
             sim = obsutils.sim(self.obs(),
-                               seed  = seed,
-                               log   = self._log_clients,
-                               debug = self['debug'].boolean())
+                               seed     = seed,
+                               log      = self._log_clients,
+                               debug    = self['debug'].boolean(),
+                               nthreads =1)
 
         # Return simulated observation
         return sim
