@@ -89,11 +89,11 @@ class cstsdist(ctools.csobservation):
             Pickled instance
         """
         # Set pickled dictionary
-        state = {'base'         : ctools.csobservation.__getstate__(self),
-                 'srcname'      : self._srcname,
-                 'log_clients'  : self._log_clients,
-                 'model'        : self._model,
-                 'nthreads'     : self._nthreads}
+        state = {'base'        : ctools.csobservation.__getstate__(self),
+                 'srcname'     : self._srcname,
+                 'log_clients' : self._log_clients,
+                 'model'       : self._model,
+                 'nthreads'    : self._nthreads}
 
         # Return pickled dictionary
         return state
@@ -108,10 +108,10 @@ class cstsdist(ctools.csobservation):
             Pickled instance
         """
         ctools.csobservation.__setstate__(self, state['base'])
-        self._srcname       = state['srcname']
-        self._log_clients   = state['log_clients']
-        self._model         = state['model']
-        self._nthreads      = state['nthreads']
+        self._srcname     = state['srcname']
+        self._log_clients = state['log_clients']
+        self._model       = state['model']
+        self._nthreads    = state['nthreads']
 
         # Return
         return
@@ -199,7 +199,7 @@ class cstsdist(ctools.csobservation):
                                seed     = seed,
                                log      = self._log_clients,
                                debug    = self['debug'].boolean(),
-                               nthreads =1)
+                               nthreads = 1)
 
         # Return simulated observation
         return sim

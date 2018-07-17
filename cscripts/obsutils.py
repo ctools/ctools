@@ -28,7 +28,7 @@ import cscripts
 # ===================== #
 def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         emin=None, emax=None, nbins=0, onsrc=None, onrad=0.2, addbounds=False,
-        binsz=0.05, npix=200, proj='TAN', coord='GAL',nthreads=0):
+        binsz=0.05, npix=200, proj='TAN', coord='GAL', nthreads=0):
     """
     Simulate events for all observations in the container
 
