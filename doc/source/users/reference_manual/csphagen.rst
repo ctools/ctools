@@ -44,6 +44,11 @@ in the format
      ...
    </observation>
 
+:ref:`csphagen` supports multiprocessing. By default each event list will be treated
+in parallel over as many processes as the number of CPUs available on your
+machine. The maximum number of parallel processes can be set by the user through the
+``nthreads`` hidden parameter.
+
 The :ref:`csphagen` script will produce on output an observation definition XML
 file that points to all relevant files. All relevant files will be prefixed with
 the string specified by the ``prefix`` parameter. If several observations are
@@ -60,6 +65,10 @@ script will write out:
 
 General parameters
 ------------------
+
+
+``(nthreads = 0) [integer]``
+    Number of parallel processes (0=use all available CPUs).
 
 ``inobs [file]``
     Input event list or observation definition XML file.

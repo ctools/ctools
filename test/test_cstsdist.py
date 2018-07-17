@@ -135,6 +135,27 @@ class Test(test):
         # Check pull distribution file
         self._check_result_file('cstsdist_py1.dat')
 
+        # Set-up cstsdist without multiprocessing
+        tsdist = cscripts.cstsdist()
+        tsdist['inobs']     = self._events
+        tsdist['inmodel']   = self._model
+        tsdist['srcname']   = 'Crab'
+        tsdist['caldb']     = self._caldb
+        tsdist['irf']       = self._irf
+        tsdist['ntrials']   = 2
+        tsdist['outfile']   = 'cstsdist_py2.dat'
+        tsdist['logfile']   = 'cstsdist_py2.log'
+        tsdist['chatter']   = 3
+        tsdist['nthreads']  = 1
+
+        # Run cstsdist script
+        tsdist.logFileOpen()  # Make sure we get a log file
+        tsdist.run()
+        tsdist.save()
+
+        # Check pull distribution file
+        self._check_result_file('cstsdist_py2.dat')
+
         # Return
         return
 

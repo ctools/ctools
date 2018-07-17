@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-3 July 2018
+17 July 2018
 
 
 Introduction
@@ -244,6 +244,9 @@ Use time reference of input observations if time selection is given in MET
 
 csphagen - Generate On/Off observations
 ---------------------------------------
+Add hidden "nthreads" parameter and implement parallelisation of computations
+(#2421).
+
 The true number of energy bins is now computed using
    int(bins_per_decade * num_of_decades + 0.5)
 making sure in addition that the result is at least 1. This provides better
@@ -255,11 +258,15 @@ tutorial was added to the user documentation (#2404).
 
 csphasecrv - Generate phase curve
 ---------------------------------
-None
+Add hidden "nthreads" parameter and implement parallelisation of computations
+(#2421).
 
 
 cspull - Generate pull distributions
 ------------------------------------
+Add hidden "nthreads" parameter and implement parallelisation of computations
+(#2421).
+
 Add hidden "mjdref" parameter for the specification of the MET reference
 (#2054).
 
@@ -282,11 +289,15 @@ None
 
 cssens - Computes sensitivity curve
 -----------------------------------
-None
+Add hidden "nthreads" parameter and implement parallelisation of computations
+(#2421).
 
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
+Add hidden "nthreads" parameter and implement parallelisation of computations
+(#2421).
+
 csspec now properly computes the Test Statistic for an On/Off analysis using
 the "wstat" statistic in the case that the input model definition XML file
 did not contain a background model (#2312).
@@ -303,7 +314,8 @@ None
 
 cstsdist - Computes Test Statistic distribution
 -----------------------------------------------
-None
+Add hidden "nthreads" parameter and implement parallelisation of computations
+(#2421).
 
 
 cstsmapmerge - Merge Test Statistic maps
@@ -340,6 +352,11 @@ None
 modutils - Model utilities
 --------------------------
 None
+
+
+mputils - Multiprocessing utilities
+-----------------------------------
+Introduce module (#2421).
 
 
 obsutils - Observation utilities

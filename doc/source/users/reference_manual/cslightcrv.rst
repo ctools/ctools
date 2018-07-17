@@ -31,6 +31,11 @@ are necessary to run internally the :ref:`csphagen` script (``inexclusion``, ``c
 ``xref``, ``yref``, ``srcshape``, ``rad``, ``bkgmethod``, ``bkgregmin``, ``maxoffset``,
 ``etruemin``, ``etruemax``, ``etruebins``).
 
+:ref:`cslightcrv` supports multiprocessing. By default the analysis in each time bin will
+be performed in parallel over as many processes as the number of CPUs available on your
+machine. The maximum number of parallel processes can be set by the user through the
+``nthreads`` hidden parameter.
+ 
 :ref:`cslightcrv` writes the fitted model parameters and their statistical errors
 in a FITS file. In addition, it computes for each time bin the statistical 
 significance of the detection, expressed by the Test Statistics, and the 

@@ -45,10 +45,11 @@ statistic, s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statistic"
 #
 # Standard parameters
 #====================
-chatter, i, h, 2,0,4, "Chattiness of output"
-clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
-debug,   b, h, no,,, "Activate debugging mode?"
-mode,    s, h, ql,,, "Mode of automatic parameters"
-logfile, f, h, cssens.log,,, "Log filename"
+nthreads, i, h, 0,0,1000, "Number of parallel processes (0=use all available CPUs)"
+chatter,  i, h, 2,0,4, "Chattiness of output"
+clobber,  b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,    b, h, no,,, "Activate debugging mode?"
+mode,     s, h, ql,,, "Mode of automatic parameters"
+logfile,  f, h, cssens.log,,, "Log filename"
 
 

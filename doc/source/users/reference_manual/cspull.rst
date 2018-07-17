@@ -29,6 +29,11 @@ the input model (specified via the ``inmodel`` parameter), the script will perfo
 an On/Off analysis using the ``REFLECTED`` method and a On region radius that is
 given by the ``onrad`` parameter.
 
+:ref:`cspull` supports multiprocessing. By default each simulation/analysis will
+be performed in parallel over as many processes as the number of CPUs available on your
+machine. The maximum number of parallel processes can be set by the user through the
+``nthreads`` hidden parameter.
+
 :ref:`cspull` will generate an ASCII file in comma-separated value (CSV) format,
 containing one row per pull. The first row is a header row providing the 
 column names. The following rows give the pull results, one row per pull. 
@@ -132,6 +137,9 @@ General parameters
 
 Standard parameters
 -------------------
+
+``(nthreads = 0) [integer]``
+    Number of parallel processes (0=use all available CPUs).
 
 ``(chatter = 2) [integer]``
     Verbosity of the executable:

@@ -23,6 +23,33 @@ import gammalib
 import ctools
 from cscripts import obsutils
 from cscripts import ioutils
+from cscripts import mputils
+
+# ============================================ #
+# Global functions for multiprocessing support #
+# ============================================ #
+def _multiprocessing_func_wrapper(args):
+   return _multiprocessing_func(*args)
+def _multiprocessing_func(cls, phbin):
+
+    # Initialise thread logger
+    cls._log.clear()
+    cls._log.buffer_size(100000)
+
+    # Compute light curve bin
+    cstart  = cls.celapse()
+    result  = cls._phase_bin(phbin)
+    celapse = cls.celapse() - cstart
+    buffer  = cls._log.buffer()
+
+    # Close logger
+    cls._log.close()
+
+    # Collect thread information
+    info = {'celapse': celapse, 'log': buffer}
+
+    # Return light curve bin result and thread information
+    return result, info
 
 
 # ================ #
@@ -67,6 +94,51 @@ class csphasecrv(ctools.csobservation):
         self._stacked   = False
         self._fits      = gammalib.GFits()
         self._fitmodels = {}
+        self._nthreads  = 0
+
+        # Return
+        return
+
+    # State methods por pickling
+    def __getstate__(self):
+        """
+        Extend ctools.csobservation getstate method to include some members
+
+        Returns
+        -------
+        state : dict
+            Pickled instance
+        """
+        # Set pickled dictionary
+        state = {'base'     : ctools.csobservation.__getstate__(self),
+                 'srcname'  : self._srcname,
+                 'phbins'   : self._phbins,
+                 'stacked'  : self._stacked,
+                 'onoff'    : self._onoff,
+                 'fits'     : self._fits,
+                 'fitmodels': self._fitmodels,
+                 'nthreads' : self._nthreads}
+
+        # Return pickled dictionary
+        return state
+
+    def __setstate__(self, state):
+        """
+        Extend ctools.csobservation setstate method to include some members
+
+        Parameters
+        ----------
+        state : dict
+            Pickled instance
+        """
+        ctools.csobservation.__setstate__(self, state['base'])
+        self._srcname  = state['srcname']
+        self._phbins   = state['phbins']
+        self._onoff    = state['onoff']
+        self._stacked  = state['stacked']
+        self._fits     = state['fits']
+        self._fitmodels= state['fitmodels']
+        self._nthreads = state['nthreads']
 
         # Return
         return
@@ -110,6 +182,9 @@ class csphasecrv(ctools.csobservation):
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
+
+        # Set number of processes for multiprocessing
+        self._nthreads = mputils.nthreads(self)
 
         # Return
         return
@@ -320,6 +395,79 @@ class csphasecrv(ctools.csobservation):
         # Return
         return
 
+    def _phase_bin(self,phbin):
+
+        # Write time bin into header
+        self._log_header2(gammalib.TERSE, 'PHASE %f - %f' %
+                          (phbin[0], phbin[1]))
+
+        # Select events
+        select = ctools.ctselect(self.obs().copy())
+        select['emin'] = self['emin'].real()
+        select['emax'] = self['emax'].real()
+        select['tmin'] = 'UNDEFINED'
+        select['tmax'] = 'UNDEFINED'
+        select['rad'] = 'UNDEFINED'
+        select['ra'] = 'UNDEFINED'
+        select['dec'] = 'UNDEFINED'
+        select['expr'] = 'PHASE>' + str(phbin[0]) + ' && PHASE<' + str(phbin[1])
+        select.run()
+
+        # Set phase string
+        phstr = str(phbin[0]) + '-' + str(phbin[1])
+
+        # Add phase to observation id
+        for i in range(0, select.obs().size()):
+            oldid = select.obs()[i].id()
+            select.obs()[i].id(oldid + '_' + phstr)
+        obs = select.obs()
+
+        # If an On/Off analysis is requested generate the On/Off observations
+        if self._onoff:
+            obs = obsutils.get_onoff_obs(self, select.obs(), nthreads=1)
+
+        # ... otherwise, if stacked analysis is requested then bin the
+        # events and compute the stacked response functions and setup
+        # an observation container with a single stacked observation.
+        elif self._stacked:
+            obs = obsutils.get_stacked_obs(self, select.obs())
+
+        # Header
+        self._log_header3(gammalib.EXPLICIT, 'Fitting the data')
+
+        # The On/Off analysis can produce empty observation containers,
+        # e.g., when on-axis observations are used. To avoid ctlike asking
+        # for a new observation container (or hang, if in interactive mode)
+        # we'll run ctlike only if the size is >0
+        if obs.size() > 0:
+
+            # Do maximum likelihood model fitting
+            like = ctools.ctlike(obs)
+            like['edisp'] = self['edisp'].boolean()
+            like.run()
+
+            # Renormalize models to phase selection
+            # TODO move the scaling from the temporal to the spectral component
+            for model in like.obs().models():
+                scaled_norm = model['Normalization'].value() / (phbin[1] - phbin[0])
+                model['Normalization'].value(scaled_norm)
+
+            # Store fit model
+            fitmodels = like.obs().models().copy()
+
+        # ... otherwise we set an empty model container
+        else:
+            self._log_string(gammalib.TERSE,
+                             'PHASE %f - %f: no observations available'
+                             ' for fitting' % (phbin[0], phbin[1]))
+
+            # Set empty models container
+            fitmodels = gammalib.GModels()
+
+        result = {'phstr'       :phstr,
+                  'fitmodels'   :fitmodels}
+
+        return result
 
     # Public methods
     def run(self):
@@ -336,84 +484,37 @@ class csphasecrv(ctools.csobservation):
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
         
-        # Store and clear observations to split them into phase bins
-        orig_obs = self.obs().copy()
-        
         # Dictionary to save phase fitted models
         self._fitmodels = {}
 
         # Write header
         self._log_header1(gammalib.TERSE, 'Generate phase curve')
 
-        # Loop over all phases
-        for phbin in self._phbins:
+        # If using multiprocessing
+        if self._nthreads > 1:
 
-            # Write time bin into header
-            self._log_header2(gammalib.TERSE, 'PHASE %f - %f' %
-                              (phbin[0], phbin[1]))
+            # Create pool of workers
+            from multiprocessing import Pool
+            pool = Pool(processes = self._nthreads)
 
-            # Select events
-            select = ctools.ctselect(orig_obs)
-            select['emin'] = self['emin'].real()
-            select['emax'] = self['emax'].real()
-            select['tmin'] = 'UNDEFINED'
-            select['tmax'] = 'UNDEFINED'
-            select['rad']  = 'UNDEFINED'
-            select['ra']   = 'UNDEFINED'
-            select['dec']  = 'UNDEFINED'
-            select['expr'] = 'PHASE>'+str(phbin[0])+' && PHASE<'+str(phbin[1])
-            select.run()
+            # Run time bin analysis in parallel with map
+            args        = [(self, phbin) for phbin in self._phbins]
+            poolresults = pool.map(_multiprocessing_func_wrapper, args)
 
-            # Set phase string
-            phstr = str(phbin[0]) + '-' + str(phbin[1])
+            # Close pool and join
+            pool.close()
+            pool.join()
 
-            # Add phase to observation id
-            for i in range(0,select.obs().size()):
-                oldid = select.obs()[i].id()
-                select.obs()[i].id(oldid+'_'+phstr)
-            obs = select.obs()
-            
-            # If an On/Off analysis is requested generate the On/Off observations
-            if self._onoff:
-                obs = obsutils.get_onoff_obs(self, select.obs())
+            # Construct results
+            for i in range(len(self._phbins)):
+                self._fitmodels[poolresults[i][0]['phstr']] = poolresults[i][0]['fitmodels']
+                self._log_string(gammalib.TERSE, poolresults[i][1]['log'], False)
 
-            # ... otherwise, if stacked analysis is requested then bin the
-            # events and compute the stacked response functions and setup
-            # an observation container with a single stacked observation.
-            elif self._stacked:
-                obs = obsutils.get_stacked_obs(self, select.obs())
-
-            # Header
-            self._log_header3(gammalib.EXPLICIT, 'Fitting the data')
-
-            # The On/Off analysis can produce empty observation containers,
-            # e.g., when on-axis observations are used. To avoid ctlike asking
-            # for a new observation container (or hang, if in interactive mode)
-            # we'll run ctlike only if the size is >0
-            if obs.size() > 0:
-
-                # Do maximum likelihood model fitting
-                like = ctools.ctlike(obs)
-                like['edisp'] = self['edisp'].boolean()
-                like.run()
-
-                # Renormalize models to phase selection
-                # TODO move the scaling from the temporal to the spectral component
-                for model in like.obs().models():
-                    scaled_norm = model['Normalization'].value()/(phbin[1]-phbin[0])
-                    model['Normalization'].value(scaled_norm)
-
-                # Store fit model
-                self._fitmodels[phstr] = like.obs().models().copy()
-
-            # ... otherwise we set an empty model container
-            else:
-                self._log_string(gammalib.TERSE,
-                                 'PHASE %f - %f: no observations available'
-                                 ' for fitting' %(phbin[0], phbin[1]))
-
-                # Set empty models container
-                self._fitmodels[phstr] = gammalib.GModels()
+        # Otherwise, loop over all phases
+        else:
+            for phbin in self._phbins:
+                result = self._phase_bin(phbin)
+                self._fitmodels[result['phstr']] = result['fitmodels']
 
         # Create FITS file
         self._create_fits()

@@ -268,6 +268,33 @@ class Test(test):
         # Check phase curve
         self._check_phase_curve('csphasecrv_py5.fits', 2)
 
+        # Set-up csphasecrv without multiprocessing
+        pcrv = cscripts.csphasecrv()
+        pcrv['inobs']    = self._phased_events
+        pcrv['inmodel']  = self._model
+        pcrv['srcname']  = 'Crab'
+        pcrv['caldb']    = self._caldb
+        pcrv['irf']      = self._irf
+        pcrv['phbinalg'] = 'LIN'
+        pcrv['phbins']   = 5
+        pcrv['method']   = '3D'
+        pcrv['enumbins'] = 0
+        pcrv['emin']     = 0.1
+        pcrv['emax']     = 100.0
+        pcrv['outfile']  = 'csphasecrv_py6.fits'
+        pcrv['logfile']  = 'csphasecrv_py6.log'
+        pcrv['chatter']  = 2
+        pcrv['publish']  = True
+        pcrv['nthreads'] = 1
+
+        # Run csphasecrv script and save phase curve
+        pcrv.logFileOpen()   # Make sure we get a log file
+        pcrv.run()
+        pcrv.save()
+
+        # Check phase curve
+        self._check_phase_curve('csphasecrv_py6.fits', 5)
+
         # Return
         return
 

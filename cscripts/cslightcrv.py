@@ -506,7 +506,7 @@ class cslightcrv(ctools.csobservation):
             # ... otherwise if On/Off analysis is requested generate
             # the On/Off observations and response
             elif self._onoff:
-                new_obs = obsutils.get_onoff_obs(self, obs)
+                new_obs = obsutils.get_onoff_obs(self, obs, nthreads=1)
 
             # Extract models
             models = new_obs.models()

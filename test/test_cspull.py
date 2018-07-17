@@ -260,6 +260,34 @@ class Test(test):
         # Check pull distribution file
         self._check_pull_file('cspull_py6.dat', rows=2)
 
+        # Set-up cspull without multiprocessing
+        pull = cscripts.cspull()
+        pull['inmodel']  = self._model
+        pull['onsrc']    = 'NONE'
+        pull['outfile']  = 'cspull_py7.dat'
+        pull['ntrials']  = 2
+        pull['caldb']    = self._caldb
+        pull['irf']      = self._irf
+        pull['ra']       = 83.6331
+        pull['dec']      = 22.0145
+        pull['emin']     = 0.1
+        pull['emax']     = 100.0
+        pull['enumbins'] = 0
+        pull['tmin']     = 0.0
+        pull['tmax']     = 100.0
+        pull['deadc']    = 0.98
+        pull['rad']      = 5.0
+        pull['logfile']  = 'cspull_py7.log'
+        pull['chatter']  = 2
+        pull['nthreads'] = 1
+
+        # Run cspull script
+        pull.logFileOpen()   # Make sure we get a log file
+        pull.run()
+
+        # Check pull distribution file
+        self._check_pull_file('cspull_py7.dat')
+
         # Return
         return
 

@@ -28,7 +28,7 @@ import cscripts
 # ===================== #
 def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         emin=None, emax=None, nbins=0, onsrc=None, onrad=0.2, addbounds=False,
-        binsz=0.05, npix=200, proj='TAN', coord='GAL'):
+        binsz=0.05, npix=200, proj='TAN', coord='GAL', nthreads=0):
     """
     Simulate events for all observations in the container
 
@@ -74,6 +74,8 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         Projection for binned simulation
     coord : str, optional
         Coordinate system for binned simulation
+    nthreads : str, optional
+        Number of parallel processes for On/Off spectra computation (0=all available CPUs)
 
     Returns
     -------
@@ -133,6 +135,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
             phagen['stack']       = False
             phagen['inexclusion'] = 'NONE'
             phagen['bkgmethod']   = 'REFLECTED'
+            phagen['nthreads']    = nthreads
 
             # Optionally open the log file
             if log:
@@ -770,7 +773,7 @@ def get_stacked_obs(cls, obs):
 # ================================ #
 # Get On/Off observation container #
 # ================================ #
-def get_onoff_obs(cls, obs):
+def get_onoff_obs(cls, obs, nthreads=0):
     """
     Create On/Off observations container from given observations
 
@@ -780,6 +783,8 @@ def get_onoff_obs(cls, obs):
         cscript class
     obs : `~gammalib.GObservations`
         Observation container
+    nthreads : str, optional
+        Number of parallel processes for On/Off spectra computation (0=all available CPUs)
 
     Returns
     -------
@@ -835,6 +840,7 @@ def get_onoff_obs(cls, obs):
     phagen['chatter']   = cls['chatter'].integer()
     phagen['clobber']   = cls['clobber'].boolean()
     phagen['debug']     = cls['debug'].boolean()
+    phagen['nthreads']  = nthreads
     phagen.run()
 
     # Clone resulting observation container

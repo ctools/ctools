@@ -1,4 +1,4 @@
-2018-07-03
+2018-07-17
 
         * Version 1.6.0 released
         ========================
@@ -9,7 +9,8 @@
         Handle zero model for SUBDIV method in show_response.py (#2456)
         Add Exponential spectral model to science verification (#2454)
         Fix bug when using precomputed model in csresspec (#2448)
-        Parallelise cslightcrv (#2421)
+        Parallelise cslightcrv, csphasecrv, csspec, cssens, csphagen, cspull and
+          cstsdist (#2421)
         Keep existing library path in installation script on Mac OS X (#2420)
         csphagen produces Xspec compliant data (#2404)
         Add show_rmf.py example script
