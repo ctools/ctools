@@ -59,6 +59,7 @@ class Test(test):
         # Append tests
         self.append(self._test_cmd, 'Test cssens on command line')
         self.append(self._test_python, 'Test cssens from Python')
+        self.append(self._test_pickeling, 'Test cssens pickeling')
 
         # Return
         return
@@ -109,7 +110,8 @@ class Test(test):
         """
         Test cssens from Python
         """
-        # Set-up cssens for differential sensitivity computation with multiprocessing
+        # Set-up cssens for differential sensitivity computation with
+        # multiprocessing
         sens = cscripts.cssens()
         sens['inobs']    = 'NONE'
         sens['inmodel']  = self._model
@@ -133,7 +135,8 @@ class Test(test):
         # Check pull distribution file
         self._check_result_file('cssens_py1.dat',nrows=3)
 
-        # Set-up cssens for integral sensitivity computation without multiprocessing
+        # Set-up cssens for integral sensitivity computation without
+        # multiprocessing
         sens = cscripts.cssens()
         sens['inobs']    = 'NONE'
         sens['inmodel']  = self._model
@@ -156,6 +159,44 @@ class Test(test):
 
         # Check pull distribution file
         self._check_result_file('cssens_py2.dat')
+
+        # Return
+        return
+
+    # Test cssens pickeling
+    def _test_pickeling(self):
+        """
+        Test cssens pickeling
+        """
+        # Perform pickeling tests of empty class
+        self._pickeling(cscripts.cssens())
+
+        # Set-up unbinned cssens
+        sens = cscripts.cssens()
+        sens['inobs']    = 'NONE'
+        sens['inmodel']  = self._model
+        sens['srcname']  = 'Crab'
+        sens['caldb']    = self._caldb
+        sens['irf']      = self._irf
+        sens['outfile']  = 'cssens_py1_pickle.dat'
+        sens['duration'] = 180.0
+        sens['rad']      = 3.0
+        sens['emin']     = 1.0
+        sens['emax']     = 10.0
+        sens['bins']     = 2
+        sens['logfile']  = 'cssens_py1_pickle.log'
+        sens['chatter']  = 4
+
+        # Perform pickeling tests of filled class
+        obj = self._pickeling(sens)
+
+        # Run csspec script and save light curve
+        obj.logFileOpen()   # Make sure we get a log file
+        obj.run()
+        obj.save()
+
+        # Check result file
+        self._check_result_file('cssens_py1_pickle.dat',nrows=3)
 
         # Return
         return

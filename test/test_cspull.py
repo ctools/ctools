@@ -62,6 +62,7 @@ class Test(test):
         # Append tests
         self.append(self._test_cmd, 'Test cspull on command line')
         self.append(self._test_python, 'Test cspull from Python')
+        self.append(self._test_pickeling, 'Test cspull pickeling')
 
         # Return
         return
@@ -287,6 +288,48 @@ class Test(test):
 
         # Check pull distribution file
         self._check_pull_file('cspull_py7.dat')
+
+        # Return
+        return
+
+    # Test cspull pickeling
+    def _test_pickeling(self):
+        """
+        Test cspull pickeling
+        """
+        # Perform pickeling tests of empty class
+        self._pickeling(cscripts.cspull())
+
+        # Set-up unbinned cspull
+        pull = cscripts.cspull()
+        pull['inmodel']  = self._model
+        pull['onsrc']    = 'NONE'
+        pull['ntrials']  = 2
+        pull['caldb']    = self._caldb
+        pull['irf']      = self._irf
+        pull['ra']       = 83.6331
+        pull['dec']      = 22.0145
+        pull['emin']     = 0.1
+        pull['emax']     = 100.0
+        pull['enumbins'] = 0
+        pull['tmin']     = 0.0
+        pull['tmax']     = 100.0
+        pull['deadc']    = 0.98
+        pull['rad']      = 5.0
+        pull['logfile']  = 'cspull_py1_pickle.log'
+        pull['outfile']  = 'cspull_py1_pickle.dat'
+        pull['chatter']  = 2
+
+        # Perform pickeling tests of filled class
+        obj = self._pickeling(pull)
+
+        # Run csphasecrv script and save light curve
+        obj.logFileOpen()   # Make sure we get a log file
+        obj.run()
+        #obj.save()
+
+        # Check pull distribution file
+        self._check_pull_file('cspull_py1_pickle.dat')
 
         # Return
         return

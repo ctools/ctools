@@ -340,6 +340,9 @@ class Test(test):
         obj.run()
         obj.save()
 
+        # Check light curve
+        self._check_light_curve('cslightcrv_py1_pickle.fits', 3)
+
         # Return
         return
 

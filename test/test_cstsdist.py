@@ -65,6 +65,7 @@ class Test(test):
                     'Test cstsdist from Python in binned mode')
         self.append(self._test_python_stacked,
                     'Test cstsdist from Python in stacked mode')
+        self.append(self._test_pickeling, 'Test cstsdist pickeling')
 
         # Return
         return
@@ -132,7 +133,7 @@ class Test(test):
         tsdist.run()
         tsdist.save()
 
-        # Check pull distribution file
+        # Check TS distribution file
         self._check_result_file('cstsdist_py1.dat')
 
         # Set-up cstsdist without multiprocessing
@@ -153,7 +154,7 @@ class Test(test):
         tsdist.run()
         tsdist.save()
 
-        # Check pull distribution file
+        # Check TS distribution file
         self._check_result_file('cstsdist_py2.dat')
 
         # Return
@@ -182,7 +183,7 @@ class Test(test):
         tsdist.logFileOpen()   # Make sure we get a log file
         tsdist.execute()
 
-        # Check pull distribution file
+        # Check TS distribution file
         self._check_result_file('cstsdist_py2.dat')
 
         # Return
@@ -206,8 +207,42 @@ class Test(test):
         tsdist.logFileOpen()   # Make sure we get a log file
         tsdist.execute()
 
-        # Check pull distribution file
+        # Check TS distribution file
         self._check_result_file('cstsdist_py3.dat')
+
+        # Return
+        return
+
+    # Test cstsdist pickeling
+    def _test_pickeling(self):
+        """
+        Test cstsdist pickeling
+        """
+        # Perform pickeling tests of empty class
+        self._pickeling(cscripts.cstsdist())
+
+        # Set-up cstsdist for event list
+        tsdist = cscripts.cstsdist()
+        tsdist['inobs']    = self._events
+        tsdist['inmodel']  = self._model
+        tsdist['srcname']  = 'Crab'
+        tsdist['caldb']    = self._caldb
+        tsdist['irf']      = self._irf
+        tsdist['ntrials']  = 2
+        tsdist['outfile']  = 'cstsdist_py1_pickle.dat'
+        tsdist['logfile']  = 'cstsdist_py1_pickle.log'
+        tsdist['chatter']  = 3
+
+        # Perform pickeling tests of filled class
+        obj = self._pickeling(tsdist)
+
+        # Run csphasecrv script and save light curve
+        obj.logFileOpen()   # Make sure we get a log file
+        obj.run()
+        obj.save()
+
+        # Check TS distribution file
+        self._check_result_file('cstsdist_py1_pickle.dat')
 
         # Return
         return

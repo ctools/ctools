@@ -61,6 +61,7 @@ class Test(test):
         # Append tests
         self.append(self._test_cmd, 'Test csphasecrv on command line')
         self.append(self._test_python, 'Test csphasecrv from Python')
+        self.append(self._test_pickeling, 'Test csphasecrv pickeling')
 
         # Return
         return
@@ -294,6 +295,46 @@ class Test(test):
 
         # Check phase curve
         self._check_phase_curve('csphasecrv_py6.fits', 5)
+
+        # Return
+        return
+
+    # Test csphasecrv pickeling
+    def _test_pickeling(self):
+        """
+        Test csphasecrv pickeling
+        """
+        # Perform pickeling tests of empty class
+        self._pickeling(cscripts.csphasecrv())
+
+        # Set-up unbinned csphasecrv
+        pcrv = cscripts.csphasecrv()
+        pcrv['inobs']    = self._phased_events
+        pcrv['inmodel']  = self._model
+        pcrv['srcname']  = 'Crab'
+        pcrv['caldb']    = self._caldb
+        pcrv['irf']      = self._irf
+        pcrv['phbinalg'] = 'LIN'
+        pcrv['phbins']   = 5
+        pcrv['method']   = '3D'
+        pcrv['enumbins'] = 0
+        pcrv['emin']     = 0.1
+        pcrv['emax']     = 100.0
+        pcrv['outfile']  = 'csphasecrv_py1_pickle.fits'
+        pcrv['logfile']  = 'csphasecrv_py1_pickle.log'
+        pcrv['chatter']  = 2
+        pcrv['publish']  = True
+
+        # Perform pickeling tests of filled class
+        obj = self._pickeling(pcrv)
+
+        # Run csphasecrv script and save light curve
+        obj.logFileOpen()   # Make sure we get a log file
+        obj.run()
+        obj.save()
+
+        # Check phase curve
+        self._check_phase_curve('csphasecrv_py1_pickle.fits', 5)
 
         # Return
         return

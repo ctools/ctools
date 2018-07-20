@@ -66,6 +66,7 @@ class Test(test):
         # Append tests
         self.append(self._test_cmd, 'Test csspec on command line')
         self.append(self._test_python, 'Test csspec from Python')
+        self.append(self._test_pickeling, 'Test csspec pickeling')
 
         # Return
         return
@@ -256,6 +257,45 @@ class Test(test):
 
         # Check result file
         self._check_result_file('csspec_py6.fits', 5)
+
+        # Return
+        return
+
+    # Test csspec pickeling
+    def _test_pickeling(self):
+        """
+        Test csspec pickeling
+        """
+        # Perform pickeling tests of empty class
+        self._pickeling(cscripts.csspec())
+
+        # Set-up unbinned csspec
+        spec = cscripts.csspec()
+        spec['inobs']    = self._events
+        spec['inmodel']  = self._model
+        spec['srcname']  = 'Crab'
+        spec['caldb']    = self._caldb
+        spec['irf']      = self._irf
+        spec['method']   = 'AUTO'
+        spec['ebinalg']  = 'LOG'
+        spec['enumbins'] = 5
+        spec['emin']     = 0.1
+        spec['emax']     = 100.0
+        spec['outfile']  = 'csspec_py1_pickle.fits'
+        spec['logfile']  = 'csspec_py1_pickle.log'
+        spec['chatter']  = 2
+        spec['publish']  = True
+
+        # Perform pickeling tests of filled class
+        obj = self._pickeling(spec)
+
+        # Run csspec script and save light curve
+        obj.logFileOpen()   # Make sure we get a log file
+        obj.run()
+        obj.save()
+
+        # Check result file
+        self._check_result_file('csspec_py1_pickle.fits', 5)
 
         # Return
         return

@@ -68,6 +68,7 @@ class Test(test):
         # Append tests
         self.append(self._test_cmd, 'Test csphagen on command line')
         self.append(self._test_python, 'Test csphagen from Python')
+        self.append(self._test_pickeling, 'Test csphagen pickeling')
 
         # Return
         return
@@ -325,6 +326,54 @@ class Test(test):
             self._check_output('csphagen_py6_stacked', self._nbins,
                                0, check_regions=False)
         self._check_outobs('csphagen_py6', 1)
+
+        # Return
+        return
+
+    # Test csphagen pickeling
+    def _test_pickeling(self):
+        """
+        Test csphagen pickeling
+        """
+        # Perform pickeling tests of empty class
+        self._pickeling(cscripts.csphagen())
+
+        # Set-up csphagen
+        phagen = cscripts.csphagen()
+        phagen['inobs']       = self._myevents1
+        phagen['inmodel']     = 'NONE'
+        phagen['caldb']       = self._caldb
+        phagen['irf']         = self._irf
+        phagen['ebinalg']     = 'LOG'
+        phagen['emin']        = 0.1
+        phagen['emax']        = 100.0
+        phagen['enumbins']    = self._nbins
+        phagen['coordsys']    = 'CEL'
+        phagen['ra']          = 83.633
+        phagen['dec']         = 22.0145
+        phagen['rad']         = 0.2
+        phagen['stack']       = False
+        phagen['inexclusion'] = self._exclusion
+        phagen['bkgmethod']   = 'REFLECTED'
+        phagen['etruemin']    = 0.05
+        phagen['etruemax']    = 150.0
+        phagen['etruebins']   = 5
+        phagen['outobs']      = 'csphagen_py1_pickle.xml'
+        phagen['prefix']      = 'csphagen_py1_pickle'
+        phagen['logfile']     = 'csphagen_py1_pickle.log'
+        phagen['chatter']     = 1
+
+        # Perform pickeling tests of filled class
+        obj = self._pickeling(phagen)
+
+        # Run csspec script and save light curve
+        obj.logFileOpen()   # Make sure we get a log file
+        obj.run()
+        obj.save()
+
+        # Check result files
+        self._check_output('csphagen_py1_pickle', self._nbins, self._nreg_with_excl)
+        self._check_outobs('csphagen_py1_pickle', 1)
 
         # Return
         return
