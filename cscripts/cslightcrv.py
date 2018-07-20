@@ -530,7 +530,8 @@ class cslightcrv(ctools.csobservation):
         # Do maximum likelihood model fitting
         if obs.size() > 0:
             like = ctools.ctlike(obs)
-            like['edisp'] = self['edisp'].boolean()
+            like['edisp']    = self['edisp'].boolean()
+            like['nthreads'] = 1  # Avoids OpenMP conflict
             like.run()
 
             # Skip bin if no event was present

@@ -27,6 +27,7 @@ from cscripts import modutils
 from cscripts import ioutils
 from cscripts import mputils
 
+
 # ============================================ #
 # Global functions for multiprocessing support #
 # ============================================ #
@@ -434,9 +435,10 @@ class cssens(ctools.csobservation):
             # Fit test source to the simulated events in the observation
             # container
             fit = ctools.ctlike(sim)
-            fit['edisp']   = self['edisp'].boolean()
-            fit['debug']   = self['debug'].boolean()
-            fit['chatter'] = self['chatter'].integer()
+            fit['edisp']    = self['edisp'].boolean()
+            fit['nthreads'] = 1  # Avoids OpenMP conflict
+            fit['debug']    = self['debug'].boolean()
+            fit['chatter']  = self['chatter'].integer()
             fit.run()
 
             # Get model fitting results

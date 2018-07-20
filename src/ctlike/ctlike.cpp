@@ -32,6 +32,11 @@
 #include "ctlike.hpp"
 #include "GTools.hpp"
 
+/* __ OpenMP section _____________________________________________________ */
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 /* __ Method name definitions ____________________________________________ */
 
 /* __ Debug definitions __________________________________________________ */
@@ -421,6 +426,14 @@ void ctlike::get_parameters(void)
     else {
         static_cast<GOptimizerLM*>(&m_opt)->logger(NULL);
     }
+
+    // Set number of OpenMP threads
+    #ifdef _OPENMP
+    int nthreads = (*this)["nthreads"].integer();
+    if (nthreads > 0) {
+        omp_set_num_threads(nthreads);
+    }
+    #endif
 
     // Write parameters into logger
     log_parameters(TERSE);

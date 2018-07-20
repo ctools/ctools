@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script generates the pull distribution for all model parameters.
 #
-# Copyright (C) 2011-2017 Juergen Knoedlseder
+# Copyright (C) 2011-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import ctools
 from cscripts import obsutils
 from cscripts import ioutils
 from cscripts import mputils
+
 
 # ============================================ #
 # Global functions for multiprocessing support #
@@ -282,6 +283,7 @@ class cspull(ctools.csobservation):
                 like['srcname']   = model.name()
                 like['edisp']     = edisp
                 like['statistic'] = statistic
+                like['nthreads']  = 1  # Avoids OpenMP conflict
                 like['debug']     = self._logDebug()
                 like['chatter']   = self['chatter'].integer()
                 like.run()
@@ -289,6 +291,7 @@ class cspull(ctools.csobservation):
             like = ctools.ctlike(obs)
             like['edisp']     = edisp
             like['statistic'] = statistic
+            like['nthreads']  = 1  # Avoids OpenMP conflict
             like['debug']     = self._logDebug()
             like['chatter']   = self['chatter'].integer()
             like.run()

@@ -74,7 +74,7 @@ None
 
 cterror - Likelihood profile error computation
 ----------------------------------------------
-None
+Add hidden "nthreads" parameter to control parallel computations (#2421).
 
 
 ctexpcube - CTA exposure cube generation
@@ -84,7 +84,7 @@ None
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
-None
+Add hidden "nthreads" parameter to control parallel computations (#2421).
 
 
 ctmapcube - CTA map cube generation

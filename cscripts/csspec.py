@@ -23,6 +23,7 @@ import gammalib
 import ctools
 from cscripts import mputils
 
+
 # ============================================ #
 # Global functions for multiprocessing support #
 # ============================================ #
@@ -674,8 +675,9 @@ class csspec(ctools.csobservation):
         self._log_header3(gammalib.EXPLICIT, 'Performing fit')
 
         # Perform maximum likelihood fit. Skip bins that have no events.
-        like          = ctools.ctlike(obs)
-        like['edisp'] = self['edisp'].boolean()
+        like = ctools.ctlike(obs)
+        like['edisp']    = self['edisp'].boolean()
+        like['nthreads'] = 1  # Avoids OpenMP conflict
         if like.obs().nobserved() > 0:
             like.run()
 

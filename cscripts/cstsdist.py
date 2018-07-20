@@ -26,6 +26,7 @@ from cscripts import modutils
 from cscripts import ioutils
 from cscripts import mputils
 
+
 # ============================================ #
 # Global functions for multiprocessing support #
 # ============================================ #
@@ -235,8 +236,9 @@ class cstsdist(ctools.csobservation):
 
         # Fit model
         fit = ctools.ctlike(sim)
-        fit['debug']   = self['debug'].boolean()
-        fit['chatter'] = self['chatter'].integer()
+        fit['nthreads'] = 1  # Avoids OpenMP conflict
+        fit['debug']    = self['debug'].boolean()
+        fit['chatter']  = self['chatter'].integer()
         fit.run()
 
         # Get model fitting results

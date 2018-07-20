@@ -443,7 +443,8 @@ class csphasecrv(ctools.csobservation):
 
             # Do maximum likelihood model fitting
             like = ctools.ctlike(obs)
-            like['edisp'] = self['edisp'].boolean()
+            like['edisp']    = self['edisp'].boolean()
+            like['nthreads'] = 1  # Avoids OpenMP conflict
             like.run()
 
             # Renormalize models to phase selection
@@ -464,10 +465,12 @@ class csphasecrv(ctools.csobservation):
             # Set empty models container
             fitmodels = gammalib.GModels()
 
-        result = {'phstr'       :phstr,
-                  'fitmodels'   :fitmodels}
+        # Set results
+        result = {'phstr': phstr, 'fitmodels': fitmodels}
 
+        # Return results
         return result
+
 
     # Public methods
     def run(self):

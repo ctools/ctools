@@ -33,6 +33,11 @@
 #include "GTools.hpp"
 #include "GOptimizer.hpp"
 
+/* __ OpenMP section _____________________________________________________ */
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 /* __ Method name definitions ____________________________________________ */
 #define G_ERR_BISECTION         "cterror::error_bisection(double&, double&)"
 
@@ -476,6 +481,14 @@ void cterror::get_parameters(void)
     if (read_ahead()) {
         (*this)["outmodel"].query();
     }
+
+    // Set number of OpenMP threads
+    #ifdef _OPENMP
+    int nthreads = (*this)["nthreads"].integer();
+    if (nthreads > 0) {
+        omp_set_num_threads(nthreads);
+    }
+    #endif
 
     // Write parameters into logger
     log_parameters(TERSE);
