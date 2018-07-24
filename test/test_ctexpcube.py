@@ -70,8 +70,8 @@ class Test(test):
                         ' incube="NONE"'+ \
                         ' outcube="ctexpcube_cmd1.fits"'+ \
                         ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                        ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
-                        ' nxpix=200 nypix=200 binsz=0.02'+ \
+                        ' ebinalg="LOG" emin=1.0 emax=100.0 enumbins=5'+ \
+                        ' nxpix=20 nypix=20 binsz=0.2'+ \
                         ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                         ' logfile="ctexpcube_cmd1.log" chatter=1'
 
@@ -87,8 +87,8 @@ class Test(test):
                         ' incube="NONE"'+ \
                         ' outcube="ctexpcube_cmd2.fits"'+ \
                         ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                        ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
-                        ' nxpix=200 nypix=200 binsz=0.02'+ \
+                        ' ebinalg="LOG" emin=1.0 emax=100.0 enumbins=5'+ \
+                        ' nxpix=20 nypix=20 binsz=0.2'+ \
                         ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                         ' logfile="ctexpcube_cmd2.log" debug=yes chatter=1'
 
@@ -131,12 +131,12 @@ class Test(test):
         expcube['caldb']    = self._caldb
         expcube['irf']      = self._irf
         expcube['ebinalg']  = 'LOG'
-        expcube['emin']     = 0.1
+        expcube['emin']     = 1.0
         expcube['emax']     = 100.0
-        expcube['enumbins'] = 20
-        expcube['nxpix']    = 200
-        expcube['nypix']    = 200
-        expcube['binsz']    = 0.02
+        expcube['enumbins'] = 5
+        expcube['nxpix']    = 20
+        expcube['nypix']    = 20
+        expcube['binsz']    = 0.2
         expcube['coordsys'] = 'CEL'
         expcube['proj']     = 'CAR'
         expcube['xref']     = 83.63
@@ -172,7 +172,7 @@ class Test(test):
         cpy_expcube.execute()
 
         # Check result file
-        self._check_result_file('ctexpcube_py2.fits', nenergies=23)
+        self._check_result_file('ctexpcube_py2.fits', nenergies=8)
 
         # Now clear copy of ctexpcube tool
         cpy_expcube.clear()
@@ -189,12 +189,12 @@ class Test(test):
         expcube['caldb']    = self._caldb
         expcube['irf']      = self._irf
         expcube['ebinalg']  = 'LOG'
-        expcube['emin']     = 0.1
+        expcube['emin']     = 1.0
         expcube['emax']     = 100.0
-        expcube['enumbins'] = 20
-        expcube['nxpix']    = 200
-        expcube['nypix']    = 200
-        expcube['binsz']    = 0.02
+        expcube['enumbins'] = 5
+        expcube['nxpix']    = 20
+        expcube['nypix']    = 20
+        expcube['binsz']    = 0.2
         expcube['coordsys'] = 'CEL'
         expcube['proj']     = 'CAR'
         expcube['xref']     = 83.63
@@ -214,7 +214,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, nenergies=21):
+    def _check_result_file(self, filename, nenergies=6):
         """
         Check result file
 
@@ -235,7 +235,7 @@ class Test(test):
         return
 
     # Check exposure cube
-    def _check_cube(self, cube, nenergies=21):
+    def _check_cube(self, cube, nenergies=6):
         """
         Check exposure cube
 

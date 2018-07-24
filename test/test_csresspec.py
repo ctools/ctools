@@ -181,7 +181,7 @@ class Test(test):
         resspec.execute()
 
         # Check result file
-        self._check_result_file('csresspec_py3.fits', 20, 5)
+        self._check_result_file('csresspec_py3.fits', 5, 5)
 
         # Set-up csresspec for counts cube with source mask
         resspec = cscripts.csresspec()
@@ -208,7 +208,7 @@ class Test(test):
         resspec.execute()
 
         # Check result file
-        self._check_result_file('csresspec_py4.fits', 20, 5)
+        self._check_result_file('csresspec_py4.fits', 5, 5)
 
         # Set-up csresspec for On/Off observations
         resspec = cscripts.csresspec()

@@ -72,7 +72,7 @@ class Test(test):
                       ' inmodel="'+self._model+'"'+ \
                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' rad=5.0 ra=83.63 dec=22.01 tmin=0.0 tmax=1800'+ \
-                      ' emin=0.1 emax=100.0 enumbins=10  ebinalg="LOG"'+ \
+                      ' emin=1.0 emax=100.0 enumbins=5  ebinalg="LOG"'+ \
                       ' nxpix=40 nypix=40'+ \
                       ' binsz=0.1 coordsys="CEL" proj="CAR"'+ \
                       ' xref=83.63 yref=22.01'+ \
@@ -92,7 +92,7 @@ class Test(test):
                       ' inmodel="model_that_does_not_exist.xml"'+ \
                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' rad=5.0 ra=83.63 dec=22.01 tmin=0.0 tmax=1800'+ \
-                      ' emin=0.1 emax=100.0 enumbins=10  ebinalg="LOG"'+ \
+                      ' emin=1.0 emax=100.0 enumbins=5  ebinalg="LOG"'+ \
                       ' nxpix=40 nypix=40'+ \
                       ' binsz=0.1 coordsys="CEL" proj="CAR"'+ \
                       ' xref=83.63 yref=22.01'+ \
@@ -145,9 +145,9 @@ class Test(test):
         model['tmin']     = 0
         model['tmax']     = 1800
         model['ebinalg']  = 'LOG'
-        model['emin']     = 0.1
+        model['emin']     = 1.0
         model['emax']     = 100.0
-        model['enumbins'] = 10
+        model['enumbins'] = 5
         model['nxpix']    = 40
         model['nypix']    = 40
         model['binsz']    = 0.1
@@ -213,7 +213,7 @@ class Test(test):
         model.execute()
 
         # Check result file
-        self._check_result_file('ctmodel_py3.fits', nx=200, ny=200, nebins=20)
+        self._check_result_file('ctmodel_py3.fits', nx=20, ny=20, nebins=5)
 
         # Publish with name
         model.publish('My model')
@@ -222,7 +222,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, nx=40, ny=40, nebins=10):
+    def _check_result_file(self, filename, nx=40, ny=40, nebins=5):
         """
         Check result file
 
@@ -247,7 +247,7 @@ class Test(test):
         return
 
     # Check model cube
-    def _check_cube(self, cube, nx=40, ny=40, nebins=10):
+    def _check_cube(self, cube, nx=40, ny=40, nebins=5):
         """
         Check model cube
 

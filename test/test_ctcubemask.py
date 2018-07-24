@@ -72,8 +72,8 @@ class Test(test):
         cmd = ctcubemask+' inobs="'+self._cntcube+'"'+ \
                          ' regfile="'+self._exclusion+'"'+ \
                          ' outcube="ctcubemask_cmd1.fits"'+ \
-                         ' ra=83.63 dec=22.01 rad=2.0'+ \
-                         ' emin=0.1 emax=100.0'+ \
+                         ' ra=83.63 dec=22.01 rad=1.0'+ \
+                         ' emin=1.0 emax=100.0'+ \
                          ' logfile="ctcubemask_cmd1.log" chatter=1'
 
         # Check if execution was successful
@@ -87,8 +87,8 @@ class Test(test):
         cmd = ctcubemask+' inobs="counts_cube_that_does_not_exist.fits"'+ \
                          ' regfile="'+self._exclusion+'"'+ \
                          ' outcube="ctcubemask_cmd2.fits"'+ \
-                         ' ra=83.63 dec=22.01 rad=2.0'+ \
-                         ' emin=0.1 emax=100.0'+ \
+                         ' ra=83.63 dec=22.01 rad=1.0'+ \
+                         ' emin=1.0 emax=100.0'+ \
                          ' logfile="ctcubemask_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
@@ -128,8 +128,8 @@ class Test(test):
         mask['regfile'] = self._exclusion
         mask['ra']      = 83.63
         mask['dec']     = 22.01
-        mask['rad']     = 2.0
-        mask['emin']    = 0.1
+        mask['rad']     = 1.0
+        mask['emin']    = 1.0
         mask['emax']    = 100.0
         mask['outcube'] = 'ctcubemask_py1.fits'
         mask['logfile'] = 'ctcubemask_py1.log'
@@ -151,8 +151,8 @@ class Test(test):
         mask['ra']      = 83.63
         mask['dec']     = 22.01
         mask['rad']     = 3.0
-        mask['emin']    = 1.0
-        mask['emax']    = 100.0
+        mask['emin']    = 2.0
+        mask['emax']    = 10.0
         mask['outcube'] = 'ctcubemask_py2.fits'
         mask['logfile'] = 'ctcubemask_py2.log'
         mask['chatter'] = 3
@@ -163,7 +163,7 @@ class Test(test):
         mask.execute()
 
         # Check result file
-        self._check_result_file('ctcubemask_py2.fits', events=573)
+        self._check_result_file('ctcubemask_py2.fits', events=65)
 
         # Copy ctcubemask tool
         cpy_mask = mask.copy()
@@ -179,7 +179,7 @@ class Test(test):
         cpy_mask.execute()
 
         # Check result file
-        self._check_result_file('ctcubemask_py3.fits', events=573)
+        self._check_result_file('ctcubemask_py3.fits', events=65)
 
         # Clear ctcubemask tool
         cpy_mask.clear()
@@ -197,7 +197,7 @@ class Test(test):
         mask['regfile'] = 'NONE'
         mask['ra']      = 83.63
         mask['dec']     = 22.01
-        mask['rad']     = 3.0
+        mask['rad']     = 1.0
         mask['emin']    = 'NONE'
         mask['emax']    = 'NONE'
         mask['outcube'] = 'ctcubemask_py4.xml'
@@ -209,13 +209,13 @@ class Test(test):
         mask.execute()
 
         # Check result file
-        self._check_result_file('filtered_crab_cntmap.fits', events=5542)
+        self._check_result_file('filtered_crab_cntmap.fits', events=132)
 
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename, events=4921):
+    def _check_result_file(self, filename, events=126):
         """
         Check result file
         """
@@ -223,7 +223,7 @@ class Test(test):
         cube = gammalib.GCTAEventCube(filename)
 
         # Check counts cube
-        self.test_value(cube.size(), 800000, 'Check for number of cube bins')
+        self.test_value(cube.size(), 2000, 'Check for number of cube bins')
         self.test_value(cube.number(), events, 'Check for number of events')
 
         # Return

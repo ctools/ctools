@@ -72,7 +72,7 @@ class Test(test):
         # Setup ctbin command
         cmd = ctbin+' inobs="'+self._events+'"'+ \
                     ' outcube="cntmap_cmd1.fits"'+\
-                    ' emin=0.1 emax=100.0 enumbins=10 ebinalg="LOG"'+ \
+                    ' emin=1.0 emax=100.0 enumbins=10 ebinalg="LOG"'+ \
                     ' nxpix=40 nypix=40 binsz=0.1 coordsys="CEL"'+ \
                     ' xref=83.63 yref=22.01 proj="CAR"'+ \
                     ' logfile="ctbin_cmd1.log" chatter=1'
@@ -83,12 +83,12 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube('cntmap_cmd1.fits')
-        self._check_cube(evt, 3105)
+        self._check_cube(evt, 245)
 
         # Setup ctbin command
         cmd = ctbin+' inobs="events_that_do_not_exist.fits"'+ \
                     ' outcube="cntmap_cmd2.fits"'+\
-                    ' emin=0.1 emax=100.0 enumbins=10 ebinalg="LOG"'+ \
+                    ' emin=1.0 emax=100.0 enumbins=10 ebinalg="LOG"'+ \
                     ' nxpix=40 nypix=40 binsz=0.1 coordsys="CEL"'+ \
                     ' xref=83.63 yref=22.01 proj="CAR"'+ \
                     ' logfile="ctbin_cmd2.log" debug=yes chatter=1'
@@ -100,7 +100,7 @@ class Test(test):
         # Setup ctbin command with different ebounds than input
         cmd = ctbin+' inobs="'+self._events+'"'+ \
                     ' outcube="cntmap_cmd3.fits"'+\
-                    ' emin=0.5 emax=20.0 enumbins=10 ebinalg="LOG"'+ \
+                    ' emin=2.0 emax=20.0 enumbins=10 ebinalg="LOG"'+ \
                     ' nxpix=40 nypix=40 binsz=0.1 coordsys="CEL"'+ \
                     ' xref=83.63 yref=22.01 proj="CAR"'+ \
                     ' logfile="ctbin_cmd3.log" chatter=3'
@@ -111,7 +111,7 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube('cntmap_cmd3.fits')
-        self._check_cube(evt, 617)
+        self._check_cube(evt, 115)
 
         # Check ctbin --help
         self._check_help(ctbin)
@@ -152,7 +152,7 @@ class Test(test):
         binning['inobs']    = self._events
         binning['outcube']  = 'ctbin_py1.fits'
         binning['ebinalg']  = 'LOG'
-        binning['emin']     = 0.1
+        binning['emin']     = 1.0
         binning['emax']     = 100.0
         binning['enumbins'] = 10
         binning['nxpix']    = 40
@@ -170,15 +170,15 @@ class Test(test):
         binning.run()
 
         # Check content of observation container and counts cube
-        self._check_observation(binning, 3105)
-        self._check_cube(binning.cube(), 3105)
+        self._check_observation(binning, 245)
+        self._check_cube(binning.cube(), 245)
 
         # Copy ctbin tool
         cpy_bin = binning.copy()
 
         # Check content of observation container and counts cube
-        self._check_observation(cpy_bin, 3105)
-        self._check_cube(cpy_bin.cube(), 3105)
+        self._check_observation(cpy_bin, 245)
+        self._check_cube(cpy_bin.cube(), 245)
 
         # Run copy of ctbin tool again
         cpy_bin['logfile'] = 'ctbin_py2.log'
@@ -197,7 +197,7 @@ class Test(test):
 
         # Load counts cube and check content
         evt = gammalib.GCTAEventCube('ctbin_py1.fits')
-        self._check_cube(evt, 3105)
+        self._check_cube(evt, 245)
 
         # Now clear ctbin tool
         binning.clear()
@@ -217,7 +217,7 @@ class Test(test):
         binning = ctools.ctbin(obs)
         binning['outcube']  = 'ctbin_py3.fits'
         binning['ebinalg']  = 'LOG'
-        binning['emin']     = 0.1
+        binning['emin']     = 1.0
         binning['emax']     = 100.0
         binning['enumbins'] = 10
         binning['nxpix']    = 40
@@ -237,16 +237,16 @@ class Test(test):
 
         # Check content of observation and cube (need multiplier=3 since
         # three identical observations have been appended)
-        self._check_observation(binning, 3105, multiplier=3)
-        self._check_cube(binning.cube(), 3105, multiplier=3)
+        self._check_observation(binning, 245, multiplier=3)
+        self._check_cube(binning.cube(), 245, multiplier=3)
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube('ctbin_py3.fits')
-        self._check_cube(evt, 3105, multiplier=3)
+        self._check_cube(evt, 245, multiplier=3)
 
         # And finally go for a fully Pythonic version with all parameters
         # being specified in a dictionary
-        pars = {'inobs': self._events, 'ebinalg': 'LIN', 'emin': 0.1,
+        pars = {'inobs': self._events, 'ebinalg': 'LIN', 'emin': 1.0,
                 'emax': 100.0, 'enumbins': 10, 'nxpix': 40, 'nypix': 40,
                 'binsz': 0.1, 'coordsys': 'CEL', 'proj': 'CAR',
                 'xref': 83.63, 'yref': 22.01, 'outcube': 'ctbin_py4.fits',
@@ -258,7 +258,7 @@ class Test(test):
 
         # Load counts cube and check content
         evt = gammalib.GCTAEventCube('ctbin_py4.fits')
-        self._check_cube(evt, 3105)
+        self._check_cube(evt, 245)
 
         # Return
         return

@@ -248,7 +248,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, nevents=3736):
+    def _check_result_file(self, filename, nevents=253):
         """
         Check result file
 

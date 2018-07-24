@@ -202,7 +202,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, nevents=3736):
+    def _check_result_file(self, filename, nevents=253):
         """
         Check result file
 
@@ -232,7 +232,7 @@ class Test(test):
         return
 
     # Check observation and event list
-    def _check_obs(self, obs, nobs=1, nevents=22220):
+    def _check_obs(self, obs, nobs=1, nevents=253):
         """
         Check observation and event list
 
@@ -257,7 +257,7 @@ class Test(test):
         return
 
     # Check events
-    def _check_events(self, events, nevents=22220):
+    def _check_events(self, events, nevents=253):
         """
         Check event list
 

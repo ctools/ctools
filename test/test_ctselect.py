@@ -72,9 +72,9 @@ class Test(test):
         # Setup ctselect command
         cmd = ctselect+' inobs="'+self._events+'"'+ \
                        ' outobs="ctselect_cmd1.fits"'+ \
-                       ' rad=2.0'+ \
+                       ' rad=1.0'+ \
                        ' tmin=2020-01-01T00:01:10 tmax=2020-01-01T00:03:40'+ \
-                       ' emin=0.2 emax=80.0'+ \
+                       ' emin=2.0 emax=80.0'+ \
                        ' logfile="ctselect_cmd1.log" chatter=1'
 
         # Check if execution was successful
@@ -87,9 +87,9 @@ class Test(test):
         # Setup ctselect command
         cmd = ctselect+' inobs="event_file_that_does_not_exist.fits"'+ \
                        ' outobs="ctselect_cmd2.fits"'+ \
-                       ' rad=2.0'+ \
+                       ' rad=1.0'+ \
                        ' tmin=2020-01-01T00:01:10 tmax=2020-01-01T00:03:40'+ \
-                       ' emin=0.2 emax=80.0'+ \
+                       ' emin=2.0 emax=80.0'+ \
                        ' logfile="ctselect_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
@@ -126,10 +126,10 @@ class Test(test):
 
         # Now set ctselect parameters
         select['inobs']   = self._events
-        select['rad']     = 2.0
+        select['rad']     = 1.0
         select['tmin']    = '2020-01-01T00:01:10'
         select['tmax']    = '2020-01-01T00:03:40'
-        select['emin']    = 0.2
+        select['emin']    = 2.0
         select['emax']    = 80.0
         select['outobs']  = 'ctselect_py1.fits'
         select['logfile'] = 'ctselect_py1.log'
@@ -176,7 +176,7 @@ class Test(test):
         cpy_select['ra']       = 83.63
         cpy_select['dec']      = 22.01
         cpy_select['tmin']     = '2020-01-01T00:01:10'
-        cpy_select['emin']     = 0.2
+        cpy_select['emin']     = 2.0
         cpy_select['usethres'] = 'USER'
         cpy_select['outobs']   = 'ctselect_py3.fits'
         cpy_select['logfile']  = 'ctselect_py3.log'
@@ -205,7 +205,7 @@ class Test(test):
         # beyond the energies covered in the event file is specified, hence
         # an empty event list will be saved.
         select = ctools.ctselect(obs)
-        select['rad']      = 2.0
+        select['rad']      = 1.0
         select['tmin']     = '2020-01-01T00:01:10'
         select['tmax']     = '2020-01-01T00:03:40'
         select['emin']     = 120.0
@@ -226,10 +226,10 @@ class Test(test):
         # Setup ctselect tool for an invalid event file
         select = ctools.ctselect()
         select['inobs']   = self._invalid_events
-        select['rad']     = 2.0
+        select['rad']     = 1.0
         select['tmin']    = '2020-01-01T00:01:10'
         select['tmax']    = '2020-01-01T00:03:40'
-        select['emin']    = 0.2
+        select['emin']    = 2.0
         select['emax']    = 80.0
         select['outobs']  = 'ctselect_py5.fits'
         select['logfile'] = 'ctselect_py5.log'
@@ -248,10 +248,10 @@ class Test(test):
         # value should be ignored.
         select = ctools.ctselect()
         select['inobs']   = self._events+'[EVENTS]'
-        select['rad']     = 2.0
+        select['rad']     = 1.0
         select['tmin']    = '2020-01-01T00:01:10'
         select['tmax']    = '2020-01-01T00:03:40'
-        select['emin']    = 0.2
+        select['emin']    = 2.0
         select['emax']    = 0.0     # Signals that "emax" should be ignored
         select['outobs']  = 'ctselect_py6.fits'
         select['logfile'] = 'ctselect_py6.log'
@@ -267,7 +267,7 @@ class Test(test):
         # Now ignore the "emin" value.
         select = ctools.ctselect()
         select['inobs']   = self._events+'[EVENTS]'
-        select['rad']     = 2.0
+        select['rad']     = 1.0
         select['tmin']    = '2020-01-01T00:01:10'
         select['tmax']    = '2020-01-01T00:03:40'
         select['emin']    = 0.0     # Signals that "emin" should be ignored
@@ -281,7 +281,7 @@ class Test(test):
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py7.fits', nevents=1504)
+        self._check_result_file('ctselect_py7.fits', nevents=60)
 
         # Now set "emin > emax"
         select['emin']    = 150.0
@@ -304,10 +304,10 @@ class Test(test):
         select['usepnt']  = False
         select['ra']      = 83.63
         select['dec']     = 24.01
-        select['rad']     = 3.0
+        select['rad']     = 2.0
         select['tmin']    = '2020-01-01T00:01:10'
         select['tmax']    = '2020-01-01T00:03:40'
-        select['emin']    = 0.2
+        select['emin']    = 2.0
         select['emax']    = 80.0
         select['outobs']  = 'ctselect_py9.fits'
         select['logfile'] = 'ctselect_py9.log'
@@ -332,21 +332,20 @@ class Test(test):
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py10.fits', nevents=833, rad=3.)
+        self._check_result_file('ctselect_py10.fits', nevents=31, rad=2.0)
 
-        # Finally test a custom defined RoI
-        # enclosed in the original one
+        # Finally test a custom defined RoI enclosed in the original one
         select = ctools.ctselect()
-        select['inobs'] = self._events
-        select['usepnt'] = False
-        select['ra'] = 83.63
-        select['dec'] = 24.01
-        select['rad'] = 1.0
-        select['tmin'] = '2020-01-01T00:01:10'
-        select['tmax'] = '2020-01-01T00:03:40'
-        select['emin'] = 0.2
-        select['emax'] = 80.0
-        select['outobs'] = 'ctselect_py11.fits'
+        select['inobs']   = self._events
+        select['usepnt']  = False
+        select['ra']      = 83.63
+        select['dec']     = 24.01
+        select['rad']     = 0.4
+        select['tmin']    = '2020-01-01T00:01:10'
+        select['tmax']    = '2020-01-01T00:03:40'
+        select['emin']    = 2.0
+        select['emax']    = 80.0
+        select['outobs']  = 'ctselect_py11.fits'
         select['logfile'] = 'ctselect_py11.log'
         select['chatter'] = 3
 
@@ -355,15 +354,15 @@ class Test(test):
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py11.fits', nevents=117, dec=24.01, rad=1.)
+        self._check_result_file('ctselect_py11.fits', nevents=1, dec=24.01, rad=0.4)
 
         # Now test phase cut
         select = ctools.ctselect()
         select['inobs']   = self._phased_events
-        select['rad']     = 2.0
+        select['rad']     = 1.0
         select['tmin']    = 'INDEF'
         select['tmax']    = 'INDEF'
-        select['emin']    = 0.1
+        select['emin']    = 1.0
         select['emax']    = 100.0
         select['phase']   = '0.1:0.4,0.6:0.8'
         select['outobs']  = 'ctselect_py12.fits'
@@ -375,15 +374,15 @@ class Test(test):
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py12.fits', nevents=1909, dec = 22.01)
+        self._check_result_file('ctselect_py12.fits', nevents=365, dec=22.01)
 
         # Now test another phase cut
         select = ctools.ctselect()
         select['inobs']   = self._phased_events
-        select['rad']     = 2.0
+        select['rad']     = 1.0
         select['tmin']    = 'INDEF'
         select['tmax']    = 'INDEF'
-        select['emin']    = 0.1
+        select['emin']    = 1.0
         select['emax']    = 100.0
         select['phase']   = '0.8:0.3'
         select['outobs']  = 'ctselect_py13.fits'
@@ -395,7 +394,7 @@ class Test(test):
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py13.fits', nevents=1995, dec = 22.01)
+        self._check_result_file('ctselect_py13.fits', nevents=395, dec=22.01)
 
         # Test invalid minimum phase value
         self.test_try('Test invalid minimum phase value')
@@ -485,7 +484,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, nevents=744, dec=22.51, rad=2.0):
+    def _check_result_file(self, filename, nevents=28, dec=22.51, rad=1.0):
         """
         Check result file
 
@@ -510,7 +509,7 @@ class Test(test):
         return
 
     # Check observation and event list
-    def _check_obs(self, obs, nobs=1, nevents=744):
+    def _check_obs(self, obs, nobs=1, nevents=28):
         """
         Check observation and event list
 
@@ -535,7 +534,7 @@ class Test(test):
         return
 
     # Check events
-    def _check_events(self, events, nevents=744, dec=22.51, rad=2.0):
+    def _check_events(self, events, nevents=28, dec=22.51, rad=1.0):
         """
         Check event list
 

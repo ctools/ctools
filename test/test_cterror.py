@@ -257,31 +257,41 @@ class Test(test):
         # Check number of models
         self.test_value(models.size(), nmodels, 'Check number of models')
 
+        # Set reference values
+        prefactor              = 3.65452317573063e-16
+        prefactor_error        = 1.12697923756417e-16
+        index                  = 2.39356360626209
+        index_error            = 0.131093571504494
+        pre_background         = 1.01409721534593
+        pre_background_error   = 0.122650321517162
+        index_background       = 0.0436264224948547
+        index_background_error = 0.110703165254809
+
         # If there are models in the container then check them
         if nmodels > 0:
             self.test_value(models['Crab']['Prefactor'].value(),
-                            5.6530206356786e-16, 1.0e-4 * 5.6530206356786e-16,
+                            prefactor, 1.0e-4 * prefactor,
                             'Check fitted Crab Prefactor')
             self.test_value(models['Crab']['Prefactor'].error(),
-                            2.45970361827369e-17, 1.0e-3 * 2.45970361827369e-17,
+                            prefactor_error, 1.0e-3 * prefactor_error,
                             'Check Crab Prefactor error')
             self.test_value(models['Crab']['Index'].value(),
-                            -2.45716228083265, 1.0e-4 * 2.45716228083265,
+                            -index, 1.0e-4 * index,
                             'Check fitted Crab Index')
             self.test_value(models['Crab']['Index'].error(),
-                            0.0366617454398694, 1.0e-3 * 0.0366617454398694,
+                            index_error, 1.0e-3 * index_error,
                             'Check Crab Index error')
             self.test_value(models['Background']['Prefactor'].value(),
-                            1.01525433446138, 1.0e-4 * 1.01525433446138,
+                            pre_background, 1.0e-4 * pre_background,
                             'Check fitted background Prefactor')
             self.test_value(models['Background']['Prefactor'].error(),
-                            0.0334412516391298, 1.0e-4 * 0.0334412516391298,
+                            pre_background_error, 1.0e-4 * pre_background_error,
                             'Check background Prefactor error')
             self.test_value(models['Background']['Index'].value(),
-                            -0.005132848897274, 1.0e-3 * 0.005132848897274,
+                            index_background, 1.0e-3 * index_background,
                             'Check fitted background Index')
             self.test_value(models['Background']['Index'].error(),
-                            0.0200624490548333, 1.0e-4 * 0.0200624490548333,
+                            index_background_error, 1.0e-4 * index_background_error,
                             'Check background Index error')
 
         # Return

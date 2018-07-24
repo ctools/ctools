@@ -72,7 +72,7 @@ class Test(test):
                         ' outcube="ctbkgcube_cmd1.fits"'+ \
                         ' outmodel="ctbkgcube_cmd1.xml"'+ \
                         ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                        ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
+                        ' ebinalg="LOG" emin=1.0 emax=100.0 enumbins=5'+ \
                         ' nxpix=10 nypix=10 binsz=0.4'+ \
                         ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                         ' logfile="ctbkgcube_cmd1.log" chatter=1'
@@ -91,7 +91,7 @@ class Test(test):
                         ' outcube="ctbkgcube_cmd2.fits"'+ \
                         ' outmodel="ctbkgcube_cmd2.xml"'+ \
                         ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                        ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
+                        ' ebinalg="LOG" emin=1.0 emax=100.0 enumbins=5'+ \
                         ' nxpix=10 nypix=10 binsz=0.4'+ \
                         ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                         ' logfile="ctbkgcube_cmd2.log" debug=yes chatter=1'
@@ -158,9 +158,9 @@ class Test(test):
         bkgcube['caldb']    = self._caldb
         bkgcube['irf']      = self._irf
         bkgcube['ebinalg']  = 'LOG'
-        bkgcube['emin']     = 0.1
+        bkgcube['emin']     = 1.0
         bkgcube['emax']     = 100.0
-        bkgcube['enumbins'] = 20
+        bkgcube['enumbins'] = 5
         bkgcube['nxpix']    = 10
         bkgcube['nypix']    = 10
         bkgcube['binsz']    = 0.4
@@ -224,7 +224,7 @@ class Test(test):
         bkgcube['ebinalg']   = 'LOG'
         bkgcube['emin']      = 0.2
         bkgcube['emax']      = 150.0
-        bkgcube['enumbins']  = 20
+        bkgcube['enumbins']  = 5
         bkgcube['nxpix']     = 10
         bkgcube['nypix']     = 10
         bkgcube['binsz']     = 0.4
@@ -243,13 +243,13 @@ class Test(test):
         bkgcube.execute()
 
         # Check result files
-        self._check_result_files('ctbkgcube_py5', nenergies=23)
+        self._check_result_files('ctbkgcube_py5', nenergies=8)
 
         # Return
         return
 
     # Check result files
-    def _check_result_files(self, filename, nenergies=21, nmodels=2):
+    def _check_result_files(self, filename, nenergies=6, nmodels=2):
         """
         Check result file
 
@@ -276,7 +276,7 @@ class Test(test):
         return
 
     # Check background cube
-    def _check_cube(self, cube, nenergies=21):
+    def _check_cube(self, cube, nenergies=6):
         """
         Check background cube
 

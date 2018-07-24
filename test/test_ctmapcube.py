@@ -72,8 +72,8 @@ class Test(test):
         # Setup ctmapcube command
         cmd = ctmapcube+' inmodel="'+self._model+'"'+ \
                         ' outcube="ctmapcube_cmd1.fits"'+\
-                        ' emin=0.1 emax=100.0 enumbins=10 ebinalg=LOG'+ \
-                        ' nxpix=100 nypix=100 binsz=0.04 coordsys=CEL'+ \
+                        ' emin=1.0 emax=100.0 enumbins=5 ebinalg=LOG'+ \
+                        ' nxpix=20 nypix=20 binsz=0.2 coordsys=CEL'+ \
                         ' xref=83.63 yref=22.01 proj=CAR'+ \
                         ' logfile="ctmapcube_cmd1.log" chatter=1'
 
@@ -87,8 +87,8 @@ class Test(test):
         # Setup ctmapcube command
         cmd = ctmapcube+' inmodel="events_that_do_not_exist.fits"'+ \
                         ' outcube="ctmapcube_cmd2.fits"'+\
-                        ' emin=0.1 emax=100.0 enumbins=10 ebinalg=LOG'+ \
-                        ' nxpix=100 nypix=100 binsz=0.04 coordsys=CEL'+ \
+                        ' emin=1.0 emax=100.0 enumbins=5 ebinalg=LOG'+ \
+                        ' nxpix=20 nypix=20 binsz=0.2 coordsys=CEL'+ \
                         ' xref=83.63 yref=22.01 proj=CAR'+ \
                         ' logfile="ctmapcube_cmd2.log" debug=yes '
 
@@ -128,12 +128,12 @@ class Test(test):
         # Now set ctmapcube parameters
         mapcube['inmodel']  = self._model
         mapcube['ebinalg']  = 'LOG'
-        mapcube['emin']     = 0.1
+        mapcube['emin']     = 1.0
         mapcube['emax']     = 100.0
-        mapcube['enumbins'] = 10
-        mapcube['nxpix']    = 100
-        mapcube['nypix']    = 100
-        mapcube['binsz']    = 0.04
+        mapcube['enumbins'] = 5
+        mapcube['nxpix']    = 20
+        mapcube['nypix']    = 20
+        mapcube['binsz']    = 0.2
         mapcube['coordsys'] = 'CEL'
         mapcube['proj']     = 'CAR'
         mapcube['xref']     = 83.63
@@ -181,12 +181,12 @@ class Test(test):
         mapcube = ctools.ctmapcube()
         mapcube.models(gammalib.GModels(self._model))
         mapcube['ebinalg']  = 'LIN'
-        mapcube['emin']     = 0.1
+        mapcube['emin']     = 1.0
         mapcube['emax']     = 100.0
-        mapcube['enumbins'] = 10
-        mapcube['nxpix']    = 100
-        mapcube['nypix']    = 100
-        mapcube['binsz']    = 0.04
+        mapcube['enumbins'] = 5
+        mapcube['nxpix']    = 20
+        mapcube['nypix']    = 20
+        mapcube['binsz']    = 0.2
         mapcube['coordsys'] = 'CEL'
         mapcube['proj']     = 'CAR'
         mapcube['xref']     = 83.63
@@ -229,7 +229,7 @@ class Test(test):
         return
 
     # Check map cube
-    def _check_cube(self, cube, nmaps=11, npixels=10000):
+    def _check_cube(self, cube, nmaps=6, npixels=400):
         """
         Check map cube
 

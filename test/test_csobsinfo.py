@@ -134,7 +134,7 @@ class Test(test):
         self.test_value(len(obsinfo.offsets()), 1, 'Test number of offsets')
         self.test_value(obsinfo.offsets()[0], 0.5, 'Test offset angle')
         self.test_value(obsinfo.ebounds().size(), 1, 'Test number of energy boundaries')
-        self.test_value(obsinfo.ebounds().emin().GeV(), 100.0, 'Test minimum energy')
+        self.test_value(obsinfo.ebounds().emin().TeV(), 1.0, 'Test minimum energy')
         self.test_value(obsinfo.ebounds().emax().TeV(), 100.0, 'Test maximum energy')
 
         # Return

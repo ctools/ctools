@@ -43,7 +43,6 @@ class Test(test):
         test.__init__(self)
 
         # Set members
-        self._inobs       = self._datadir + '/crab_cntmap_small.fits'
         self._inonoff     = self._datadir + '/onoff_obs.xml'
         self._expcube     = self._datadir + '/crab_expcube.fits'
         self._psfcube     = self._datadir + '/crab_psfcube.fits'
@@ -146,7 +145,7 @@ class Test(test):
 
         # Set-up stacked csspec
         spec = cscripts.csspec()
-        spec['inobs']     = self._inobs
+        spec['inobs']     = self._cntcube
         spec['expcube']   = self._expcube
         spec['psfcube']   = self._psfcube
         spec['edispcube'] = self._edispcube

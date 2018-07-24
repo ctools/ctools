@@ -73,8 +73,8 @@ class Test(test):
                        ' outmap="csresmap_cmd1.fits"'+ \
                        ' inmodel="'+self._model+'"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                       ' emin=0.1 emax=100.0 enumbins=20'+ \
-                       ' nxpix=50 nypix=50 binsz=0.02'+ \
+                       ' emin=1.0 emax=100.0 enumbins=5'+ \
+                       ' nxpix=20 nypix=20 binsz=0.2'+ \
                        ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                        ' algorithm="SUBDIVSQRT"'+ \
                        ' logfile="csresmap_cmd1.log" chatter=1'
@@ -91,8 +91,8 @@ class Test(test):
                        ' outmap="csresmap_cmd1.fits"'+ \
                        ' inmodel="'+self._model+'"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                       ' emin=0.1 emax=100.0 enumbins=20'+ \
-                       ' nxpix=50 nypix=50 binsz=0.02'+ \
+                       ' emin=1.0 emax=100.0 enumbins=5'+ \
+                       ' nxpix=20 nypix=20 binsz=0.2'+ \
                        ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                        ' algorithm="SUBDIVSQRT"'+ \
                        ' logfile="csresmap_cmd2.log" debug=yes chatter=2'
@@ -119,12 +119,12 @@ class Test(test):
         resmap['inmodel']   = self._model
         resmap['caldb']     = self._caldb
         resmap['irf']       = self._irf
-        resmap['emin']      = 0.1
+        resmap['emin']      = 1.0
         resmap['emax']      = 100.0
-        resmap['enumbins']  = 20
-        resmap['nxpix']     = 50
-        resmap['nypix']     = 50
-        resmap['binsz']     = 0.02
+        resmap['enumbins']  = 5
+        resmap['nxpix']     = 20
+        resmap['nypix']     = 20
+        resmap['binsz']     = 0.2
         resmap['coordsys']  = 'CEL'
         resmap['proj']      = 'CAR'
         resmap['xref']      = 83.63
@@ -162,7 +162,7 @@ class Test(test):
         resmap.execute()
 
         # Check pull distribution file
-        self._check_result_file('csresmap_py2.fits', nx=200, ny=200)
+        self._check_result_file('csresmap_py2.fits')
 
         # Run csresmap with SUBDIVSQRT algorithm
         resmap = cscripts.csresmap()
@@ -185,7 +185,7 @@ class Test(test):
         resmap.execute()
 
         # Check pull distribution file
-        self._check_result_file('csresmap_py3.fits', nx=200, ny=200)
+        self._check_result_file('csresmap_py3.fits')
 
         # Run csresmap with SIGNIFICANCE algorithm
         resmap = cscripts.csresmap()
@@ -208,14 +208,14 @@ class Test(test):
         resmap.execute()
 
         # Check pull distribution file
-        self._check_result_file('csresmap_py4.fits', nx=200, ny=200)
+        self._check_result_file('csresmap_py4.fits')
 
 
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename, nx=50, ny=50):
+    def _check_result_file(self, filename, nx=20, ny=20):
         """
         Check result file
         """

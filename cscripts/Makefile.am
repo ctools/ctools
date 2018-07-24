@@ -162,9 +162,8 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/obs_unbinned.xml \
            $(top_srcdir)/test/data/obs_stacked.xml \
            $(top_srcdir)/test/data/obs_stacked_two.xml \
-           $(top_srcdir)/test/data/crab_events.fits.gz \
-           $(top_srcdir)/test/data/crab_cntmap.fits.gz \
-           $(top_srcdir)/test/data/crab_cntmap_small.fits.gz \
+           $(top_srcdir)/test/data/crab_events.fits \
+           $(top_srcdir)/test/data/crab_cntmap.fits \
            $(top_srcdir)/test/data/crab_expcube.fits.gz \
            $(top_srcdir)/test/data/crab_psfcube.fits.gz \
            $(top_srcdir)/test/data/crab_edispcube.fits.gz \

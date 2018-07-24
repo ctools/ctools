@@ -70,8 +70,8 @@ class Test(test):
                         ' incube="NONE"'+ \
                         ' outcube="ctpsfcube_cmd1.fits"'+ \
                         ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                        ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
-                        ' nxpix=200 nypix=200 binsz=0.02'+ \
+                        ' ebinalg="LOG" emin=1.0 emax=100.0 enumbins=5'+ \
+                        ' nxpix=20 nypix=20 binsz=0.2'+ \
                         ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                         ' amax=0.3 anumbins=10'+ \
                         ' logfile="ctpsfcube_cmd1.log" chatter=1'
@@ -88,8 +88,8 @@ class Test(test):
                         ' incube="NONE"'+ \
                         ' outcube="ctpsfcube_cmd2.fits"'+ \
                         ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                        ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
-                        ' nxpix=200 nypix=200 binsz=0.02'+ \
+                        ' ebinalg="LOG" emin=1.0 emax=100.0 enumbins=5'+ \
+                        ' nxpix=20 nypix=20 binsz=0.2'+ \
                         ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                         ' amax=0.3 anumbins=10'+ \
                         ' logfile="ctpsfcube_cmd2.log" debug=yes chatter=1'
@@ -133,9 +133,9 @@ class Test(test):
         psfcube['caldb']    = self._caldb
         psfcube['irf']      = self._irf
         psfcube['ebinalg']  = 'LOG'
-        psfcube['emin']     = 0.1
+        psfcube['emin']     = 1.0
         psfcube['emax']     = 100
-        psfcube['enumbins'] = 20
+        psfcube['enumbins'] = 5
         psfcube['nxpix']    = 10
         psfcube['nypix']    = 10
         psfcube['binsz']    = 0.4
@@ -175,7 +175,7 @@ class Test(test):
         cpy_psfcube.execute()
 
         # Check result file
-        self._check_result_file('ctpsfcube_py2.fits', nenergies=23)
+        self._check_result_file('ctpsfcube_py2.fits', nenergies=8)
 
         # Now clear copy of ctpsfcube tool
         cpy_psfcube.clear()
@@ -192,17 +192,6 @@ class Test(test):
         psfcube['incube']    = self._cntcube
         psfcube['caldb']     = self._caldb
         psfcube['irf']       = self._irf
-        #psfcube['ebinalg']   = 'LOG'
-        #psfcube['emin']      = 0.1
-        #psfcube['emax']      = 100
-        #psfcube['enumbins']  = 20
-        #psfcube['nxpix']     = 10
-        #psfcube['nypix']     = 10
-        #psfcube['binsz']     = 0.4
-        #psfcube['coordsys']  = 'CEL'
-        #psfcube['proj']      = 'CAR'
-        #psfcube['xref']      = 83.63
-        #psfcube['yref']      = 22.01
         psfcube['amax']      = 0.3
         psfcube['anumbins']  = 10
         psfcube['addbounds'] = True
@@ -221,7 +210,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, nenergies=21):
+    def _check_result_file(self, filename, nenergies=6):
         """
         Check result file
 
@@ -242,7 +231,7 @@ class Test(test):
         return
 
     # Check PSF cube
-    def _check_cube(self, cube, nenergies=21):
+    def _check_cube(self, cube, nenergies=6):
         """
         Check PSF cube
 

@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs tests processing pipelines
 #
-# Copyright (C) 2014-2016 Juergen Knoedlseder
+# Copyright (C) 2014-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -77,11 +77,11 @@ class Test(gammalib.GPythonTestSuite):
         result_name          = 'results.xml'
         ra                   =   83.63
         dec                  =   22.01
-        rad_sim              =   10.0
-        rad_select           =    3.0
+        rad_sim              =    3.0
+        rad_select           =    2.0
         tstart               =    0.0
         tstop                =  300.0
-        emin                 =    0.1
+        emin                 =    1.0
         emax                 =  100.0
 
         # Simulate events
@@ -132,11 +132,11 @@ class Test(gammalib.GPythonTestSuite):
         # Set script parameters
         ra         =   83.63
         dec        =   22.01
-        rad_sim    =   10.0
-        rad_select =    3.0
+        rad_sim    =    3.0
+        rad_select =    2.0
         tstart     =    0.0
         tstop      =  300.0
-        emin       =    0.1
+        emin       =    1.0
         emax       =  100.0
 
         # Simulate events

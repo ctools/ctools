@@ -70,7 +70,7 @@ class Test(test):
                           ' incube="NONE"'+ \
                           ' outcube="ctedispcube_cmd1.fits"'+ \
                           ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                          ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
+                          ' ebinalg="LOG" emin=1.0 emax=100.0 enumbins=5'+ \
                           ' nxpix=10 nypix=10 binsz=0.4'+ \
                           ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                           ' migramax=2.0 migrabins=10'+ \
@@ -88,7 +88,7 @@ class Test(test):
                           ' incube="NONE"'+ \
                           ' outcube="ctedispcube_cmd2.fits"'+ \
                           ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                          ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
+                          ' ebinalg="LOG" emin=1.0 emax=100.0 enumbins=5'+ \
                           ' nxpix=10 nypix=10 binsz=0.4'+ \
                           ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                           ' migramax=2.0 migrabins=10'+ \
@@ -133,9 +133,9 @@ class Test(test):
         edispcube['caldb']     = self._caldb
         edispcube['irf']       = self._irf
         edispcube['ebinalg']   = 'LOG'
-        edispcube['emin']      = 0.1
+        edispcube['emin']      = 1.0
         edispcube['emax']      = 100.0
-        edispcube['enumbins']  = 20
+        edispcube['enumbins']  = 5
         edispcube['nxpix']     = 10
         edispcube['nypix']     = 10
         edispcube['binsz']     = 0.4
@@ -175,7 +175,7 @@ class Test(test):
         cpy_edispcube.execute()
 
         # Check result file
-        self._check_result_file('ctedispcube_py2.fits', nenergies=23)
+        self._check_result_file('ctedispcube_py2.fits', nenergies=8)
 
         # Now clear copy of ctedispcube tool
         cpy_edispcube.clear()
@@ -193,9 +193,9 @@ class Test(test):
         edispcube['caldb']     = self._caldb
         edispcube['irf']       = self._irf
         edispcube['ebinalg']   = 'LOG'
-        edispcube['emin']      = 0.1
+        edispcube['emin']      = 1.0
         edispcube['emax']      = 100.0
-        edispcube['enumbins']  = 20
+        edispcube['enumbins']  = 5
         edispcube['nxpix']     = 10
         edispcube['nypix']     = 10
         edispcube['binsz']     = 0.4
@@ -221,7 +221,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, nenergies=21):
+    def _check_result_file(self, filename, nenergies=6):
         """
         Check result file
 
@@ -242,7 +242,7 @@ class Test(test):
         return
 
     # Check energy dispersion cube
-    def _check_cube(self, cube, nenergies=21, nmigras=10):
+    def _check_cube(self, cube, nenergies=6, nmigras=10):
         """
         Check energy dispersion cube
 

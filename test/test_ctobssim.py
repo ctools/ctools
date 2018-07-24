@@ -74,10 +74,10 @@ class Test(test):
         cmd = ctobssim+' inmodel="'+self._model+'" '+ \
                        ' outevents="ctobssim_cmd1.fits"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'" '+ \
-                       ' ra=83.63 dec=22.01 rad=3.0'+ \
+                       ' ra=83.63 dec=22.01 rad=2.0'+ \
                        ' tmin="2020-01-01T00:00:00"'+ \
                        ' tmax="2020-01-01T00:05:00"'+ \
-                       ' emin=0.1 emax=100.0'+ \
+                       ' emin=1.0 emax=100.0'+ \
                        ' logfile="ctobssim_cmd1.log" chatter=1'
 
         # Check if execution was successful
@@ -86,16 +86,16 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventList('ctobssim_cmd1.fits')
-        self._test_list(evt, 3775)
+        self._test_list(evt, 253)
 
         # Setup ctobssim command
         cmd = ctobssim+' inmodel="model_that_does_not_exist.xml"'+ \
                        ' outevents="ctobssim_cmd2.fits"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'" '+ \
-                       ' ra=83.63 dec=22.01 rad=3.0'+ \
+                       ' ra=83.63 dec=22.01 rad=2.0'+ \
                        ' tmin="2020-01-01T00:00:00"'+ \
                        ' tmax="2020-01-01T00:05:00"'+ \
-                       ' emin=0.1 emax=100.0'+ \
+                       ' emin=1.0 emax=100.0'+ \
                        ' logfile="ctobssim_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
@@ -137,10 +137,10 @@ class Test(test):
         sim['irf']       = self._irf
         sim['ra']        = 83.63
         sim['dec']       = 22.01
-        sim['rad']       = 3.0
+        sim['rad']       = 2.0
         sim['tmin']      = '2020-01-01T00:00:00'
         sim['tmax']      = '2020-01-01T00:05:00'
-        sim['emin']      = 0.1
+        sim['emin']      = 1.0
         sim['emax']      = 100.0
         sim['outevents'] = 'ctobssim_py1.fits'
         sim['logfile']   = 'ctobssim_py1.log'
@@ -152,21 +152,21 @@ class Test(test):
 
         # Check content of observation
         self._test_observation(sim)
-        self._test_list(sim.obs()[0].events(), 3775)
+        self._test_list(sim.obs()[0].events(), 253)
 
         # Save events
         sim.save()
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventList('ctobssim_py1.fits')
-        self._test_list(evt, 3775)
+        self._test_list(evt, 253)
 
         # Copy ctobssim tool
         cpy_sim = sim.copy()
 
         # Retrieve observation and check content of copy
         self._test_observation(cpy_sim)
-        self._test_list(cpy_sim.obs()[0].events(), 3775)
+        self._test_list(cpy_sim.obs()[0].events(), 253)
 
         # Execute copy of ctobssim tool again, now with a higher chatter
         # level than before
@@ -179,7 +179,7 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventList('ctobssim_py2.fits')
-        self._test_list(evt, 3775)
+        self._test_list(evt, 253)
 
         # Set-up observation container
         pnts = [{'ra': 83.63, 'dec': 21.01},
