@@ -84,7 +84,7 @@ class Test(test):
                      ' inmodel="'+self._model+'"'+ \
                      ' srcname="Crab" method="AUTO"'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                     ' ebinalg="LOG" enumbins=5 emin=0.1 emax=100.0'+ \
+                     ' ebinalg="LOG" enumbins=2 emin=1.0 emax=100.0'+ \
                      ' outfile="csspec_cmd1.fits"'+ \
                      ' logfile="csspec_cmd1.log" chatter=1'
 
@@ -93,14 +93,14 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check result file
-        self._check_result_file('csspec_cmd1.fits', 5)
+        self._check_result_file('csspec_cmd1.fits', 2)
 
         # Setup csspec command
         cmd = csspec+' inobs="input_file_that_does_not_exist.fits"'+ \
                      ' inmodel="'+self._model+'"'+ \
                      ' srcname="Crab" method="AUTO"'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                     ' ebinalg="LOG" enumbins=5 emin=0.1 emax=100.0'+ \
+                     ' ebinalg="LOG" enumbins=2 emin=1.0 emax=100.0'+ \
                      ' outfile="csspec_cmd2.fits"'+ \
                      ' logfile="csspec_cmd2.log" debug=yes chatter=1'
 
@@ -128,8 +128,8 @@ class Test(test):
         spec['irf']      = self._irf
         spec['method']   = 'AUTO'
         spec['ebinalg']  = 'LOG'
-        spec['enumbins'] = 5
-        spec['emin']     = 0.1
+        spec['enumbins'] = 2
+        spec['emin']     = 1.0
         spec['emax']     = 100.0
         spec['outfile']  = 'csspec_py1.fits'
         spec['logfile']  = 'csspec_py1.log'
@@ -142,7 +142,7 @@ class Test(test):
         spec.save()
 
         # Check result file
-        self._check_result_file('csspec_py1.fits', 5)
+        self._check_result_file('csspec_py1.fits', 2)
 
         # Set-up stacked csspec
         spec = cscripts.csspec()
@@ -176,8 +176,8 @@ class Test(test):
         spec['srcname']  = 'Crab'
         spec['method']   = 'AUTO'
         spec['ebinalg']  = 'LOG'
-        spec['enumbins'] = 10
-        spec['emin']     = 0.1
+        spec['enumbins'] = 2
+        spec['emin']     = 1.0
         spec['emax']     = 10.0
         spec['outfile']  = 'csspec_py3.fits'
         spec['logfile']  = 'csspec_py3.log'
@@ -188,7 +188,7 @@ class Test(test):
         spec.execute()
 
         # Check result file
-        self._check_result_file('csspec_py3.fits', 10)
+        self._check_result_file('csspec_py3.fits', 2)
 
         # Set-up On/Off csspec with NODES method
         spec = cscripts.csspec()
@@ -197,8 +197,8 @@ class Test(test):
         spec['srcname']  = 'Crab'
         spec['method']   = 'NODES'
         spec['ebinalg']  = 'LOG'
-        spec['enumbins'] = 10
-        spec['emin']     = 0.1
+        spec['enumbins'] = 2
+        spec['emin']     = 1.0
         spec['emax']     = 10.0
         spec['outfile']  = 'csspec_py4.fits'
         spec['logfile']  = 'csspec_py4.log'
@@ -209,7 +209,7 @@ class Test(test):
         spec.execute()
 
         # Check result file
-        self._check_result_file('csspec_py4.fits', 10)
+        self._check_result_file('csspec_py4.fits', 2)
 
         # Set-up On/Off csspec using WSTAT
         spec = cscripts.csspec()
@@ -219,8 +219,8 @@ class Test(test):
         spec['method']    = 'AUTO'
         spec['statistic'] = 'WSTAT'
         spec['ebinalg']   = 'LOG'
-        spec['enumbins']  = 10
-        spec['emin']      = 0.1
+        spec['enumbins']  = 2
+        spec['emin']      = 1.0
         spec['emax']      = 10.0
         spec['outfile']   = 'csspec_py5.fits'
         spec['logfile']   = 'csspec_py5.log'
@@ -230,7 +230,7 @@ class Test(test):
         spec.execute()
 
         # Check result file
-        self._check_result_file('csspec_py5.fits', 10)
+        self._check_result_file('csspec_py5.fits', 2)
 
         # Set-up csspec without multiprocessing
         spec = cscripts.csspec()
@@ -241,8 +241,8 @@ class Test(test):
         spec['irf']      = self._irf
         spec['method']   = 'AUTO'
         spec['ebinalg']  = 'LOG'
-        spec['enumbins'] = 5
-        spec['emin']     = 0.1
+        spec['enumbins'] = 2
+        spec['emin']     = 1.0
         spec['emax']     = 100.0
         spec['outfile']  = 'csspec_py6.fits'
         spec['logfile']  = 'csspec_py6.log'
@@ -256,7 +256,7 @@ class Test(test):
         spec.save()
 
         # Check result file
-        self._check_result_file('csspec_py6.fits', 5)
+        self._check_result_file('csspec_py6.fits', 2)
 
         # Return
         return
@@ -278,8 +278,8 @@ class Test(test):
         spec['irf']      = self._irf
         spec['method']   = 'AUTO'
         spec['ebinalg']  = 'LOG'
-        spec['enumbins'] = 5
-        spec['emin']     = 0.1
+        spec['enumbins'] = 2
+        spec['emin']     = 1.0
         spec['emax']     = 100.0
         spec['outfile']  = 'csspec_py1_pickle.fits'
         spec['logfile']  = 'csspec_py1_pickle.log'
@@ -295,7 +295,7 @@ class Test(test):
         obj.save()
 
         # Check result file
-        self._check_result_file('csspec_py1_pickle.fits', 5)
+        self._check_result_file('csspec_py1_pickle.fits', 2)
 
         # Return
         return

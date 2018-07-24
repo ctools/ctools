@@ -78,8 +78,8 @@ class Test(test):
         cmd = csphasecrv+' inobs="'+self._phased_events+'"'+ \
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                         ' phbinalg="LIN" phbins=5 method="3D"'+ \
-                         ' enumbins=0 emin=0.1 emax=100.0'+ \
+                         ' phbinalg="LIN" phbins=2 method="3D"'+ \
+                         ' enumbins=0 emin=1.0 emax=100.0'+ \
                          ' outfile="csphasecrv_cmd1.fits"'+ \
                          ' logfile="csphasecrv_cmd1.log" chatter=1'
 
@@ -88,14 +88,14 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check phase curve
-        self._check_phase_curve('csphasecrv_cmd1.fits', 5)
+        self._check_phase_curve('csphasecrv_cmd1.fits', 2)
 
         # Setup csphasecrv command
         cmd = csphasecrv+' inobs="events_that_do_not_exist.fits"'+ \
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                         ' phbinalg="LIN" phbins=5 method="3D"'+ \
-                         ' enumbins=0 emin=0.1 emax=100.0'+ \
+                         ' phbinalg="LIN" phbins=2 method="3D"'+ \
+                         ' enumbins=0 emin=1.0 emax=100.0'+ \
                          ' outfile="csphasecrv_cmd2.fits"'+ \
                          ' logfile="csphasecrv_cmd2.log" debug=yes chatter=1'
 
@@ -122,10 +122,10 @@ class Test(test):
         pcrv['caldb']    = self._caldb
         pcrv['irf']      = self._irf
         pcrv['phbinalg'] = 'LIN'
-        pcrv['phbins']   = 5
+        pcrv['phbins']   = 2
         pcrv['method']   = '3D'
         pcrv['enumbins'] = 0
-        pcrv['emin']     = 0.1
+        pcrv['emin']     = 1.0
         pcrv['emax']     = 100.0
         pcrv['outfile']  = 'csphasecrv_py1.fits'
         pcrv['logfile']  = 'csphasecrv_py1.log'
@@ -138,7 +138,7 @@ class Test(test):
         pcrv.save()
 
         # Check phase curve
-        self._check_phase_curve('csphasecrv_py1.fits', 5)
+        self._check_phase_curve('csphasecrv_py1.fits', 2)
 
         # Now use FILE as time bin algorithm. For this we need first to
         # create an ASCII file. We use now 2 phase bins. The ASCII file
@@ -162,7 +162,7 @@ class Test(test):
         pcrv['phbinfile'] = 'csphasecrv_py2.dat'
         pcrv['method']    = '3D'
         pcrv['enumbins']  = 0
-        pcrv['emin']      = 0.1
+        pcrv['emin']      = 1.0
         pcrv['emax']      = 100.0
         pcrv['outfile']   = 'csphasecrv_py2.fits'
         pcrv['logfile']   = 'csphasecrv_py2.log'
@@ -190,10 +190,10 @@ class Test(test):
         pcrv['caldb']    = self._caldb
         pcrv['irf']      = self._irf
         pcrv['phbinalg'] = 'LIN'
-        pcrv['phbins']   = 5
+        pcrv['phbins']   = 2
         pcrv['method']   = '3D'
         pcrv['enumbins'] = 0
-        pcrv['emin']     = 0.1
+        pcrv['emin']     = 1.0
         pcrv['emax']     = 100.0
         pcrv['outfile']  = 'csphasecrv_py3.fits'
         pcrv['logfile']  = 'csphasecrv_py3.log'
@@ -204,7 +204,7 @@ class Test(test):
         pcrv.execute()
 
         # Check phase curve
-        self._check_phase_curve('csphasecrv_py3.fits', 5)
+        self._check_phase_curve('csphasecrv_py3.fits', 2)
 
         # Binned csphasecrv
         pcrv = cscripts.csphasecrv()
@@ -216,16 +216,16 @@ class Test(test):
         pcrv['phbinalg'] = 'LIN'
         pcrv['phbins']   = 2
         pcrv['method']   = '3D'
-        pcrv['emin']     = 0.1
+        pcrv['emin']     = 1.0
         pcrv['emax']     = 100.0
-        pcrv['enumbins'] = 10
+        pcrv['enumbins'] = 2
         pcrv['coordsys'] = 'CEL'
         pcrv['proj']     = 'TAN'
         pcrv['xref']     = 83.63
         pcrv['yref']     = 22.01
-        pcrv['nxpix']    = 20
-        pcrv['nypix']    = 20
-        pcrv['binsz']    = 0.02
+        pcrv['nxpix']    = 10
+        pcrv['nypix']    = 10
+        pcrv['binsz']    = 0.04
         pcrv['outfile']  = 'csphasecrv_py4.fits'
         pcrv['logfile']  = 'csphasecrv_py4.log'
         pcrv['chatter']  = 4
@@ -248,15 +248,15 @@ class Test(test):
         pcrv['phbins']    = 2
         pcrv['method']    = 'ONOFF'
         pcrv['statistic'] = 'WSTAT'
-        pcrv['emin']      = 0.1
+        pcrv['emin']      = 1.0
         pcrv['emax']      = 100.0
-        pcrv['enumbins']  = 10
+        pcrv['enumbins']  = 2
         pcrv['coordsys']  = 'CEL'
         pcrv['xref']      = 83.63
         pcrv['yref']      = 22.01
         pcrv['rad']       = 0.2
-        pcrv['etruemin']  = 0.05
-        pcrv['etruemax']  = 150.0
+        pcrv['etruemin']  = 1.0
+        pcrv['etruemax']  = 100.0
         pcrv['etruebins'] = 5
         pcrv['outfile']   = 'csphasecrv_py5.fits'
         pcrv['logfile']   = 'csphasecrv_py5.log'
@@ -277,10 +277,10 @@ class Test(test):
         pcrv['caldb']    = self._caldb
         pcrv['irf']      = self._irf
         pcrv['phbinalg'] = 'LIN'
-        pcrv['phbins']   = 5
+        pcrv['phbins']   = 2
         pcrv['method']   = '3D'
         pcrv['enumbins'] = 0
-        pcrv['emin']     = 0.1
+        pcrv['emin']     = 1.0
         pcrv['emax']     = 100.0
         pcrv['outfile']  = 'csphasecrv_py6.fits'
         pcrv['logfile']  = 'csphasecrv_py6.log'
@@ -294,7 +294,7 @@ class Test(test):
         pcrv.save()
 
         # Check phase curve
-        self._check_phase_curve('csphasecrv_py6.fits', 5)
+        self._check_phase_curve('csphasecrv_py6.fits', 2)
 
         # Return
         return
@@ -315,10 +315,10 @@ class Test(test):
         pcrv['caldb']    = self._caldb
         pcrv['irf']      = self._irf
         pcrv['phbinalg'] = 'LIN'
-        pcrv['phbins']   = 5
+        pcrv['phbins']   = 2
         pcrv['method']   = '3D'
         pcrv['enumbins'] = 0
-        pcrv['emin']     = 0.1
+        pcrv['emin']     = 1.0
         pcrv['emax']     = 100.0
         pcrv['outfile']  = 'csphasecrv_py1_pickle.fits'
         pcrv['logfile']  = 'csphasecrv_py1_pickle.log'
@@ -334,7 +334,7 @@ class Test(test):
         obj.save()
 
         # Check phase curve
-        self._check_phase_curve('csphasecrv_py1_pickle.fits', 5)
+        self._check_phase_curve('csphasecrv_py1_pickle.fits', 2)
 
         # Return
         return

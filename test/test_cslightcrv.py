@@ -79,7 +79,7 @@ class Test(test):
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                          ' tbinalg=LIN '+ \
                          ' tmin=2020-01-01T00:00:00 tmax=2020-01-01T00:05:00'+ \
-                         ' tbins=3 method=3D enumbins=0 emin=0.1 emax=100.0'+ \
+                         ' tbins=2 method=3D enumbins=0 emin=1.0 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
                          ' logfile="cslightcrv_cmd1.log" chatter=1'
 
@@ -88,7 +88,7 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check light curve
-        self._check_light_curve('lightcurve_cmd1.fits', 3)
+        self._check_light_curve('lightcurve_cmd1.fits', 2)
 
         # Setup cslightcrv command
         cmd = cslightcrv+' inobs="events_that_do_not_exist.fits"'+ \
@@ -96,7 +96,7 @@ class Test(test):
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                          ' tbinalg=LIN '+ \
                          ' tmin=2020-01-01T00:00:00 tmax=2020-01-01T00:05:00'+ \
-                         ' tbins=3 method=3D enumbins=0 emin=0.1 emax=100.0'+ \
+                         ' tbins=2 method=3D enumbins=0 emin=1.0 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
                          ' logfile="cslightcrv_cmd2.log" debug=yes'
 
@@ -125,10 +125,10 @@ class Test(test):
         lcrv['tbinalg']  = 'LIN'
         lcrv['tmin']     = '2020-01-01T00:00:00'
         lcrv['tmax']     = '2020-01-01T00:05:00'
-        lcrv['tbins']    = 3
+        lcrv['tbins']    = 2
         lcrv['method']   = '3D'
         lcrv['enumbins'] = 0
-        lcrv['emin']     = 0.1
+        lcrv['emin']     = 1.0
         lcrv['emax']     = 100.0
         lcrv['outfile']  = 'cslightcrv_py1.fits'
         lcrv['logfile']  = 'cslightcrv_py1.log'
@@ -141,10 +141,10 @@ class Test(test):
         lcrv.save()
 
         # Check light curve
-        self._check_light_curve('cslightcrv_py1.fits', 3)
+        self._check_light_curve('cslightcrv_py1.fits', 2)
 
         # Now use FILE as time bin algorithm. For this we need first to
-        # create an ASCII file. We use now 6 time bins. The ASCII file
+        # create an ASCII file. We use now 2 time bins. The ASCII file
         # is saved into the file "lightcurve_py2.dat".
         csv    = gammalib.GCsv(2,2)
         tmin   = 58849.00
@@ -165,7 +165,7 @@ class Test(test):
         lcrv['tbinfile'] = 'cslightcrv_py2.dat'
         lcrv['method']   = '3D'
         lcrv['enumbins'] = 0
-        lcrv['emin']     = 0.1
+        lcrv['emin']     = 1.0
         lcrv['emax']     = 100.0
         lcrv['fix_bkg']  =  True
         lcrv['outfile']  = 'cslightcrv_py2.fits'
@@ -195,7 +195,7 @@ class Test(test):
         lcrv['tbinalg']  = 'GTI'
         lcrv['method']   = '3D'
         lcrv['enumbins'] = 0
-        lcrv['emin']     = 0.1
+        lcrv['emin']     = 1.0
         lcrv['emax']     = 100.0
         lcrv['outfile']  = 'cslightcrv_py3.fits'
         lcrv['logfile']  = 'cslightcrv_py3.log'
@@ -219,16 +219,16 @@ class Test(test):
         lcrv['tmax']     = '2020-01-01T00:05:00'
         lcrv['tbins']    = 2
         lcrv['method']   = '3D'
-        lcrv['emin']     = 0.1
+        lcrv['emin']     = 1.0
         lcrv['emax']     = 100.0
-        lcrv['enumbins'] = 10
+        lcrv['enumbins'] = 3
         lcrv['coordsys'] = 'CEL'
         lcrv['proj']     = 'TAN'
         lcrv['xref']     = 83.63
         lcrv['yref']     = 22.01
-        lcrv['nxpix']    = 20
-        lcrv['nypix']    = 20
-        lcrv['binsz']    = 0.02
+        lcrv['nxpix']    = 10
+        lcrv['nypix']    = 10
+        lcrv['binsz']    = 0.04
         lcrv['outfile']  = 'cslightcrv_py4.fits'
         lcrv['logfile']  = 'cslightcrv_py4.log'
         lcrv['chatter']  = 4
@@ -251,16 +251,16 @@ class Test(test):
         lcrv['tmax']      = '2020-01-01T00:05:00'
         lcrv['tbins']     = 2
         lcrv['method']    = 'ONOFF'
-        lcrv['emin']      = 0.1
+        lcrv['emin']      = 1.0
         lcrv['emax']      = 100.0
-        lcrv['enumbins']  = 10
+        lcrv['enumbins']  = 2
         lcrv['coordsys']  = 'CEL'
         lcrv['xref']      = 83.63
         lcrv['yref']      = 22.01
         lcrv['rad']       = 0.2
-        lcrv['etruemin']  = 0.05
-        lcrv['etruemax']  = 150.0
-        lcrv['etruebins'] = 20
+        lcrv['etruemin']  = 1.0
+        lcrv['etruemax']  = 100.0
+        lcrv['etruebins'] = 5
         lcrv['statistic'] = 'WSTAT'
         lcrv['outfile']   = 'cslightcrv_py5.fits'
         lcrv['logfile']   = 'cslightcrv_py5.log'
@@ -274,23 +274,23 @@ class Test(test):
 
         # Set-up cslightcrv without multiprocessing
         lcrv = cscripts.cslightcrv()
-        lcrv['inobs'] = self._events
-        lcrv['inmodel'] = self._model
-        lcrv['srcname'] = 'Crab'
-        lcrv['caldb'] = self._caldb
-        lcrv['irf'] = self._irf
-        lcrv['tbinalg'] = 'LIN'
-        lcrv['tmin'] = '2020-01-01T00:00:00'
-        lcrv['tmax'] = '2020-01-01T00:05:00'
-        lcrv['tbins'] = 3
-        lcrv['method'] = '3D'
+        lcrv['inobs']    = self._events
+        lcrv['inmodel']  = self._model
+        lcrv['srcname']  = 'Crab'
+        lcrv['caldb']    = self._caldb
+        lcrv['irf']      = self._irf
+        lcrv['tbinalg']  = 'LIN'
+        lcrv['tmin']     = '2020-01-01T00:00:00'
+        lcrv['tmax']     = '2020-01-01T00:05:00'
+        lcrv['tbins']    = 2
+        lcrv['method']   = '3D'
         lcrv['enumbins'] = 0
-        lcrv['emin'] = 0.1
-        lcrv['emax'] = 100.0
-        lcrv['outfile'] = 'cslightcrv_py6.fits'
-        lcrv['logfile'] = 'cslightcrv_py6.log'
-        lcrv['chatter'] = 2
-        lcrv['publish'] = True
+        lcrv['emin']     = 1.0
+        lcrv['emax']     = 100.0
+        lcrv['outfile']  = 'cslightcrv_py6.fits'
+        lcrv['logfile']  = 'cslightcrv_py6.log'
+        lcrv['chatter']  = 2
+        lcrv['publish']  = True
         lcrv['nthreads'] = 1
 
         # Run cslightcrv script and save light curve
@@ -299,7 +299,7 @@ class Test(test):
         lcrv.save()
 
         # Check light curve
-        self._check_light_curve('cslightcrv_py6.fits', 3)
+        self._check_light_curve('cslightcrv_py6.fits', 2)
 
         # Return
         return
@@ -322,10 +322,10 @@ class Test(test):
         lcrv['tbinalg']  = 'LIN'
         lcrv['tmin']     = '2020-01-01T00:00:00'
         lcrv['tmax']     = '2020-01-01T00:05:00'
-        lcrv['tbins']    = 3
+        lcrv['tbins']    = 2
         lcrv['method']   = '3D'
         lcrv['enumbins'] = 0
-        lcrv['emin']     = 0.1
+        lcrv['emin']     = 1.0
         lcrv['emax']     = 100.0
         lcrv['outfile']  = 'cslightcrv_py1_pickle.fits'
         lcrv['logfile']  = 'cslightcrv_py1_pickle.log'
@@ -341,7 +341,7 @@ class Test(test):
         obj.save()
 
         # Check light curve
-        self._check_light_curve('cslightcrv_py1_pickle.fits', 3)
+        self._check_light_curve('cslightcrv_py1_pickle.fits', 2)
 
         # Return
         return
@@ -379,7 +379,7 @@ class Test(test):
 
         # Check that the Prefactor has the right order of magnitude
         for s in range(table.nrows()):
-            self.test_value(table['Prefactor'][s], prefactor, 0.2*prefactor,
+            self.test_value(table['Prefactor'][s], prefactor, 0.9*prefactor,
                             'Check prefactor value')
 
         # Close FITS file

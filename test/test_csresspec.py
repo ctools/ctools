@@ -77,7 +77,7 @@ class Test(test):
                           ' outfile="csresspec_cmd1.fits"' + \
                           ' inmodel="' + self._model + '"' + \
                           ' caldb="' + self._caldb + '" irf="' + self._irf + '"' + \
-                          ' emin=0.1 emax=100.0 enumbins=20 ebinalg="LOG"' + \
+                          ' emin=1.0 emax=100.0 enumbins=2 ebinalg="LOG"' + \
                           ' mask=no algorithm="SUB"' + \
                           ' logfile="csresspec_cmd1.log" chatter=4'
 
@@ -86,14 +86,14 @@ class Test(test):
                          'Check successful execution from command line')
 
         # Check result file
-        self._check_result_file('csresspec_cmd1.fits', 20, 5)
+        self._check_result_file('csresspec_cmd1.fits', 2, 5)
 
         # Setup csresspec command
         cmd = csresspec + ' inobs="event_file_that_does_not_exist.fits"' + \
                           ' outfile="csresspec_cmd2.fits"' + \
                           ' inmodel="' + self._model + '"' + \
                           ' caldb="' + self._caldb + '" irf="' + self._irf + '"' + \
-                          ' emin=0.1 emax=100.0 enumbins=20 ebinalg="LOG"' + \
+                          ' emin=1.0 emax=100.0 enumbins=2 ebinalg="LOG"' + \
                           ' mask=no algorithm="SUBDIVSQRT"' + \
                           ' logfile="csresspec_cmd2.log" debug=yes chatter=2'
 
@@ -120,9 +120,9 @@ class Test(test):
         resspec['caldb']     = self._caldb
         resspec['irf']       = self._irf
         resspec['ebinalg']   = 'LOG'
-        resspec['emin']      = 0.1
+        resspec['emin']      = 1.0
         resspec['emax']      = 100.0
-        resspec['enumbins']  = 20
+        resspec['enumbins']  = 2
         resspec['mask']      = False
         resspec['algorithm'] = 'SUB'
         resspec['logfile']   = 'csresspec_py1.log'
@@ -134,7 +134,7 @@ class Test(test):
         resspec.save()
 
         # Check result file
-        self._check_result_file('csresspec_py1.fits', 20, 5)
+        self._check_result_file('csresspec_py1.fits', 2, 5)
 
         # Set-up csresspec for event list with computation of individual
         # model components
@@ -145,9 +145,9 @@ class Test(test):
         resspec['caldb']      = self._caldb
         resspec['irf']        = self._irf
         resspec['ebinalg']   = 'LOG'
-        resspec['emin']       = 0.1
+        resspec['emin']       = 1.0
         resspec['emax']       = 100.0
-        resspec['enumbins']   = 20
+        resspec['enumbins']   = 2
         resspec['mask']       = False
         resspec['algorithm']  = 'SUBDIV'
         resspec['components'] = True
@@ -158,7 +158,7 @@ class Test(test):
         resspec.execute()
 
         # Check result file
-        self._check_result_file('csresspec_py2.fits', 20, 7)
+        self._check_result_file('csresspec_py2.fits', 2, 7)
 
         # Set-up csresspec for counts cube
         resspec = cscripts.csresspec()

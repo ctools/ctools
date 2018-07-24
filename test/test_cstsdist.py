@@ -118,15 +118,15 @@ class Test(test):
         """
         # Set-up cstsdist for event list
         tsdist = cscripts.cstsdist()
-        tsdist['inobs']    = self._events
-        tsdist['inmodel']  = self._model
-        tsdist['srcname']  = 'Crab'
-        tsdist['caldb']    = self._caldb
-        tsdist['irf']      = self._irf
-        tsdist['ntrials']  = 2
-        tsdist['outfile']  = 'cstsdist_py1.dat'
-        tsdist['logfile']  = 'cstsdist_py1.log'
-        tsdist['chatter']  = 3
+        tsdist['inobs']   = self._events
+        tsdist['inmodel'] = self._model
+        tsdist['srcname'] = 'Crab'
+        tsdist['caldb']   = self._caldb
+        tsdist['irf']     = self._irf
+        tsdist['ntrials'] = 2
+        tsdist['outfile'] = 'cstsdist_py1.dat'
+        tsdist['logfile'] = 'cstsdist_py1.log'
+        tsdist['chatter'] = 3
 
         # Run cstsdist script
         tsdist.logFileOpen()   # Make sure we get a log file
@@ -138,16 +138,16 @@ class Test(test):
 
         # Set-up cstsdist without multiprocessing
         tsdist = cscripts.cstsdist()
-        tsdist['inobs']     = self._events
-        tsdist['inmodel']   = self._model
-        tsdist['srcname']   = 'Crab'
-        tsdist['caldb']     = self._caldb
-        tsdist['irf']       = self._irf
-        tsdist['ntrials']   = 2
-        tsdist['outfile']   = 'cstsdist_py2.dat'
-        tsdist['logfile']   = 'cstsdist_py2.log'
-        tsdist['chatter']   = 3
-        tsdist['nthreads']  = 1
+        tsdist['inobs']    = self._events
+        tsdist['inmodel']  = self._model
+        tsdist['srcname']  = 'Crab'
+        tsdist['caldb']    = self._caldb
+        tsdist['irf']      = self._irf
+        tsdist['ntrials']  = 2
+        tsdist['outfile']  = 'cstsdist_py2.dat'
+        tsdist['logfile']  = 'cstsdist_py2.log'
+        tsdist['chatter']  = 3
+        tsdist['nthreads'] = 1
 
         # Run cstsdist script
         tsdist.logFileOpen()  # Make sure we get a log file
@@ -166,18 +166,18 @@ class Test(test):
         """
         # Set-up cstsdist for counts cube
         tsdist = cscripts.cstsdist()
-        tsdist['inobs']    = self._cntcube
-        tsdist['inmodel']  = self._model
-        tsdist['srcname']  = 'Crab'
-        tsdist['expcube']  = 'NONE'
-        tsdist['psfcube']  = 'NONE'
-        tsdist['bkgcube']  = 'NONE'
-        tsdist['caldb']    = self._caldb
-        tsdist['irf']      = self._irf
-        tsdist['ntrials']  = 2
-        tsdist['outfile']  = 'cstsdist_py2.dat'
-        tsdist['logfile']  = 'cstsdist_py2.log'
-        tsdist['chatter']  = 4
+        tsdist['inobs']   = self._cntcube
+        tsdist['inmodel'] = self._model
+        tsdist['srcname'] = 'Crab'
+        tsdist['expcube'] = 'NONE'
+        tsdist['psfcube'] = 'NONE'
+        tsdist['bkgcube'] = 'NONE'
+        tsdist['caldb']   = self._caldb
+        tsdist['irf']     = self._irf
+        tsdist['ntrials'] = 2
+        tsdist['outfile'] = 'cstsdist_py2.dat'
+        tsdist['logfile'] = 'cstsdist_py2.log'
+        tsdist['chatter'] = 4
 
         # Run cstsdist script
         tsdist.logFileOpen()   # Make sure we get a log file
@@ -195,13 +195,13 @@ class Test(test):
         """
         # Set-up cstsdist for stacked cube
         tsdist = cscripts.cstsdist()
-        tsdist['inobs']    = self._stacked_inobs
-        tsdist['inmodel']  = self._stacked_model
-        tsdist['srcname']  = 'Crab'
-        tsdist['ntrials']  = 2
-        tsdist['outfile']  = 'cstsdist_py3.dat'
-        tsdist['logfile']  = 'cstsdist_py3.log'
-        tsdist['chatter']  = 4
+        tsdist['inobs']   = self._stacked_inobs
+        tsdist['inmodel'] = self._stacked_model
+        tsdist['srcname'] = 'Crab'
+        tsdist['ntrials'] = 2
+        tsdist['outfile'] = 'cstsdist_py3.dat'
+        tsdist['logfile'] = 'cstsdist_py3.log'
+        tsdist['chatter'] = 4
 
         # Run cstsdist script
         tsdist.logFileOpen()   # Make sure we get a log file
@@ -223,15 +223,15 @@ class Test(test):
 
         # Set-up cstsdist for event list
         tsdist = cscripts.cstsdist()
-        tsdist['inobs']    = self._events
-        tsdist['inmodel']  = self._model
-        tsdist['srcname']  = 'Crab'
-        tsdist['caldb']    = self._caldb
-        tsdist['irf']      = self._irf
-        tsdist['ntrials']  = 2
-        tsdist['outfile']  = 'cstsdist_py1_pickle.dat'
-        tsdist['logfile']  = 'cstsdist_py1_pickle.log'
-        tsdist['chatter']  = 3
+        tsdist['inobs']   = self._events
+        tsdist['inmodel'] = self._model
+        tsdist['srcname'] = 'Crab'
+        tsdist['caldb']   = self._caldb
+        tsdist['irf']     = self._irf
+        tsdist['ntrials'] = 2
+        tsdist['outfile'] = 'cstsdist_py1_pickle.dat'
+        tsdist['logfile'] = 'cstsdist_py1_pickle.log'
+        tsdist['chatter'] = 3
 
         # Perform pickeling tests of filled class
         obj = self._pickeling(tsdist)

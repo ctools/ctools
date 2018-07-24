@@ -80,7 +80,7 @@ class Test(test):
                      ' outfile="cspull_cmd1.dat"'+ \
                      ' ntrials=2'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                     ' ra=83.6331 dec=22.0145 emin=0.1 emax=100.0'+ \
+                     ' ra=83.6331 dec=22.0145 emin=1.0 emax=100.0'+ \
                      ' enumbins=0 tmin=0.0 tmax=100.0 deadc=0.98 rad=5.0'+ \
                      ' npix=200 binsz=0.05'+ \
                      ' logfile="cspull_cmd1.log" chatter=1'
@@ -97,7 +97,7 @@ class Test(test):
                      ' outfile="cspull_cmd1.dat"'+ \
                      ' ntrials=2'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                     ' ra=83.6331 dec=22.0145 emin=0.1 emax=100.0'+ \
+                     ' ra=83.6331 dec=22.0145 emin=1.0 emax=100.0'+ \
                      ' enumbins=0 tmin=0.0 tmax=100.0 deadc=0.98 rad=5.0'+ \
                      ' npix=200 binsz=0.05'+ \
                      ' logfile="cspull_cmd2.log" debug=yes'
@@ -127,7 +127,7 @@ class Test(test):
         pull['irf']      = self._irf
         pull['ra']       = 83.6331
         pull['dec']      = 22.0145
-        pull['emin']     = 0.1
+        pull['emin']     = 1.0
         pull['emax']     = 100.0
         pull['enumbins'] = 0
         pull['tmin']     = 0.0
@@ -140,7 +140,6 @@ class Test(test):
         # Run cspull script
         pull.logFileOpen()   # Make sure we get a log file
         pull.run()
-        #pull.save()
 
         # Check pull distribution file
         self._check_pull_file('cspull_py1.dat')
@@ -155,14 +154,14 @@ class Test(test):
         pull['irf']      = self._irf
         pull['ra']       = 83.6331
         pull['dec']      = 22.0145
-        pull['emin']     = 0.1
+        pull['emin']     = 1.0
         pull['emax']     = 100.0
-        pull['enumbins'] = 10
+        pull['enumbins'] = 2
         pull['tmin']     = 0.0
         pull['tmax']     = 100.0
         pull['deadc']    = 0.98
         pull['rad']      = 5.0
-        pull['npix']     = 20
+        pull['npix']     = 10
         pull['binsz']    = 0.2
         pull['coordsys'] = 'CEL'
         pull['proj']     = 'TAN'
@@ -245,10 +244,10 @@ class Test(test):
         pull['onsrc']    = 'NONE'
         pull['outfile']  = 'cspull_py6.dat'
         pull['ntrials']  = 1
-        pull['emin']     = 0.02
+        pull['emin']     = 1.0
         pull['emax']     = 100.0
-        pull['enumbins'] = 10
-        pull['npix']     = 20
+        pull['enumbins'] = 2
+        pull['npix']     = 10
         pull['binsz']    = 0.2
         pull['coordsys'] = 'CEL'
         pull['proj']     = 'TAN'
@@ -271,7 +270,7 @@ class Test(test):
         pull['irf']      = self._irf
         pull['ra']       = 83.6331
         pull['dec']      = 22.0145
-        pull['emin']     = 0.1
+        pull['emin']     = 1.0
         pull['emax']     = 100.0
         pull['enumbins'] = 0
         pull['tmin']     = 0.0
@@ -309,7 +308,7 @@ class Test(test):
         pull['irf']      = self._irf
         pull['ra']       = 83.6331
         pull['dec']      = 22.0145
-        pull['emin']     = 0.1
+        pull['emin']     = 1.0
         pull['emax']     = 100.0
         pull['enumbins'] = 0
         pull['tmin']     = 0.0
@@ -326,7 +325,6 @@ class Test(test):
         # Run csphasecrv script and save light curve
         obj.logFileOpen()   # Make sure we get a log file
         obj.run()
-        #obj.save()
 
         # Check pull distribution file
         self._check_pull_file('cspull_py1_pickle.dat')
