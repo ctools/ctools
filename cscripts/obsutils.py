@@ -849,9 +849,7 @@ def get_onoff_obs(cls, obs, nthreads=0):
 
     # On/Off observations are created with CSTAT as default statistic
     # We will change this to the user choice
-    if cls['statistic'].string() == 'DEFAULT':
-        pass
-    else:
+    if cls['statistic'].string() != 'DEFAULT':
         for observation in onoff_obs:
             observation.statistic(cls['statistic'].string())
 

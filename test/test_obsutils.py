@@ -19,13 +19,14 @@
 #
 # ==========================================================================
 import gammalib
+import cscripts
 from cscripts import obsutils
 from testing import test
 
 
-# =============================== #
-# Test class for csviscube script #
-# =============================== #
+# ============================== #
+# Test class for obsutils module #
+# ============================== #
 class Test(test):
     """
     Test class for csviscube script
@@ -79,6 +80,8 @@ class Test(test):
                     'Test obsutils.get_stacked_response() function')
         self.append(self._test_get_stacked_obs,
                     'Test obsutils.get_stacked_obs() function')
+        self.append(self._test_get_onoff_obs,
+                    'Test obsutils.get_onoff_obs() function')
 
         # Return
         return
@@ -122,7 +125,7 @@ class Test(test):
         self.test_value(res[0].events().ebounds().emin().TeV(), 1.0,
                         'Check minimum energy')
         self.test_value(res[0].events().ebounds().emax().TeV(), 10.0,
-                        'Check minimum energy')
+                        'Check maximum energy')
         self.test_value(res[0].events().number(), 4,
                         'Check number of events in list')
 
@@ -153,7 +156,7 @@ class Test(test):
         self.test_value(res[0].events().ebounds().emin().TeV(), 1.0,
                         'Check minimum energy')
         self.test_value(res[0].events().ebounds().emax().TeV(), 10.0,
-                        'Check minimum energy')
+                        'Check maximum energy')
         self.test_value(res[0].events().ebounds().size(), 5,
                         'Check number of energy bins')
         self.test_value(res[0].events().number(), 4,
@@ -186,7 +189,7 @@ class Test(test):
         self.test_value(res[0].events().ebounds().emin().TeV(), 1.0,
                         'Check minimum energy')
         self.test_value(res[0].events().ebounds().emax().TeV(), 10.0,
-                        'Check minimum energy')
+                        'Check maximum energy')
         self.test_value(res[0].events().ebounds().size(), 5,
                         'Check number of energy bins')
         self.test_value(res[0].events().number(), 15,
@@ -220,7 +223,7 @@ class Test(test):
         self.test_value(res[0].events().ebounds().emin().TeV(), 1.0,
                         'Check minimum energy')
         self.test_value(res[0].events().ebounds().emax().TeV(), 10.0,
-                        'Check minimum energy')
+                        'Check maximum energy')
         self.test_value(res[0].events().ebounds().size(), 5,
                         'Check number of energy bins')
         self.test_value(res[0].events().number(), 20,
@@ -263,7 +266,7 @@ class Test(test):
         self.test_value(res[0].on_spec().ebounds().emin().TeV(), 1.0,
                         'Check minimum energy of On spectrum')
         self.test_value(res[0].on_spec().ebounds().emax().TeV(), 10.0,
-                        'Check minimum energy of On spectrum')
+                        'Check maximum energy of On spectrum')
         self.test_value(res[0].on_spec().ebounds().size(), 5,
                         'Check number of energy bins of On spectrum')
         self.test_value(res[0].on_spec().counts(), 24,
@@ -271,7 +274,7 @@ class Test(test):
         self.test_value(res[0].off_spec().ebounds().emin().TeV(), 1.0,
                         'Check minimum energy of Off spectrum')
         self.test_value(res[0].off_spec().ebounds().emax().TeV(), 10.0,
-                        'Check minimum energy of Off spectrum')
+                        'Check maximum energy of Off spectrum')
         self.test_value(res[0].off_spec().ebounds().size(), 5,
                         'Check number of energy bins of Off spectrum')
         self.test_value(res[0].off_spec().counts(), 2,
@@ -279,19 +282,19 @@ class Test(test):
         self.test_value(res[0].arf().ebounds().emin().TeV(), 0.5,
                         'Check minimum energy of ARF')
         self.test_value(res[0].arf().ebounds().emax().TeV(), 12.0,
-                        'Check minimum energy of ARF')
+                        'Check maximum energy of ARF')
         self.test_value(res[0].arf().ebounds().size(), 41,
                         'Check number of energy bins of ARF')
         self.test_value(res[0].rmf().etrue().emin().TeV(), 0.5,
                         'Check minimum true energy of RMF')
         self.test_value(res[0].rmf().etrue().emax().TeV(), 12.0,
-                        'Check minimum true energy of RMF')
+                        'Check maximum true energy of RMF')
         self.test_value(res[0].rmf().etrue().size(), 41,
                         'Check number of true energy bins of RMF')
         self.test_value(res[0].rmf().emeasured().emin().TeV(), 1.0,
                         'Check minimum reconstructed energy of RMF')
         self.test_value(res[0].rmf().emeasured().emax().TeV(), 10.0,
-                        'Check minimum reconstructed energy of RMF')
+                        'Check maximum reconstructed energy of RMF')
         self.test_value(res[0].rmf().emeasured().size(), 5,
                         'Check number of reconstructed energy bins of RMF')
 
@@ -315,7 +318,7 @@ class Test(test):
         self.test_value(res[0].events().ebounds().emin().TeV(), 1.0,
                         'Check minimum energy')
         self.test_value(res[0].events().ebounds().emax().TeV(), 10.0,
-                        'Check minimum energy')
+                        'Check maximum energy')
 
         # Check energy dispersion flag
         self.test_assert(not (res[0].response().use_edisp()),
@@ -332,7 +335,39 @@ class Test(test):
         """
         Test set_obs() function
         """
-        # TODO: implement
+        # Setup pointing direction
+        pnt = gammalib.GSkyDir()
+        pnt.radec_deg(83.63, 22.51)
+
+        # Setup one CTA observation
+        res = obsutils.set_obs(pnt, emin=1.0, emax=10.0)
+        
+        # Check result
+        self.test_value(res.eventtype(), 'EventList', 'Check event type')
+        self.test_value(res.events().ebounds().emin().TeV(), 1.0,
+                        'Check minimum energy')
+        self.test_value(res.events().ebounds().emax().TeV(), 10.0,
+                        'Check maximum energy')
+        self.test_value(res.pointing().dir().ra_deg(), 83.63,
+                        'Check pointing Right Ascension')
+        self.test_value(res.pointing().dir().dec_deg(), 22.51,
+                        'Check pointing declination')
+
+        # Setup one CTA observation for local caldb directory
+        res = obsutils.set_obs(pnt, caldb=self._datadir, irf='irf_file.fits',
+                               emin=1.0, emax=10.0)
+
+        # Check result
+        self.test_value(res.eventtype(), 'EventList', 'Check event type')
+        self.test_value(res.events().ebounds().emin().TeV(), 1.0,
+                        'Check minimum energy')
+        self.test_value(res.events().ebounds().emax().TeV(), 10.0,
+                        'Check maximum energy')
+        self.test_value(res.pointing().dir().ra_deg(), 83.63,
+                        'Check pointing Right Ascension')
+        self.test_value(res.pointing().dir().dec_deg(), 22.51,
+                        'Check pointing declination')
+
         # Return
         return
 
@@ -341,7 +376,23 @@ class Test(test):
         """
         Test set_obs_list() function
         """
-        # TODO: implement
+        # Setup observation definition list
+        obsdeflist = [{'ra': 83.63, 'dec': 22.51}]
+
+        # Setup observation container
+        res = obsutils.set_obs_list(obsdeflist)
+
+        # Check result
+        self.test_value(res.size(), 1, 'Check number of observations')
+        self.test_value(res.models().size(), 0, 'Check number of models')
+        self.test_value(res.nobserved(), 0, 'Check number of observed events')
+        self.test_value(res.npred(), 0.0, 'Check number of predicted events')
+        self.test_value(res[0].eventtype(), 'EventList', 'Check event type')
+        self.test_value(res[0].pointing().dir().ra_deg(), 83.63,
+                        'Check pointing Right Ascension')
+        self.test_value(res[0].pointing().dir().dec_deg(), 22.51,
+                        'Check pointing declination')
+
         # Return
         return
 
@@ -360,7 +411,7 @@ class Test(test):
         self.test_value(len(res), 4, 'Check number of observations for "four"'
                         ' pattern')
 
-        # Get invalud observations pattern
+        # Get invalid observations pattern
         self.test_try('Check invalid pointing pattern')
         try:
             res = obsutils.set_obs_patterns('five')
@@ -376,7 +427,28 @@ class Test(test):
         """
         Test set_observations() function
         """
-        # TODO: implement
+        # Set observation
+        res = obsutils.set_observations(83.63, 22.51, 5.0,
+                                        0.0, 1800.0,
+                                        1.0, 100.0,
+                                        'South_50h', 'prod2',
+                                        pattern='single')
+
+        # Check result
+        self.test_value(res.size(), 1, 'Check number of observations')
+        self.test_value(res.models().size(), 0, 'Check number of models')
+        self.test_value(res.nobserved(), 0, 'Check number of observed events')
+        self.test_value(res.npred(), 0.0, 'Check number of predicted events')
+        self.test_value(res[0].eventtype(), 'EventList', 'Check event type')
+        self.test_value(res[0].events().ebounds().emin().TeV(), 1.0,
+                        'Check minimum energy')
+        self.test_value(res[0].events().ebounds().emax().TeV(), 100.0,
+                        'Check maximum energy')
+        self.test_value(res[0].pointing().dir().ra_deg(), 83.63,
+                        'Check pointing Right Ascension')
+        self.test_value(res[0].pointing().dir().dec_deg(), 22.51,
+                        'Check pointing declination')
+
         # Return
         return
 
@@ -385,7 +457,97 @@ class Test(test):
         """
         Test get_stacked_response() function
         """
-        # TODO: implement
+        # Set-up observation container
+        obs = self._setup_sim()
+
+        # Get stacked response with xref/yref set
+        res = obsutils.get_stacked_response(obs, 83.6331, 22.0145,
+                                            coordsys='CEL',
+                                            binsz=0.1, nxpix=10, nypix=10,
+                                            emin=1.0, emax=100.0, enumbins=5,
+                                            edisp=False)
+
+        # Check result
+        self.test_value(res['expcube'].cube().npix(), 100,
+                        'Check number of exposure cube pixels')
+        self.test_value(res['expcube'].cube().nmaps(), 61,
+                        'Check number of exposure cube maps')
+        self.test_value(res['psfcube'].cube().npix(), 4,
+                        'Check number of PSF cube pixels')
+        self.test_value(res['psfcube'].cube().nmaps(), 12200,
+                        'Check number of PSF cube maps')
+        self.test_value(res['bkgcube'].cube().npix(), 100,
+                        'Check number of background cube pixels')
+        self.test_value(res['bkgcube'].cube().nmaps(), 61,
+                        'Check number of background cube maps')
+
+        # Get stacked response with None xref/yref
+        res = obsutils.get_stacked_response(obs, None, None,
+                                            coordsys='CEL',
+                                            binsz=0.1, nxpix=10, nypix=10,
+                                            emin=1.0, emax=100.0, enumbins=5,
+                                            edisp=False)
+
+        # Check result
+        self.test_value(res['expcube'].cube().npix(), 100,
+                        'Check number of exposure cube pixels')
+        self.test_value(res['expcube'].cube().nmaps(), 61,
+                        'Check number of exposure cube maps')
+        self.test_value(res['psfcube'].cube().npix(), 4,
+                        'Check number of PSF cube pixels')
+        self.test_value(res['psfcube'].cube().nmaps(), 12200,
+                        'Check number of PSF cube maps')
+        self.test_value(res['bkgcube'].cube().npix(), 100,
+                        'Check number of background cube pixels')
+        self.test_value(res['bkgcube'].cube().nmaps(), 61,
+                        'Check number of background cube maps')
+
+        # Get stacked response with xref/yref set and large number of energy bins
+        res = obsutils.get_stacked_response(obs, 83.6331, 22.0145,
+                                            coordsys='CEL',
+                                            binsz=0.1, nxpix=10, nypix=10,
+                                            emin=1.0, emax=100.0, enumbins=100,
+                                            edisp=False)
+
+        # Check result
+        self.test_value(res['expcube'].cube().npix(), 100,
+                        'Check number of exposure cube pixels')
+        self.test_value(res['expcube'].cube().nmaps(), 101,
+                        'Check number of exposure cube maps')
+        self.test_value(res['psfcube'].cube().npix(), 4,
+                        'Check number of PSF cube pixels')
+        self.test_value(res['psfcube'].cube().nmaps(), 20200,
+                        'Check number of PSF cube maps')
+        self.test_value(res['bkgcube'].cube().npix(), 100,
+                        'Check number of background cube pixels')
+        self.test_value(res['bkgcube'].cube().nmaps(), 101,
+                        'Check number of background cube maps')
+
+        # Get stacked response with energy dispersion
+        res = obsutils.get_stacked_response(obs, 83.6331, 22.0145,
+                                            coordsys='CEL',
+                                            binsz=0.1, nxpix=10, nypix=10,
+                                            emin=1.0, emax=100.0, enumbins=5,
+                                            edisp=True)
+
+        # Check result
+        self.test_value(res['expcube'].cube().npix(), 100,
+                        'Check number of exposure cube pixels')
+        self.test_value(res['expcube'].cube().nmaps(), 61,
+                        'Check number of exposure cube maps')
+        self.test_value(res['psfcube'].cube().npix(), 4,
+                        'Check number of PSF cube pixels')
+        self.test_value(res['psfcube'].cube().nmaps(), 12200,
+                        'Check number of PSF cube maps')
+        self.test_value(res['bkgcube'].cube().npix(), 100,
+                        'Check number of background cube pixels')
+        self.test_value(res['bkgcube'].cube().nmaps(), 61,
+                        'Check number of background cube maps')
+        self.test_value(res['edispcube'].cube().npix(), 4,
+                        'Check number of energy dispersion cube pixels')
+        self.test_value(res['edispcube'].cube().nmaps(), 6100,
+                        'Check number of energy dispersion cube maps')
+
         # Return
         return
 
@@ -394,7 +556,135 @@ class Test(test):
         """
         Test get_stacked_obs() function
         """
-        # TODO: implement
+        # Set-up unbinned cslightcrv (is not run here!!!)
+        lcrv = cscripts.cslightcrv()
+        lcrv['inobs']    = self._events
+        lcrv['inmodel']  = self._model
+        lcrv['srcname']  = 'Crab'
+        lcrv['caldb']    = self._caldb
+        lcrv['irf']      = self._irf
+        lcrv['tbinalg']  = 'LIN'
+        lcrv['tmin']     = '2020-01-01T00:00:00'
+        lcrv['tmax']     = '2020-01-01T00:05:00'
+        lcrv['tbins']    = 2
+        lcrv['method']   = '3D'
+        lcrv['emin']     = 1.0
+        lcrv['emax']     = 100.0
+        lcrv['enumbins'] = 3
+        lcrv['coordsys'] = 'CEL'
+        lcrv['proj']     = 'TAN'
+        lcrv['xref']     = 83.63
+        lcrv['yref']     = 22.01
+        lcrv['binsz']    = 0.1
+        lcrv['nxpix']    = 10
+        lcrv['nypix']    = 10
+        lcrv['outfile']  = 'obsutils_cslightcrv_py1.fits'
+        lcrv['logfile']  = 'obsutils_cslightcrv_py1.log'
+        lcrv._get_parameters()
+
+        # Get stacked observation container
+        res = obsutils.get_stacked_obs(lcrv, lcrv.obs())
+
+        # Apply energy dispersion
+        res[0].response().apply_edisp(True)
+
+        # Check result
+        self.test_value(res.size(), 1, 'Check number of observations')
+        self.test_value(res.models().size(), 2, 'Check number of models')
+        self.test_value(res.nobserved(), 96, 'Check number of observed events')
+        self.test_value(res.npred(), 0.0, 'Check number of predicted events')
+        self.test_assert(not res[0].response().use_edisp(),
+                         'Check that no energy dispersion is used')
+
+        # Set energy dispersion
+        lcrv['edisp'] = True
+
+        # Get stacked observation container
+        res = obsutils.get_stacked_obs(lcrv, lcrv.obs())
+
+        # Apply energy dispersion
+        res[0].response().apply_edisp(True)
+
+        # Check result
+        self.test_value(res.size(), 1, 'Check number of observations')
+        self.test_value(res.models().size(), 2, 'Check number of models')
+        self.test_value(res.nobserved(), 96, 'Check number of observed events')
+        self.test_value(res.npred(), 0.0, 'Check number of predicted events')
+        self.test_assert(res[0].response().use_edisp(),
+                         'Check that energy dispersion is used')
+
+        # Increase chatter level
+        lcrv['edisp']   = False
+        lcrv['chatter'] = 4
+
+        # Get stacked observation container
+        res = obsutils.get_stacked_obs(lcrv, lcrv.obs())
+
+        # Apply energy dispersion
+        res[0].response().apply_edisp(True)
+
+        # Check result
+        self.test_value(res.size(), 1, 'Check number of observations')
+        self.test_value(res.models().size(), 2, 'Check number of models')
+        self.test_value(res.nobserved(), 96, 'Check number of observed events')
+        self.test_value(res.npred(), 0.0, 'Check number of predicted events')
+        self.test_assert(not res[0].response().use_edisp(),
+                         'Check that no energy dispersion is used')
+
         # Return
         return
 
+    # Test get_onoff_obs() function
+    def _test_get_onoff_obs(self):
+        """
+        Test get_onoff_obs() function
+        """
+        # Set-up unbinned cslightcrv (is not run here!!!)
+        lcrv = cscripts.cslightcrv()
+        lcrv['inobs']    = self._events
+        lcrv['inmodel']  = self._model
+        lcrv['srcname']  = 'Crab'
+        lcrv['caldb']    = self._caldb
+        lcrv['irf']      = self._irf
+        lcrv['tbinalg']  = 'LIN'
+        lcrv['tmin']     = '2020-01-01T00:00:00'
+        lcrv['tmax']     = '2020-01-01T00:05:00'
+        lcrv['tbins']    = 2
+        lcrv['method']   = 'ONOFF'
+        lcrv['emin']     = 1.0
+        lcrv['emax']     = 100.0
+        lcrv['enumbins'] = 2
+        lcrv['coordsys'] = 'CEL'
+        lcrv['xref']     = 83.63
+        lcrv['yref']     = 22.01
+        lcrv['rad']      = 0.2
+        lcrv['outfile']  = 'obsutils_cslightcrv_py2.fits'
+        lcrv['logfile']  = 'obsutils_cslightcrv_py2.log'
+        lcrv._get_parameters()
+
+        # Get on/off observation container
+        res = obsutils.get_onoff_obs(lcrv, lcrv.obs())
+
+        # Check result
+        self.test_value(res.size(), 1, 'Check number of observations')
+        self.test_value(res.models().size(), 2, 'Check number of models')
+        self.test_value(res.nobserved(), 91, 'Check number of observed events')
+        self.test_value(res.npred(), 0.0, 'Check number of predicted events')
+
+        # Use galactic coordinates
+        lcrv['coordsys'] = 'GAL'
+        lcrv['xref']     = 184.5597
+        lcrv['yref']     =  -5.7892
+        lcrv['chatter']  = 4
+
+        # Get on/off observation container
+        res = obsutils.get_onoff_obs(lcrv, lcrv.obs())
+
+        # Check result
+        self.test_value(res.size(), 1, 'Check number of observations')
+        self.test_value(res.models().size(), 2, 'Check number of models')
+        self.test_value(res.nobserved(), 91, 'Check number of observed events')
+        self.test_value(res.npred(), 0.0, 'Check number of predicted events')
+
+        # Return
+        return
