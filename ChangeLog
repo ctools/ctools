@@ -1,4 +1,4 @@
-2018-07-17
+2018-07-25
 
         * Version 1.6.0 released
         ========================
@@ -10,7 +10,7 @@
         Add Exponential spectral model to science verification (#2454)
         Fix bug when using precomputed model in csresspec (#2448)
         Parallelise cslightcrv, csphasecrv, csspec, cssens, csphagen, cspull and
-          cstsdist and add nthreads parameter to ctlike and cterror (#2421)
+          cstsdist and add nthreads parameter to ctobssim, ctlike and cterror (#2421)
         Keep existing library path in installation script on Mac OS X (#2420)
         csphagen produces Xspec compliant data (#2404)
         Add show_rmf.py example script

@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-17 July 2018
+25 July 2018
 
 
 Introduction
@@ -99,6 +99,8 @@ None
 
 ctobssim - CTA observation simulation
 -------------------------------------
+Add hidden "nthreads" parameter to control parallel computations (#2421).
+
 Add "mjdref" parameter to allow specification of the MJD reference time
 for the simulation (#2054).
 

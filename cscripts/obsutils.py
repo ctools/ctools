@@ -84,10 +84,11 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
     """
     # Allocate ctobssim application and set parameters
     obssim = ctools.ctobssim(obs)
-    obssim['seed']    = seed
-    obssim['edisp']   = edisp
-    obssim['chatter'] = chatter
-    obssim['debug']   = debug
+    obssim['seed']     = seed
+    obssim['edisp']    = edisp
+    obssim['nthreads'] = nthreads
+    obssim['chatter']  = chatter
+    obssim['debug']    = debug
 
     # Optionally open the log file
     if log:

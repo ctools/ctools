@@ -34,6 +34,10 @@
 #include "GTools.hpp"
 #include "GFits.hpp"
 
+/* __ OpenMP section _____________________________________________________ */
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                         "ctobssim::get_parameters()"
@@ -693,6 +697,14 @@ void ctobssim::get_parameters(void)
         m_rans.push_back(GRan(new_seed));
 
     } // endfor: looped over observations
+
+    // Set number of OpenMP threads
+    #ifdef _OPENMP
+    int nthreads = (*this)["nthreads"].integer();
+    if (nthreads > 0) {
+        omp_set_num_threads(nthreads);
+    }
+    #endif
 
     // Write parameters into logger
     log_parameters(TERSE);
