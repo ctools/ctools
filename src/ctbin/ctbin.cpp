@@ -32,6 +32,11 @@
 #include "ctbin.hpp"
 #include "GTools.hpp"
 
+/* __ OpenMP section _____________________________________________________ */
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                            "ctbin::get_parameters()"
 #define G_FILL_CUBE                      "ctbin::fill_cube(GCTAObservation*)"
