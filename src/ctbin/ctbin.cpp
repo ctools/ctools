@@ -473,6 +473,14 @@ void ctbin::get_parameters(void)
         m_dirs[pix].radec(m_dirs[pix].ra(), m_dirs[pix].dec());
     }
 
+    // Set number of OpenMP threads
+    #ifdef _OPENMP
+    int nthreads = (*this)["nthreads"].integer();
+    if (nthreads > 0) {
+        omp_set_num_threads(nthreads);
+    }
+    #endif
+
     // Write parameters into logger
     log_parameters(TERSE);
 

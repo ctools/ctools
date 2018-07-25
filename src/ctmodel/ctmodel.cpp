@@ -590,6 +590,14 @@ void ctmodel::get_parameters(void)
 
     } // endif: cube was scheduled for appending
 
+    // Set number of OpenMP threads
+    #ifdef _OPENMP
+    int nthreads = (*this)["nthreads"].integer();
+    if (nthreads > 0) {
+        omp_set_num_threads(nthreads);
+    }
+    #endif
+
     // Write parameters into logger
     log_parameters(TERSE);
 

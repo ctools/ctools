@@ -85,6 +85,9 @@ General parameters
 Standard parameters
 -------------------
 
+``(nthreads = 0) [integer]``
+    Number of parallel processes (0=use all available CPUs).
+
 ``(publish = no) [boolean]``
     Specifies whether the counts cube should be published on VO Hub.
 

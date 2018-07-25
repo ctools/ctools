@@ -189,6 +189,13 @@ class ctobservation_test(ctools.csobservation):
         self._set_obs_statistic(statistic)
         return gammalib.toupper(self.obs()[0].statistic())
 
+    # Check read_ogip_keywords() and write_ogip_keywords methods
+    def check_ogip_keywords(self, hdu):
+        self._read_ogip_keywords(hdu)
+        self._write_ogip_keywords(hdu)
+        self._read_ogip_keywords(hdu)
+        return hdu
+
 
 # ======================= #
 # ctlikelihood_test class #
@@ -664,6 +671,43 @@ class Test(test):
         self.test_value(empty.check_set_obs_statistic_onoff('DEFAULT'),
                         'CSTAT',
                         'Check set_obs_statistic("DEFAULT") for On/Off')
+
+        # Test read_ogip_keywords() method for empty header
+        hdu = empty.check_ogip_keywords(gammalib.GFitsBinTable())
+        self.test_value(hdu.string('TELESCOP'), '', 'Check "TELESCOP" keyword')
+        self.test_value(hdu.string('DATE-OBS'), '2010-01-01', 'Check "DATE-OBS" keyword')
+        self.test_value(hdu.string('TIME-OBS'), '00:00:00', 'Check "TIME-OBS" keyword')
+        self.test_value(hdu.string('DATE-END'), '2010-01-01', 'Check "DATE-END" keyword')
+        self.test_value(hdu.string('TIME-END'), '00:00:00', 'Check "TIME-END" keyword')
+        self.test_value(hdu.real('TELAPSE'), 0.0, 'Check "TELAPSE" keyword')
+        self.test_value(hdu.real('ONTIME'), 0.0, 'Check "ONTIME" keyword')
+        self.test_value(hdu.real('LIVETIME'), 0.0, 'Check "LIVETIME" keyword')
+        self.test_value(hdu.real('EXPOSURE'), 0.0, 'Check "EXPOSURE" keyword')
+        self.test_value(hdu.real('DEADC'), 1.0, 'Check "DEADC" keyword')
+
+        # Test read_ogip_keywords() method for filled header
+        table = gammalib.GFitsBinTable()
+        table.card('TELESCOP', 'CTA', 'Comment')
+        table.card('DATE-OBS', '2018-01-01', 'Comment')
+        table.card('TIME-OBS', '01:02:03', 'Comment')
+        table.card('DATE-END', '2018-02-05', 'Comment')
+        table.card('TIME-END', '21:12:05', 'Comment')
+        table.card('TELAPSE', 1234.0, 'Comment')
+        table.card('ONTIME', 2345.0, 'Comment')
+        table.card('LIVETIME', 2210.0, 'Comment')
+        table.card('EXPOSURE', 3001.0, 'Comment')
+
+        hdu = empty.check_ogip_keywords(table)
+        self.test_value(hdu.string('TELESCOP'), 'CTA', 'Check "TELESCOP" keyword')
+        self.test_value(hdu.string('DATE-OBS'), '2018-01-01', 'Check "DATE-OBS" keyword')
+        self.test_value(hdu.string('TIME-OBS'), '01:02:03', 'Check "TIME-OBS" keyword')
+        self.test_value(hdu.string('DATE-END'), '2018-02-05', 'Check "DATE-END" keyword')
+        self.test_value(hdu.string('TIME-END'), '21:12:05', 'Check "TIME-END" keyword')
+        self.test_value(hdu.real('TELAPSE'), 1234.0, 'Check "TELAPSE" keyword')
+        self.test_value(hdu.real('ONTIME'), 2345.0, 'Check "ONTIME" keyword')
+        self.test_value(hdu.real('LIVETIME'), 2210.0, 'Check "LIVETIME" keyword')
+        self.test_value(hdu.real('EXPOSURE'), 3001.0, 'Check "EXPOSURE" keyword')
+        self.test_value(hdu.real('DEADC'), 2210.0/2345.0, 'Check "DEADC" keyword')
 
         # Return
         return

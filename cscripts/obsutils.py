@@ -165,6 +165,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
             binning['binsz']    = binsz
             binning['coordsys'] = coord
             binning['proj']     = proj
+            binning['nthreads'] = nthreads
             binning['chatter']  = chatter
             binning['debug']    = debug
 

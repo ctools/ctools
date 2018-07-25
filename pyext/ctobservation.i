@@ -118,6 +118,7 @@ public:
     // Protected methods
     GCTAObservation* first_unbinned_observation(void);
     GCTAObservation* next_unbinned_observation(void);
+    void             read_ogip_keywords(GFitsHDU* hdu) const;
     void             write_ogip_keywords(GFitsHDU* hdu) const;
     void             set_obs_statistic(const std::string& statistic);
     void             save_events_fits(void);

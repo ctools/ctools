@@ -49,6 +49,8 @@ of the filename is now done by the GApplicationPar class.
 
 ctbin - CTA event binning
 -------------------------
+Add hidden "nthreads" parameter to control parallel computations (#2421).
+
 Copy the time reference from the first input observation (#2054).
 
 
@@ -94,7 +96,7 @@ None
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
-None
+Add hidden "nthreads" parameter to control parallel computations (#2421).
 
 
 ctobssim - CTA observation simulation
