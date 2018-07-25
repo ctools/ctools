@@ -352,13 +352,15 @@ class cstsdist(ctools.csobservation):
                 self._log_string(gammalib.TERSE, poolresults[seed][1]['log'], False)
 
         # Otherwise, loop over trials
-        for seed in range(self['ntrials'].integer()):
+        else:
 
-            # Make a trial
-            result = self._trial(seed)
+            for seed in range(self['ntrials'].integer()):
 
-            # Write out trial result
-            ioutils.write_csv_row(self['outfile'].filename().url(), seed,
+                # Make a trial
+                result = self._trial(seed)
+
+                # Write out trial result
+                ioutils.write_csv_row(self['outfile'].filename().url(), seed,
                                   result['colnames'], result['values'])
 
         # Return

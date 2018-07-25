@@ -401,14 +401,16 @@ class cspull(ctools.csobservation):
                 self._log_string(gammalib.TERSE, poolresults[seed][1]['log'], False)
 
         # Otherwise, loop over trials
-        for seed in range(self['ntrials'].integer()):
+        else:
 
-            # Make a trial and add initial seed
-            result = self._trial(seed + self['seed'].integer())
+            for seed in range(self['ntrials'].integer()):
 
-            # Write out trial result
-            ioutils.write_csv_row(self['outfile'].filename().url(), seed,
-                                  result['colnames'], result['values'])
+                # Make a trial and add initial seed
+                result = self._trial(seed + self['seed'].integer())
+
+                # Write out trial result
+                ioutils.write_csv_row(self['outfile'].filename().url(), seed,
+                                      result['colnames'], result['values'])
 
         # Return
         return
