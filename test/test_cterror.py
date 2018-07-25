@@ -68,7 +68,7 @@ class Test(test):
         cmd = cterror+' inobs="'+self._events+'"'+ \
                       ' inmodel="'+self._model+'" srcname="Crab"'+ \
                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                      ' outmodel="cterror_cmd1.xml"'+ \
+                      ' tol=0.1 outmodel="cterror_cmd1.xml"'+ \
                       ' logfile="cterror_cmd1.log" chatter=1'
 
         # Check if execution was successful
@@ -82,7 +82,7 @@ class Test(test):
         cmd = cterror+' inobs="event_file_that_does_not_exist.fits"'+ \
                       ' inmodel="'+self._model+'" srcname="Crab"'+ \
                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                      ' outmodel="cterror_cmd2.xml"'+ \
+                      ' tol=0.1 outmodel="cterror_cmd2.xml"'+ \
                       ' logfile="cterror_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
@@ -124,6 +124,7 @@ class Test(test):
         error['srcname']  = 'Crab'
         error['caldb']    = self._caldb
         error['irf']      = self._irf
+        error['tol']      = 0.1
         error['outmodel'] = 'cterror_py1.xml'
         error['logfile']  = 'cterror_py1.log'
         error['chatter']  = 2
@@ -170,6 +171,7 @@ class Test(test):
         error['srcname']  = 'Crab'
         error['caldb']    = self._caldb
         error['irf']      = self._irf
+        error['tol']      = 0.1
         error['outmodel'] = 'cterror_py3.xml'
         error['logfile']  = 'cterror_py3.log'
         error['chatter']  = 4
@@ -259,9 +261,9 @@ class Test(test):
 
         # Set reference values
         prefactor              = 3.65452317573063e-16
-        prefactor_error        = 1.12697923756417e-16
+        prefactor_error        = 1.12920470341148e-16
         index                  = 2.39356360626209
-        index_error            = 0.131093571504494
+        index_error            = 0.128468611886618
         pre_background         = 1.01409721534593
         pre_background_error   = 0.122650321517162
         index_background       = 0.0436264224948547

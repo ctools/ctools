@@ -67,7 +67,7 @@ class Test(test):
         cmd = ctulimit+' inobs="'+self._events+'"'+ \
                        ' inmodel="'+self._model+'" srcname="Crab"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                       ' logfile="ctulimit_cmd1.log" chatter=1'
+                       ' tol=0.1 logfile="ctulimit_cmd1.log" chatter=1'
 
         # Check if execution was successful
         self.test_assert(self._execute(cmd) == 0,
@@ -77,7 +77,7 @@ class Test(test):
         cmd = ctulimit+' inobs="event_file_that_does_not_exist.fits"'+ \
                        ' inmodel="'+self._model+'" srcname="Crab"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                       ' logfile="ctulimit_cmd2.log" debug=yes chatter=2'
+                       ' tol=0.1 logfile="ctulimit_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd, success=False) != 0,
@@ -87,7 +87,7 @@ class Test(test):
         cmd = ctulimit+' inobs="'+self._events+'"'+ \
                        ' inmodel="'+self._model+'" srcname="Vela"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                       ' logfile="ctulimit_cmd2.log" debug=yes chatter=2'
+                       ' tol=0.1 logfile="ctulimit_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd, success=False) != 0,
@@ -129,6 +129,7 @@ class Test(test):
         ulimit['srcname'] = 'Crab'
         ulimit['caldb']   = self._caldb
         ulimit['irf']     = self._irf
+        ulimit['tol']     = 0.1
         ulimit['logfile'] = 'ctulimit_py1.log'
         ulimit['chatter'] = 2
 
@@ -138,9 +139,9 @@ class Test(test):
         ulimit.save()
 
         # Set reference value
-        ref_diff  = 2.7504120441004e-17
-        ref_flux  = 1.66909538876204e-11
-        ref_eflux = 6.46471558856293e-11
+        ref_diff  = 2.75359655874408e-17
+        ref_flux  = 1.66942609234064e-11
+        ref_eflux = 6.4588860064421e-11
 
         # Check results
         self.test_value(ulimit.diff_ulimit(), ref_diff, 1.0e-21,
@@ -200,6 +201,7 @@ class Test(test):
         # maximum likelihood
         ulimit = ctools.ctulimit(like.obs())
         ulimit['srcname'] = 'Crab'
+        ulimit['tol']     = 0.1
         ulimit['logfile'] = 'ctulimit_py2.log'
         ulimit['chatter'] = 3
 

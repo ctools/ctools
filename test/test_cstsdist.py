@@ -33,7 +33,7 @@ class Test(test):
     This test class makes unit tests for the cstsdist script by using it
     from the command line and from Python.
     """
-    
+
     # Constructor
     def __init__(self):
         """
@@ -97,7 +97,7 @@ class Test(test):
         cmd = cstsdist+' inobs="event_file_that_does_not_exist.xml"'+ \
                        ' inmodel="'+self._model+'" srcname="Crab"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                       ' ntrials=1 '+ \
+                       ' ntrials=2 '+ \
                        ' outfile="cstsdist_cmd2.dat"'+ \
                        ' logfile="cstsdist_cmd2.log" chatter=2'
 
@@ -135,27 +135,6 @@ class Test(test):
 
         # Check TS distribution file
         self._check_result_file('cstsdist_py1.dat')
-
-        # Set-up cstsdist without multiprocessing
-        tsdist = cscripts.cstsdist()
-        tsdist['inobs']    = self._events
-        tsdist['inmodel']  = self._model
-        tsdist['srcname']  = 'Crab'
-        tsdist['caldb']    = self._caldb
-        tsdist['irf']      = self._irf
-        tsdist['ntrials']  = 2
-        tsdist['outfile']  = 'cstsdist_py2.dat'
-        tsdist['logfile']  = 'cstsdist_py2.log'
-        tsdist['chatter']  = 3
-        tsdist['nthreads'] = 1
-
-        # Run cstsdist script
-        tsdist.logFileOpen()  # Make sure we get a log file
-        tsdist.run()
-        tsdist.save()
-
-        # Check TS distribution file
-        self._check_result_file('cstsdist_py2.dat')
 
         # Return
         return
@@ -223,15 +202,16 @@ class Test(test):
 
         # Set-up cstsdist for event list
         tsdist = cscripts.cstsdist()
-        tsdist['inobs']   = self._events
-        tsdist['inmodel'] = self._model
-        tsdist['srcname'] = 'Crab'
-        tsdist['caldb']   = self._caldb
-        tsdist['irf']     = self._irf
-        tsdist['ntrials'] = 2
-        tsdist['outfile'] = 'cstsdist_py1_pickle.dat'
-        tsdist['logfile'] = 'cstsdist_py1_pickle.log'
-        tsdist['chatter'] = 3
+        tsdist['inobs']    = self._events
+        tsdist['inmodel']  = self._model
+        tsdist['srcname']  = 'Crab'
+        tsdist['caldb']    = self._caldb
+        tsdist['irf']      = self._irf
+        tsdist['ntrials']  = 2
+        tsdist['nthreads'] = 1 # This tests at the same time no multiprocessing
+        tsdist['outfile']  = 'cstsdist_py1_pickle.dat'
+        tsdist['logfile']  = 'cstsdist_py1_pickle.log'
+        tsdist['chatter']  = 3
 
         # Perform pickeling tests of filled class
         obj = self._pickeling(tsdist)

@@ -10,7 +10,7 @@
             <parameter name="ra"      value="83.63" />
             <parameter name="dec"     value="22.51" />
             <parameter name="target"  value="Crab" />
-            <parameter name="emin"    value="0.1" />
+            <parameter name="emin"    value="1.0" />
             <parameter name="emax"    value="100.0" />
             <parameter name="tmin"    value="0.0" />
             <parameter name="tmax"    value="300.0" />
