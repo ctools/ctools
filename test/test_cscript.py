@@ -94,8 +94,7 @@ class cscript_test(ctools.cscript):
         return obs.copy()
 
     # Check get_mean_pointing() method
-    def check_get_mean_pointing(self):
-        obs = gammalib.GObservations()
+    def check_get_mean_pointing(self, obs):
         return self._get_mean_pointing(obs)
 
     # Check set_obs_response() method
@@ -123,6 +122,10 @@ class cscript_test(ctools.cscript):
         obs.save(infile, True)
         self._save_event_list(obs, infile, evtname, gtiname, outfile)
         return
+
+    # Check warn_too_few_energies() method
+    def check_warn_too_few_energies(self, energies):
+        return self._warn_too_few_energies(energies)
 
     # Check warn_xml_suffix() method
     def check_warn_xml_suffix(self, filename):
@@ -503,7 +506,20 @@ class Test(test):
         self.test_try('Check get_mean_pointing() method for empty observation '
                       'container')
         try:
-            empty.check_get_mean_pointing()
+            obs = gammalib.GObservations()
+            empty.check_get_mean_pointing(obs)
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
+
+        # Test get_mean_pointing() method for observation container with LAT obs
+        self.test_try('Check get_mean_pointing() method for empty observation '
+                      'container')
+        try:
+            lat = gammalib.GLATObservation()
+            obs = gammalib.GObservations()
+            obs.append(lat)
+            empty.check_get_mean_pointing(obs)
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
@@ -518,9 +534,6 @@ class Test(test):
         # TODO: implement
 
         # Test cube_layer_usage() method
-        # TODO: implement
-
-        # Test get_gtiname() method
         # TODO: implement
 
         # Check save_event_list() method
@@ -549,17 +562,27 @@ class Test(test):
         self._test_cscript_save_event_list('test_event_list_output6.fits',
                                            ['Primary','EVT','TIME','EVENTS','GTI'])
 
-        # Test warn_too_few_energies() method
+        # Test get_gtiname() method
         # TODO: implement
+
+        # Test warn_too_few_energies() method
+        energies_empty = gammalib.GEnergies()
+        energies_2     = gammalib.GEnergies(2, gammalib.GEnergy(1.0,'TeV'),
+                                               gammalib.GEnergy(10.0,'TeV'))
+        energies_100   = gammalib.GEnergies(100, gammalib.GEnergy(1.0,'TeV'),
+                                                 gammalib.GEnergy(10.0,'TeV'))
+        self.test_value(len(empty.check_warn_too_few_energies(energies_empty)), 0,
+                        'Check length of warning string for too few energies')
+        self.test_value(len(empty.check_warn_too_few_energies(energies_2)), 253,
+                        'Check length of warning string for too few energies')
+        self.test_value(len(empty.check_warn_too_few_energies(energies_100)), 0,
+                        'Check length of warning string for too few energies')
 
         # Test warn_xml_suffix() method
         self.test_value(len(empty.check_warn_xml_suffix('test.xml')), 0,
                         'Check xml suffix warning for "test.xml" file')
         self.test_value(len(empty.check_warn_xml_suffix('test.fits')), 235,
                         'Check xml suffix warning for "test.fits" file')
-
-        # Test provide_help() method
-        # TODO: implement
 
         # Return
         return

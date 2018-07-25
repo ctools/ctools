@@ -2170,9 +2170,12 @@ std::string ctool::warn_too_few_energies(const GEnergies& energies) const
     int n = energies.size();
 
     // Compute the required number of energy bins
-    double logEmin   = std::log10(energies[0].TeV());
-    double logEmax   = std::log10(energies[n-1].TeV());
-    int    nrequired = int((logEmax - logEmin) * 25.0);
+    int nrequired = 0;
+    if (n > 0) {
+        double logEmin = std::log10(energies[0].TeV());
+        double logEmax = std::log10(energies[n-1].TeV());
+        nrequired      = int((logEmax - logEmin) * 25.0);
+    }
 
     // Warn if there are not enough energy bins
     if (n < nrequired) {
