@@ -39,6 +39,14 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set test data
+        self._obs_unbinned = self._datadir + '/obs_unbinned.xml'
+        self._expcube      = self._datadir + '/crab_expcube.fits'
+        self._psfcube      = self._datadir + '/crab_psfcube.fits'
+        self._edispcube    = self._datadir + '/crab_edispcube.fits'
+        self._bkgcube      = self._datadir + '/crab_bkgcube.fits'
+        self._bkgmodel     = self._datadir + '/crab_bkgcube.xml'
+
         # Return
         return
 
@@ -217,6 +225,156 @@ class Test(test):
 
         # Publish with name
         model.publish('My model')
+
+        # Setup ctmodel from event list FITS file
+        model = ctools.ctmodel()
+        model['inobs']     = self._events
+        model['incube']    = 'NONE'
+        model['inmodel']   = self._model
+        model['expcube']   = 'NONE'
+        model['psfcube']   = 'NONE'
+        model['edispcube'] = 'NONE'
+        model['bkgcube']   = 'NONE'
+        model['caldb']     = self._caldb
+        model['irf']       = self._irf
+        model['rad']       = 5
+        model['ra']        = 83.63
+        model['dec']       = 22.01
+        model['tmin']      = 0
+        model['tmax']      = 1800
+        model['ebinalg']   = 'LOG'
+        model['emin']      = 1.0
+        model['emax']      = 100.0
+        model['enumbins']  = 5
+        model['nxpix']     = 40
+        model['nypix']     = 40
+        model['binsz']     = 0.1
+        model['coordsys']  = 'CEL'
+        model['proj']      = 'CAR'
+        model['xref']      = 83.63
+        model['yref']      = 22.01
+        model['outcube']   = 'ctmodel_py4.fits'
+        model['logfile']   = 'ctmodel_py4.log'
+        model['chatter']   = 2
+
+        # Run ctmodel tool
+        model.logFileOpen()   # Make sure we get a log file
+        model.execute()
+
+        # Check result file
+        self._check_result_file('ctmodel_py4.fits')
+
+        # Setup ctmodel from observation definition XML file
+        model = ctools.ctmodel()
+        model['inobs']     = self._obs_unbinned
+        model['incube']    = 'NONE'
+        model['inmodel']   = self._model
+        model['expcube']   = 'NONE'
+        model['psfcube']   = 'NONE'
+        model['edispcube'] = 'NONE'
+        model['bkgcube']   = 'NONE'
+        model['caldb']     = self._caldb
+        model['irf']       = self._irf
+        model['rad']       = 5
+        model['ra']        = 83.63
+        model['dec']       = 22.01
+        model['tmin']      = 0
+        model['tmax']      = 1800
+        model['ebinalg']   = 'LOG'
+        model['emin']      = 1.0
+        model['emax']      = 100.0
+        model['enumbins']  = 5
+        model['nxpix']     = 40
+        model['nypix']     = 40
+        model['binsz']     = 0.1
+        model['coordsys']  = 'CEL'
+        model['proj']      = 'CAR'
+        model['xref']      = 83.63
+        model['yref']      = 22.01
+        model['outcube']   = 'ctmodel_py5.fits'
+        model['logfile']   = 'ctmodel_py5.log'
+        model['chatter']   = 2
+
+        # Run ctmodel tool
+        model.logFileOpen()   # Make sure we get a log file
+        model.execute()
+
+        # Check result file
+        self._check_result_file('ctmodel_py5.fits')
+
+        # Setup ctmodel for stacked IRF
+        model = ctools.ctmodel()
+        model['inobs']     = 'NONE'
+        model['incube']    = 'NONE'
+        model['inmodel']   = self._bkgmodel
+        model['expcube']   = self._expcube
+        model['psfcube']   = self._psfcube
+        model['edispcube'] = 'NONE'
+        model['bkgcube']   = self._bkgcube
+        model['edisp']     = False
+        model['rad']       = 5
+        model['ra']        = 83.63
+        model['dec']       = 22.01
+        model['tmin']      = 0
+        model['tmax']      = 1800
+        model['ebinalg']   = 'LOG'
+        model['emin']      = 1.0
+        model['emax']      = 100.0
+        model['enumbins']  = 5
+        model['nxpix']     = 40
+        model['nypix']     = 40
+        model['binsz']     = 0.1
+        model['coordsys']  = 'CEL'
+        model['proj']      = 'CAR'
+        model['xref']      = 83.63
+        model['yref']      = 22.01
+        model['outcube']   = 'ctmodel_py6.fits'
+        model['logfile']   = 'ctmodel_py6.log'
+        model['chatter']   = 2
+
+        # Run ctmodel tool
+        model.logFileOpen()   # Make sure we get a log file
+        model.execute()
+
+        # Check result file
+        self._check_result_file('ctmodel_py6.fits')
+
+        # Setup ctmodel for stacked IRF using energy dispersion
+        model = ctools.ctmodel()
+        model['inobs']     = 'NONE'
+        model['incube']    = 'NONE'
+        model['inmodel']   = self._bkgmodel
+        model['expcube']   = self._expcube
+        model['psfcube']   = self._psfcube
+        model['edispcube'] = self._edispcube
+        model['bkgcube']   = self._bkgcube
+        model['edisp']     = True
+        model['rad']       = 5
+        model['ra']        = 83.63
+        model['dec']       = 22.01
+        model['tmin']      = 0
+        model['tmax']      = 1800
+        model['ebinalg']   = 'LOG'
+        model['emin']      = 1.0
+        model['emax']      = 100.0
+        model['enumbins']  = 5
+        model['nxpix']     = 40
+        model['nypix']     = 40
+        model['binsz']     = 0.1
+        model['coordsys']  = 'CEL'
+        model['proj']      = 'CAR'
+        model['xref']      = 83.63
+        model['yref']      = 22.01
+        model['outcube']   = 'ctmodel_py7.fits'
+        model['logfile']   = 'ctmodel_py7.log'
+        model['chatter']   = 2
+
+        # Run ctmodel tool
+        model.logFileOpen()   # Make sure we get a log file
+        model.execute()
+
+        # Check result file
+        self._check_result_file('ctmodel_py7.fits')
 
         # Return
         return

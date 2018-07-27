@@ -66,6 +66,11 @@ testscripts = ctools/tests/__init__.py \
 testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/crab_events.fits \
            $(top_srcdir)/test/data/crab_cntmap.fits \
+           $(top_srcdir)/test/data/crab_expcube.fits.gz \
+           $(top_srcdir)/test/data/crab_psfcube.fits.gz \
+           $(top_srcdir)/test/data/crab_edispcube.fits.gz \
+           $(top_srcdir)/test/data/crab_bkgcube.fits.gz \
+           $(top_srcdir)/test/data/crab_bkgcube.xml \
            $(top_srcdir)/test/data/phased_events.fits.gz \
            $(top_srcdir)/test/data/invalid_event_list.fits.gz \
            $(top_srcdir)/test/data/model_temporal_phasecurve.xml \
