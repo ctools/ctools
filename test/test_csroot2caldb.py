@@ -19,7 +19,7 @@
 #
 # ==========================================================================
 import os
-import cscripts
+from cscripts.csroot2caldb import csroot2caldb
 from testing import test
 
 
@@ -98,7 +98,8 @@ class Test(test):
         """
         # Set-up csroot2caldb with a maximum of parameters so that the
         # corresponding code gets tests
-        caldb = cscripts.csroot2caldb()
+        #caldb = cscripts.csroot2caldb()
+        caldb = csroot2caldb()
         caldb['infile']        = self._infile
         caldb['outdir']        = 'csroot2caldb_py1'
         caldb['inst']          = 'prod3'
