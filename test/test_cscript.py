@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the cspull script.
+# This scripts performs unit tests for the cscript base classes.
 #
 # Copyright (C) 2016-2018 Juergen Knoedlseder
 #
@@ -341,7 +341,7 @@ class Test(test):
         test = cscript_test()
 
         # Recover User parameters
-        pars     = test.pars()
+        pars = test.pars()
 
         # Create a copy of the User parameters
         cpy_pars = pars.copy()
@@ -351,7 +351,6 @@ class Test(test):
 
         # Return
         return (test, pars, cpy_pars)
-
 
     # Test cscript base class
     def _test_cscript(self):

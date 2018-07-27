@@ -30,7 +30,7 @@ from cscripts import mputils
 # Global functions for multiprocessing support #
 # ============================================ #
 def _multiprocessing_func_wrapper(args):
-   return _multiprocessing_func(*args)
+    return _multiprocessing_func(*args)
 def _multiprocessing_func(cls, i):
 
     # Initialise thread logger
@@ -41,13 +41,13 @@ def _multiprocessing_func(cls, i):
     cstart  = cls.celapse()
     result  = cls._timebin(i)
     celapse = cls.celapse() - cstart
-    buffer  = cls._log.buffer()
+    log     = cls._log.buffer()
 
     # Close logger
     cls._log.close()
 
     # Collect thread information
-    info = {'celapse': celapse, 'log': buffer}
+    info = {'celapse': celapse, 'log': log}
 
     # Return light curve bin result and thread information
     return result, info
