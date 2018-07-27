@@ -3,7 +3,7 @@
         * Version 1.6.0 released
         ========================
 
-        Do no longer automatically import csroot2caldb (#2652)
+        Defer import of ROOT module in csroot2caldb to run method (#2652)
         Transparently update parameter files (#2513)
         Change formula for number of true energy bins in csphagen (#2490)
         Remove ctools::is_valid_filename() method

@@ -20,7 +20,7 @@ Bug fixes
 ---------
 
 * [`2652 <https://cta-redmine.irap.omp.eu/issues/2652>`_] -
-  Do no longer automatically import :ref:`csroot2caldb`
+  Defer import of ``ROOT`` module in :ref:`csroot2caldb` to run method
 * [`2456 <https://cta-redmine.irap.omp.eu/issues/2456>`_] -
   Handle zero model for ``SUBDIV method`` in ``show_response.py``
 * [`2448 <https://cta-redmine.irap.omp.eu/issues/2448>`_] -

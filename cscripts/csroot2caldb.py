@@ -27,13 +27,6 @@ import gammalib
 import ctools
 from cscripts import calutils
 
-# Optional ROOT import
-try:
-    from ROOT import TFile, TH2F, TH3F
-    _has_root = True
-except ImportError:
-    _has_root = False
-
 
 # ================== #
 # csroot2caldb class #
@@ -329,7 +322,7 @@ class csroot2caldb(ctools.cscript):
             ds['PSF_FITS'].close()
             ds['EDISP_FITS'].close()
             ds['BGD_FITS'].close()
- 
+
         # Return
         return
 
@@ -533,6 +526,9 @@ class csroot2caldb(ctools.cscript):
         ds : dict
             Directory structure dictionary
         """
+        # Import TFile from ROOT module
+        from ROOT import TFile
+
         # Open ROOT performance file
         tfile = TFile(self['infile'].filename().url())
 
@@ -554,7 +550,7 @@ class csroot2caldb(ctools.cscript):
     def _root2ea(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB effective area extension
- 
+
         The following ROOT histograms are used:
         - EffectiveAreaEtrueNoTheta2cut_offaxis -> EFFAREA
         - EffectiveAreaEtrueNoTheta2cut (for normalization)
@@ -675,6 +671,9 @@ class csroot2caldb(ctools.cscript):
         ndist   = dists.GetNbins()
         noffset = offsets.GetNbins()
 
+        # Import TH2F histograms from ROOT module
+        from ROOT import TH2F
+
         # Create r68 and r80 histograms
         r68 = TH2F('AngRes68Etrue_offaxis',
                    'Angular resolution (68% containment)',
@@ -688,7 +687,7 @@ class csroot2caldb(ctools.cscript):
         # Loop over all energy and offset angle bins
         for ieng in range(neng):
             for ioff in range(noffset):
-            
+
                 # Compute PDF integral
                 pdf_integral = 0.0
                 for idist in range(ndist):
@@ -911,7 +910,7 @@ class csroot2caldb(ctools.cscript):
                                     'ieng=%d ioff=%d%s' % (ieng,ioff,status),
                                     'r68=%f r80=%f gamma=%f sigma=%f' %
                                     (r_68, r_80, gamma, sigma))
-    
+
                     # Store surrent result as last result
                     last_gamma = gamma
                     last_sigma = sigma
@@ -967,6 +966,9 @@ class csroot2caldb(ctools.cscript):
         # Set number of migration bins
         nmigra = 300
 
+        # Import TH3F histogram from ROOT module
+        from ROOT import TH3F
+
         # Create migra histograms
         migra = TH3F('EestOverEtrue_offaxis',
                      'Migration',
@@ -979,7 +981,7 @@ class csroot2caldb(ctools.cscript):
 
             # Get true energy in TeV
             e_true = math.pow(10.0, migra.GetXaxis().GetBinCenter(ietrue+1))
-            
+
             # Loop over migration values
             for imigra in range(nmigra):
 
@@ -1738,6 +1740,13 @@ class csroot2caldb(ctools.cscript):
         """
         Run the script
         """
+        # Optional ROOT import
+        try:
+            from ROOT import TFile, TH2F, TH3F
+            _has_root = True
+        except ImportError:
+            _has_root = False
+
         # Warn if ROOT module is missing
         if not _has_root:
             gammalib.warning('csroot2caldb', 'ROOT Python module not present, '

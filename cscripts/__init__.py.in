@@ -80,6 +80,7 @@ from cscripts.csphasecrv    import csphasecrv
 from cscripts.cspull        import cspull
 from cscripts.csresmap      import csresmap
 from cscripts.csresspec     import csresspec
+from cscripts.csroot2caldb  import csroot2caldb
 from cscripts.cssens        import cssens
 from cscripts.csspec        import csspec
 from cscripts.cssrcdetect   import cssrcdetect

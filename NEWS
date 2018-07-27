@@ -288,10 +288,8 @@ parameter due to a bug in the code. This bug was fixed (#2448).
 
 csroot2caldb - Generates calibration database from ROOT file
 ------------------------------------------------------------
-The script is no longer automatically imported by a "import cscript" statement
-since this led to some conflicts with the "--help" option due to the automatic
-opening of a X windows link. To use the tool in Python, use
-"from cscripts.csroot2caldb import csroot2caldb" (#2652).
+The ROOT Python module is now imported in the run method and not globally so
+that no conflit arises with the "--help" option (#2652).
 
 
 cssens - Computes sensitivity curve
