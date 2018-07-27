@@ -72,7 +72,9 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/model_temporal_phasecurve.fits \
            $(top_srcdir)/test/data/obs_unbinned.xml \
            $(top_srcdir)/test/data/exclusion.reg \
-           $(top_srcdir)/test/data/irf_file.fits.gz
+           $(top_srcdir)/test/data/exclusion.fits \
+           $(top_srcdir)/test/data/irf_file.fits.gz \
+           $(top_srcdir)/test/data/skymap_ring.fits
 
 # Install test scripts and test data. Note that we don't need to prepend
 # $(DESTDIR) here (not fully clear why, but that's the way it is)

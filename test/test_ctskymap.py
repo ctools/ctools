@@ -39,6 +39,11 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set test data
+        self._skymap_ring      = self._datadir + '/skymap_ring.fits'
+        self._exclusion_region = self._datadir + '/exclusion.reg'
+        self._exclusion_map    = self._datadir + '/exclusion.fits'
+
         # Return
         return
 
@@ -53,7 +58,11 @@ class Test(test):
         # Append tests
         self.append(self._test_cmd, 'Test ctskymap on command line')
         self.append(self._test_python, 'Test ctskymap from Python')
-
+        self.append(self._test_python_irf,
+                    'Test ctskymap from Python for IRF background')
+        self.append(self._test_python_ring,
+                    'Test ctskymap from Python for RING background')
+        
         # Return
         return
 
@@ -202,12 +211,17 @@ class Test(test):
         # Publish with name
         skymap.publish('My sky map')
 
-        # ================================
-        # TEST IRF BACKGROUND SUBTRACTION
-        # ================================
-        
-        # Allocate ctskymap tool from observation container
-        skymap = ctools.ctskymap(obs)
+        # Return
+        return
+
+    # Test ctskymap from Python for IRF background method
+    def _test_python_irf(self):
+        """
+        Test ctskymap from Python for IRF background method
+        """
+        # Test IRF background subtraction
+        skymap = ctools.ctskymap()
+        skymap['inobs']       = self._events
         skymap['emin']        = 0.1
         skymap['emax']        = 100
         skymap['nxpix']       = 20
@@ -220,25 +234,34 @@ class Test(test):
         skymap['bkgsubtract'] = 'IRF'
         skymap['caldb']       = self._caldb
         skymap['irf']         = self._irf
-        skymap['outmap']      = 'ctskymap_py4.fits'
-        skymap['logfile']     = 'ctskymap_py4.log'
-        skymap['chatter']     = 4
+        skymap['outmap']      = 'ctskymap_irf_py1.fits'
+        skymap['logfile']     = 'ctskymap_irf_py1.log'
+        skymap['chatter']     = 2
 
         # Execute tool
         skymap.logFileOpen()  # Needed to get a new log file
         skymap.execute()
 
         # Check result file
-        self._check_result_file('ctskymap_py4.fits')
-        self._check_result_file('ctskymap_py4.fits[BACKGROUND]')
-        self._check_result_file('ctskymap_py4.fits[SIGNIFICANCE]')
+        self._check_result_file('ctskymap_irf_py1.fits')
+        self._check_result_file('ctskymap_irf_py1.fits[BACKGROUND]')
+        self._check_result_file('ctskymap_irf_py1.fits[SIGNIFICANCE]')
 
-        # Test RING background subtraction
-        skymap = ctools.ctskymap(obs)
+        # Return
+        return
+
+    # Test ctskymap from Python for RING background method
+    def _test_python_ring(self):
+        """
+        Test ctskymap from Python for RING background method
+        """
+        # Test basic RING background subtraction
+        skymap = ctools.ctskymap()
+        skymap['inobs']       = self._events
         skymap['emin']        = 0.1
         skymap['emax']        = 100
-        skymap['nxpix']       = 10  # Make region smaller since the 'RING'
-        skymap['nypix']       = 10  # method takes longer to run than 'IRF'
+        skymap['nxpix']       = 10
+        skymap['nypix']       = 10
         skymap['binsz']       = 0.2
         skymap['coordsys']    = 'CEL'
         skymap['proj']        = 'CAR'
@@ -252,18 +275,145 @@ class Test(test):
         skymap['inexclusion'] = 'NONE'
         skymap['caldb']       = self._caldb
         skymap['irf']         = self._irf
-        skymap['outmap']      = 'ctskymap_py5.fits'
-        skymap['logfile']     = 'ctskymap_py5.log'
-        skymap['chatter']     = 4
+        skymap['outmap']      = 'ctskymap_ring_py1.fits'
+        skymap['logfile']     = 'ctskymap_ring_py1.log'
+        skymap['chatter']     = 2
 
         # Execute tool
         skymap.logFileOpen()  # Needed to get a new log file
         skymap.execute()
 
         # Check result file
-        self._check_result_file('ctskymap_py5.fits', 10, 10)
-        self._check_result_file('ctskymap_py5.fits[BACKGROUND]', 10, 10)
-        self._check_result_file('ctskymap_py5.fits[SIGNIFICANCE]', 10, 10)
+        self._check_result_file('ctskymap_ring_py1.fits', 10, 10)
+        self._check_result_file('ctskymap_ring_py1.fits[BACKGROUND]', 10, 10)
+        self._check_result_file('ctskymap_ring_py1.fits[SIGNIFICANCE]', 10, 10)
+
+        # Test iterative RING background subtraction
+        skymap = ctools.ctskymap()
+        skymap['inobs']       = self._events
+        skymap['emin']        = 0.1
+        skymap['emax']        = 100
+        skymap['nxpix']       = 10
+        skymap['nypix']       = 10
+        skymap['binsz']       = 0.2
+        skymap['coordsys']    = 'CEL'
+        skymap['proj']        = 'CAR'
+        skymap['xref']        = 83.63
+        skymap['yref']        = 22.01
+        skymap['bkgsubtract'] = 'RING'
+        skymap['roiradius']   = 0.1
+        skymap['inradius']    = 0.6
+        skymap['outradius']   = 0.8
+        skymap['iterations']  = 2
+        skymap['threshold']   = 5.0
+        skymap['inexclusion'] = 'NONE'
+        skymap['caldb']       = self._caldb
+        skymap['irf']         = self._irf
+        skymap['outmap']      = 'ctskymap_ring_py2.fits'
+        skymap['logfile']     = 'ctskymap_ring_py2.log'
+        skymap['chatter']     = 2
+
+        # Execute tool
+        skymap.logFileOpen()  # Needed to get a new log file
+        skymap.execute()
+
+        # Check result file
+        self._check_result_file('ctskymap_ring_py2.fits', 10, 10)
+        self._check_result_file('ctskymap_ring_py2.fits[BACKGROUND]', 10, 10)
+        self._check_result_file('ctskymap_ring_py2.fits[SIGNIFICANCE]', 10, 10)
+
+        # Test iterative RING background subtraction, starting from a sky map
+        skymap = ctools.ctskymap()
+        skymap['inmap']       = self._skymap_ring
+        skymap['bkgsubtract'] = 'RING'
+        skymap['roiradius']   = 0.1
+        skymap['inradius']    = 0.6
+        skymap['outradius']   = 0.8
+        skymap['iterations']  = 2
+        skymap['threshold']   = 5.0
+        skymap['inexclusion'] = 'NONE'
+        skymap['outmap']      = 'ctskymap_ring_py3.fits'
+        skymap['logfile']     = 'ctskymap_ring_py3.log'
+        skymap['chatter']     = 2
+
+        # Execute tool
+        skymap.logFileOpen()  # Needed to get a new log file
+        skymap.execute()
+
+        # Check result file
+        self._check_result_file('ctskymap_ring_py3.fits', 10, 10)
+        self._check_result_file('ctskymap_ring_py3.fits[BACKGROUND]', 10, 10)
+        self._check_result_file('ctskymap_ring_py3.fits[SIGNIFICANCE]', 10, 10)
+
+        # Test iterative RING background subtraction with an exclusion region
+        skymap = ctools.ctskymap()
+        skymap['inmap']       = self._skymap_ring
+        skymap['bkgsubtract'] = 'RING'
+        skymap['roiradius']   = 0.1
+        skymap['inradius']    = 0.6
+        skymap['outradius']   = 0.8
+        skymap['iterations']  = 2
+        skymap['threshold']   = 5.0
+        skymap['inexclusion'] = self._exclusion_region
+        skymap['outmap']      = 'ctskymap_ring_py4.fits'
+        skymap['logfile']     = 'ctskymap_ring_py4.log'
+        skymap['chatter']     = 2
+
+        # Execute tool
+        skymap.logFileOpen()  # Needed to get a new log file
+        skymap.execute()
+
+        # Check result file
+        self._check_result_file('ctskymap_ring_py4.fits', 10, 10)
+        self._check_result_file('ctskymap_ring_py4.fits[BACKGROUND]', 10, 10)
+        self._check_result_file('ctskymap_ring_py4.fits[SIGNIFICANCE]', 10, 10)
+
+        # Test iterative RING background subtraction with an exclusion map
+        skymap = ctools.ctskymap()
+        skymap['inmap']       = self._skymap_ring
+        skymap['bkgsubtract'] = 'RING'
+        skymap['roiradius']   = 0.1
+        skymap['inradius']    = 0.6
+        skymap['outradius']   = 0.8
+        skymap['iterations']  = 2
+        skymap['threshold']   = 5.0
+        skymap['inexclusion'] = self._exclusion_map
+        skymap['outmap']      = 'ctskymap_ring_py5.fits'
+        skymap['logfile']     = 'ctskymap_ring_py5.log'
+        skymap['chatter']     = 2
+
+        # Execute tool
+        skymap.logFileOpen()  # Needed to get a new log file
+        skymap.execute()
+
+        # Check result file
+        self._check_result_file('ctskymap_ring_py5.fits', 10, 10)
+        self._check_result_file('ctskymap_ring_py5.fits[BACKGROUND]', 10, 10)
+        self._check_result_file('ctskymap_ring_py5.fits[SIGNIFICANCE]', 10, 10)
+
+        # Test RING background subtraction with direct significance computation
+        skymap = ctools.ctskymap()
+        skymap['inmap']       = self._skymap_ring
+        skymap['bkgsubtract'] = 'RING'
+        skymap['roiradius']   = 0.1
+        skymap['inradius']    = 0.6
+        skymap['outradius']   = 0.8
+        skymap['iterations']  = 0
+        skymap['threshold']   = 5.0
+        skymap['inexclusion'] = 'NONE'
+        skymap['usefft']      = False  # Direct computation, no FFT
+        skymap['outmap']      = 'ctskymap_ring_py6.fits'
+        skymap['logfile']     = 'ctskymap_ring_py6.log'
+        skymap['chatter']     = 2
+
+        # Execute tool
+        skymap.logFileOpen()  # Needed to get a new log file
+        skymap.execute()
+
+        # Check result file
+        self._check_result_file('ctskymap_ring_py6.fits', 10, 10)
+        self._check_result_file('ctskymap_ring_py6.fits[BACKGROUND]', 10, 10)
+        self._check_result_file('ctskymap_ring_py6.fits[SIGNIFICANCE]', 10, 10)
 
         # Return
         return

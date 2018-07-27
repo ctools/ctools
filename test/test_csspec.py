@@ -118,7 +118,7 @@ class Test(test):
         """
         Test csspec from Python
         """
-        # Set-up unbinned csspec
+        # Set-up unbinned csspec (no multi-processing)
         spec = cscripts.csspec()
         spec['inobs']    = self._events
         spec['inmodel']  = self._model
@@ -130,6 +130,7 @@ class Test(test):
         spec['enumbins'] = 2
         spec['emin']     = 1.0
         spec['emax']     = 100.0
+        spec['nthreads'] = 1
         spec['outfile']  = 'csspec_py1.fits'
         spec['logfile']  = 'csspec_py1.log'
         spec['chatter']  = 2
@@ -143,7 +144,7 @@ class Test(test):
         # Check result file
         self._check_result_file('csspec_py1.fits', 2)
 
-        # Set-up stacked csspec
+        # Set-up stacked csspec (no multi-processing)
         spec = cscripts.csspec()
         spec['inobs']     = self._cntcube
         spec['expcube']   = self._expcube
@@ -157,6 +158,7 @@ class Test(test):
         spec['enumbins']  = 2
         spec['emin']      = 0.1
         spec['emax']      = 100.0
+        spec['nthreads']  = 1
         spec['outfile']   = 'csspec_py2.fits'
         spec['logfile']   = 'csspec_py2.log'
         spec['chatter']   = 3
@@ -168,7 +170,7 @@ class Test(test):
         # Check result file
         self._check_result_file('csspec_py2.fits', 2)
 
-        # Set-up On/Off csspec
+        # Set-up On/Off csspec (no multi-processing)
         spec = cscripts.csspec()
         spec['inobs']    = self._inonoff
         spec['inmodel']  = self._onoff_model
@@ -178,6 +180,7 @@ class Test(test):
         spec['enumbins'] = 2
         spec['emin']     = 1.0
         spec['emax']     = 10.0
+        spec['nthreads'] = 1
         spec['outfile']  = 'csspec_py3.fits'
         spec['logfile']  = 'csspec_py3.log'
         spec['chatter']  = 4
@@ -230,32 +233,6 @@ class Test(test):
 
         # Check result file
         self._check_result_file('csspec_py5.fits', 2)
-
-        # Set-up csspec without multiprocessing
-        spec = cscripts.csspec()
-        spec['inobs']    = self._events
-        spec['inmodel']  = self._model
-        spec['srcname']  = 'Crab'
-        spec['caldb']    = self._caldb
-        spec['irf']      = self._irf
-        spec['method']   = 'AUTO'
-        spec['ebinalg']  = 'LOG'
-        spec['enumbins'] = 2
-        spec['emin']     = 1.0
-        spec['emax']     = 100.0
-        spec['outfile']  = 'csspec_py6.fits'
-        spec['logfile']  = 'csspec_py6.log'
-        spec['chatter']  = 2
-        spec['publish']  = True
-        spec['nthreads'] = 1
-
-        # Run csspec script
-        spec.logFileOpen()   # Make sure we get a log file
-        spec.run()
-        spec.save()
-
-        # Check result file
-        self._check_result_file('csspec_py6.fits', 2)
 
         # Return
         return
