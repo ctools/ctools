@@ -377,40 +377,34 @@ class cspull(ctools.csobservation):
         # Write header
         self._log_header1(gammalib.TERSE, 'Generate pull distribution')
 
-        # If using multiprocessing
+        # Get number of trials
+        ntrials = self['ntrials'].integer()
+
+        # Get seed value
+        seed = self['seed'].integer()
+
+        # If more than a single thread is requested then use multiprocessing
         if self._nthreads > 1:
+            args        = [(self, i + seed) for i in range(ntrials)]
+            poolresults = mputils.process(self._nthreads,
+                                          _multiprocessing_func_wrapper, args)
 
-            # Create pool of workers
-            from multiprocessing import Pool
-            pool = Pool(processes = self._nthreads)
+        # Continue with regular processing
+        for i in range(ntrials):
 
-            # Run time bin analysis in parallel with map
-            args        = [(self, seed + self['seed'].integer())
-                           for seed in range(self['ntrials'].integer())]
-            poolresults = pool.map(_multiprocessing_func_wrapper, args)
+            # If multiprocessing was used then recover results and put them
+            # into the log file
+            if self._nthreads > 1:
+                result = poolresults[i][0]
+                self._log_string(gammalib.TERSE, poolresults[i][1]['log'], False)
 
-            # Close pool and join
-            pool.close()
-            pool.join()
+            # ... otherwise make a trial now
+            else:
+                result = self._trial(i + seed)
 
-            # Write results
-            for seed in range(self['ntrials'].integer()):
-                result = poolresults[seed][0]
-                ioutils.write_csv_row(self['outfile'].filename().url(), seed,
-                                      result['colnames'], result['values'])
-                self._log_string(gammalib.TERSE, poolresults[seed][1]['log'], False)
-
-        # Otherwise, loop over trials
-        else:
-
-            for seed in range(self['ntrials'].integer()):
-
-                # Make a trial and add initial seed
-                result = self._trial(seed + self['seed'].integer())
-
-                # Write out trial result
-                ioutils.write_csv_row(self['outfile'].filename().url(), seed,
-                                      result['colnames'], result['values'])
+            # Write out trial result
+            ioutils.write_csv_row(self['outfile'].filename().url(), i,
+                                  result['colnames'], result['values'])
 
         # Return
         return

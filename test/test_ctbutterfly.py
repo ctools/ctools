@@ -123,6 +123,12 @@ class Test(test):
         # Check result file
         self._check_result_file('ctbutterfly_py1.dat')
 
+        # Check CSV result
+        self.test_value(butterfly.butterfly().nrows(), 100,
+             'Check for 100 rows in CSV file')
+        self.test_value(butterfly.butterfly().ncols(), 4,
+             'Check for 4 columns in CSV file')
+
         # Set-up ctbutterfly
         butterfly = ctools.ctbutterfly()
         butterfly['inobs']   = self._events

@@ -715,17 +715,10 @@ class cssens(ctools.csobservation):
         # If using multiprocessing
         if self._nthreads > 1 and self._ebounds.size() > 1:
 
-            # Create pool of workers
-            from multiprocessing import Pool
-            pool = Pool(processes = self._nthreads)
-
-            # Run energy bin analysis in parallel with map
+            # Compute phase bins
             args        = [(self, ieng) for ieng in range(self._ebounds.size())]
-            poolresults = pool.map(_multiprocessing_func_wrapper, args)
-
-            # Close pool and join
-            pool.close()
-            pool.join()
+            poolresults = mputils.process(self._nthreads,
+                                          _multiprocessing_func_wrapper, args)
 
             # Construct results
             for ieng in range(self._ebounds.size()):

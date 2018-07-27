@@ -20,12 +20,12 @@
 import gammalib
 
 
-# ==================== #
-# Number of processes  #
-# ==================== #
+# ====================== #
+# Get number of threads  #
+# ====================== #
 def nthreads(cls):
     """
-    Determines the number of parallel processes to use.
+    Determines the number of parallel processes to use
 
     The number is based on the user parameter "nthreads" and the availability
     of the multiprocessing module.
@@ -38,7 +38,7 @@ def nthreads(cls):
     Returns
     -------
     nthreads : int
-        Number of parallel processes
+        Number of threads
     """
     # Log multiprocessing configuration
     cls._log_header1(gammalib.NORMAL, 'Multiprocessing')
@@ -69,3 +69,41 @@ def nthreads(cls):
 
     # Return number of processes to be used
     return nthreads
+
+
+# ============================ #
+# Execute function in parallel #
+# ============================ #
+def process(nthreads, function, args):
+    """
+    Execute function in parallel
+
+    Parameters
+    ----------
+    nthreads : int
+        Number of parallel threads
+    function : Python function
+        Function to be executed in parallel
+    args : list of tuples
+        Function arguments for each evaluation
+
+    Returns
+    -------
+    results : list of dicts
+        List of function evaluation results
+    """
+    # Import Pool module from multiprocessing module
+    from multiprocessing import Pool
+
+    # Create a pool of processes
+    pool = Pool(processes=nthreads)
+
+    # Run function in parallel
+    results = pool.map(function, args)
+
+    # Close pool and join
+    pool.close()
+    pool.join()
+
+    # Return results
+    return results

@@ -578,17 +578,10 @@ class csphagen(ctools.csobservation):
         # If there is more than one observation and we use multiprocessing
         if self._nthreads > 1 and self.obs().size() > 1:
 
-            # Create pool of workers
-            from multiprocessing import Pool
-            pool = Pool(processes = self._nthreads)
-
-            # Run time bin analysis in parallel with map
+            # Compute observations
             args        = [(self, i) for i in range(self.obs().size())]
-            poolresults = pool.map(_multiprocessing_func_wrapper, args)
-
-            # Close pool and join
-            pool.close()
-            pool.join()
+            poolresults = mputils.process(self._nthreads,
+                                          _multiprocessing_func_wrapper, args)
 
             # Construct results
             for i in range(self.obs().size()):

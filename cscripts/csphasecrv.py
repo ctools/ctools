@@ -493,20 +493,13 @@ class csphasecrv(ctools.csobservation):
         # Write header
         self._log_header1(gammalib.TERSE, 'Generate phase curve')
 
-        # If using multiprocessing
+        # If more than a single thread is requested then use multiprocessing
         if self._nthreads > 1:
 
-            # Create pool of workers
-            from multiprocessing import Pool
-            pool = Pool(processes = self._nthreads)
-
-            # Run time bin analysis in parallel with map
+            # Compute phase bins
             args        = [(self, phbin) for phbin in self._phbins]
-            poolresults = pool.map(_multiprocessing_func_wrapper, args)
-
-            # Close pool and join
-            pool.close()
-            pool.join()
+            poolresults = mputils.process(self._nthreads,
+                                          _multiprocessing_func_wrapper, args)
 
             # Construct results
             for i in range(len(self._phbins)):
