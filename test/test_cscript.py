@@ -76,6 +76,35 @@ class cscript_test(ctools.cscript):
         pnt = gammalib.GCTAPointing()
         return self._get_roi(pnt)
 
+    # Check get_ebounds() method
+    def check_get_ebounds(self):
+        return self._get_ebounds()
+
+    # Check get_gti() method
+    def check_get_gti(self):
+        ref = gammalib.GTimeReference()
+        return self._get_gti(ref)
+
+    # Check get_pointing() method
+    def check_get_pointing(self):
+        return self._get_pointing()
+
+    # Check get_skydir() method
+    def check_get_skydir(self):
+        return self._get_skydir()
+
+    # Check set_outfile_name() method
+    def check_set_outfile_name(self, filename):
+        return self._set_outfile_name(filename)
+
+    # Check is_stacked() method
+    def check_is_stacked(self):
+        return self._is_stacked()
+
+    # Check is_onoff() method
+    def check_is_onoff(self):
+        return self._is_onoff()
+
     # Check restore_edisp() method
     def check_restore_edisp(self):
         obs   = gammalib.GObservations()
@@ -223,9 +252,9 @@ class ctlikelihood_test(ctools.cslikelihood):
         return self._evaluate(par, value)
 
 
-# ============================ #
-# Test class for base classes  #
-# ============================ #
+# =========================== #
+# Test class for base classes #
+# =========================== #
 class Test(test):
     """
     Test class for base classes
@@ -302,6 +331,27 @@ class Test(test):
 
         # Return
         return
+
+    # Setup cscript class
+    def _setup_cscript(self):
+        """
+        Setup cscript test class
+        """
+        # Get text class
+        test = cscript_test()
+
+        # Recover User parameters
+        pars     = test.pars()
+
+        # Create a copy of the User parameters
+        cpy_pars = pars.copy()
+
+        # Clear User parameters
+        pars.clear()
+
+        # Return
+        return (test, pars, cpy_pars)
+
 
     # Test cscript base class
     def _test_cscript(self):
@@ -406,6 +456,14 @@ class Test(test):
         self.test_value(ebounds.emin().TeV(), 1.0, 'Check minimum energy')
         self.test_value(ebounds.emax().TeV(), 10.0, 'Check maximum energy')
 
+        # Test create_ebounds() method for invalid extension name
+        self.test_try('Check create_ebounds() method for invalid extension name')
+        try:
+            empty.check_create_ebounds('test_ebinfile_bins.fits')
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
+
         # Test create_map() method
         # TODO: implement
 
@@ -439,30 +497,297 @@ class Test(test):
         except ValueError:
             self.test_try_success()
 
-        # Test get_roi() method
-        roi = empty.check_get_roi()
-        self.test_assert(not roi.is_valid(), 'Check get_roi() method')
+        # Test get_roi() method for the case that there is no "usepnt"
+        # parameter and that there are no valid "ra" and "dec" parameters.
+        # In that case an empty ROI should be returned.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('ra','r','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('dec','r','h','NONE','','',''))
+        roi = test.check_get_roi()
+        self.test_assert(not roi.is_valid(), 'Check that get_roi() for absent '
+                        '"usepnt" and invalid "ra" and "dec" parameters returns '
+                        'an invalid ROI')
+        test.pars(cpy_pars)
 
-        # Test get_ebounds() method
-        # TODO: implement
+        # Test get_roi() method for the case that there is no "usepnt"
+        # parameter and that there is no valid "ra" parameter.
+        # In that case an empty ROI should be returned.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('ra','r','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('dec','r','h','10.0','','',''))
+        roi = test.check_get_roi()
+        self.test_assert(not roi.is_valid(), 'Check that get_roi() for absent '
+                        '"usepnt" and an invalid "ra" parameter returns '
+                        'an invalid ROI')
+        test.pars(cpy_pars)
 
-        # Test get_gti() method
-        # TODO: implement
+        # Test get_roi() method for the case that there is no "usepnt"
+        # parameter and that there is no valid "dec" parameter.
+        # In that case an empty ROI should be returned.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('ra','r','h','10.0','','',''))
+        pars.append(gammalib.GApplicationPar('dec','r','h','NONE','','',''))
+        roi = test.check_get_roi()
+        self.test_assert(not roi.is_valid(), 'Check that get_roi() for absent '
+                        '"usepnt" and an invalid "dec" parameter returns '
+                        'an invalid ROI')
+        test.pars(cpy_pars)
+
+        # Test get_roi() method for the case that there is no "usepnt"
+        # parameter and that there are valid "ra", "dec" and "rad" parameters.
+        # In that case a valid ROI should be returned.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('ra','r','h','10.0','','',''))
+        pars.append(gammalib.GApplicationPar('dec','r','h','20.0','','',''))
+        pars.append(gammalib.GApplicationPar('rad','r','h','1.0','','',''))
+        roi = test.check_get_roi()
+        self.test_assert(roi.is_valid(), 'Check that get_roi() for absent '
+                        '"usepnt" and valid "ra", "dec" and "rad" parameters '
+                        'returns a valid ROI')
+        self.test_value(roi.centre().dir().ra_deg(), 10.0, 'Check Right Ascension')
+        self.test_value(roi.centre().dir().dec_deg(), 20.0, 'Check Declination')
+        self.test_value(roi.radius(), 1.0, 'Check radius')
+        test.pars(cpy_pars)
+
+        # Test get_roi() method for the case that there is a "usepnt"
+        # parameter and that there is a valid "rad" parameter.
+        # In that case a valid ROI should be returned.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('usepnt','b','h','yes','','',''))
+        pars.append(gammalib.GApplicationPar('rad','r','h','1.0','','',''))
+        roi = test.check_get_roi()
+        self.test_assert(roi.is_valid(), 'Check that get_roi() for present '
+                        '"usepnt" and valid "rad" parameter returns a valid ROI')
+        self.test_value(roi.centre().dir().ra_deg(), 0.0, 'Check Right Ascension')
+        self.test_value(roi.centre().dir().dec_deg(), 0.0, 'Check Declination')
+        self.test_value(roi.radius(), 1.0, 'Check radius')
+        test.pars(cpy_pars)
+
+        # Test get_ebounds() method for the case that both "emin" and "emax"
+        # parameters are invalid. In that case an empty energy boundary should
+        # be returned.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('emin','r','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('emax','r','h','NONE','','',''))
+        ebounds = test.check_get_ebounds()
+        self.test_value(ebounds.size(), 0, 'Check that get_ebounds() for '
+                        'invalid "emin" and "emax" parameters returns empty '
+                        'energy boundaries')
+        test.pars(cpy_pars)
+
+        # Test get_ebounds() method for the case that the "emin" parameter is
+        # invalid. In that case an empty energy boundary should be returned.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('emin','r','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('emax','r','h','100.0','','',''))
+        ebounds = test.check_get_ebounds()
+        self.test_value(ebounds.size(), 0, 'Check that get_ebounds() for '
+                        'invalid "emin" parameter returns empty energy '
+                        'boundaries')
+        test.pars(cpy_pars)
+
+        # Test get_ebounds() method for the case that the "emax" parameter is
+        # invalid. In that case an empty energy boundary should be returned.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('emin','r','h','1.0','','',''))
+        pars.append(gammalib.GApplicationPar('emax','r','h','NONE','','',''))
+        ebounds = test.check_get_ebounds()
+        self.test_value(ebounds.size(), 0, 'Check that get_ebounds() for '
+                        'invalid "emax" parameter returns empty energy '
+                        'boundaries')
+        test.pars(cpy_pars)
+
+        # Test get_ebounds() method for the case of valid "emin" and "emax"
+        # parameters. In that case a single energy boundary should be returned.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('emin','r','h','1.0','','',''))
+        pars.append(gammalib.GApplicationPar('emax','r','h','100.0','','',''))
+        ebounds = test.check_get_ebounds()
+        self.test_value(ebounds.size(), 1, 'Check that get_ebounds() for '
+                        'valid "emin" and "emax" parameters returns empty one '
+                        'energy boundary')
+        self.test_value(ebounds.emin().TeV(), 1.0, 'Check minimum energy')
+        self.test_value(ebounds.emax().TeV(), 100.0, 'Check maximum energy')
+        test.pars(cpy_pars)
+
+        # Test get_gti() method for the case that both "tmin" and "tmax"
+        # parameters are invalid. In that case an empty Good Time Interval
+        # should be returned.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('tmin','t','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('tmax','t','h','NONE','','',''))
+        gti = test.check_get_gti()
+        self.test_value(gti.size(), 0, 'Check that get_gti() for invalid "tmin" '
+                        'and "tmax" parameters returns empty GTI')
+        test.pars(cpy_pars)
+
+        # Test get_gti() method for the case that the "tmin" parameter is
+        # invalid. In that case an empty Good Time Interval should be returned.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('tmin','t','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('tmax','t','h','2005-10-08T14:58:26','','',''))
+        gti = test.check_get_gti()
+        self.test_value(gti.size(), 0, 'Check that get_gti() for an invalid '
+                        '"tmin" parameter returns empty GTI')
+        test.pars(cpy_pars)
+
+        # Test get_gti() method for the case that the "tmax" parameter is
+        # invalid. In that case an empty Good Time Interval should be returned.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('tmin','t','h','2005-10-08T14:30:25','','',''))
+        pars.append(gammalib.GApplicationPar('tmax','t','h','NONE','','',''))
+        gti = test.check_get_gti()
+        self.test_value(gti.size(), 0, 'Check that get_gti() for an invalid '
+                        '"tmax" parameter returns empty GTI')
+        test.pars(cpy_pars)
+
+        # Test get_gti() method for the case that both "tmin" and "tmax"
+        # parameters are valid. In that case a valid Good Time Interval should
+        # be returned.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('tmin','t','h','2005-10-08T14:30:25','','',''))
+        pars.append(gammalib.GApplicationPar('tmax','t','h','2005-10-08T14:58:26','','',''))
+        gti = test.check_get_gti()
+        self.test_value(gti.size(), 1, 'Check that get_gti() for valid "tmin" '
+                        'and "tmax" parameters returns one GTI')
+        self.test_value(gti.tstart().utc(), '2005-10-08T14:30:25', 'Check "tmin"')
+        self.test_value(gti.tstop().utc(), '2005-10-08T14:58:26', 'Check "tmax"')
+        test.pars(cpy_pars)
 
         # Test get_pointing() method
-        # TODO: implement
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('ra','r','h','10.0','','',''))
+        pars.append(gammalib.GApplicationPar('dec','r','h','20.0','','',''))
+        pnt = test.check_get_pointing()
+        self.test_value(pnt.dir().ra_deg(), 10.0, 'Check Right Ascension')
+        self.test_value(pnt.dir().dec_deg(), 20.0, 'Check Declination')
+        test.pars(cpy_pars)
 
         # Test get_skydir() method
-        # TODO: implement
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('ra','r','h','10.0','','',''))
+        pars.append(gammalib.GApplicationPar('dec','r','h','20.0','','',''))
+        dir = test.check_get_skydir()
+        self.test_value(dir.ra_deg(), 10.0, 'Check Right Ascension')
+        self.test_value(dir.dec_deg(), 20.0, 'Check Declination')
+        test.pars(cpy_pars)
 
-        # Test set_outfile_name() method
-        # TODO: implement
+        # Test set_outfile_name() method for "fix" filename, which should
+        # return the prefixed basename.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('prefix','s','h','pre_','','',''))
+        filename = test.check_set_outfile_name('fix')
+        self.test_value(filename, 'pre_fix', 'Check "pre_fix"')
+        test.pars(cpy_pars)
 
-        # Test is_stacked() method
-        # TODO: implement
+        # Test set_outfile_name() method for "/path/to/fix" filename, which
+        # should return the prefixed basename.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('prefix','s','h','pre_','','',''))
+        filename = test.check_set_outfile_name('/path/to/fix')
+        self.test_value(filename, 'pre_fix', 'Check "pre_fix"')
+        test.pars(cpy_pars)
 
-        # Test is_onoff() method
-        # TODO: implement
+        # Test set_outfile_name() method for "/path/to/fix.gz" filename, which
+        # should return the prefixed basename without the ".gz"
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('prefix','s','h','pre_','','',''))
+        filename = test.check_set_outfile_name('/path/to/fix.gz')
+        self.test_value(filename, 'pre_fix', 'Check "pre_fix"')
+        test.pars(cpy_pars)
+
+        # Test set_outfile_name() method for empty filename, which should
+        # return an empty filename.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('prefix','s','h','pre_','','',''))
+        filename = test.check_set_outfile_name('')
+        self.test_value(filename, '', 'Check on empty string')
+        test.pars(cpy_pars)
+
+        # Test is_stacked() method for the case that "enumbins" is zero. In
+        # that case the is_stacked() method should return False.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('emin','r','h','1.0','','',''))
+        pars.append(gammalib.GApplicationPar('emax','r','h','100.0','','',''))
+        pars.append(gammalib.GApplicationPar('enumbins','i','h','0','','',''))
+        self.test_assert(not test.check_is_stacked(), 'Check if is_stacked() '
+                         'returns False if there are no energy bins')
+        test.pars(cpy_pars)
+
+        # Test is_stacked() method for the case that "enumbins" is larger
+        # than zero. In that case the is_stacked() method should return True
+        # and query a bunch of parameters.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('emin','r','h','1.0','','',''))
+        pars.append(gammalib.GApplicationPar('emax','r','h','100.0','','',''))
+        pars.append(gammalib.GApplicationPar('enumbins','i','h','10','','',''))
+        pars.append(gammalib.GApplicationPar('coordsys','s','h','CEL','','',''))
+        pars.append(gammalib.GApplicationPar('proj','s','h','TAN','','',''))
+        pars.append(gammalib.GApplicationPar('xref','r','h','11.1','','',''))
+        pars.append(gammalib.GApplicationPar('yref','r','h','12.1','','',''))
+        pars.append(gammalib.GApplicationPar('nxpix','i','h','100','','',''))
+        pars.append(gammalib.GApplicationPar('nypix','i','h','100','','',''))
+        pars.append(gammalib.GApplicationPar('binsz','r','h','0.02','','',''))
+        self.test_assert(test.check_is_stacked(), 'Check if is_stacked() '
+                         'returns True if there are energy bins')
+        test.pars(cpy_pars)
+
+        # Test is_onoff() method for the case that method='NONE', i.e. the
+        # method is not 'ONOFF'. In that case the is_onoff() method should
+        # return False.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('method','s','h','NONE','','',''))
+        self.test_assert(not test.check_is_onoff(),
+             'Check if is_onoff() returns False if method is not "ONOFF"')
+        test.pars(cpy_pars)
+
+        # Test is_onoff() method for the case that method='ONOFF',
+        # srcshape='CIRCLE' and bkgmethod='REFLECTED'. In that case the
+        # is_onoff() method should return True and a bunch of application
+        # parameters are queried.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('method','s','h','ONOFF','','',''))
+        pars.append(gammalib.GApplicationPar('inexclusion','f','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('emin','r','h','0.1','','',''))
+        pars.append(gammalib.GApplicationPar('emax','r','h','100.0','','',''))
+        pars.append(gammalib.GApplicationPar('enumbins','i','h','10','','',''))
+        pars.append(gammalib.GApplicationPar('coordsys','s','h','CEL','','',''))
+        pars.append(gammalib.GApplicationPar('xref','r','h','11.1','','',''))
+        pars.append(gammalib.GApplicationPar('yref','r','h','12.1','','',''))
+        pars.append(gammalib.GApplicationPar('srcshape','s','h','CIRCLE','','',''))
+        pars.append(gammalib.GApplicationPar('rad','r','h','1.1','','',''))
+        pars.append(gammalib.GApplicationPar('bkgmethod','s','h','REFLECTED','','',''))
+        pars.append(gammalib.GApplicationPar('bkgregmin','i','h','3','','',''))
+        pars.append(gammalib.GApplicationPar('maxoffset','r','h','0.1','','',''))
+        pars.append(gammalib.GApplicationPar('etruemin','r','h','0.1','','',''))
+        pars.append(gammalib.GApplicationPar('etruemax','r','h','100.0','','',''))
+        pars.append(gammalib.GApplicationPar('etruebins','i','h','10','','',''))
+        self.test_assert(test.check_is_onoff(),
+             'Check if is_onoff() returns True if method is "ONOFF"')
+        test.pars(cpy_pars)
+
+        # Test is_onoff() method for the case that method='ONOFF',
+        # srcshape='CIRCLE' and bkgmethod='REFLECTED'. In that case the
+        # is_onoff() method should return True and a bunch of application
+        # parameters are queried, except of rad and bkgregmin.
+        test, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('method','s','h','ONOFF','','',''))
+        pars.append(gammalib.GApplicationPar('inexclusion','f','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('emin','r','h','0.1','','',''))
+        pars.append(gammalib.GApplicationPar('emax','r','h','100.0','','',''))
+        pars.append(gammalib.GApplicationPar('enumbins','i','h','10','','',''))
+        pars.append(gammalib.GApplicationPar('coordsys','s','h','CEL','','',''))
+        pars.append(gammalib.GApplicationPar('xref','r','h','11.1','','',''))
+        pars.append(gammalib.GApplicationPar('yref','r','h','12.1','','',''))
+        pars.append(gammalib.GApplicationPar('srcshape','s','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('bkgmethod','s','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('maxoffset','r','h','0.1','','',''))
+        pars.append(gammalib.GApplicationPar('etruemin','r','h','0.1','','',''))
+        pars.append(gammalib.GApplicationPar('etruemax','r','h','100.0','','',''))
+        pars.append(gammalib.GApplicationPar('etruebins','i','h','10','','',''))
+        self.test_assert(test.check_is_onoff(),
+             'Check if is_onoff() returns True if method is "ONOFF"')
+        test.pars(cpy_pars)
 
         # Test set_response() method
         # TODO: implement

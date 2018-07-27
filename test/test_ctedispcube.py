@@ -217,6 +217,25 @@ class Test(test):
         # Check result file
         self._check_result_file('ctedispcube_py3.fits')
 
+        # Set-up ctexpcube from event list and counts cube
+        edispcube = ctools.ctedispcube()
+        edispcube['inobs']     = self._events
+        edispcube['incube']    = self._cntcube
+        edispcube['caldb']     = self._caldb
+        edispcube['irf']       = self._irf
+        edispcube['migramax']  = 2.0
+        edispcube['migrabins'] = 10
+        edispcube['outcube']   = 'ctedispcube_py4.fits'
+        edispcube['logfile']   = 'ctedispcube_py4.log'
+        edispcube['chatter']   = 2
+
+        # Run ctedispcube tool
+        edispcube.logFileOpen()  # Make sure we get a log file
+        edispcube.execute()
+
+        # Check result file
+        self._check_result_file('ctedispcube_py4.fits')
+
         # Return
         return
 

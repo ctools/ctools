@@ -210,6 +210,23 @@ class Test(test):
         # Check result file
         self._check_result_file('ctexpcube_py3.fits')
 
+        # Set-up ctexpcube from event list and counts cube
+        expcube = ctools.ctexpcube()
+        expcube['inobs']    = self._events
+        expcube['incube']   = self._cntcube
+        expcube['caldb']    = self._caldb
+        expcube['irf']      = self._irf
+        expcube['logfile']  = 'ctexpcube_py4.log'
+        expcube['outcube']  = 'ctexpcube_py4.fits'
+        expcube['chatter']  = 2
+
+        # Execute ctexpcube tool
+        expcube.logFileOpen()  # Needed to get a new log file
+        expcube.execute()
+
+        # Check result file
+        self._check_result_file('ctexpcube_py4.fits')
+
         # Return
         return
 
