@@ -20,9 +20,9 @@
 import gammalib
 
 
-# ====================== #
-# Get number of threads  #
-# ====================== #
+# ===================== #
+# Get number of threads #
+# ===================== #
 def nthreads(cls):
     """
     Determines the number of parallel processes to use
@@ -107,3 +107,45 @@ def process(nthreads, function, args):
 
     # Return results
     return results
+
+
+# ======== #
+# Function #
+# ======== #
+def mpfunc(args):
+    """
+    Multiprocessing function
+
+    Parameters
+    ----------
+    args : tuple
+        Tuple comprised of class, function name and function argument
+
+    Returns
+    -------
+    result, info : tuple
+        Tuple of function result and information
+    """
+    # Extract
+    cls = args[0] # Class
+    fct = args[1] # Class method name
+    i   = args[2] # Function argument
+
+    # Initialise thread logger
+    cls._log.clear()
+    cls._log.buffer_size(100000)
+
+    # Compute function for argument
+    cstart  = cls.celapse()
+    result  = getattr(cls, fct)(i)
+    celapse = cls.celapse() - cstart
+    log     = cls._log.buffer()
+
+    # Close logger
+    cls._log.close()
+
+    # Collect thread information
+    info = {'celapse': celapse, 'log': log}
+
+    # Return light curve bin result and thread information
+    return result, info

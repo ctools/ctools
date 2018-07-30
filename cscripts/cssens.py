@@ -28,33 +28,6 @@ from cscripts import ioutils
 from cscripts import mputils
 
 
-# ============================================ #
-# Global functions for multiprocessing support #
-# ============================================ #
-def _multiprocessing_func_wrapper(args):
-    return _multiprocessing_func(*args)
-def _multiprocessing_func(cls, i):
-
-    # Initialise thread logger
-    cls._log.clear()
-    cls._log.buffer_size(100000)
-
-    # Compute light curve bin
-    cstart  = cls.celapse()
-    result  = cls._e_bin(i)
-    celapse = cls.celapse() - cstart
-    log     = cls._log.buffer()
-
-    # Close logger
-    cls._log.close()
-
-    # Collect thread information
-    info = {'celapse': celapse, 'log': log}
-
-    # Return light curve bin result and thread information
-    return result, info
-
-
 # ============ #
 # cssens class #
 # ============ #
@@ -715,10 +688,10 @@ class cssens(ctools.csobservation):
         # If using multiprocessing
         if self._nthreads > 1 and self._ebounds.size() > 1:
 
-            # Compute phase bins
-            args        = [(self, ieng) for ieng in range(self._ebounds.size())]
-            poolresults = mputils.process(self._nthreads,
-                                          _multiprocessing_func_wrapper, args)
+            # Compute energy bins
+            args        = [(self, '_e_bin', i)
+                           for i in range(self._ebounds.size())]
+            poolresults = mputils.process(self._nthreads, mputils.mpfunc, args)
 
             # Construct results
             for ieng in range(self._ebounds.size()):

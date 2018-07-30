@@ -26,33 +26,6 @@ from cscripts import ioutils
 from cscripts import mputils
 
 
-# ============================================ #
-# Global functions for multiprocessing support #
-# ============================================ #
-def _multiprocessing_func_wrapper(args):
-    return _multiprocessing_func(*args)
-def _multiprocessing_func(cls, i):
-
-    # Initialise thread logger
-    cls._log.clear()
-    cls._log.buffer_size(100000)
-
-    # Compute light curve bin
-    cstart  = cls.celapse()
-    result  = cls._timebin(i)
-    celapse = cls.celapse() - cstart
-    log     = cls._log.buffer()
-
-    # Close logger
-    cls._log.close()
-
-    # Collect thread information
-    info = {'celapse': celapse, 'log': log}
-
-    # Return light curve bin result and thread information
-    return result, info
-
-
 # ================ #
 # cslightcrv class #
 # ================ #
@@ -651,9 +624,9 @@ class cslightcrv(ctools.csobservation):
         if self._nthreads > 1:
 
             # Compute time bins
-            args        = [(self, i) for i in range(self._tbins.size())]
-            poolresults = mputils.process(self._nthreads,
-                                          _multiprocessing_func_wrapper, args)
+            args        = [(self, '_timebin', i)
+                           for i in range(self._tbins.size())]
+            poolresults = mputils.process(self._nthreads, mputils.mpfunc, args)
 
             # Construct results
             results = []

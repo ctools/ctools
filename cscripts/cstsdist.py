@@ -27,33 +27,6 @@ from cscripts import ioutils
 from cscripts import mputils
 
 
-# ============================================ #
-# Global functions for multiprocessing support #
-# ============================================ #
-def _multiprocessing_func_wrapper(args):
-    return _multiprocessing_func(*args)
-def _multiprocessing_func(cls, i):
-
-    # Initialise thread logger
-    cls._log.clear()
-    cls._log.buffer_size(100000)
-
-    # Compute light curve bin
-    cstart  = cls.celapse()
-    result  = cls._trial(i)
-    celapse = cls.celapse() - cstart
-    log     = cls._log.buffer()
-
-    # Close logger
-    cls._log.close()
-
-    # Collect thread information
-    info = {'celapse': celapse, 'log': log}
-
-    # Return light curve bin result and thread information
-    return result, info
-
-
 # ============== #
 # cstsdist class #
 # ============== #
@@ -334,9 +307,8 @@ class cstsdist(ctools.csobservation):
 
         # If more than a single thread is requested then use multiprocessing
         if self._nthreads > 1:
-            args        = [(self, i) for i in range(ntrials)]
-            poolresults = mputils.process(self._nthreads,
-                                          _multiprocessing_func_wrapper, args)
+            args        = [(self, '_trial', i) for i in range(ntrials)]
+            poolresults = mputils.process(self._nthreads, mputils.mpfunc, args)
 
         # Continue with regular processing
         for i in range(ntrials):
