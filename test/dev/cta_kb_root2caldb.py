@@ -7,7 +7,7 @@
 # area (i.e. the area before applying any theta cut). This is required by
 # GammaLib as the maximum likelihood analysis does not imply any theta cut.
 #
-# Copyright (C) 2014-2016 Juergen Knoedlseder
+# Copyright (C) 2014-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-#from ROOT import TFile, TH1F, TH2F
 from ROOT import TFile, TH1F
 from datetime import datetime
 import gammalib
@@ -96,7 +95,7 @@ class caldb():
         self.edisp_bounds = [self.cal_name, self.cal_version, self.cal_cut, self.cal_analysis]
         self.edisp_desc   = "CTA energy dispersion"
         #
-        self.bgd_name     = "BGD"
+        self.bgd_name     = "BKG"
         self.bgd_doc      = "???"
         self.bgd_bounds   = [self.cal_name, self.cal_version, self.cal_cut, self.cal_analysis]
         self.bgd_desc     = "CTA background"

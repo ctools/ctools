@@ -1,4 +1,4 @@
-2018-07-27
+2018-07-31
 
         * Version 1.6.0 released
         ========================
@@ -16,6 +16,7 @@
         Keep existing library path in installation script on Mac OS X (#2420)
         csphagen produces Xspec compliant data (#2404)
         Add show_rmf.py example script
+        Change CTA 3D background "BGD" keywords to "BKG" (#2343)
         Add ras() and decs() methods to csobsinfo (#2313)
         Also compute TS in csspec for On/Off analysis using wstat statistic (#2312)
         Allow specifying of input sky map in ctskymap (#2311)

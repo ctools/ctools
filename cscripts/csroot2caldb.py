@@ -130,12 +130,12 @@ class csroot2caldb(ctools.cscript):
         irf['EDISP_DOC']      = '???'
         irf['EDISP_BOUNDS']   = copy.deepcopy(cal_bounds)
         irf['EDISP_DESC']     = 'CTA energy dispersion'
-        irf['BGD_NAME']       = 'BKG'
-        irf['BGD_HDUCLAS3']   = 'FULL-ENCLOSURE'
-        irf['BGD_HDUCLAS4']   = '3D'
-        irf['BGD_DOC']        = '???'
-        irf['BGD_BOUNDS']     = copy.deepcopy(cal_bounds)
-        irf['BGD_DESC']       = 'CTA background'
+        irf['BKG_NAME']       = 'BKG'
+        irf['BKG_HDUCLAS3']   = 'FULL-ENCLOSURE'
+        irf['BKG_HDUCLAS4']   = '3D'
+        irf['BKG_DOC']        = '???'
+        irf['BKG_BOUNDS']     = copy.deepcopy(cal_bounds)
+        irf['BKG_DESC']       = 'CTA background'
 
         # Set parameter dependent IRF information
         if self['psftype'].string() == 'King':
@@ -183,7 +183,7 @@ class csroot2caldb(ctools.cscript):
         ds['EA_DIR']    = obs_dir
         ds['PSF_DIR']   = obs_dir
         ds['EDISP_DIR'] = obs_dir
-        ds['BGD_DIR']   = obs_dir
+        ds['BKG_DIR']   = obs_dir
 
         # Set path to response components. If the "outdir" parameter is set
         # then prefix the value to the path of the response components
@@ -193,13 +193,13 @@ class csroot2caldb(ctools.cscript):
             ds['EA_PATH']    = outdir+'/'+ds['EA_DIR']
             ds['PSF_PATH']   = outdir+'/'+ds['PSF_DIR']
             ds['EDISP_PATH'] = outdir+'/'+ds['EDISP_DIR']
-            ds['BGD_PATH']   = outdir+'/'+ds['BGD_DIR']
+            ds['BKG_PATH']   = outdir+'/'+ds['BKG_DIR']
         else:
             ds['BASE_PATH']  = base_dir
             ds['EA_PATH']    = ds['EA_DIR']
             ds['PSF_PATH']   = ds['PSF_DIR']
             ds['EDISP_PATH'] = ds['EDISP_DIR']
-            ds['BGD_PATH']   = ds['BGD_DIR']
+            ds['BKG_PATH']   = ds['BKG_DIR']
 
         # Set IRF component file names. If the "split" parameter is "yes" then
         # split the IRF components over several files.
@@ -207,12 +207,12 @@ class csroot2caldb(ctools.cscript):
             ds['EA_FILE']    = 'ea_'+version+'.fits'
             ds['PSF_FILE']   = 'psf_'+version+'.fits'
             ds['EDISP_FILE'] = 'edisp_'+version+'.fits'
-            ds['BGD_FILE']   = 'bgd_'+version+'.fits'
+            ds['BKG_FILE']   = 'bgd_'+version+'.fits'
         else:
             ds['EA_FILE']    = 'irf_'+version+'.fits'
             ds['PSF_FILE']   = 'irf_'+version+'.fits'
             ds['EDISP_FILE'] = 'irf_'+version+'.fits'
-            ds['BGD_FILE']   = 'irf_'+version+'.fits'
+            ds['BKG_FILE']   = 'irf_'+version+'.fits'
 
         # Create directory structure
         if not os.path.isdir(ds['EA_PATH']):
@@ -221,8 +221,8 @@ class csroot2caldb(ctools.cscript):
             os.makedirs(ds['PSF_PATH'])
         if not os.path.isdir(ds['EDISP_PATH']):
             os.makedirs(ds['EDISP_PATH'])
-        if not os.path.isdir(ds['BGD_PATH']):
-            os.makedirs(ds['BGD_PATH'])
+        if not os.path.isdir(ds['BKG_PATH']):
+            os.makedirs(ds['BKG_PATH'])
 
         # Return ds
         return ds
@@ -255,19 +255,19 @@ class csroot2caldb(ctools.cscript):
         ea_filename    = ds['EA_PATH']+'/'+ds['EA_FILE']
         psf_filename   = ds['PSF_PATH']+'/'+ds['PSF_FILE']
         edisp_filename = ds['EDISP_PATH']+'/'+ds['EDISP_FILE']
-        bgd_filename   = ds['BGD_PATH']+'/'+ds['BGD_FILE']
+        bgd_filename   = ds['BKG_PATH']+'/'+ds['BKG_FILE']
 
         # Open IRF component files
         if self['split'].boolean():
             ds['EA_FITS']    = gammalib.GFits(ea_filename, True)
             ds['PSF_FITS']   = gammalib.GFits(psf_filename, True)
             ds['EDISP_FITS'] = gammalib.GFits(edisp_filename, True)
-            ds['BGD_FITS']   = gammalib.GFits(bgd_filename, True)
+            ds['BKG_FITS']   = gammalib.GFits(bgd_filename, True)
         else:
             ds['EA_FITS']    = gammalib.GFits(ea_filename, True)
             ds['PSF_FITS']   = ds['EA_FITS']
             ds['EDISP_FITS'] = ds['EA_FITS']
-            ds['BGD_FITS']   = ds['EA_FITS']
+            ds['BKG_FITS']   = ds['EA_FITS']
 
         # Open HDUs
         ds['HDU_EA']    = self._open_hdu(ds['EA_FITS'], "EFFECTIVE AREA",
@@ -282,9 +282,9 @@ class csroot2caldb(ctools.cscript):
                                          irf['EDISP_NAME'], irf['EDISP_HDUCLAS3'],
                                          irf['EDISP_HDUCLAS4'], irf['EDISP_DOC'],
                                          irf)
-        ds['HDU_BGD']   = self._open_hdu(ds['BGD_FITS'], "BACKGROUND",
-                                         irf['BGD_NAME'], irf['BGD_HDUCLAS3'],
-                                         irf['BGD_HDUCLAS4'], irf['BGD_DOC'],
+        ds['HDU_BKG']   = self._open_hdu(ds['BKG_FITS'], "BACKGROUND",
+                                         irf['BKG_NAME'], irf['BKG_HDUCLAS3'],
+                                         irf['BKG_HDUCLAS4'], irf['BKG_DOC'],
                                          irf)
 
         # Return
@@ -318,10 +318,10 @@ class csroot2caldb(ctools.cscript):
         if self['split'].boolean():
             ds['PSF_FITS'].save(True)
             ds['EDISP_FITS'].save(True)
-            ds['BGD_FITS'].save(True)
+            ds['BKG_FITS'].save(True)
             ds['PSF_FITS'].close()
             ds['EDISP_FITS'].close()
-            ds['BGD_FITS'].close()
+            ds['BKG_FITS'].close()
 
         # Return
         return
@@ -421,7 +421,7 @@ class csroot2caldb(ctools.cscript):
             Directory structure dictionary
         """
         # Set list of IRF component names
-        names = ['EA', 'PSF', 'EDISP', 'BGD']
+        names = ['EA', 'PSF', 'EDISP', 'BKG']
 
         # Initialise CIF row index
         row = ds['HDU_CIF'].nrows()
@@ -1049,7 +1049,7 @@ class csroot2caldb(ctools.cscript):
         Translate ROOT to CALDB background extension.
 
         The following ROOT histograms are used:
-        - BGRatePerSqDeg_offaxis -> BGD
+        - BGRatePerSqDeg_offaxis -> BKG
 
         Parameters
         ----------
@@ -1081,11 +1081,11 @@ class csroot2caldb(ctools.cscript):
             self._renorm_onaxis(array, array_1D)
 
         # Write boundary keywords
-        self._set_cif_keywords(ds['HDU_BGD'], irf['BGD_NAME'],
-                               irf['BGD_BOUNDS'], irf['BGD_DESC'], irf)
+        self._set_cif_keywords(ds['HDU_BKG'], irf['BKG_NAME'],
+                               irf['BKG_BOUNDS'], irf['BKG_DESC'], irf)
 
-        # Create "BGD" data column
-        self._make_3D(array, ds['HDU_BGD'], 'BGD', '1/(MeV s sr)')
+        # Create "BKG" data column
+        self._make_3D(array, ds['HDU_BKG'], 'BKG', '1/(MeV s sr)')
 
         # Return
         return

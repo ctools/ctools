@@ -34,7 +34,7 @@ class Test(test):
     This test class makes unit tests for the csobs2caldb script by using it
     from the command line and from Python.
     """
-    
+
     # Constructor
     def __init__(self):
         """
@@ -159,13 +159,13 @@ class Test(test):
         aeff  = gammalib.GFilename(db.filename('','','EFF_AREA','','',expr))
         psf   = gammalib.GFilename(db.filename('','','RPSF','','',expr))
         edisp = gammalib.GFilename(db.filename('','','EDISP','','',expr))
-        bgd   = gammalib.GFilename(db.filename('','','BGD','','',expr))
+        bkg   = gammalib.GFilename(db.filename('','','BKG','','',expr))
 
         # Check whether files exist
         self.test_assert(aeff.exists(), 'Effective area file exists')
         self.test_assert(psf.exists(), 'Point spread function file exists')
         self.test_assert(edisp.exists(), 'Energy dispersion file exists')
-        self.test_assert(bgd.exists(), 'Background file exists')
-        
+        self.test_assert(bkg.exists(), 'Background file exists')
+
         # Return
         return

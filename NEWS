@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-27 July 2018
+31 July 2018
 
 
 Introduction
@@ -226,7 +226,7 @@ None
 
 csobs2caldb - Generate calibration database entry for an IACT observation
 -------------------------------------------------------------------------
-None
+Change background template table name from "BGD" to "BKG" (#2343).
 
 
 csobsdef - Generate observation definition XML file
@@ -288,6 +288,8 @@ parameter due to a bug in the code. This bug was fixed (#2448).
 
 csroot2caldb - Generates calibration database from ROOT file
 ------------------------------------------------------------
+Change background template table name from "BGD" to "BKG" (#2343).
+
 The ROOT Python module is now imported in the run method and not globally so
 that no conflit arises with the "--help" option (#2652).
 

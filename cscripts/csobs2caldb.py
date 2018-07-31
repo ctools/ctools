@@ -2,7 +2,7 @@
 # ==========================================================================
 # Creates a calibration database entry for an IACT observation
 #
-# Copyright (C) 2015-2017 Michael Mayer
+# Copyright (C) 2015-2018 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ from cscripts import calutils
 class csobs2caldb(ctools.csobservation):
     """
     Creates a calibration database entry for an IACT observation.
-    
+
     The creation of a calibration database entry is useful for performing
     simulations for current Imaging Air Cherenkov Telescopes (IACTs).
     The class takes an observation definition XML file as input and uses
@@ -40,7 +40,7 @@ class csobs2caldb(ctools.csobservation):
     the first observation will be used, but the user can specify the
     index of any observation using the hidden "index" parameter.
     """
-    
+
     # Constructor
     def __init__(self, *argv):
         """
@@ -81,7 +81,7 @@ class csobs2caldb(ctools.csobservation):
         if self.obs().is_empty():
             raise ValueError('No or empty observation provided for '
                              'parameter "inobs".')
-        
+
         # Get index of observation to be used
         index = self['index'].integer()
 
@@ -89,7 +89,7 @@ class csobs2caldb(ctools.csobservation):
         if index < 0 or index >= self.obs().size():
             raise IndexError('Parameter "index=%d" outside the validity '
                              'range [0,%d].' % (index, self.obs().size()))
-        
+
         # Get observation
         self._observation = self.obs()[index]
 
@@ -97,13 +97,13 @@ class csobs2caldb(ctools.csobservation):
         if not self._observation.classname() == 'GCTAObservation':
             raise RuntimeError('Input observation not of type '
                                '"GCTAObservation".')
-        
+
         # Make sure we have an IRF response associated with the CTA
         # observation
         if not self._observation.response().classname() == 'GCTAResponseIrf':
             raise RuntimeError('Response of input observation not of '
                                'type "GCTAResponseIrf".')
-        
+
         # Get calibration database name. If the "caldb" parameter is "NONE"
         # or empty then use the instrument name from the observation as
         # calibration database name.
@@ -132,13 +132,11 @@ class csobs2caldb(ctools.csobservation):
         Creates an IRF FITS file
         """
         # Write header into logger
-        if self._logTerse():
-            self._log("\n")
-            self._log.header2("Creating IRF file")
+        self._log_header2(gammalib.TERSE, 'Creating IRF file')
 
         # Get response for the observation
         rsp = self._observation.response()
-        
+
         # Extract response file names
         fname_aeff  = rsp.aeff().filename()
         fname_psf   = rsp.psf().filename()
@@ -151,7 +149,7 @@ class csobs2caldb(ctools.csobservation):
         self._log_value(gammalib.NORMAL, 'Point spread function', fname_psf.url())
         self._log_value(gammalib.NORMAL, 'Energy dispersion', fname_edisp.url())
         self._log_value(gammalib.NORMAL, 'Background rate', fname_bkg.url())
-    
+
         # Open FITS files of response components
         fits_aeff  = gammalib.GFits(fname_aeff)
         fits_psf   = gammalib.GFits(fname_psf)
@@ -163,10 +161,10 @@ class csobs2caldb(ctools.csobservation):
         ext_psf   = fname_psf.extname("POINT SPREAD FUNCTION")
         ext_edisp = fname_edisp.extname("ENERGY DISPERSION")
         ext_bkg   = fname_bkg.extname("BACKGROUND")
-        
+
         # Create empty FITS file
         fits = gammalib.GFits()
-        
+
         # Append IRF component to FITS file
         fits.append(fits_aeff[ext_aeff])
         fits.append(fits_psf[ext_psf])
@@ -186,7 +184,7 @@ class csobs2caldb(ctools.csobservation):
             self._log("\n")
             self._log(str(fits[ext_bkg].header()))
             self._log("\n")
-        
+
         # Return fits file
         return fits
 
@@ -195,16 +193,14 @@ class csobs2caldb(ctools.csobservation):
         Creates an IRF index FITS file
         """
         # Write header into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header2('Creating database index file')
+        self._log_header2(gammalib.TERSE, 'Creating database index file')
 
         # Open calibration database index
         indx_file = self._base_dir + '/caldb.indx'
-        
+
         # Open index file (or create one if it does not exist)
         cif = gammalib.GFits(indx_file, True)
-        
+
         # Retrieve "CIF" table
         if cif.contains('CIF'):
             table = cif.table('CIF')
@@ -212,7 +208,7 @@ class csobs2caldb(ctools.csobservation):
         # ... or create binary table if no "CIF" table exists yet, append
         # binary table to CIF file and return a reference to the appended
         # table to work with
-        else:       
+        else:
             table = cif.append(calutils.create_cif_table())
 
         # Check if output config already exist
@@ -223,9 +219,9 @@ class csobs2caldb(ctools.csobservation):
             if caldir == self._cal_dir:
                 has_config = True
                 break
-         
-        # Create columns if not available   
-        if not has_config:           
+
+        # Create columns if not available
+        if not has_config:
             # Append 4 rows to CIF extension
             table.append_rows(4)
             row_index = table.nrows()
@@ -241,7 +237,7 @@ class csobs2caldb(ctools.csobservation):
             # Set date
             now = str(datetime.datetime.now())
             today, time = now.split()
-            
+
             # Set element
             table['TELESCOP'][row] = self._mission
             table['INSTRUME'][row] = self._caldb
@@ -268,7 +264,7 @@ class csobs2caldb(ctools.csobservation):
         row = row_index-3
         table['CAL_CNAM'][row] = 'RPSF'
         table['CAL_DESC'][row] = self._caldb+' point spread function'
-        
+
         # Add energy dispersion information
         row = row_index-2
         table['CAL_CNAM'][row] = 'EDISP'
@@ -276,7 +272,7 @@ class csobs2caldb(ctools.csobservation):
 
         # Add background information
         row = row_index-1
-        table['CAL_CNAM'][row] = 'BGD'
+        table['CAL_CNAM'][row] = 'BKG'
         table['CAL_DESC'][row] = self._caldb+' background'
 
         # Log resulting FITS table and header
@@ -286,35 +282,33 @@ class csobs2caldb(ctools.csobservation):
         if self._logExplicit():
             self._log(str(table.header()))
             self._log('\n')
-        
+
         # Return CIF FITS file
         return cif
-        
+
     def _make_dirs(self):
         """
         Make CALDB directories
         """
         # Write header into logger
-        if self._logTerse():
-            self._log("\n")
-            self._log.header2("Creating directory structure")
+        self._log_header2(gammalib.TERSE, 'Creating directory structure')
 
         # Create calibration database        
-        caldb = gammalib.GCaldb(self["rootdir"].string())
-        
+        caldb = gammalib.GCaldb(self['rootdir'].string())
+
         # Set calibration directory 
-        self._cal_dir  = "data"
-        self._cal_dir += "/"+self._mission.lower()
-        self._cal_dir += "/"+self._caldb.lower()
-        self._cal_dir += "/bcf/"+self["irf"].string()
-        
+        self._cal_dir  = 'data'
+        self._cal_dir += '/'+self._mission.lower()
+        self._cal_dir += '/'+self._caldb.lower()
+        self._cal_dir += '/bcf/'+self['irf'].string()
+
         # Set absolute path
-        self._base_dir = caldb.rootdir() +"/data"
-        self._base_dir += "/"+self._mission.lower()
-        self._base_dir += "/"+self._caldb.lower()
-        
+        self._base_dir = caldb.rootdir() +'/data'
+        self._base_dir += '/'+self._mission.lower()
+        self._base_dir += '/'+self._caldb.lower()
+
         # Set directory for irf file
-        self._rsp_dir = caldb.rootdir() + "/" + self._cal_dir
+        self._rsp_dir = caldb.rootdir() + '/' + self._cal_dir
 
         # Log resulting FITS table
         self._log_value(gammalib.NORMAL, 'Calibration directory', self._cal_dir)
@@ -324,7 +318,7 @@ class csobs2caldb(ctools.csobservation):
         else:
             name = 'IRF directory (existing)'
         self._log_value(gammalib.NORMAL, name, self._rsp_dir)
-        
+
         # Create IRF directory is it does not yet exist
         if not os.path.isdir(self._rsp_dir):
             os.makedirs(self._rsp_dir)
@@ -344,21 +338,19 @@ class csobs2caldb(ctools.csobservation):
 
         # Get parameters
         self._get_parameters()
-        
+
         # Write input parameters and header into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Creating CALDB entry')
-        
+        self._log_header1(gammalib.TERSE, 'Creating CALDB entry')
+
         # Create directory structure
         self._make_dirs()
-         
+
         # Create/update calibration database   
         self._caldb_inx = self._make_caldb_index()
-        
+
         # Create response file
         self._irf_fits = self._make_irf_file()
-                
+
         # Return
         return
 
@@ -371,7 +363,7 @@ class csobs2caldb(ctools.csobservation):
 
         # Set response filename
         filename = self._rsp_dir + '/' + self._outfile
-        
+
         # Write filenames into logger
         self._log_value(gammalib.NORMAL, 'CALDB index file',
                         self._caldb_inx.filename().url())
@@ -382,7 +374,7 @@ class csobs2caldb(ctools.csobservation):
 
         # Save response file
         self._irf_fits.saveto(filename, self._clobber())
-        
+
         # Return
         return
 
@@ -394,6 +386,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = csobs2caldb(sys.argv)
-    
+
     # Execute application
     app.execute()
