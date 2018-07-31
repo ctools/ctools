@@ -617,15 +617,20 @@ class cssens(ctools.csobservation):
         # Return
         return (crab_flux_prediction, regcoeff)
 
-
-    def _e_bin(self,ieng):
+    def _e_bin(self, ieng):
         """
-        Determines sensivity in energy bin ieng
-        :param ieng: int, energy bin number
-        :return: dict,
+        Determines sensivity in energy bin
+        
+        Parameters
+        ----------
+        ieng : int
+            Energy bin number
+
+        Returns
+        -------
+        result : dict
             Result dictionary
         """
-
         # Get sensitivity type
         sensitivity_type = self['type'].string()
 
@@ -647,6 +652,7 @@ class cssens(ctools.csobservation):
 
         # Return results
         return result
+
 
     # Public methods
     def run(self):

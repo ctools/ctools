@@ -113,19 +113,29 @@ class csphagen(ctools.csobservation):
     # Private methods
     def _query_src_direction(self):
         """
-        Set up the source direction parameter.
-        Query relevant parameters.
+        Set up the source direction parameter
         """
+        # Initialise source direction
         self._src_dir = gammalib.GSkyDir()
+
+        # Get coordinate systel
         coordsys = self['coordsys'].string()
+
+        # If coordinate system is celestial then query "ra" and "dec"
         if coordsys == 'CEL':
             ra  = self['ra'].real()
             dec = self['dec'].real()
             self._src_dir.radec_deg(ra, dec)
+
+        # ... otherwise, if coordinate system is galactic then query "glon"
+        # and "glat"
         elif coordsys == 'GAL':
             glon = self['glon'].real()
             glat = self['glat'].real()
             self._src_dir.lb_deg(glon, glat)
+
+        # Return
+        return
 
     def _get_parameters_bkgmethod_reflected(self):
         """
@@ -439,11 +449,16 @@ class csphagen(ctools.csobservation):
         """
         Generate On/Off spectra for individual observation
 
-        :param i: int, observation number
-        :return: dictionary
-                On/Off spectra, background regions, observation id
-        """
+        Parameters
+        ----------
+        i : int
+            Observation number
 
+        Returns
+        -------
+        result : dict
+            On/Off spectra, background regions, observation id
+        """
         # Retrieve observation from container
         obs = self.obs()[i]
 
@@ -486,17 +501,22 @@ class csphagen(ctools.csobservation):
         # Return results
         return result
 
-    def _unpack_result(self,outobs,result):
+    def _unpack_result(self, outobs, result):
         """
-        Unpack result from calculation of On/Off regions and appends it to observation
-        container.
+        Unpack result from calculation of On/Off regions
 
-        :param outobs: `~gammalib.GObservations`, observation container
-        :param result: dict, result to unpack
-        :return: `~gammalib.GObservations`
-                observation container with result appended
+        Parameters
+        ----------
+        outobs : `~gammalib.GObservations`
+            Observation container
+        result : dict
+            On/Off spectra, background regions, observation id
+
+        Returns
+        -------
+        outobs : `~gammalib.GObservations`
+            Observation container with result appended
         """
-
         # If the results contain an On/Off observation
         if result['onoff'].classname() == 'GCTAOnOffObservation':
             # Append observation to observation container
