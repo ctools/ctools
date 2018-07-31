@@ -29,7 +29,7 @@ from testing import test
 # ============================== #
 class Test(test):
     """
-    Test class for csviscube script
+    Test class for obsutils module
     """
 
     # Constructor

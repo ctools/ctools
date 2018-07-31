@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for cscripts
 #
-# Copyright (C) 2016-2017 Juergen Knoedlseder
+# Copyright (C) 2016-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@ import test_cstsmapsplit
 import test_csviscube
 import test_csworkflow
 import test_obsutils
+import test_mputils
 import test_csiactcopy
 import test_csiactdata
 import test_csiactobs
@@ -144,7 +145,8 @@ def test(installed=False, debug=False):
              test_cstsmapsplit.Test(),
              test_csviscube.Test(),
              test_csworkflow.Test(),
-             test_obsutils.Test()]
+             test_obsutils.Test(),
+             test_mputils.Test()]
 
     # Append tests for Python 2.6+ (the IACT cscripts depend on the json
     # module which is only available since Python 2.6+)
