@@ -32,6 +32,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`2656 <https://cta-redmine.irap.omp.eu/issues/2656>`_] -
+  Use full ``RMF`` true energy range for On/Off analysis in :ref:`csspec`
 * [`2513 <https://cta-redmine.irap.omp.eu/issues/2513>`_] -
   Transparently update parameter files
 * [`2490 <https://cta-redmine.irap.omp.eu/issues/2490>`_] -

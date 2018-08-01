@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-31 July 2018
+1 August 2018
 
 
 Introduction
@@ -302,6 +302,10 @@ Add hidden "nthreads" parameter and implement parallelisation of computations
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
+The full true energy range of the RMF is now used in an On/Off analysis to
+prevent cutting off the tails of the energy dispersion, which happened before
+when the script was used for the analysis of H.E.S.S. data (#2656).
+
 Add hidden "nthreads" parameter and implement parallelisation of computations
 (#2421).
 

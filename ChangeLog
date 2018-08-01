@@ -1,8 +1,9 @@
-2018-07-31
+2018-08-01
 
         * Version 1.6.0 released
         ========================
 
+        Use full RMF true energy range for On/Off analysis in csspec (#2656)
         Defer import of ROOT module in csroot2caldb to run method (#2652)
         Transparently update parameter files (#2513)
         Change formula for number of true energy bins in csphagen (#2490)

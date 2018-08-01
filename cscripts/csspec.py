@@ -468,25 +468,18 @@ class csspec(ctools.csobservation):
         obs : `~gammalib.GCTAOnOffObservation`
             CTA On/Off observation
         """
-        # Select energy bins in etrue and ereco. 20% margin is added for
-        # true energies to take into account the energy dispersion. 0.1%
-        # margin is added for reconstructed energies to accomodate for
-        # rounding errors.
-        etrue = gammalib.GEbounds()
-        ereco = gammalib.GEbounds()
-        itrue = []
-        ireco = []
-        for i in range(obs.rmf().etrue().size()):
-            etrue_min = obs.rmf().etrue().emin(i)
-            etrue_max = obs.rmf().etrue().emax(i)
-            if etrue_min * 1.2 >= emin and etrue_max * 0.8 <= emax:
-                etrue.append(etrue_min, etrue_max)
-                itrue.append(i)
+        # Select energy bins in etrue and ereco. All etrue energy bins are
+        # selected. A 0.1% margin is added for reconstructed energies to
+        # accomodate for rounding errors.
+        etrue     = obs.rmf().etrue()
+        ereco     = gammalib.GEbounds()
+        itrue     = [i for i in range(obs.rmf().etrue().size())]
+        ireco     = []
         for i in range(obs.rmf().emeasured().size()):
-            ereco_min = obs.rmf().emeasured().emin(i)
-            ereco_max = obs.rmf().emeasured().emax(i)
-            if ereco_min * 1.001 >= emin and ereco_max * 0.999 <= emax:
-                ereco.append(ereco_min, ereco_max)
+            ereco_bin_min = obs.rmf().emeasured().emin(i)
+            ereco_bin_max = obs.rmf().emeasured().emax(i)
+            if ereco_bin_min * 1.001 >= emin and ereco_bin_max * 0.999 <= emax:
+                ereco.append(ereco_bin_min, ereco_bin_max)
                 ireco.append(i)
 
         # Extract PHA
