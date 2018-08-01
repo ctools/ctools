@@ -114,10 +114,12 @@ class Test(test):
         Test nthreads() function
         """
         # Set reference number of CPU's
-        ncpus = 1
+        n0   = 1
+        n739 = 1
         try:
             from multiprocessing import cpu_count
-            ncpus = cpu_count()
+            n0   = cpu_count()
+            n739 = 739
         except:
             pass
 
@@ -128,7 +130,7 @@ class Test(test):
         cls, pars, cpy_pars = self._setup_mputils_test()
         pars.append(gammalib.GApplicationPar('nthreads','i','h','0','','',''))
         nthreads = mputils.nthreads(cls)
-        self.test_value(nthreads, ncpus, 'Check nthreads=0')
+        self.test_value(nthreads, n0, 'Check nthreads=0')
         cls.pars(cpy_pars)
 
         # Check nthreads=739. In this case the nthreads() function should
@@ -137,7 +139,7 @@ class Test(test):
         cls, pars, cpy_pars = self._setup_mputils_test()
         pars.append(gammalib.GApplicationPar('nthreads','i','h','739','','',''))
         nthreads = mputils.nthreads(cls)
-        self.test_value(nthreads, 739, 'Check nthreads=739')
+        self.test_value(nthreads, n739, 'Check nthreads=739')
         cls.pars(cpy_pars)
 
         # Return
