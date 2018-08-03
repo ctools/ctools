@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-1 August 2018
+3 August 2018
 
 
 Introduction
@@ -248,6 +248,17 @@ Use time reference of input observations if time selection is given in MET
 
 csphagen - Generate On/Off observations
 ---------------------------------------
+Add hidden "use_irf_bkg" parameter. By default the parameter is set to "yes",
+which means that the background acceptance provided in the IRF is used for
+the computation of the alpha parameter and the background rate, stored in the
+"BACKSCAL" column of the On spectrum and the "BACKRESP" column of the Off
+spectrum, respectively. If the parameter is set to "no" it is assumed that the
+background rate in the On and Off regions are the same, and the IRF background
+template is not used. In that case, the "BACKSCAL" column gives the ratio of
+the solid angles between On and Off regions, and the "BACKRESP" column is set
+to zero. The resulting data can only be fitted using the "wstat" statistic
+(#2659).
+
 Add hidden "nthreads" parameter and implement parallelisation of computations
 (#2421).
 

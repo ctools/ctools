@@ -167,6 +167,20 @@ General parameters
     If this number of background regions is not available the observation is
     skipped.
 
+``(use_irf_bkg = yes) [boolean]``
+    Specifies whether the IRF background template should be used for the
+    computation of the ``alpha`` parameter and the predicted background rate in
+    the Off region that is stored in the ``BACKRESP`` column of the Off spectrum.
+
+    If the parameter is set to ``no`` the IRF background template is not used and
+    the background rate is assumed identical within the On and Off regions. This
+    is the classical IACT analysis method that is used when using reflected Off
+    regions. In that case the ``alpha`` parameter becomes independent of energy
+    and only reflects the ratio between the solid angles of the On and Off
+    regions. The ``BACKRESP`` column in the Off spectrum will be filled with zeros.
+    The data need to be fitted with the ``wstat`` statistic, fitting with ``cstat``
+    will not work.
+
 ``(maxoffset = 4.0) [real]``
     Maximum offset in degrees of source from camera center to accept the
     observation.

@@ -157,6 +157,9 @@ class csphagen(ctools.csobservation):
             self._rad = self['rad'].real()
             self._src_reg.append(gammalib.GSkyRegionCircle(self._src_dir, self._rad))
 
+        # Query usage of IRF background template
+        self['use_irf_bkg'].boolean()
+
         # Return
         return
 
@@ -478,6 +481,12 @@ class csphagen(ctools.csobservation):
             # Set background regions for this observation
             bkg_reg = self._set_background_regions(obs)
 
+            # Get IRF background template usage flag
+            use_irf_bkg = self['use_irf_bkg'].boolean()
+            if not use_irf_bkg:
+                self._log_string(gammalib.NORMAL, 'IRF background template '
+                                 'not used, assume constant backround rate.')
+
             # If there are background regions then create On/Off observation
             # and append it to the output container
             if bkg_reg.size() >= self['bkgregmin'].integer():
@@ -486,7 +495,8 @@ class csphagen(ctools.csobservation):
                                                       self._etruebounds,
                                                       self._ebounds,
                                                       self._src_reg,
-                                                      bkg_reg)
+                                                      bkg_reg,
+                                                      use_irf_bkg)
                 onoff.id(obs.id())
 
             else:
@@ -519,6 +529,7 @@ class csphagen(ctools.csobservation):
         """
         # If the results contain an On/Off observation
         if result['onoff'].classname() == 'GCTAOnOffObservation':
+
             # Append observation to observation container
             outobs.append(result['onoff'])
 
