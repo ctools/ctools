@@ -670,7 +670,7 @@ class csphagen(ctools.csobservation):
             self._log_value(gammalib.NORMAL, 'PHA on file', onname)
             self._log_value(gammalib.NORMAL, 'PHA off file', offname)
             self._log_value(gammalib.NORMAL, 'ARF file', arfname)
-            self._log_value(gammalib.NORMAL, 'RMF file', arfname)
+            self._log_value(gammalib.NORMAL, 'RMF file', rmfname)
 
         # Save observation definition XML file
         self.obs().save(outobs)
