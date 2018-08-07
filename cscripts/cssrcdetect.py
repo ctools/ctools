@@ -72,6 +72,8 @@ class cssrcdetect(ctools.cscript):
         self['exclrad'].real()
         self['fit_pos'].boolean()
         self['fit_shape'].boolean()
+        self['smoothkernel'].string()
+        self['smoothparam'].real()
 
         # Query ahead output model filename
         if self._read_ahead():
@@ -338,6 +340,26 @@ class cssrcdetect(ctools.cscript):
         return model
 
 
+    def _smooth_skymap(self, skymap):
+        """
+        Smooth the input sky map if a valid kernel was supplied
+
+        Parameters
+        ----------
+        skymap : `~gammalib.GSkyMap()`
+            Sky map
+        """
+        # Make sure the smoothing kernel is not 'NONE'
+        if self['smoothkernel'].string().upper() != 'NONE':
+            skymap.smooth(self['smoothkernel'].string(),
+                          self['smoothparam'].real())
+        else:
+            self._log_string(gammalib.NORMAL, 
+                        "Smoothing kernel is NONE, smoothing will be ignored.")
+
+        return
+
+
     def _load_skymap(self):
         """
         Load sky map
@@ -378,12 +400,15 @@ class cssrcdetect(ctools.cscript):
         # Get parameters
         self._get_parameters()
 
-        # Write header
-        self._log_header1(gammalib.NORMAL, 'Source detection')
-
         # If sky map is empty then load it from input parameter
         if self._map.is_empty():
             self._map = self._load_skymap()
+
+        # Smooth the map
+        self._smooth_skymap(self._map)
+
+        # Write header
+        self._log_header1(gammalib.NORMAL, 'Source detection')
 
         # Detect sources
         self._detect_sources(self._map)

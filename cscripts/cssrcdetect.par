@@ -30,6 +30,8 @@ maxsrcs,   i, h, 20,1,1000, "Maximum number of sources"
 exclrad,   r, h, 0.2,,, "Exclusion radius (deg)"
 fit_pos,   b, h, yes,,, "Fit source positions?"
 fit_shape, b, h, yes,,, "Fit source shapes?"
+smoothkernel, s, a, NONE,NONE|DISK|GAUSSIAN,,"Smoothing kernel to use for smoothing the input sky map"
+smoothparam,  r, a, 0.05,,,"Smoothing kernel parameters (sigma for GAUS, radius for DISK)"
 
 #
 # Standard parameters
