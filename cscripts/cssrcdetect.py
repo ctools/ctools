@@ -349,8 +349,13 @@ class cssrcdetect(ctools.cscript):
         skymap : `~gammalib.GSkyMap()`
             Sky map
         """
+        self._log_header3(gammalib.NORMAL, "Smoothing Skymap")
         # Make sure the smoothing kernel is not 'NONE'
         if self['smoothkernel'].string().upper() != 'NONE':
+            self._log_value(gammalib.NORMAL, "Kernel", 
+                            self['smoothkernel'].string())
+            self._log_value(gammalib.NORMAL, "Parameter", 
+                            self["smoothparam"].real())
             skymap.smooth(self['smoothkernel'].string(),
                           self['smoothparam'].real())
         else:
