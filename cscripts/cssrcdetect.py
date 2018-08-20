@@ -382,7 +382,7 @@ class cssrcdetect(ctools.cscript):
         fits.close()
 
         # Return
-        return skymap
+        return skymap.extract(0)
 
 
     # Public methods
