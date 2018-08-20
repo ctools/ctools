@@ -48,6 +48,16 @@ General parameters
     Detection threshold (Gaussian sigma). Only sources above this detection
     threshold will be added to the model definiton XML file.
 
+``momentradius [real]``
+    Radius (deg) for computing map mean and std-deviation values.
+
+``smoothkernel <NONE|DISK|GAUSSIAN> [string]``
+    Smoothing kernel to use for smoothing the input sky map.
+
+``smoothparam [real]``
+    Smoothing kernel parameters (sigma for GAUS, radius for DISK, both in 
+    degrees).
+
 ``(maxsrcs = 20) [integer]``
     Maximum number of sources that should be detected.
 
