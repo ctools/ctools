@@ -72,13 +72,17 @@ class cssrcdetect(ctools.cscript):
         self['exclrad'].real()
         self['fit_pos'].boolean()
         self['fit_shape'].boolean()
+
+        # Query the smoothing parameters
         self['smoothkernel'].string()
-        self['smoothparam'].real()
+        if self['smoothkernel'].string().upper() != "NONE":
+            self['smoothparam'].real()
 
         # Query ahead output model filename
         if self._read_ahead():
             self['outmodel'].filename()
             self['outds9file'].filename()
+            self["momentradius"].real()
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -102,20 +106,13 @@ class cssrcdetect(ctools.cscript):
             self._log_header3(gammalib.NORMAL, 'Iteration '+str(i+1))
 
             # Get map moments
-            mean, std = self._map_moments(counts)
-
-            # Log map moments
-            self._log_value(gammalib.NORMAL, 'Map mean', mean)
-            self._log_value(gammalib.NORMAL, 'Map standard deviation', std)
+            mean, std = self._map_moments(counts, self["momentradius"].real())
  
             # Compute threshold
-            threshold = mean + self['threshold'].real() * std
-
-            # Log map threshold
-            self._log_value(gammalib.NORMAL, 'Map threshold', threshold)
-
+            sigmap = (counts - mean)/std
+            
             # Get maximum value and corresponding sky direction
-            value, pos = self._find_maximum(counts, threshold=threshold)
+            value, pos = self._find_maximum(sigmap)
 
             # If maximum found then log maximum and add model
             if pos is not None:
@@ -131,7 +128,7 @@ class cssrcdetect(ctools.cscript):
                 self._add_model(pos, name)
 
                 # Remove maximum from map
-                counts = self._remove_maximum(counts, pos, mean,
+                counts = self._remove_maximum(counts, pos, mean(pos),
                                               radius=self['exclrad'].real())
 
             # ... otherwise log that no maximum was found and break iterations
@@ -147,7 +144,7 @@ class cssrcdetect(ctools.cscript):
         # Return
         return
 
-    def _find_maximum(self, skymap, threshold=0.0):
+    def _find_maximum(self, skymap):
         """
         Find maximum in a sky map
 
@@ -155,8 +152,6 @@ class cssrcdetect(ctools.cscript):
         ----------
         skymap : `~gammalib.GSkyMap()`
             Sky map
-        threshold : float, optional
-            Threshold for maximum value
 
         Returns
         -------
@@ -164,7 +159,7 @@ class cssrcdetect(ctools.cscript):
             Maximum sky map value and corresponding sky direction
         """
         # Initialise maximum pixel value and sky direction
-        value = threshold
+        value = self['threshold'].real()
         pos   = None
 
         # Loop over all pixels and find maximum
@@ -208,7 +203,7 @@ class cssrcdetect(ctools.cscript):
         # Return copy of map
         return skymap_copy
 
-    def _map_moments(self, skymap):
+    def _map_moments(self, skymap, radius):
         """
         Determine moments of sky map pixels
 
@@ -216,26 +211,26 @@ class cssrcdetect(ctools.cscript):
         ----------
         skymap : `~gammalib.GSkyMap()`
             Sky map
+        radius : float
+            radius (deg) for pixel consideration
 
         Returns
         -------
-        mean, std : tuple of float
-            Mean and standard deviation of pixel values
+        mean, std : tuple of GSkyMap
+            Mean and standard deviation of pixel values within a given radius
         """
-        # Initialise mean and standard deviation
-        mean = 0.0
-        std  = 0.0
+        # Copy the input skymap
+        mean = gammalib.GSkyMap(skymap)
+        std  = gammalib.GSkyMap(skymap)
+        std *= std
 
-        # Loop over all pixels
-        for i in range(skymap.npix()):
-            mean += skymap[i]
-            std  += skymap[i]*skymap[i]
+        # Convolve by disk to get bin-by-bin mean
+        mean.smooth("DISK", radius)
+        std.smooth("DISK", radius)
 
-        # Compute mean and standard deviation
-        mean /= float(skymap.npix())
-        std  /= float(skymap.npix())
-        std  -= mean * mean
-        std   = math.sqrt(std)
+        # Compute the standard deviation for each pixel
+        std = std - (mean*mean)
+        std = std.sqrt()
 
         # Return mean and standard deviation
         return mean, std
