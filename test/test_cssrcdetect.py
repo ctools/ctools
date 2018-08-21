@@ -75,6 +75,8 @@ class Test(test):
         cmd = cssrcdetect+' inmap="'+self._map+'"'+ \
                           ' outmodel="cssrcdetect_cmd1.xml"'+ \
                           ' outds9file="cssrcdetect_cmd1.reg"'+ \
+                          ' momentradius=200.0'+ \
+                          ' smoothkernel=NONE smoothparam=0.1'+ \
                           ' srcmodel="POINT" bkgmodel="NONE" threshold=10.0'+ \
                           ' logfile="cssrcdetect_cmd1.log" chatter=1'
 
@@ -89,6 +91,8 @@ class Test(test):
         cmd = cssrcdetect+' inmap="skymap_that_does_not_exist"'+ \
                           ' outmodel="cssrcdetect_cmd1.xml"'+ \
                           ' outds9file="cssrcdetect_cmd1.reg"'+ \
+                          ' momentradius=200.0'+ \
+                          ' smoothkernel=NONE smoothparam=0.1'+ \
                           ' srcmodel="POINT" bkgmodel="NONE" threshold=10.0'+ \
                           ' logfile="cssrcdetect_cmd2.log" debug=yes chatter=2'
 
@@ -130,6 +134,9 @@ class Test(test):
         srcdetect['srcmodel']   = 'POINT'
         srcdetect['bkgmodel']   = 'NONE'
         srcdetect['threshold']  = 10.0
+        srcdetect['momentradius'] = 200.0
+        srcdetect['smoothkernel'] = "NONE"
+        srcdetect['smoothparam']  = 0.1
         srcdetect['logfile']    = 'cssrcdetect_py1.log'
         srcdetect['chatter']    = 2
 
