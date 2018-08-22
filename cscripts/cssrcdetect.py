@@ -51,6 +51,7 @@ class cssrcdetect(ctools.cscript):
         else:
             self._map = gammalib.GSkyMap()
 
+        self._map_dirs = []
         # Return
         return
 
@@ -166,7 +167,7 @@ class cssrcdetect(ctools.cscript):
         for i in range(skymap.npix()):
             if skymap[i] > value:
                 value = skymap[i]
-                pos   = skymap.inx2dir(i)
+                pos   = self._map_dirs[i]
 
         # Return sky direction of maximum
         return value, pos
@@ -194,10 +195,13 @@ class cssrcdetect(ctools.cscript):
         # Copy skymap
         skymap_copy = skymap.copy()
         
+        # Cache the cosine of the radius
+        cos_radius = math.cos(math.radians(radius))
+
         # Loop over all pixels and find maximum
         for i in range(skymap_copy.npix()):
-            skymap_dir = skymap_copy.inx2dir(i)
-            if skymap_dir.dist_deg(pos) < radius:
+            skymap_dir = self._map_dirs[i]
+            if skymap_dir.cos_dist(pos) > cos_radius:
                 skymap_copy[i] = value
 
         # Return copy of map
@@ -385,6 +389,17 @@ class cssrcdetect(ctools.cscript):
         return skymap.extract(0)
 
 
+    def _cache_map_dirs(self, skymap):
+        """
+        Cache map pixel positions to save some computation time
+        """
+        # Setup the skymap directions
+        if not skymap.is_empty():
+            self._map_dirs = [skymap.inx2dir(i) for i in range(skymap.npix())]
+        else:
+            self._map_dirs = []
+
+
     # Public methods
     def run(self):
         """
@@ -403,6 +418,8 @@ class cssrcdetect(ctools.cscript):
         # If sky map is empty then load it from input parameter
         if self._map.is_empty():
             self._map = self._load_skymap()
+
+        self._cache_map_dirs(self._map)
 
         # Smooth the map
         self._smooth_skymap(self._map)
