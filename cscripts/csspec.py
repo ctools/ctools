@@ -640,15 +640,14 @@ class csspec(ctools.csobservation):
         # Write header for fitting
         self._log_header3(gammalib.EXPLICIT, 'Performing fit')
 
-        # Perform maximum likelihood fit. Skip bins that have no events.
+        # Perform maximum likelihood fit
         like = ctools.ctlike(obs)
         like['edisp']    = self['edisp'].boolean()
         like['nthreads'] = 1  # Avoids OpenMP conflict
-        if like.obs().nobserved() > 0:
-            like.run()
+        like.run()
 
         # Continue only if log-likelihood is non-zero
-        if like.obs().logL() != 0.0 and like.obs().nobserved() > 0:
+        if like.obs().logL() != 0.0:
 
             # Get results
             fitted_models = like.obs().models()
@@ -715,7 +714,7 @@ class csspec(ctools.csobservation):
         # ... otherwise if logL is zero then signal that bin is
         # skipped
         else:
-            value = 'No event in this bin. Likelihood is zero. Bin is skipped.'
+            value = 'Likelihood is zero. Bin is skipped.'
             self._log_value(gammalib.TERSE, 'Bin '+str(i+1), value)
 
         # Return result
