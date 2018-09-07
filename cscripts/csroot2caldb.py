@@ -1658,7 +1658,7 @@ class csroot2caldb(ctools.cscript):
 
     def _make_3D_migra(self, array, hdu, name, unit, scale=1.0):
         """
-        Make 3D data column as function of ETRUE, MIGRA and THETA
+        Make 3D data column as function of ENERG, MIGRA and THETA
 
         If the HDU has already the energy and offset angle columns, this method
         will simply add another data column. If name==None, the method will not
@@ -1699,8 +1699,8 @@ class csroot2caldb(ctools.cscript):
         self._log_value(gammalib.NORMAL, 'Number of offsets', noffset)
 
         # Append axis columns to HDU
-        self._append_column_axis(hdu, 'ETRUE_LO', 'TeV', etrue, log=True)
-        self._append_column_axis(hdu, 'ETRUE_HI', 'TeV', etrue, log=True)
+        self._append_column_axis(hdu, 'ENERG_LO', 'TeV', etrue, log=True)
+        self._append_column_axis(hdu, 'ENERG_HI', 'TeV', etrue, log=True)
         self._append_column_axis(hdu, 'MIGRA_LO', '', migra)
         self._append_column_axis(hdu, 'MIGRA_HI', '', migra)
         self._append_column_axis(hdu, 'THETA_LO', 'deg', offsets)
@@ -1719,7 +1719,7 @@ class csroot2caldb(ctools.cscript):
                         hdu[name][0,index] = value * scale
 
         # Collect boundary information
-        bd_eng   = 'ETRUE(%.4f-%.2f)TeV' % \
+        bd_eng   = 'ENERG(%.4f-%.2f)TeV' % \
                    (pow(10.0, etrue.GetBinLowEdge(1)),
                     pow(10.0, etrue.GetBinUpEdge(netrue)))
         bd_migra = 'MIGRA(%.3f-%.3f)' % \

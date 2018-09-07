@@ -2,7 +2,7 @@
 # ==========================================================================
 # Display Instrument Response Function
 #
-# Copyright (C) 2017 Juergen Knoedlseder
+# Copyright (C) 2017-2018 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -249,7 +249,10 @@ def plot_edisp(edisp, emin=None, emax=None, tmin=None, tmax=None,
         Number of offset angles
     """
     # Determine energy range
-    ieng = edisp.table().axis('ETRUE')
+    if edisp.table().has_axis('ENERG'):
+        ieng = edisp.table().axis('ENERG')
+    else:
+        ieng = edisp.table().axis('ETRUE')
     neng = edisp.table().axis_bins(ieng)
     if emin == None:
         emin = edisp.table().axis_lo(ieng, 0)

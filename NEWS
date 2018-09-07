@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-3 August 2018
+7 September 2018
 
 
 Introduction
@@ -299,6 +299,8 @@ parameter due to a bug in the code. This bug was fixed (#2448).
 
 csroot2caldb - Generates calibration database from ROOT file
 ------------------------------------------------------------
+Change energy dispersion energy axis name from "ETRUE" to "ENERG" (#2670).
+
 Change background template table name from "BGD" to "BKG" (#2343).
 
 The ROOT Python module is now imported in the run method and not globally so

@@ -32,6 +32,9 @@ Bug fixes
 Improvements
 ------------
 
+* [`2670 <https://cta-redmine.irap.omp.eu/issues/2670>`_] -
+  Use ``ENERG`` instead of ``ETRUE`` in energy dispersion axis names in
+  :ref:`csroot2caldb`
 * [`2659 <https://cta-redmine.irap.omp.eu/issues/2659>`_] -
   Add hidden ``use_irf_bkg`` parameter to :ref:`csphagen`
 * [`2656 <https://cta-redmine.irap.omp.eu/issues/2656>`_] -
