@@ -315,7 +315,7 @@ Add hidden "nthreads" parameter and implement parallelisation of computations
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-The script no longer skips energy bins with zero counts (#2672).
+The script no longer skips energy bins with zero counts (#2671).
 
 The full true energy range of the RMF is now used in an On/Off analysis to
 prevent cutting off the tails of the energy dispersion, which happened before

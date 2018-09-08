@@ -32,7 +32,7 @@ Bug fixes
 Improvements
 ------------
 
-* [`2672 <https://cta-redmine.irap.omp.eu/issues/2672>`_] -
+* [`2671 <https://cta-redmine.irap.omp.eu/issues/2671>`_] -
   Do not skip bins with zero counts in :ref:`csspec`
 * [`2670 <https://cta-redmine.irap.omp.eu/issues/2670>`_] -
   Use ``ENERG`` instead of ``ETRUE`` in energy dispersion axis names in

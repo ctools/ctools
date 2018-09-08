@@ -3,7 +3,7 @@
         * Version 1.6.0 released
         ========================
 
-        Do not skip bins with zero counts in csspec (#2672)
+        Do not skip bins with zero counts in csspec (#2671)
         Use "ENERG" instead of "ETRUE" in energy dispersion axis names in csroot2caldb (#2670)
         Add hidden "use_irf_bkg" parameter to csphagen (#2659)
         Use full RMF true energy range for On/Off analysis in csspec (#2656)
