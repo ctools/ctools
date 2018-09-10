@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-7 September 2018
+10 September 2018
 
 
 Introduction
@@ -335,7 +335,12 @@ certain amount (#2233).
 
 cssrcdetect - Detects sources in sky map
 ----------------------------------------
-None
+The script was made more robust by optionally convolving the input sky map
+with a smoothing kernel with a specified correlation radius (options are a
+"DISK" or a "GAUSSIAN" kernel, default is now "DISK"). In addition, the mean
+and standard deviation of the pixel values are now computed locally over a
+given radius, controlled through the "avgrad" parameter. This accomodates for
+counts variations in the field of view (#2498).
 
 
 cstsdist - Computes Test Statistic distribution

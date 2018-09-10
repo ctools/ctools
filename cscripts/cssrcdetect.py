@@ -77,15 +77,15 @@ class cssrcdetect(ctools.cscript):
         self['fit_shape'].boolean()
 
         # Query the smoothing parameters
-        self['smoothkernel'].string()
-        if self['smoothkernel'].string().upper() != 'NONE':
-            self['smoothparam'].real()
+        self['avgrad'].real()
+        self['corr_kern'].string()
+        if self['corr_kern'].string().upper() != 'NONE':
+            self['corr_rad'].real()
 
         # Query ahead output model filename
         if self._read_ahead():
             self['outmodel'].filename()
             self['outds9file'].filename()
-            self['momentradius'].real()
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -109,11 +109,11 @@ class cssrcdetect(ctools.cscript):
             self._log_header3(gammalib.NORMAL, 'Iteration '+str(i+1))
 
             # Get map moments
-            mean, std = self._map_moments(counts, self['momentradius'].real())
- 
+            mean, std = self._map_moments(counts, self['avgrad'].real())
+
             # Compute threshold
             sigmap = (counts - mean)/std
-            
+
             # Get maximum value and corresponding sky direction
             value, pos = self._find_maximum(sigmap)
 
@@ -126,7 +126,7 @@ class cssrcdetect(ctools.cscript):
                 # Log maximum
                 self._log_value(gammalib.NORMAL, 'Map maximum', str(value))
                 self._log_value(gammalib.NORMAL, name+' position', str(pos))
-            
+
                 # Add model
                 self._add_model(pos, name)
 
@@ -196,7 +196,7 @@ class cssrcdetect(ctools.cscript):
         """
         # Copy skymap
         skymap_copy = skymap.copy()
-        
+
         # Cache the cosine of the radius
         cos_radius = math.cos(math.radians(radius))
 
@@ -354,16 +354,13 @@ class cssrcdetect(ctools.cscript):
         self._log_header3(gammalib.NORMAL, 'Smoothing Skymap')
 
         # Make sure the smoothing kernel is not 'NONE'
-        if self['smoothkernel'].string().upper() != 'NONE':
-            self._log_value(gammalib.NORMAL, 'Kernel',
-                            self['smoothkernel'].string())
-            self._log_value(gammalib.NORMAL, 'Parameter',
-                            self['smoothparam'].real())
-            skymap.smooth(self['smoothkernel'].string(),
-                          self['smoothparam'].real())
+        if self['corr_kern'].string().upper() != 'NONE':
+            self._log_value(gammalib.NORMAL, 'Kernel', self['corr_kern'].string())
+            self._log_value(gammalib.NORMAL, 'Parameter', self['corr_rad'].real())
+            skymap.smooth(self['corr_kern'].string(), self['corr_rad'].real())
         else:
             self._log_string(gammalib.NORMAL, 
-                        'Smoothing kernel is NONE, smoothing will be ignored.')
+                'Smoothing kernel is "NONE", smoothing will be ignored.')
 
         return
 

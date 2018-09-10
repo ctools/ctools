@@ -1,4 +1,4 @@
-2018-09-07
+2018-09-10
 
         * Version 1.6.0 released
         ========================
@@ -9,6 +9,7 @@
         Use full RMF true energy range for On/Off analysis in csspec (#2656)
         Defer import of ROOT module in csroot2caldb to run method (#2652)
         Transparently update parameter files (#2513)
+        Make cssrcdetect more robust (#2498)
         Change formula for number of true energy bins in csphagen (#2490)
         Remove ctools::is_valid_filename() method
         Handle zero model for SUBDIV method in show_response.py (#2456)

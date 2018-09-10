@@ -23,16 +23,16 @@ outds9file, f, a, ds9.reg,,, "Output DS9 region file"
 #
 # Script parameters
 #==================
-srcmodel,     s, a, POINT,POINT,, "Source model type"
-bkgmodel,     s, a, NONE,NONE|IRF|AEFF|CUBE,, "Background model type"
-threshold,    r, a, 5.0,,, "Detection threshold (Gaussian sigma)"
-maxsrcs,      i, h, 20,1,1000, "Maximum number of sources"
-exclrad,      r, h, 0.2,,, "Exclusion radius (deg)"
-fit_pos,      b, h, yes,,, "Fit source positions?"
-fit_shape,    b, h, yes,,, "Fit source shapes?"
-momentradius, r, a, 200,,, "Radius (deg) for computing map mean and std-deviation values"
-smoothkernel, s, a, NONE,NONE|DISK|GAUSSIAN,,"Smoothing kernel to use for smoothing the input sky map"
-smoothparam,  r, a, 0.05,,,"Smoothing kernel parameters (sigma for GAUS, radius for DISK)"
+srcmodel,  s, a, POINT,POINT,, "Source model type"
+bkgmodel,  s, a, NONE,NONE|IRF|AEFF|CUBE,, "Background model type"
+threshold, r, a, 5.0,,, "Detection threshold (Gaussian sigma)"
+maxsrcs,   i, h, 20,1,1000, "Maximum number of sources"
+avgrad,    r, h, 1.0,,, "Averaging radius (deg) for significance computation"
+corr_rad,  r, a, 0.1,,, "Correlation kernel radius (deg)"
+corr_kern, s, h, DISK,NONE|DISK|GAUSSIAN,, "Correlation kernel to apply to input sky map"
+exclrad,   r, h, 0.3,,, "Exclusion radius (deg)"
+fit_pos,   b, h, yes,,, "Fit source positions?"
+fit_shape, b, h, yes,,, "Fit source shapes?"
 
 #
 # Standard parameters
