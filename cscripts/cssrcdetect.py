@@ -51,7 +51,9 @@ class cssrcdetect(ctools.cscript):
         else:
             self._map = gammalib.GSkyMap()
 
+        # Initialise other members
         self._map_dirs = []
+
         # Return
         return
 
@@ -76,14 +78,14 @@ class cssrcdetect(ctools.cscript):
 
         # Query the smoothing parameters
         self['smoothkernel'].string()
-        if self['smoothkernel'].string().upper() != "NONE":
+        if self['smoothkernel'].string().upper() != 'NONE':
             self['smoothparam'].real()
 
         # Query ahead output model filename
         if self._read_ahead():
             self['outmodel'].filename()
             self['outds9file'].filename()
-            self["momentradius"].real()
+            self['momentradius'].real()
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -107,7 +109,7 @@ class cssrcdetect(ctools.cscript):
             self._log_header3(gammalib.NORMAL, 'Iteration '+str(i+1))
 
             # Get map moments
-            mean, std = self._map_moments(counts, self["momentradius"].real())
+            mean, std = self._map_moments(counts, self['momentradius'].real())
  
             # Compute threshold
             sigmap = (counts - mean)/std
@@ -229,8 +231,8 @@ class cssrcdetect(ctools.cscript):
         std *= std
 
         # Convolve by disk to get bin-by-bin mean
-        mean.smooth("DISK", radius)
-        std.smooth("DISK", radius)
+        mean.smooth('DISK', radius)
+        std.smooth('DISK', radius)
 
         # Compute the standard deviation for each pixel
         std = std - (mean*mean)
@@ -348,18 +350,20 @@ class cssrcdetect(ctools.cscript):
         skymap : `~gammalib.GSkyMap()`
             Sky map
         """
-        self._log_header3(gammalib.NORMAL, "Smoothing Skymap")
+        # Log header
+        self._log_header3(gammalib.NORMAL, 'Smoothing Skymap')
+
         # Make sure the smoothing kernel is not 'NONE'
         if self['smoothkernel'].string().upper() != 'NONE':
-            self._log_value(gammalib.NORMAL, "Kernel", 
+            self._log_value(gammalib.NORMAL, 'Kernel',
                             self['smoothkernel'].string())
-            self._log_value(gammalib.NORMAL, "Parameter", 
-                            self["smoothparam"].real())
+            self._log_value(gammalib.NORMAL, 'Parameter',
+                            self['smoothparam'].real())
             skymap.smooth(self['smoothkernel'].string(),
                           self['smoothparam'].real())
         else:
             self._log_string(gammalib.NORMAL, 
-                        "Smoothing kernel is NONE, smoothing will be ignored.")
+                        'Smoothing kernel is NONE, smoothing will be ignored.')
 
         return
 
