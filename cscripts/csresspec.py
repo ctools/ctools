@@ -269,6 +269,10 @@ class csresspec(ctools.csobservation):
         else:
             emax = obs[0].events().emax().TeV()
 
+        # Log energy range
+        self._log_value(gammalib.EXPLICIT, 'Minimum energy (TeV)', emin)
+        self._log_value(gammalib.EXPLICIT, 'Maximum energy (TeV)', emax)
+
         # Put ROI and E bound info in dictionary
         info = {'was_list': True, 'roi_ra': ra, 'roi_dec': dec, 'roi_rad': rad,
                 'emin': emin, 'emax': emax}
@@ -519,7 +523,7 @@ class csresspec(ctools.csobservation):
             obs.append(observation)
             obs.models(self.obs().models())
 
-            # if 3D observation
+            # If 3D observation
             if obs[0].classname() == 'GCTAObservation':
 
                 # If already binned set the evlist_info dictionary to have
