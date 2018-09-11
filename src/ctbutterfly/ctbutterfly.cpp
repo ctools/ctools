@@ -374,7 +374,6 @@ void ctbutterfly::init_members(void)
     m_srcname.clear();
     m_method.clear();
     m_confidence  = 0.68;
-    m_max_iter    = 50;
     m_apply_edisp = false;
     m_fit         = false;
     m_chatter     = static_cast<GChatter>(2);
@@ -388,10 +387,6 @@ void ctbutterfly::init_members(void)
     m_min_intensities.clear();
     m_max_intensities.clear();
     m_csv.clear();
-
-    // Set optimizer parameters
-    m_opt.max_iter(m_max_iter);
-    m_opt.max_stalls(10);
 
     // Return
     return;

@@ -399,10 +399,6 @@ void cterror::init_members(void)
     m_best_logL   = 0.0;
     m_model_par   = NULL;
 
-    // Set optimizer parameters
-    m_opt.max_iter(m_max_iter);
-    m_opt.max_stalls(10);
-
     // Return
     return;
 }

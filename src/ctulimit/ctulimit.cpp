@@ -372,10 +372,6 @@ void ctulimit::init_members(void)
     m_diff_ulimit  = 0.0;
     m_eflux_ulimit = 0.0;
 
-    // Set optimizer parameters
-    m_opt.max_iter(m_max_iter);
-    m_opt.max_stalls(10);
-
     // Return
     return;
 }

@@ -290,6 +290,19 @@ void ctlikelihood::init_members(void)
     // Initialise members
     m_opt.clear();
 
+    // Initialise optimizer characteristics
+    m_opt.max_iter(50);     // Maximum number of iterations
+    m_opt.max_stalls(10);   // Maximum number of stalls
+    m_opt.eps(0.005);       // Accuracy of maximum likelihood value
+
+    // Set optimizer characteristics from optional user parameters
+    if (has_par("like_accuracy")) {
+        m_opt.eps((*this)["like_accuracy"].real());
+    }
+    if (has_par("max_iter")) {
+        m_opt.max_iter((*this)["max_iter"].integer());
+    }
+
     // Return
     return;
 }

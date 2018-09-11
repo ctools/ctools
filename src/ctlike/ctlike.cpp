@@ -559,8 +559,6 @@ void ctlike::init_members(void)
     m_outmodel.clear();
     m_outcovmat.clear();
     m_refit           = false;
-    m_max_iter        = 100;   // Set maximum number of iterations
-    m_max_stall       = 10;    // Set maximum number of stalls
     m_logL            = 0.0;
     m_apply_edisp     = false;
     m_fix_spat_for_ts = false;
@@ -568,10 +566,6 @@ void ctlike::init_members(void)
 
     // Set logger properties
     log.date(true);
-
-    // Set optimizer parameters
-    m_opt.max_iter(m_max_iter);
-    m_opt.max_stalls(m_max_stall);
 
     // Return
     return;
@@ -589,8 +583,6 @@ void ctlike::copy_members(const ctlike& app)
     m_refit           = app.m_refit;
     m_outmodel        = app.m_outmodel;
     m_outcovmat       = app.m_outcovmat;
-    m_max_iter        = app.m_max_iter;
-    m_max_stall       = app.m_max_stall;
     m_logL            = app.m_logL;
     m_apply_edisp     = app.m_apply_edisp;
     m_fix_spat_for_ts = app.m_fix_spat_for_ts;

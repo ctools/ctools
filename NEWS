@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-10 September 2018
+11 September 2018
 
 
 Introduction
@@ -61,7 +61,8 @@ None
 
 ctbutterfly - Generate butterfly diagrams
 -----------------------------------------
-None
+Add hidden "like_accuracy" parameter to allow control of the accuracy of
+the maximum log-likelikelihood value (#2662).
 
 
 ctcubemask - CTA cube filtering
@@ -76,6 +77,9 @@ None
 
 cterror - Likelihood profile error computation
 ----------------------------------------------
+Add hidden "like_accuracy" parameter to allow control of the accuracy of
+the maximum log-likelikelihood value (#2662).
+
 Add hidden "nthreads" parameter to control parallel computations (#2421).
 
 
@@ -86,6 +90,9 @@ None
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
+Add hidden "like_accuracy" parameter to allow control of the accuracy of
+the maximum log-likelikelihood value (#2662).
+
 Add hidden "nthreads" parameter to control parallel computations (#2421).
 
 
@@ -150,11 +157,15 @@ accurately computes the distances between sky map pixels (#2309).
 
 cttsmap - Generation of Test Statistic map
 ------------------------------------------
-None
+Add hidden "like_accuracy" parameter to allow control of the accuracy of
+the maximum log-likelikelihood value (#2662).
 
 
 ctulimit - Compute upper limit
 ------------------------------
+Add hidden "like_accuracy" parameter to allow control of the accuracy of
+the maximum log-likelikelihood value (#2662).
+
 Add "parname" parameter to allow upper limit computations also for a node
 function spectral model. In addition, it is now checked that the parameter
 values actually bracket the upper limit (#2233).
@@ -356,7 +367,8 @@ None
 
 cstsmapsplit - Prepare split Test Statistic computation
 -------------------------------------------------------
-None
+Add hidden "like_accuracy" parameter to allow control of the accuracy of
+the maximum log-likelikelihood value (#2662).
 
 
 csviscube - Generate visibility cube

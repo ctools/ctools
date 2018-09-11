@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -75,8 +75,6 @@ protected:
     GChatter  m_chatter;         //!< Chattiness
 
     // Members
-    int       m_max_iter;        //!< Maximum number of iterations
-    int       m_max_stall;       //!< Maximum number of stalls
     double    m_logL;            //!< Maximum log likelihood
 };
 

@@ -32,10 +32,11 @@ outmodel, f, a, results.xml,,, "Output model definiton XML file"
 #
 # Error calculation parameters
 #=============================
-confidence, r, h, 0.68,0.0,1.0, "Confidence level"
-tol,        r, h, 1e-3,,, "Computation tolerance"
-statistic,  s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statistic"
-max_iter,   i, h, 50,1,1000, "Maximum number of iterations"
+confidence,    r, h, 0.68,0.0,1.0, "Confidence level"
+tol,           r, h, 1e-3,,, "Computation tolerance"
+statistic,     s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statistic"
+like_accuracy, r, h, 0.005,1.0e-30,0.1, "Absolute accuracy of maximum likelihood value"
+max_iter,      i, h, 50,1,1000, "Maximum number of iterations"
 
 #
 # Standard parameters

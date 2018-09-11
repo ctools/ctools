@@ -32,10 +32,11 @@ method,     s, h, GAUSSIAN, GAUSSIAN|ENVELOPE,,"Butterfly computation method"
 #
 # Butterfly parameters
 #=====================
-fit,        b, h, no,,, "Perform maximum likelihood fitting?"
-confidence, r, h, 0.68,0.0,1.0, "Confidence level"
-statistic,  s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statistic"
-matrix,     f, h, NONE,,, "Input covariance Matrix FITS file"
+fit,           b, h, no,,, "Perform maximum likelihood fitting?"
+confidence,    r, h, 0.68,0.0,1.0, "Confidence level"
+statistic,     s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statistic"
+like_accuracy, r, h, 0.005,1.0e-30,0.1, "Absolute accuracy of maximum likelihood value"
+matrix,        f, h, NONE,,, "Input covariance Matrix FITS file"
 
 #
 # Energy binning parameters

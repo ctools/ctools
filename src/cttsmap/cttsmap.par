@@ -31,8 +31,9 @@ outmap,    f, a, tsmap.fits,,, "Output Test Statistic map file"
 #
 # TS map computation parameters
 #==============================
-errors,    b, h, no,,, "Compute and store parameter errors?"
-statistic, s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statistic"
+errors,        b, h, no,,, "Compute and store parameter errors?"
+statistic,     s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statistic"
+like_accuracy, r, h, 0.005,1.0e-30,0.1, "Absolute accuracy of maximum likelihood value"
 
 #
 # Spatial binning parameters

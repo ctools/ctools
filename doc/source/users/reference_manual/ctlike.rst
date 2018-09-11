@@ -105,6 +105,12 @@ General parameters
 ``(refit = no) [boolean]``
     Perform refitting of solution after initial fit.
 
+``(like_accuracy = 0.005) [real]``
+    Absolute accuracy of maximum likelihood value. Reducing this value will
+    increase the number of iterations and provide a more accurate maximum
+    log likelihood value. Converserly, decreasing the value will result in less
+    iterations at the expense of a less accurate maximum likelihood value.
+
 ``(fix_spat_for_ts = no) [boolean]``
     Fix spatial parameters for TS computation.
 

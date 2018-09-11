@@ -61,6 +61,12 @@ General parameters
     observations, and ``CHI2`` uses the Chi squared statistic for all
     binned or stacked observations.
 
+``(like_accuracy = 0.005) [real]``
+    Absolute accuracy of maximum likelihood value. Reducing this value will
+    increase the number of iterations and provide a more accurate maximum
+    log likelihood value. Converserly, decreasing the value will result in less
+    iterations at the expense of a less accurate maximum likelihood value.
+
 ``outmap [file]``
     Output Test Statistic map file.
 
