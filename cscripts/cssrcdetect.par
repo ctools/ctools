@@ -24,7 +24,7 @@ outds9file, f, a, ds9.reg,,, "Output DS9 region file"
 # Script parameters
 #==================
 srcmodel,  s, a, POINT,POINT,, "Source model type"
-bkgmodel,  s, a, NONE,NONE|IRF|AEFF|CUBE,, "Background model type"
+bkgmodel,  s, a, NONE,NONE|IRF|AEFF|CUBE|RACC,, "Background model type"
 threshold, r, a, 5.0,,, "Detection threshold (Gaussian sigma)"
 maxsrcs,   i, h, 20,1,1000, "Maximum number of sources"
 avgrad,    r, h, 1.0,,, "Averaging radius (deg) for significance computation"

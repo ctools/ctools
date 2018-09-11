@@ -271,24 +271,30 @@ class cssrcdetect(ctools.cscript):
         Parameters
         ----------
         modeltype : str
-            Model type ('IRF', 'AEFF' or 'CUBE')
+            Model type ('IRF', 'AEFF', 'CUBE' or 'RACC')
 
         Returns
         -------
         model : `~gammalib.GModelData()`
             Background model
         """
-        # Set spectral component
-        spectral = gammalib.GModelSpectralPlaw(1.0, 0.0,
-                                               gammalib.GEnergy(1.0, 'TeV'))
+        # Pivot energy
+        epivot = gammalib.GEnergy(1.0, 'TeV')
 
         # Set background model
         if modeltype == 'IRF':
-            model = gammalib.GCTAModelIrfBackground(spectral)
+            spectral = gammalib.GModelSpectralPlaw(1.0, 0.0, epivot)
+            model    = gammalib.GCTAModelIrfBackground(spectral)
         elif modeltype == 'AEFF':
-            model = gammalib.GCTAModelAeffBackground(spectral)
+            spectral = gammalib.GModelSpectralPlaw(1.0e-13, -2.5, epivot)
+            model    = gammalib.GCTAModelAeffBackground(spectral)
         elif modeltype == 'CUBE':
-            model = gammalib.GCTAModelCubeBackground(spectral)
+            spectral = gammalib.GModelSpectralPlaw(1.0, 0.0, epivot)
+            model    = gammalib.GCTAModelCubeBackground(spectral)
+        elif modeltype == 'RACC':
+            radial   = gammalib.GCTAModelRadialGauss(3.0)
+            spectral = gammalib.GModelSpectralPlaw(1.0e-4, -2.5, epivot)
+            model    = gammalib.GCTAModelRadialAcceptance(radial, spectral)
         else:
             model = None
 

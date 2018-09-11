@@ -36,13 +36,13 @@ General parameters
     point sources with power law spectral shapes to the model definition
     XML file.
 
-``bkgmodel <NONE|IRF|AEFF|CUBE> [string]``
+``bkgmodel <NONE|IRF|AEFF|CUBE|RACC> [string]``
     Background model type. Using ``NONE`` no background model will be added
     to the model definition XML file. Using ``IRF`` a background model based
     on the template information in the Instrument Response Function will be
     added. Using ``AEFF`` a background model based on the shape of the effective
     area will be added. Using ``CUBE`` a background model for stacked analysis
-    will be added.
+    will be added. Using ``RACC`` a radial acceptance model will be added.
 
 ``threshold [real]``
     Detection threshold (Gaussian sigma). Only sources above this detection
