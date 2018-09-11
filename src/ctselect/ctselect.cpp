@@ -714,8 +714,8 @@ void ctselect::select_events(GCTAObservation*   obs,
     GCTARoi  old_roi     = list->roi();
     GEbounds old_ebounds = list->ebounds();
 
-    // Determine new energy boundaries for selection
-    // taking into account previous existing ones
+    // Determine new energy boundaries for selection taking into account
+    // previous existing ones
     double   emin    = 0.0;
     double   emax    = 0.0;
     GEbounds ebounds = set_ebounds(obs, list->ebounds());
@@ -1081,6 +1081,11 @@ void ctselect::select_events(GCTAObservation*   obs,
         list->ebounds(ebounds);
     }
 
+    // ... otherwise set new boundaries
+    else if (ebounds.size() > 0) {
+        list->ebounds(ebounds);
+    }
+
     // ... otherwise restore old Ebounds if they existed
     else if (old_ebounds.size() > 0) {
         list->ebounds(old_ebounds);
@@ -1156,7 +1161,7 @@ GEbounds ctselect::set_ebounds(GCTAObservation* obs, const GEbounds& ebounds) co
     if (m_usethres == "DEFAULT") {
 
         // Get CTA IRF respsonse pointer and throw exception if we don't
-        //  find IRF
+        // find IRF
         const GCTAResponseIrf* rsp = dynamic_cast<const GCTAResponseIrf*>
                                                              (obs->response());
         if (rsp == NULL) {
@@ -1190,7 +1195,7 @@ GEbounds ctselect::set_ebounds(GCTAObservation* obs, const GEbounds& ebounds) co
             emax = hi_save_thres;
         }
 
-    } //endif: usethres was "DEFAULT"
+    } // endif: usethres was "DEFAULT"
 
     // ... otherwise check if a user specified threshold should be applied
     else if (m_usethres == "USER") {
@@ -1220,7 +1225,7 @@ GEbounds ctselect::set_ebounds(GCTAObservation* obs, const GEbounds& ebounds) co
             emax = hi_user_thres;
         }
 
-    } // endif: usethres was "USER
+    } // endif: usethres was "USER"
 
     // Set selection energy boundaries
     GEbounds result;
