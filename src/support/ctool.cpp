@@ -1629,7 +1629,8 @@ void ctool::set_obs_bounds(GObservations& obs)
         // If there are no energy boundaries then read the "emin" and "emax"
         // user parameters and add them
         if (list->ebounds().is_empty()) {
-            if (has_par("emin") && has_par("emax")) {
+            if (has_par("emin") && (*this)["emin"].is_valid() &&
+                has_par("emax") && (*this)["emax"].is_valid()) {
                 double emin((*this)["emin"].real());
                 double emax((*this)["emax"].real());
                 GEbounds ebounds(GEnergy(emin, "TeV"),
