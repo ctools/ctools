@@ -7,4 +7,6 @@ Analysing public H.E.S.S. data
    :maxdepth: 1
 
    data
-
+   select_events
+   skymap
+   fitting
