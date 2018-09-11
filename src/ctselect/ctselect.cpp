@@ -561,9 +561,13 @@ void ctselect::get_parameters(void)
     get_gti(GTimeReference());
 
     // Get energy selection parameters
+    m_usethres = (*this)["usethres"].string();
     if ((*this)["emin"].is_valid() && (*this)["emax"].is_valid()) {
         m_emin          = (*this)["emin"].real();
         m_emax          = (*this)["emax"].real();
+        m_select_energy = true;
+    }
+    else if ((m_usethres == "DEFAULT") || (m_usethres == "USER")) {
         m_select_energy = true;
     }
 
@@ -645,9 +649,8 @@ void ctselect::get_parameters(void)
     } // endif: phase selection parameters were valid
 
     // Get other User parameters
-    m_expr     = (*this)["expr"].string();
-    m_usethres = (*this)["usethres"].string();
-    m_chatter  = static_cast<GChatter>((*this)["chatter"].integer());
+    m_expr    = (*this)["expr"].string();
+    m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
 
     // If needed later, query output filename and prefix now
     if (read_ahead()) {
@@ -1078,11 +1081,6 @@ void ctselect::select_events(GCTAObservation*   obs,
     if (m_select_energy) {
         GEbounds ebounds;
         ebounds.append(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
-        list->ebounds(ebounds);
-    }
-
-    // ... otherwise set new boundaries
-    else if (ebounds.size() > 0) {
         list->ebounds(ebounds);
     }
 
