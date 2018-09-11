@@ -43,6 +43,8 @@ Improvements
   Use full ``RMF`` true energy range for On/Off analysis in :ref:`csspec`
 * [`2513 <https://cta-redmine.irap.omp.eu/issues/2513>`_] -
   Transparently update parameter files
+* [`2498 <https://cta-redmine.irap.omp.eu/issues/2498>`_] -
+  Make :ref:`cssrcdetect` more robust
 * [`2490 <https://cta-redmine.irap.omp.eu/issues/2490>`_] -
   Change formula for number of true energy bins in :ref:`csphagen`
 * [`2421 <https://cta-redmine.irap.omp.eu/issues/2421>`_] -

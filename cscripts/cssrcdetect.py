@@ -51,6 +51,9 @@ class cssrcdetect(ctools.cscript):
         else:
             self._map = gammalib.GSkyMap()
 
+        # Initialise other members
+        self._map_dirs = []
+
         # Return
         return
 
@@ -72,6 +75,12 @@ class cssrcdetect(ctools.cscript):
         self['exclrad'].real()
         self['fit_pos'].boolean()
         self['fit_shape'].boolean()
+
+        # Query the smoothing parameters
+        self['avgrad'].real()
+        self['corr_kern'].string()
+        if self['corr_kern'].string().upper() != 'NONE':
+            self['corr_rad'].real()
 
         # Query ahead output model filename
         if self._read_ahead():
@@ -100,20 +109,13 @@ class cssrcdetect(ctools.cscript):
             self._log_header3(gammalib.NORMAL, 'Iteration '+str(i+1))
 
             # Get map moments
-            mean, std = self._map_moments(counts)
+            mean, std = self._map_moments(counts, self['avgrad'].real())
 
-            # Log map moments
-            self._log_value(gammalib.NORMAL, 'Map mean', mean)
-            self._log_value(gammalib.NORMAL, 'Map standard deviation', std)
- 
             # Compute threshold
-            threshold = mean + self['threshold'].real() * std
-
-            # Log map threshold
-            self._log_value(gammalib.NORMAL, 'Map threshold', threshold)
+            sigmap = (counts - mean)/std
 
             # Get maximum value and corresponding sky direction
-            value, pos = self._find_maximum(counts, threshold=threshold)
+            value, pos = self._find_maximum(sigmap)
 
             # If maximum found then log maximum and add model
             if pos is not None:
@@ -124,12 +126,12 @@ class cssrcdetect(ctools.cscript):
                 # Log maximum
                 self._log_value(gammalib.NORMAL, 'Map maximum', str(value))
                 self._log_value(gammalib.NORMAL, name+' position', str(pos))
-            
+
                 # Add model
                 self._add_model(pos, name)
 
                 # Remove maximum from map
-                counts = self._remove_maximum(counts, pos, mean,
+                counts = self._remove_maximum(counts, pos, mean(pos),
                                               radius=self['exclrad'].real())
 
             # ... otherwise log that no maximum was found and break iterations
@@ -145,7 +147,7 @@ class cssrcdetect(ctools.cscript):
         # Return
         return
 
-    def _find_maximum(self, skymap, threshold=0.0):
+    def _find_maximum(self, skymap):
         """
         Find maximum in a sky map
 
@@ -153,8 +155,6 @@ class cssrcdetect(ctools.cscript):
         ----------
         skymap : `~gammalib.GSkyMap()`
             Sky map
-        threshold : float, optional
-            Threshold for maximum value
 
         Returns
         -------
@@ -162,14 +162,14 @@ class cssrcdetect(ctools.cscript):
             Maximum sky map value and corresponding sky direction
         """
         # Initialise maximum pixel value and sky direction
-        value = threshold
+        value = self['threshold'].real()
         pos   = None
 
         # Loop over all pixels and find maximum
         for i in range(skymap.npix()):
             if skymap[i] > value:
                 value = skymap[i]
-                pos   = skymap.inx2dir(i)
+                pos   = self._map_dirs[i]
 
         # Return sky direction of maximum
         return value, pos
@@ -196,17 +196,20 @@ class cssrcdetect(ctools.cscript):
         """
         # Copy skymap
         skymap_copy = skymap.copy()
-        
+
+        # Cache the cosine of the radius
+        cos_radius = math.cos(math.radians(radius))
+
         # Loop over all pixels and find maximum
         for i in range(skymap_copy.npix()):
-            skymap_dir = skymap_copy.inx2dir(i)
-            if skymap_dir.dist_deg(pos) < radius:
+            skymap_dir = self._map_dirs[i]
+            if skymap_dir.cos_dist(pos) > cos_radius:
                 skymap_copy[i] = value
 
         # Return copy of map
         return skymap_copy
 
-    def _map_moments(self, skymap):
+    def _map_moments(self, skymap, radius):
         """
         Determine moments of sky map pixels
 
@@ -214,26 +217,26 @@ class cssrcdetect(ctools.cscript):
         ----------
         skymap : `~gammalib.GSkyMap()`
             Sky map
+        radius : float
+            radius (deg) for pixel consideration
 
         Returns
         -------
-        mean, std : tuple of float
-            Mean and standard deviation of pixel values
+        mean, std : tuple of GSkyMap
+            Mean and standard deviation of pixel values within a given radius
         """
-        # Initialise mean and standard deviation
-        mean = 0.0
-        std  = 0.0
+        # Copy the input skymap
+        mean = gammalib.GSkyMap(skymap)
+        std  = gammalib.GSkyMap(skymap)
+        std *= std
 
-        # Loop over all pixels
-        for i in range(skymap.npix()):
-            mean += skymap[i]
-            std  += skymap[i]*skymap[i]
+        # Convolve by disk to get bin-by-bin mean
+        mean.smooth('DISK', radius)
+        std.smooth('DISK', radius)
 
-        # Compute mean and standard deviation
-        mean /= float(skymap.npix())
-        std  /= float(skymap.npix())
-        std  -= mean * mean
-        std   = math.sqrt(std)
+        # Compute the standard deviation for each pixel
+        std = std - (mean*mean)
+        std = std.sqrt()
 
         # Return mean and standard deviation
         return mean, std
@@ -338,6 +341,30 @@ class cssrcdetect(ctools.cscript):
         return model
 
 
+    def _smooth_skymap(self, skymap):
+        """
+        Smooth the input sky map if a valid kernel was supplied
+
+        Parameters
+        ----------
+        skymap : `~gammalib.GSkyMap()`
+            Sky map
+        """
+        # Log header
+        self._log_header3(gammalib.NORMAL, 'Smoothing Skymap')
+
+        # Make sure the smoothing kernel is not 'NONE'
+        if self['corr_kern'].string().upper() != 'NONE':
+            self._log_value(gammalib.NORMAL, 'Kernel', self['corr_kern'].string())
+            self._log_value(gammalib.NORMAL, 'Parameter', self['corr_rad'].real())
+            skymap.smooth(self['corr_kern'].string(), self['corr_rad'].real())
+        else:
+            self._log_string(gammalib.NORMAL, 
+                'Smoothing kernel is "NONE", smoothing will be ignored.')
+
+        return
+
+
     def _load_skymap(self):
         """
         Load sky map
@@ -360,7 +387,18 @@ class cssrcdetect(ctools.cscript):
         fits.close()
 
         # Return
-        return skymap
+        return skymap.extract(0)
+
+
+    def _cache_map_dirs(self, skymap):
+        """
+        Cache map pixel positions to save some computation time
+        """
+        # Setup the skymap directions
+        if not skymap.is_empty():
+            self._map_dirs = [skymap.inx2dir(i) for i in range(skymap.npix())]
+        else:
+            self._map_dirs = []
 
 
     # Public methods
@@ -378,12 +416,17 @@ class cssrcdetect(ctools.cscript):
         # Get parameters
         self._get_parameters()
 
-        # Write header
-        self._log_header1(gammalib.NORMAL, 'Source detection')
-
         # If sky map is empty then load it from input parameter
         if self._map.is_empty():
             self._map = self._load_skymap()
+
+        self._cache_map_dirs(self._map)
+
+        # Smooth the map
+        self._smooth_skymap(self._map)
+
+        # Write header
+        self._log_header1(gammalib.NORMAL, 'Source detection')
 
         # Detect sources
         self._detect_sources(self._map)

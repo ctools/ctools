@@ -51,6 +51,17 @@ General parameters
 ``(maxsrcs = 20) [integer]``
     Maximum number of sources that should be detected.
 
+``(avgrad = 1.0) [real]``
+    Averaging radius for significance computation (degrees). The script computes
+    the mean pixel value and standard deviation value over this radius and
+    uses the result to estimate the excess significance.
+
+``corr_rad [real]``
+    Correlation kernel radius (degrees).
+
+``(corr_kern = DISK) <NONE|DISK|GAUSSIAN> [string]``
+    Correlation kernel to use for smoothing the input sky map.
+
 ``(exclrad = 0.2) [real]``
     Radius around a detected source that is excluded from further source
     detection (degrees).

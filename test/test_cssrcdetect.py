@@ -33,7 +33,7 @@ class Test(test):
     This test class makes unit tests for the cssrcdetect script by using it
     from the command line and from Python.
     """
-    
+
     # Constructor
     def __init__(self):
         """
@@ -75,7 +75,8 @@ class Test(test):
         cmd = cssrcdetect+' inmap="'+self._map+'"'+ \
                           ' outmodel="cssrcdetect_cmd1.xml"'+ \
                           ' outds9file="cssrcdetect_cmd1.reg"'+ \
-                          ' srcmodel="POINT" bkgmodel="NONE" threshold=10.0'+ \
+                          ' corr_rad=0.1'+ \
+                          ' srcmodel="POINT" bkgmodel="NONE" threshold=8.0'+ \
                           ' logfile="cssrcdetect_cmd1.log" chatter=1'
 
         # Check if execution was successful
@@ -89,7 +90,8 @@ class Test(test):
         cmd = cssrcdetect+' inmap="skymap_that_does_not_exist"'+ \
                           ' outmodel="cssrcdetect_cmd1.xml"'+ \
                           ' outds9file="cssrcdetect_cmd1.reg"'+ \
-                          ' srcmodel="POINT" bkgmodel="NONE" threshold=10.0'+ \
+                          ' corr_rad=0.1'+ \
+                          ' srcmodel="POINT" bkgmodel="NONE" threshold=8.0'+ \
                           ' logfile="cssrcdetect_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
@@ -129,9 +131,10 @@ class Test(test):
         srcdetect['outds9file'] = 'cssrcdetect_py1.reg'
         srcdetect['srcmodel']   = 'POINT'
         srcdetect['bkgmodel']   = 'NONE'
-        srcdetect['threshold']  = 10.0
+        srcdetect['threshold']  = 8.0
+        srcdetect['corr_rad']   = 0.1
         srcdetect['logfile']    = 'cssrcdetect_py1.log'
-        srcdetect['chatter']    = 2
+        srcdetect['chatter']    = 4
 
         # Run cssrcdetect script and save models
         srcdetect.logFileOpen()   # Make sure we get a log file
@@ -146,6 +149,7 @@ class Test(test):
         srcdetect['outmodel']   = 'cssrcdetect_py2.xml'
         srcdetect['outds9file'] = 'cssrcdetect_py2.reg'
         srcdetect['bkgmodel']   = 'IRF'
+        srcdetect['threshold']  = 8.0
         srcdetect['logfile']    = 'cssrcdetect_py2.log'
         srcdetect['chatter']    = 3
         srcdetect.logFileOpen()  # Needed to get a new log file
@@ -168,6 +172,6 @@ class Test(test):
         # Check number of models
         self.test_value(models.size(), number, 'Check for '+str(number)+
                         ' models in XML file')
-        
+
         # Return
         return
