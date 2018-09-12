@@ -245,13 +245,13 @@ void ctmodel::run(void)
     {
         // Create a models object for this core
         GModels models(m_obs.models());
-        
+
         #pragma omp for schedule(static,1)
         for (int i = 0; i < m_obs.size(); ++i) {
-            
+
             // Get CTA observation
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-            
+
             // Skip observation if it's not CTA
             if (obs == NULL) {
                 log_header3(TERSE, get_obs_header(m_obs[i]));
@@ -259,14 +259,14 @@ void ctmodel::run(void)
                 " observation";
                 log_string(NORMAL, msg);
             }
-            
+
             // Fill cube and leave loop if we are binned mode (meaning we
             // only have one binned observation)
             else if (m_binned) {
                 fill_cube(obs, models);
                 i = m_obs.size();
             }
-            
+
             // Skip observation if we have a binned observation
             else if (obs->eventtype() == "CountsCube") {
                 log_header3(TERSE, get_obs_header(m_obs[i]));
@@ -274,22 +274,22 @@ void ctmodel::run(void)
                 " observation";
                 log_string(NORMAL, msg);
             }
-            
+
             // Otherwise, everything seems to be fine, so fill the cube from obs
             else {
                 // Fill the cube
                 fill_cube(obs, models);
-                
+
                 // Dispose events to free memory if event file exists on disk
                 if (obs->eventfile().length() > 0 && obs->eventfile().exists()) {
                     obs->dispose_events();
                 }
             }
-            
+
         } // endfor: looped over observations
 
     } // end openmp parallel section
-    
+
     // Write model cube into header
     log_header1(NORMAL, "Model cube");
     log_string(NORMAL, m_cube.print());
@@ -589,7 +589,7 @@ void ctmodel::get_parameters(void)
 
         // Attach GTI of observations to model cube
         m_cube.gti(m_obs[0]->events()->gti());
-    
+
         // Attach model cube to observations
         m_obs[0]->events(m_cube);
 
@@ -695,7 +695,7 @@ void ctmodel::get_obs(void)
                                       "energy dispersion cube was specified.";
                     throw GException::invalid_value(G_GET_OBS, msg);
                 }
-            
+
             } // endif: energy dispersion needed
 
             // ... otherwise work without energy dispersion
@@ -877,7 +877,7 @@ void ctmodel::fill_cube(const GCTAObservation* obs, GModels& models)
 
     // Extract copy of models from observation container
     GModels ex_models = trim_models(models, roi);
-    
+
     // Get pointer to event cube pixels
     double* pixels = const_cast<double*>(m_cube.counts().pixels());
 
@@ -887,7 +887,6 @@ void ctmodel::fill_cube(const GCTAObservation* obs, GModels& models)
     // Set event bin attributes that are constant for a counts cube
     bin.time(m_time);
     bin.ontime(obs->ontime());
-    bin.weight(1.0);
 
     // Loop over all the spatial bins
     for (int i = 0; i < npix; ++i) {
@@ -915,10 +914,11 @@ void ctmodel::fill_cube(const GCTAObservation* obs, GModels& models)
                 continue;
             }
 
-            // Set energy, energy width and energy index of bin
+            // Set energy, energy width, energy index and weight of bin
             bin.energy(m_energy[iebin]);
             bin.ewidth(m_ewidth[iebin]);
             bin.ieng(iebin);
+            bin.weight(m_cube[ibin]->weight());
 
             // Compute model value for cube bin
             double model = models.eval(bin, *obs) * bin.size();
@@ -936,7 +936,7 @@ void ctmodel::fill_cube(const GCTAObservation* obs, GModels& models)
 
     // Re-append the models to the main model
     models.extend(ex_models);
-    
+
     // Update GTIs
     #pragma omp critical(ctmodel_fill_cube)
     {
