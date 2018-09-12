@@ -298,7 +298,7 @@ def plot_residuals(filename, plotfile, hdu):
             axarr[0].step(ebounds, component, zorder=0, label=table[s].name())
 
     # Add legend
-    axarr[0].legend(loc='best')
+    axarr[0].legend(loc='best', prop={'size': 10})
 
     # Show figure
     if len(plotfile) > 0:

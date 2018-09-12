@@ -1,7 +1,7 @@
 .. _hess_dr1_sky_map:
 
-Generating a sky map from the events
-------------------------------------
+Generating a sky map and finding sources
+----------------------------------------
 
   .. admonition:: What you will learn
 
