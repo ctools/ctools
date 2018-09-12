@@ -329,7 +329,7 @@ def show_residuals():
 
     # Extract script parameters from options
     plotfile = options[0]['value']
-    hdu      = options[1]['value']
+    hdu      = int(options[1]['value'])
 
     # Show residuals
     plot_residuals(args[0], plotfile, hdu)
