@@ -216,17 +216,11 @@ void ctbkgcube::run(void)
     // Get task parameters
     get_parameters();
 
-    // Warn if there are not enough energy bins
-    log_string(TERSE, warn_too_few_energies(m_background.energies()));
-
     // Write input observation container into logger
     log_observations(NORMAL, m_obs, "Input observation");
 
     // Write input model container into logger
     log_models(NORMAL, m_obs.models(), "Input model");
-
-    // Initialise exposure cube
-    init_cube();
 
     // Write header
     log_header1(TERSE, "Prepare model");
@@ -518,68 +512,6 @@ void ctbkgcube::get_parameters(void)
 
     // Write parameters into logger
     log_parameters(TERSE);
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Initialise background cube
- *
- * Initialise the background cube.
- ***************************************************************************/
-void ctbkgcube::init_cube(void)
-{
-    // Write header
-    log_header1(TERSE, "Initialise background cube");
-
-    // Extract exposure cube definition
-    const GWcs* proj   = static_cast<const GWcs*>(m_background.cube().projection());
-    std::string wcs    = m_background.cube().projection()->code();
-    std::string coords = m_background.cube().projection()->coordsys();
-    double      x      = proj->crval(0);
-    double      y      = proj->crval(1);
-    double      dx     = proj->cdelt(0);
-    double      dy     = proj->cdelt(1);
-    int         nx     = m_background.cube().nx();
-    int         ny     = m_background.cube().ny();
-
-    // Extract energies
-    GEnergies energies = m_background.energies();
-
-    // If requested, insert energies at all event list energy boundaries
-    if (m_addbounds) {
-
-        // Loop over all observations
-        for (int i = 0; i < m_obs.size(); ++i) {
-    
-            // Get observation and continue only if it is a CTA observation
-            const GCTAObservation* cta = dynamic_cast<const GCTAObservation*>
-                                         (m_obs[i]);
-
-            // Skip observation if it's not a CTA observation
-            if (cta == NULL) {
-                continue;
-            }
-
-            // Skip observation if it does not contain an event list
-            if (cta->eventtype() != "EventList") {
-                continue;
-            }
-
-            // Insert energy boundaries
-            energies = insert_energy_boundaries(energies, *cta);
-
-        } // endfor: looped over all observations
-
-       } // endif: energy bin insertion requested
-
-    // Setup background cube
-    m_background = GCTACubeBackground(wcs, coords, x, y, dx, dy, nx, ny, energies);
-
-    // Write background cube into logger
-    log_string(NORMAL, m_background.print(m_chatter));
 
     // Return
     return;

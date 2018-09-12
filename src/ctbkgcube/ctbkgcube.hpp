@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2018 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -68,7 +68,6 @@ protected:
     void copy_members(const ctbkgcube& app);
     void free_members(void);
     void get_parameters(void);
-    void init_cube(void);
 
     // User parameters
     GFilename          m_outcube;     //!< Filename of output cube
