@@ -633,7 +633,9 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
         psfcube.logFileOpen()
     psfcube.run()
 
-    # Create background cube
+    # Create background cube. Note that we use the same energy binning as
+    # for the counts cube since no interpolation should be actually done
+    # for the background cube.
     bkgcube = ctools.ctbkgcube(obs)
     bkgcube['incube']    = 'NONE'
     bkgcube['usepnt']    = usepnt
@@ -641,7 +643,7 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     bkgcube['binsz']     = binsz
     bkgcube['nxpix']     = nxpix
     bkgcube['nypix']     = nypix
-    bkgcube['enumbins']  = _enumbins
+    bkgcube['enumbins']  = enumbins
     bkgcube['emin']      = emin
     bkgcube['emax']      = emax
     bkgcube['coordsys']  = coordsys
