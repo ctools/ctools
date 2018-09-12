@@ -478,7 +478,7 @@ class Test(test):
                         'Check number of PSF cube maps')
         self.test_value(res['bkgcube'].cube().npix(), 100,
                         'Check number of background cube pixels')
-        self.test_value(res['bkgcube'].cube().nmaps(), 61,
+        self.test_value(res['bkgcube'].cube().nmaps(), 5,
                         'Check number of background cube maps')
 
         # Get stacked response with None xref/yref
@@ -499,7 +499,7 @@ class Test(test):
                         'Check number of PSF cube maps')
         self.test_value(res['bkgcube'].cube().npix(), 100,
                         'Check number of background cube pixels')
-        self.test_value(res['bkgcube'].cube().nmaps(), 61,
+        self.test_value(res['bkgcube'].cube().nmaps(), 5,
                         'Check number of background cube maps')
 
         # Get stacked response with xref/yref set and large number of energy bins
@@ -520,7 +520,7 @@ class Test(test):
                         'Check number of PSF cube maps')
         self.test_value(res['bkgcube'].cube().npix(), 100,
                         'Check number of background cube pixels')
-        self.test_value(res['bkgcube'].cube().nmaps(), 101,
+        self.test_value(res['bkgcube'].cube().nmaps(), 100,
                         'Check number of background cube maps')
 
         # Get stacked response with energy dispersion
@@ -541,7 +541,7 @@ class Test(test):
                         'Check number of PSF cube maps')
         self.test_value(res['bkgcube'].cube().npix(), 100,
                         'Check number of background cube pixels')
-        self.test_value(res['bkgcube'].cube().nmaps(), 61,
+        self.test_value(res['bkgcube'].cube().nmaps(), 5,
                         'Check number of background cube maps')
         self.test_value(res['edispcube'].cube().npix(), 4,
                         'Check number of energy dispersion cube pixels')

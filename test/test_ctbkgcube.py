@@ -116,7 +116,7 @@ class Test(test):
 
         # Check that empty ctbkgcube tool holds a background cube that has
         # no energy bins
-        self._check_cube(bkgcube.bkgcube(), nenergies=0)
+        self._check_cube(bkgcube.bkgcube(), nebounds=0)
 
         # Check that saving does not nothing
         bkgcube['outcube']  = 'ctbkgcube_py0.fits'
@@ -209,7 +209,7 @@ class Test(test):
 
         # Check that the cleared copy has also cleared the background cube
         # and model container
-        self._check_cube(cpy_bkgcube.bkgcube(), nenergies=0)
+        self._check_cube(cpy_bkgcube.bkgcube(), nebounds=0)
         self._check_models(cpy_bkgcube.models(), nmodels=0)
 
         # Get mixel observation container
@@ -243,13 +243,13 @@ class Test(test):
         bkgcube.execute()
 
         # Check result files
-        self._check_result_files('ctbkgcube_py5', nenergies=8)
+        self._check_result_files('ctbkgcube_py5')
 
         # Return
         return
 
     # Check result files
-    def _check_result_files(self, filename, nenergies=6, nmodels=2):
+    def _check_result_files(self, filename, nebounds=5, nmodels=2):
         """
         Check result file
 
@@ -257,8 +257,8 @@ class Test(test):
         ----------
         filename : str
             Test file name without extension
-        nenergies : int, optional
-            Number of energy bins
+        nebounds : int, optional
+            Number of energy boundaries
         """
         # Open background cube
         cube = gammalib.GCTACubeBackground(filename+'.fits')
@@ -267,7 +267,7 @@ class Test(test):
         models = gammalib.GModels(filename+'.xml')
 
         # Check cube
-        self._check_cube(cube, nenergies=nenergies)
+        self._check_cube(cube, nebounds=nebounds)
 
         # Check models
         self._check_models(models, nmodels=nmodels)
@@ -276,7 +276,7 @@ class Test(test):
         return
 
     # Check background cube
-    def _check_cube(self, cube, nenergies=6):
+    def _check_cube(self, cube, nebounds=5):
         """
         Check background cube
 
@@ -284,11 +284,11 @@ class Test(test):
         ----------
         cube : `~gammalib.GCTACubeBackground`
             Background cube
-        nenergies : int, optional
-            Number of energy bins
+        nebounds : int, optional
+            Number of energy boundaries
         """
         # Check dimensions
-        self.test_value(len(cube.energies()), nenergies,
+        self.test_value(len(cube.ebounds()), nebounds,
              'Check number of energy maps')
 
         # Return
