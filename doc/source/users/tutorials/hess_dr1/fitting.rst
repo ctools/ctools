@@ -118,6 +118,10 @@ The fit has converged and the source was fitted at a position of
 :math:`22.025 \pm 0.002` degrees in Declination.
 The statistical :math:`1\sigma` positional uncertainty corresponds to 0.12 arcmin.
 Systematic uncertainties are not computed.
+This can be compared to the values of
+:math:`83.629 \pm 0.005` degrees in Right Ascension and
+:math:`22.012 \pm 0.001` degrees in Declination reported in
+`Holler et al. (2017) <https://arxiv.org/pdf/1707.04196.pdf>`_.
 
 According to
 `SIMBAD <http://cdsportal.u-strasbg.fr/?target=Crab%20nebula>`_,
@@ -128,13 +132,37 @@ from the fitted position.
 The intensity at 1 TeV of the Crab was fitted to
 :math:`(4.81 \pm 0.26) \times 10^{-11}\,{\rm photons}\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm TeV}^{-1}`
 the spectral index of the power law is
-:math:`-2.58 \pm 0.01`.
+:math:`-2.71 \pm 0.07`.
 This can be compared to the values of
 :math:`(3.45 \pm 0.05) \times 10^{-11}\,{\rm photons}\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm TeV}^{-1}`
 and
 :math:`-2.63 \pm 0.01`
 reported in
-`Aharonian et al. (2016), A&A, 457, 899 <https://www.aanda.org/articles/aa/abs/2006/39/aa5351-06/aa5351-06.html>`_.
+`Aharonian et al. (2006), A&A, 457, 899 <https://www.aanda.org/articles/aa/abs/2006/39/aa5351-06/aa5351-06.html>`_.
+
+.. note::
+   In the :ref:`ctlike` run above the energy dispersion, which relates the
+   true photon energies to the energies of the reconstructed events, was
+   not taken into account.
+   **By default energy dispersion usage is disabled** since it involves an
+   extra dimension in the data analysis which slows down the computations.
+   To enable energy dispersion you have to run :ref:`ctlike` with the
+   ``edisp=yes`` argument:
+
+   .. code-block:: bash
+
+      $ ctlike debug=yes edisp=yes
+      Input event list, counts cube or observation definition XML file [events.fits] obs_crab_selected.xml
+      Input model definition XML file [$CTOOLS/share/models/crab.xml] crab_models.xml
+      Output model definition XML file [crab_results.xml]
+
+   Taking into account the energy dispersion, the fitted source position is
+   :math:`83.621 \pm 0.003` degrees in Right Ascension and
+   :math:`22.024 \pm 0.002` degrees in Declination,
+   the fitted source intensity at 1 TeV is
+   :math:`(4.64 \pm 0.26) \times 10^{-11}\,{\rm photons}\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm TeV}^{-1}`
+   and the fitted spectral index is
+   :math:`-2.61 \pm 0.07`.
 
 Following a model fit, **you should always inspect the fit residuals.**
 First let's inspect the spectral residuals.
@@ -164,20 +192,23 @@ You can do this using the :ref:`csresspec` script as follows:
 The script will produce the FITS file ``resspec.fits`` that contains the
 spectral residuals for each of the model components.
 To display the residuals you can use the ``show_residuals.py`` script in the
-example folder.
-Apparently there as still significant spectral residuals that cannot be
-explained by the model, yet overall, the model provides a reasonable first order
-approximation of the data.
+example folder as follows:
 
 .. code-block:: bash
 
    $CTOOLS/share/examples/python/show_residuals.py resspec.fits
 
+The figure below shows the resulting residual spectrum.
+Although the model provides a reasonable first order approximation of the
+spectral distribution of the data, there are still significant spectral
+residuals that cannot be explained by the model.
+
 .. figure:: fitting_resspec.png
    :width: 600px
    :align: center
 
-   *Residual spectrum*
+   *Residual counts spectrum after model fitting*
+
 
 Finally you should also inspect the spatial residuals.
 You do this using the :ref:`csresmap` script as follows:
@@ -213,3 +244,12 @@ south-east of the fitted Crab nebula position.
    :align: center
 
    *Residual map with a slight Gaussian smoothing applied*
+
+.. note::
+   If the energy dispersion should be taken into account you also have to
+   specify the ``edisp=yes`` argument in the residual computations:
+
+   .. code-block:: bash
+
+      $ csresspec components=yes edisp=yes
+      $ csresmap edisp=yes
