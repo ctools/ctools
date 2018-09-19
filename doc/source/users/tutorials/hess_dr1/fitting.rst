@@ -151,7 +151,7 @@ reported in
 
    .. code-block:: bash
 
-      $ ctlike debug=yes edisp=yes
+      $ ctlike edisp=yes
       Input event list, counts cube or observation definition XML file [events.fits] obs_crab_selected.xml
       Input model definition XML file [$CTOOLS/share/models/crab.xml] crab_models.xml
       Output model definition XML file [crab_results.xml]

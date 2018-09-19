@@ -19,7 +19,7 @@ To create the sky map, type:
 
 .. code-block:: bash
 
-   $ ctskymap debug=yes
+   $ ctskymap
    Input event list or observation definition XML file [events.fits] obs_crab_selected.xml
    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
