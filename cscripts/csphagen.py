@@ -463,14 +463,14 @@ class csphagen(ctools.csobservation):
             On/Off spectra, background regions, observation id
         """
         # Retrieve observation from container
-        obs = self.obs()[i]
+        onoff   = None
+        bkg_reg = None
+        obs     = self.obs()[i]
 
         # Skip non CTA observations
         if obs.classname() != 'GCTAObservation':
             self._log_string(gammalib.NORMAL, 'Skip %s observation "%s"' % \
                              (obs.instrument(), obs.id()))
-            onoff = 0
-            bkg_reg = 0
 
         # Otherwise calculate On/Off spectra
         else:
@@ -527,15 +527,18 @@ class csphagen(ctools.csobservation):
         outobs : `~gammalib.GObservations`
             Observation container with result appended
         """
-        # If the results contain an On/Off observation
-        if result['onoff'].classname() == 'GCTAOnOffObservation':
+        # Continue only if result is valid
+        if result['onoff'] != None:
+        
+            # If the results contain an On/Off observation
+            if result['onoff'].classname() == 'GCTAOnOffObservation':
 
-            # Append observation to observation container
-            outobs.append(result['onoff'])
+                # Append observation to observation container
+                outobs.append(result['onoff'])
 
-            # Append background regions
-            self._bkg_regs.append({'regions': result['bkg_reg'],
-                                   'id': result['id']})
+                # Append background regions
+                self._bkg_regs.append({'regions': result['bkg_reg'],
+                                      'id': result['id']})
 
         # Return observation container
         return outobs

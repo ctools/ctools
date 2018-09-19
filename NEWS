@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-11 September 2018
+19 September 2018
 
 
 Introduction
@@ -208,6 +208,8 @@ None
 
 cslightcrv - Generate light curve
 ---------------------------------
+Add hidden "use_irf_bkg" parameter for forwarding to csphagen.
+
 Add hidden "nthreads" parameter and implement parallelisation of light
 curve computation (#2421).
 

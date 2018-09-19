@@ -1,8 +1,9 @@
-2018-09-11
+2018-09-19
 
         * Version 1.6.0 released
         ========================
 
+        Add "use_irf_bkg" parameter to cslightcrv
         Add "like_accuracy" parameter to likelihood tools and scripts (#2662)
         Do not skip bins with zero counts in csspec (#2671)
         Use "ENERG" instead of "ETRUE" in energy dispersion axis names in csroot2caldb (#2670)
