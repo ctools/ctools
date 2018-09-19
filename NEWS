@@ -131,6 +131,9 @@ None
 
 ctselect - CTA event selection
 ------------------------------
+Avoid an error in case that the RoI radius is identical to the existing RoI
+radius (#2682).
+
 Interpret MET specified by "tmin" and "tmax" parameters in the time reference
 of the input observations (#2054). 
 

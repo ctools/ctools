@@ -11,8 +11,10 @@ Synopsis
 
 This tool selects events from one or several event lists. Event selection 
 is based on a circular acceptance region, a time interval and an energy 
-interval. In addition, any expression following the cfitsio syntax can be 
-used for event selection.
+interval. If any of these default selections are to be skipped, the
+user should set the relative parameters to ``INDEF`` (or ``NONE``,
+``UNDEF``, ``UNDEFINED``). In addition, any expression following the cfitsio
+syntax can be used for event selection.
 
 The circular acceptance region is centred by default at the pointing direction
 of each observation, but the user can specify a custom direction. To obtain in
@@ -35,7 +37,7 @@ of ``prefix`` prepended to the file name that contains only the selected
 events. In addition, a new observation definition file will be written 
 that references the new FITS files.
 
-For each event file, the event selection parameters will be writted as data
+For each event file, the event selection parameters will be written as data
 selection keywords to the FITS header. These keywords are mandatory for any
 unbinned maximum likelihood analysis of the event data.
 

@@ -928,17 +928,19 @@ void ctselect::select_events(GCTAObservation*   obs,
             double distance = centre.dist_deg(roi_centre);
 
             // If the requested RoI and selected RoI are centred at the same
-            // position and the requested RoI is bigger then the original
-            // keep original radius
+            // position and the requested RoI is bigger or same size as
+            // the original keep original radius
             // RoIs same centre = distance < 1.e-4
             // to cope with numerical precision limitations
-            if ((distance < 1.e-4) && (rad > roi_radius)) {
+            if ((distance < 1.e-4) && (rad >= roi_radius)) {
                 rad = roi_radius;
             }
 
             // ... otherwise, check if requested RoI is enclosed within
             // original RoI
-            else if ((distance + rad) > roi_radius) {
+            // enclosed = distance + rad - roi_radius > 1.e-4
+            // to cope with numerical precision limitations
+            else if ((distance + rad - roi_radius) > 1.e-4) {
 
                 // If selection is enforced log warning and store
                 if (m_forcesel) {

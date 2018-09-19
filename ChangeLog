@@ -3,6 +3,7 @@
         * Version 1.6.0 released
         ========================
 
+        Avoid ctselect error in case that RoI radius is unchanged (#2682)
         Add "use_irf_bkg" parameter to cslightcrv
         Add "like_accuracy" parameter to likelihood tools and scripts (#2662)
         Do not skip bins with zero counts in csspec (#2671)

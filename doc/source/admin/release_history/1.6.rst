@@ -19,6 +19,8 @@ In particular, this release provides:
 Bug fixes
 ---------
 
+* [`2682 <https://cta-redmine.irap.omp.eu/issues/2682>`_] -
+  Avoid :ref:`ctselect` error in case that RoI radius is unchanged
 * [`2652 <https://cta-redmine.irap.omp.eu/issues/2652>`_] -
   Defer import of ``ROOT`` module in :ref:`csroot2caldb` to run method
 * [`2456 <https://cta-redmine.irap.omp.eu/issues/2456>`_] -
