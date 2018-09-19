@@ -41,6 +41,21 @@ direction:
    Start time (UTC string, JD, MJD or MET in seconds) [NONE]
    Output event list or observation definition XML file [selected_events.fits] obs_crab_selected.xml
 
+.. warning::
+   If you encounter the error
+
+   .. code-block:: none
+
+      *** ERROR encounterted in the execution of ctselect. Run aborted ...
+      *** ERROR in ctselect::run(): Invalid value. Invalid RoI selection: the new RoI must be enclosed in the original RoI
+
+   then run the :ref:`ctselect` tool with the ``forcesel=yes`` option:
+
+   .. code-block:: bash
+
+      $ ctselect usethres=DEFAULT forcesel=yes
+
+
 Below is an excerpt of the log file that was created by :ref:`ctselect`.
 You will find that the following energy ranges were applied for the
 observations:
