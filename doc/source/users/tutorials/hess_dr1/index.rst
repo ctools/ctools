@@ -10,3 +10,4 @@ Analysing public H.E.S.S. data
    select_events
    skymap
    fitting
+   classical
