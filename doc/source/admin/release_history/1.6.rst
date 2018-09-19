@@ -72,9 +72,9 @@ Improvements
   Accelerate `IRF` and `RING` background methods in :ref:`ctskymap`
 * [`2233 <https://cta-redmine.irap.omp.eu/issues/2233>`_] -
   Add upper limit computation is :ref:`csspec` for ``NODES`` method
-* [`2045 <https://cta-redmine.irap.omp.eu/issues/2045>`_] -
+* [`2054 <https://cta-redmine.irap.omp.eu/issues/2054>`_] -
   Define MET with respect to the observation time reference or the ``mjdref``
-  user parameter (#2054)
+  user parameter
 
 
 New features
