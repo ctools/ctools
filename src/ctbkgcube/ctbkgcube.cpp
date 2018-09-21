@@ -296,6 +296,18 @@ void ctbkgcube::run(void)
     // Fill background cube from observations
     m_background.fill(m_obs, logger);
 
+    // Un-normalize background cube. We do this since the counts cube weight is
+    // later multiplied when computing the model value for binned analysis.
+    GSkyMap* bkg = const_cast<GSkyMap*>(&m_background.cube());
+    for (int pixel = 0; pixel < m_cube.npix(); ++pixel) {
+        for (int iebin = 0; iebin < m_cube.ebins(); ++iebin) {
+            double weight = m_cube.weights()(pixel, iebin);
+            if (weight > 0.0) {
+                (*bkg)(pixel, iebin) /= weight;
+            }
+        }
+    }
+
     // Create a background model for the output background cube and append
     // that model to the input model in place of the original
     // background models
@@ -432,6 +444,7 @@ void ctbkgcube::init_members(void)
 
     // Initialise protected members
     m_background.clear();
+    m_cube.clear();
     m_bkgmdl.clear();
     m_outmdl.clear();
 
@@ -456,6 +469,7 @@ void ctbkgcube::copy_members(const ctbkgcube& app)
 
     // Copy protected members
     m_background = app.m_background;
+    m_cube       = app.m_cube;
     m_bkgmdl     = app.m_bkgmdl;
     m_outmdl     = app.m_outmdl;
 
@@ -486,15 +500,21 @@ void ctbkgcube::get_parameters(void)
     // event lists, but do not accept counts cubes.
     setup_observations(m_obs, true, true, false);
 
-    // If the "incube" file name is valid then setup the background cube from
-    // the counts cube. Otherwise create a counts cube from the user
+    // If there is a valid event cube than use it for construction.
+    // Otherwise check if "incube" file name is valid then use the specified
+    // counts cube. Otherwise create a counts cube from the user
     // parameters
-    GCTAEventCube cube = (*this)["incube"].is_valid()
-                         ? GCTAEventCube((*this)["incube"].filename())
-                         : create_cube(m_obs);
+    if (m_cube.size() == 0) {
+        if ((*this)["incube"].is_valid()) {
+            m_cube = GCTAEventCube((*this)["incube"].filename());
+        }
+        else {
+            m_cube = create_cube(m_obs);
+        }
+    }
 
     // Define background cube
-    m_background = GCTACubeBackground(cube);
+    m_background = GCTACubeBackground(m_cube);
 
     // Setup models from "inmodel" parameter
     setup_models(m_obs);

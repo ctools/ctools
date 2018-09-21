@@ -61,8 +61,11 @@ ctbkgcube - CTA background cube generation
 ------------------------------------------
 Add ctbkgcube::cntcube() method so that a counts cube be specified as
 instance before running the tool. This avoids storing the counts cube on
-disk if the couts cube definition should be used to generate a background
-cube (#2685).
+disk if the counts cube definition should be used to generate a background
+cube. In addition, the background cube values are now devided by the
+weight values of the counts cube since later, during model evaluation,
+the model is multiplied by the weight values. This makes sure that the
+normalisation is correct (#2685).
 
 
 ctbutterfly - Generate butterfly diagrams
