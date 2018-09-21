@@ -59,6 +59,7 @@ public:
     void                      run(void);
     void                      save(void);
     void                      publish(const std::string& name = "");
+    void                      cntcube(const GCTAEventCube& cntcube);
     const GCTACubeBackground& bkgcube(void) const;
     const GModels&            models(void) const;
 
@@ -78,9 +79,26 @@ protected:
 
     // Protected members
     GCTACubeBackground m_background;  //!< Background cube
+    GCTAEventCube      m_cube;        //!< Event cube
     GModels            m_bkgmdl;      //!< CTA background models
     GModels            m_outmdl;      //!< Output models
 };
+
+
+/***********************************************************************//**
+ * @brief Set event cube
+ *
+ * @param[in] Event cube.
+ ***************************************************************************/
+inline
+void ctbkgcube::cntcube(const GCTAEventCube& cntcube)
+{
+    // Set counts cube
+    m_cube = cntcube;
+
+    // Return
+    return;
+}
 
 
 /***********************************************************************//**
@@ -94,7 +112,6 @@ const GCTACubeBackground& ctbkgcube::bkgcube(void) const
     // Return background cube
     return (m_background);
 }
-
 
 
 /***********************************************************************//**

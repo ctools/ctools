@@ -1,8 +1,9 @@
-2018-09-19
+2018-09-21
 
         * Version 1.6.0 released
         ========================
 
+        Add ctbkgcube::cntcube() method (#2685)
         Avoid ctselect error in case that RoI radius is unchanged (#2682)
         Add "use_irf_bkg" parameter to cslightcrv
         Add "like_accuracy" parameter to likelihood tools and scripts (#2662)
