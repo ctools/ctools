@@ -517,7 +517,7 @@ def set_observations(ra, dec, rad, tstart, duration, emin, emax, irf, caldb,
 def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
                          emin=0.1, emax=100.0, enumbins=20, edisp=False,
                          coordsys='GAL', proj='TAN', addbounds=False,
-                         log=False, debug=False, chatter=2):
+                         cntcube=None, log=False, debug=False, chatter=2):
     """
     Get stacked response cubes
 
@@ -556,6 +556,8 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
         Projection
     addbounds : bool, optional
         Add boundaries at observation energies
+    cntcube : `~gammalib.GCTAEventCube`, optional
+        Counts cube
     log : bool, optional
         Create log file(s)
     debug : bool, optional
@@ -637,23 +639,26 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     # for the counts cube since no interpolation should be actually done
     # for the background cube.
     bkgcube = ctools.ctbkgcube(obs)
-    bkgcube['incube']    = 'NONE'
+    if cntcube != None:
+        bkgcube.cntcube(cntcube)
+    else:
+        bkgcube['incube']    = 'NONE'
+        bkgcube['ebinalg']   = 'LOG'
+        bkgcube['binsz']     = binsz
+        bkgcube['nxpix']     = nxpix
+        bkgcube['nypix']     = nypix
+        bkgcube['enumbins']  = enumbins
+        bkgcube['emin']      = emin
+        bkgcube['emax']      = emax
+        bkgcube['coordsys']  = coordsys
+        bkgcube['proj']      = proj
+        if not usepnt:
+            bkgcube['xref'] = xref
+            bkgcube['yref'] = yref
     bkgcube['usepnt']    = usepnt
-    bkgcube['ebinalg']   = 'LOG'
-    bkgcube['binsz']     = binsz
-    bkgcube['nxpix']     = nxpix
-    bkgcube['nypix']     = nypix
-    bkgcube['enumbins']  = enumbins
-    bkgcube['emin']      = emin
-    bkgcube['emax']      = emax
-    bkgcube['coordsys']  = coordsys
-    bkgcube['proj']      = proj
     bkgcube['addbounds'] = addbounds
     bkgcube['debug']     = debug
     bkgcube['chatter']   = chatter
-    if not usepnt:
-        bkgcube['xref'] = xref
-        bkgcube['yref'] = yref
     if log:
         bkgcube.logFileOpen()
     bkgcube.run()
@@ -735,6 +740,10 @@ def get_stacked_obs(cls, obs):
     cntcube['proj']     = cls['proj'].string()
     cntcube.run()
 
+    # Store counts cube so that we can use it to build the background
+    # cube
+    cube = cntcube.cube().copy()
+
     # Write header
     if cls._logExplicit():
         cls._log.header3('Creating stacked response')
@@ -751,7 +760,8 @@ def get_stacked_obs(cls, obs):
                                     enumbins=cls['enumbins'].integer(),
                                     edisp=cls['edisp'].boolean(),
                                     coordsys=cls['coordsys'].string(),
-                                    proj=cls['proj'].string())
+                                    proj=cls['proj'].string(),
+                                    cntcube=cube)
 
     # Retrieve a new oberservation container
     new_obs = cntcube.obs().copy()
