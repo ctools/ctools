@@ -3,6 +3,7 @@
         * Version 1.6.0 released
         ========================
 
+        Account for varying energy thresholds in ctbin weight computation (#2685)
         Add ctbkgcube::cntcube() method (#2685)
         Avoid ctselect error in case that RoI radius is unchanged (#2682)
         Add "use_irf_bkg" parameter to cslightcrv

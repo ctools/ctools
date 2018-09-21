@@ -276,6 +276,35 @@ void ctbin::run(void)
 
     } // endfor: looped over observations
 
+    // Compute total livetime in all observations
+    double livetime = 0.0;
+    for (int i = 0; i < obs_list.size(); ++i) {
+        livetime += obs_list[i]->livetime();
+    }
+
+    // Compute livetime fraction per energy bin so that varying energy
+    // thresholds are correctly taken into account in the weighting
+    // array. Computational speed is not optimum, we have to see later
+    // whether this is an issue.
+    for (int iebin = 0; iebin < m_ebounds.size(); ++iebin) {
+        double livetime_ebin = 0.0;
+        for (int i = 0; i < obs_list.size(); ++i) {
+            const GCTAEventList* events = dynamic_cast<const GCTAEventList*>(obs_list[i]->events());
+            std::vector<bool>    usage  = cube_layer_usage(m_ebounds, events->ebounds());
+            if (usage[iebin]) {
+                livetime_ebin += obs_list[i]->livetime();
+            }
+        }
+        if (livetime > 0.0) {
+            double fraction = livetime_ebin / livetime;
+            for (int pixel = 0; pixel < m_counts.npix(); ++pixel) {
+                if (m_weights(pixel, iebin) > 0.0) {
+                    m_weights(pixel, iebin) *= fraction;
+                }
+            }
+        }
+    }
+
     // Build event cube (needs to come before obs_cube() since this method
     // relies on correct setting of m_cube)
     m_cube = GCTAEventCube(m_counts, m_weights, m_ebounds, m_gti);

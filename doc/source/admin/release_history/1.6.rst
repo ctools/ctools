@@ -36,6 +36,7 @@ Improvements
 
 * [`2685 <https://cta-redmine.irap.omp.eu/issues/2685>`_] -
   Add ``ctbkgcube::cntcube()`` method
+  Accout for varying energy thresholds in :ref:`ctbin` weight computation
 * Add ``use_irf_bkg`` parameter to :ref:`cslightcrv`
 * [`2671 <https://cta-redmine.irap.omp.eu/issues/2671>`_] -
   Do not skip bins with zero counts in :ref:`csspec`

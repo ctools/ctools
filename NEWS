@@ -49,6 +49,9 @@ of the filename is now done by the GApplicationPar class.
 
 ctbin - CTA event binning
 -------------------------
+ctbin now accouts for varying energy thresholds when computing the weight
+array (#2685).
+
 Add hidden "nthreads" parameter to control parallel computations (#2421).
 
 Copy the time reference from the first input observation (#2054).
