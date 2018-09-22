@@ -1,8 +1,10 @@
-2018-09-21
+2018-09-22
 
         * Version 1.6.0 released
         ========================
 
+        Do no longer set missing boundaries in ctool::get_observations and
+          ctool::setup_observations (#2686)
         Unnormalize background cube values in ctbkgcube (#2685)
         Account for varying energy thresholds in ctbin weight computation (#2685)
         Add ctbkgcube::cntcube() method (#2685)

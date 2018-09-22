@@ -19,6 +19,9 @@ In particular, this release provides:
 Bug fixes
 ---------
 
+* [`2686 <https://cta-redmine.irap.omp.eu/issues/2686>`_] -
+  Do no longer set missing boundaries in ``ctool::get_observations`` and
+  ``ctool::setup_observations``
 * [`2682 <https://cta-redmine.irap.omp.eu/issues/2682>`_] -
   Avoid :ref:`ctselect` error in case that RoI radius is unchanged
 * [`2652 <https://cta-redmine.irap.omp.eu/issues/2652>`_] -

@@ -388,11 +388,6 @@ void ctool::sync_pfiles(void)
  * observations in the container. In case that no response information is
  * required, the @p response argument should be set to @p false. See the
  * set_response() method for details.
- *
- *
- * The method will also setup the observation boundaries for all CTA
- * observations in the container that contain event lists. For details, see
- * the set_obs_bounds() method.
  ***************************************************************************/
 void ctool::setup_observations(GObservations& obs,
                                const bool&    response,
@@ -479,9 +474,6 @@ void ctool::setup_observations(GObservations& obs,
     if (response) {
         set_response(obs);
     }
-
-    // Setup boundaries for all CTA observations containing event lists
-    set_obs_bounds(obs);
 
     // Return
     return;
@@ -1735,9 +1727,6 @@ GObservations ctool::get_observations(const bool& get_response)
                 set_response(obs);
 
             } // endif: response was required
-
-            // Set observation boundary parameters (emin, emax, rad)
-            set_obs_bounds(obs);
 
             // Signal that XML file should be used for storage
             m_use_xml = true;

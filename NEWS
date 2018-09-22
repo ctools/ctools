@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-21 September 2018
+22 September 2018
 
 
 Introduction
@@ -140,6 +140,14 @@ None
 
 ctselect - CTA event selection
 ------------------------------
+Do no longer set missing energy and RoI boundaries in ctool::get_observations
+and ctool::setup_observations since this led to a problem in ctselect. For
+H.E.S.S. data, where the boundaries are not set, the boundaries were preset
+with the User parameters, which made event selection with the usepnt=no option
+impossible. It is not clear why the setting of missing boundaries was introduced
+but it looks like a dangerous thing to do. The setting has therefore been
+removed (#2686).
+
 Avoid an error in case that the RoI radius is identical to the existing RoI
 radius (#2682).
 
