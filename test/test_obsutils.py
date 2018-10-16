@@ -255,7 +255,7 @@ class Test(test):
         obs.append(run)
         obs.models(gammalib.GModels(self._model))
 
-        # Simulate stacked observations
+        # Simulate On/Off observations
         res = obsutils.sim(obs, onsrc='Crab', nbins=5)
 
         # Check simulation results
@@ -263,6 +263,8 @@ class Test(test):
         self.test_value(res.models().size(), 2, 'Check number of models')
         self.test_value(res.nobserved(), 46, 'Check number of observed events')
         self.test_value(res.npred(), 0.0, 'Check number of predicted events')
+
+        # Check results of first observation
         self.test_value(res[0].on_spec().ebounds().emin().TeV(), 1.0,
                         'Check minimum energy of On spectrum')
         self.test_value(res[0].on_spec().ebounds().emax().TeV(), 10.0,
@@ -277,7 +279,7 @@ class Test(test):
                         'Check maximum energy of Off spectrum')
         self.test_value(res[0].off_spec().ebounds().size(), 5,
                         'Check number of energy bins of Off spectrum')
-        self.test_value(res[0].off_spec().counts(), 2,
+        self.test_value(res[0].off_spec().counts(), 1,
                         'Check number of events in of Off spectrum')
         self.test_value(res[0].arf().ebounds().emin().TeV(), 0.5,
                         'Check minimum energy of ARF')
@@ -296,6 +298,42 @@ class Test(test):
         self.test_value(res[0].rmf().emeasured().emax().TeV(), 10.0,
                         'Check maximum reconstructed energy of RMF')
         self.test_value(res[0].rmf().emeasured().size(), 5,
+                        'Check number of reconstructed energy bins of RMF')
+
+        # Check results of second observation
+        self.test_value(res[1].on_spec().ebounds().emin().TeV(), 1.0,
+                        'Check minimum energy of On spectrum')
+        self.test_value(res[1].on_spec().ebounds().emax().TeV(), 10.0,
+                        'Check maximum energy of On spectrum')
+        self.test_value(res[1].on_spec().ebounds().size(), 5,
+                        'Check number of energy bins of On spectrum')
+        self.test_value(res[1].on_spec().counts(), 22,
+                        'Check number of events in of On spectrum')
+        self.test_value(res[1].off_spec().ebounds().emin().TeV(), 1.0,
+                        'Check minimum energy of Off spectrum')
+        self.test_value(res[1].off_spec().ebounds().emax().TeV(), 10.0,
+                        'Check maximum energy of Off spectrum')
+        self.test_value(res[1].off_spec().ebounds().size(), 5,
+                        'Check number of energy bins of Off spectrum')
+        self.test_value(res[1].off_spec().counts(), 0,
+                        'Check number of events in of Off spectrum')
+        self.test_value(res[1].arf().ebounds().emin().TeV(), 0.5,
+                        'Check minimum energy of ARF')
+        self.test_value(res[1].arf().ebounds().emax().TeV(), 12.0,
+                        'Check maximum energy of ARF')
+        self.test_value(res[1].arf().ebounds().size(), 41,
+                        'Check number of energy bins of ARF')
+        self.test_value(res[1].rmf().etrue().emin().TeV(), 0.5,
+                        'Check minimum true energy of RMF')
+        self.test_value(res[1].rmf().etrue().emax().TeV(), 12.0,
+                        'Check maximum true energy of RMF')
+        self.test_value(res[1].rmf().etrue().size(), 41,
+                        'Check number of true energy bins of RMF')
+        self.test_value(res[1].rmf().emeasured().emin().TeV(), 1.0,
+                        'Check minimum reconstructed energy of RMF')
+        self.test_value(res[1].rmf().emeasured().emax().TeV(), 10.0,
+                        'Check maximum reconstructed energy of RMF')
+        self.test_value(res[1].rmf().emeasured().size(), 5,
                         'Check number of reconstructed energy bins of RMF')
 
         # Return
