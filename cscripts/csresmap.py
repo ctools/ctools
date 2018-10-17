@@ -285,6 +285,18 @@ class csresmap(ctools.csobservation):
         # Return
         return
 
+    def resmap(self):
+        """
+        Return residual map
+
+        Returns
+        -------
+        map : `~gammalib.GSkyMap'
+            Residual sky map
+        """
+        # Return
+        return self._resmap
+
 
 # ======================== #
 # Main routine entry point #

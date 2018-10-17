@@ -703,11 +703,13 @@ class csresspec(ctools.csobservation):
         # Return
         return
 
-    def residuals(self):
+    def resspec(self):
         """
         Return residual FITS file
 
-        Returns:
+        Returns
+        -------
+        fits : `~gammalib.GFits'
             FITS file containing residuals
         """
         # Return
