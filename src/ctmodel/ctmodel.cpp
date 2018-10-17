@@ -852,6 +852,10 @@ void ctmodel::fill_cube(const GCTAObservation* obs, GModels& models)
     int npix   = m_cube.npix();
     int nebins = m_cube.ebins();
 
+    // Get reference to the pointing for DETX and DETY computation, if
+    // required
+    const GCTAPointing& pnt = obs->pointing();
+
     // Get references to GTI and energy boundaries for the event list
     const GGti&     gti         = obs->events()->gti();
     const GEbounds& obs_ebounds = obs->ebounds();
@@ -898,8 +902,15 @@ void ctmodel::fill_cube(const GCTAObservation* obs, GModels& models)
             continue;
         }
 
+        // Get instrument direction for spatial pixel. Compute DETX and DETY
+        // if they are not provided
+        GCTAInstDir dir = m_dir[i];
+        if (!dir.has_detx() || !dir.has_dety()) {
+            dir = pnt.instdir(dir.dir());
+        }
+
         // Set instrument direction, solid angle and pixel index of bin
-        bin.dir(m_dir[i]);
+        bin.dir(dir);
         bin.solidangle(m_solidangle[i]);
         bin.ipix(i);
 
