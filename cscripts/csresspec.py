@@ -703,6 +703,16 @@ class csresspec(ctools.csobservation):
         # Return
         return
 
+    def residuals(self):
+        """
+        Return residual FITS file
+
+        Returns:
+            FITS file containing residuals
+        """
+        # Return
+        return self._fits
+
 
 # ======================== #
 # Main routine entry point #
