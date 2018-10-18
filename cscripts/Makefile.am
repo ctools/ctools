@@ -21,6 +21,7 @@
 
 # Scripts to be distributed in $(pyexecdir)/cscripts
 pythonscripts = $(top_builddir)/cscripts/__init__.py \
+                $(srcdir)/csbkgmodel.py \
                 $(srcdir)/cscaldb.py \
                 $(srcdir)/csebins.py \
                 $(srcdir)/csinfo.py \
@@ -58,7 +59,8 @@ pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/mputils.py 	
 
 # Parfiles to be distributed in $(prefix)/syspfiles
-parfiles = $(srcdir)/cscaldb.par \
+parfiles = $(srcdir)/csbkgmodel.par \
+           $(srcdir)/cscaldb.par \
            $(srcdir)/csebins.par \
            $(srcdir)/cslightcrv.par \
            $(srcdir)/csmodelinfo.par \
@@ -89,7 +91,8 @@ parfiles = $(srcdir)/cscaldb.par \
            $(srcdir)/csiactobs.par
 
 # Scripts for which symbolic links will be created in bindir
-linkscripts = cscaldb \
+linkscripts = csbkgmodel \
+              cscaldb \
               csebins \
               csinfo \
               cslightcrv \

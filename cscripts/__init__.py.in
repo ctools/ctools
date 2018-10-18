@@ -24,6 +24,7 @@ cur_version = sys.version_info
 
 # List all scripts in this module
 __all__ = [
+    "csbkgmodel",
     "cscaldb",
     "csebins",
     "csinfo",
@@ -63,9 +64,10 @@ if cur_version > req_version:
                     "csiactobs"])
 
 # Import
+from cscripts.csbkgmodel    import csbkgmodel
 from cscripts.cscaldb       import cscaldb
-from cscripts.csinfo        import csinfo
 from cscripts.csebins       import csebins
+from cscripts.csinfo        import csinfo
 from cscripts.cslightcrv    import cslightcrv
 from cscripts.csmodelinfo   import csmodelinfo
 from cscripts.csmodelmerge  import csmodelmerge

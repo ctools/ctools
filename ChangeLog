@@ -1,8 +1,9 @@
-2018-10-17
+2018-10-18
 
         * Version 1.6.0 released
         ========================
 
+        Add csbkgmodel script (#2694)
         Compute DETX and DETY in ctmodel if they are not available (#2694)
         Do no longer set missing boundaries in ctool::get_observations and
           ctool::setup_observations (#2686)

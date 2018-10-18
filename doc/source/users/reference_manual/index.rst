@@ -43,6 +43,7 @@ cscripts
 .. toctree::
    :maxdepth: 1
 
+   csbkgmodel --- Generates background model for 3D analysis <csbkgmodel>
    cscaldb --- Lists available instrument response functions <cscaldb>
    csebins --- Generates energy boundaries for stacked analysis <csebins>
    cslightcrv --- Computes light curve <cslightcrv>

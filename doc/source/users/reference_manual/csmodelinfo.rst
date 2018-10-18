@@ -28,28 +28,28 @@ General parameters
 ------------------
 
 ``inmodel [file]``
-    Event list, counts cube, or observation definition file
+    Input model XML file.
 
 ``outds9file [file]``
-    Output DS9 region file containing soucre positions
+    Output DS9 region file containing soucre positions.
 
 ``(pnt_type=cross) <circle|box|diamond|cross|x|arrow|boxcircle> [string]``
-    Marker type for point sources
+    Marker type for point sources.
 
 ``(pnt_mark_size=12) [integer]``
-    Marker size for point sources
+    Marker size for point sources.
 
 ``(show_labels=yes) [boolean]``
     Add source labels?
 
 ``(width=2) [integer]``
-    Line width for regions
+    Line width for regions.
 
 ``(fontfamily=helvetica) <helvetica|times|courier> [string]``
-    Font for source labels
+    Font for source labels.
 
 ``(fontsize=12) [integer]``
-    Font size for source labels
+    Font size for source labels.
 
 ``(fontweight=normal) <normal|bold> [string]``
     Use normal or bold font?
@@ -61,10 +61,10 @@ General parameters
     Show type of extended model in source name?
 
 ``(free_color=green) [string]``
-    Color for sources with free parameters (any ds9 color or hex code)
+    Color for sources with free parameters (any ds9 color or hex code).
 
 ``(fixed_color=magenta) [string]``
-    Color for sources without free parameters (any ds9 color or hex code)
+    Color for sources without free parameters (any ds9 color or hex code).
 
 
 Standard parameters

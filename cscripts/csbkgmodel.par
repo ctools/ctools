@@ -1,0 +1,39 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      csbkgmodel.par                                                #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the csbkgmodel script                      #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,    f, a, obs.xml,,, "Input observation definition XML file"
+outmodel, f, a, model.xml,,, "Output model definition XML file"
+
+#
+# Script parameters
+#==================
+instrument, s, a, CTA,,, "Instrument name (for multi-instrument analysis)"
+spatial,    s, a, GAUSS,IRF|AEFF|GAUSS,, "Spatial model component"
+gradient,   b, a, yes,,, "Allow for spatial gradient?"
+spectral,   s, a, HESS,PLAW|HESS,, "Spectral model component"
+runwise,    b, a, yes,,, "Generate runwise background model?"
+rad,        r, h, 2.0,,, "Radius for event selection (degrees)"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Activate debugging mode?"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, csbkgmodel.log,,, "Log filename"

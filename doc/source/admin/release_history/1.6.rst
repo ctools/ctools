@@ -10,6 +10,7 @@ ctools 1.6 is a major release that adds significant functionality.
 
 In particular, this release provides:
 
+* Support for H.E.S.S. public data release analysis
 * Support for Xspec spectral analysis
 * Improved computation speed for :ref:`ctskymap` and :ref:`csphagen`
 * Parallelisation of various cscripts
@@ -89,6 +90,8 @@ Improvements
 New features
 ------------
 
+* [`2694 <https://cta-redmine.irap.omp.eu/issues/2694>`_] -
+  Add :ref:`csbkgmodel` script
 * [`2421 <https://cta-redmine.irap.omp.eu/issues/2421>`_] -
   Parallelise :ref:`cslightcrv`, :ref:`csphasecrv`, :ref:`csspec`, :ref:`cssens`,
   :ref:`csphagen`, :ref:`cspull` and :ref:`cstsdist`

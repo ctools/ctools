@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-17 October 2018
+18 October 2018
 
 
 Introduction
@@ -198,6 +198,13 @@ values actually bracket the upper limit (#2233).
 support - Support classes
 -------------------------
 None
+
+
+csbkgmodel - Generate background model for 3D analysis
+------------------------------------------------------
+Introduced the script that generates a background for a 3D analysis. This
+script is particularly useful to generate a background model for the analysis
+of the H.E.S.S. public data release (#2694).
 
 
 cscaldb - Inspect calibration database
