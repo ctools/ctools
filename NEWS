@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-22 September 2018
+17 October 2018
 
 
 Introduction
@@ -112,6 +112,10 @@ None
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
+The tools now computes DETX and DETY for every event bin if they are not
+available so that model that rely on the existence of these parameters can
+be handled (#2694).
+
 Add hidden "nthreads" parameter to control parallel computations (#2421).
 
 

@@ -703,6 +703,18 @@ class csresspec(ctools.csobservation):
         # Return
         return
 
+    def resspec(self):
+        """
+        Return residual FITS file
+
+        Returns
+        -------
+        fits : `~gammalib.GFits'
+            FITS file containing residuals
+        """
+        # Return
+        return self._fits
+
 
 # ======================== #
 # Main routine entry point #

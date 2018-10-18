@@ -1066,8 +1066,9 @@ void ctselect::select_events(GCTAObservation*   obs,
     // If RoI selection has been applied without forcing then set the event
     // list RoI
     if (select_roi && !enforced_roi) {
-        GCTAInstDir instdir;
-        instdir.dir().radec_deg(ra, dec);
+        GSkyDir     skydir;
+        skydir.radec_deg(ra, dec);
+        GCTAInstDir instdir(skydir);
         list->roi(GCTARoi(instdir, rad));
     }
 
