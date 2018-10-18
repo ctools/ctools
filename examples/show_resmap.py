@@ -29,11 +29,44 @@ try:
 except (ImportError, RuntimeError):
     print('This script needs the "matplotlib" module')
     sys.exit()
-try:
-    import numpy as np
-except ImportError:
-    print('This script needs the "numpy" module')
-    sys.exit()
+
+
+# ============ #
+# Create array #
+# ============ #
+def create_array(map,step_nx=10,step_ny=10,step_neng=1):
+    """
+    """
+    # Initialise array of values
+    values = []
+
+    # Loop over sky map
+    for ix in range(0,map.nx(),step_nx):
+        for iy in range(0,map.ny(),step_ny):
+            for ieng in range(0,map.nmaps(),step_neng):
+
+                # Initialise value
+                value = 0.0
+
+                # Loop over sub block
+                for ix_sub in range(step_nx):
+                    ix_abs = ix + ix_sub
+                    if ix_abs < map.nx():
+                        for iy_sub in range(step_ny):
+                            iy_abs = iy + iy_sub
+                            if iy_abs < map.ny():
+                                inx = ix_abs + iy_abs*map.nx()
+                                for ieng_sub in range(step_neng):
+                                    ieng_abs = ieng + ieng_sub
+                                    if ieng_abs < map.nmaps():
+                                        value += map(inx,ieng_abs)
+
+                # If value differs from zero than append it
+                if value != 0.0:
+                    values.append(value)
+
+    # Return values
+    return values
 
 
 # ================= #
@@ -56,7 +89,7 @@ def plot_resmap(filename, nbins, plotfile):
     map = gammalib.GSkyMap(filename)
 
     # Create array of values
-    values = map.array()
+    values = create_array(map)
 
     # Create histogram
     _, bins, _ = plt.hist(values, nbins, range=[-4.0,4.0],
