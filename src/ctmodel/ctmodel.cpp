@@ -902,12 +902,9 @@ void ctmodel::fill_cube(const GCTAObservation* obs, GModels& models)
             continue;
         }
 
-        // Get instrument direction for spatial pixel. Compute DETX and DETY
-        // if they are not provided
-        GCTAInstDir dir = m_dir[i];
-        if (!dir.has_detx() || !dir.has_dety()) {
-            dir = pnt.instdir(dir.dir());
-        }
+        // Get instrument direction for spatial pixel and recompute DETX and
+        // DETY based on the pointing of the observation.
+        GCTAInstDir dir = pnt.instdir(m_dir[i].dir());
 
         // Set instrument direction, solid angle and pixel index of bin
         bin.dir(dir);
