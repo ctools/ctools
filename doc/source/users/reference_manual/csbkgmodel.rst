@@ -49,11 +49,10 @@ General parameters
     linearly or logarithmically between ``emin`` and ``emax``, respectively.
 
 ``emin [real]``
-    First node energy (in TeV) if ``LIN`` or ``LOG`` energy algorithms are
-    used.
+    Lower energy limit (in TeV).
 
 ``emax [real]``
-    Last node energy (in TeV) if ``LIN`` or ``LOG`` energy algorithms are used.
+    Upper energy limit (in TeV).
 
 ``enumbins [integer]``
     Number of energy nodes if ``LIN`` or ``LOG`` energy algorithms are used.
