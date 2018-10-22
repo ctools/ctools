@@ -68,6 +68,8 @@ class csbkgmodel(ctools.csobservation):
         if self['spatial'].string() == 'NODES':
             self._create_energies()
         self['runwise'].boolean()
+        self['emin'].real()
+        self['emax'].real()
         self['rad'].real()
 
         # Query ahead output model filename
@@ -176,8 +178,8 @@ class csbkgmodel(ctools.csobservation):
         select['rad']      = self['rad'].real()
         select['tmin']     = 'UNDEF'
         select['tmax']     = 'UNDEF'
-        select['emin']     = 'UNDEF'
-        select['emax']     = 'UNDEF'
+        select['emin']     = self['emin'].real()
+        select['emax']     = self['emax'].real()
         select['usethres'] = 'DEFAULT'
 
         # Select events
