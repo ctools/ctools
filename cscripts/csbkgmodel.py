@@ -285,6 +285,16 @@ class csbkgmodel(ctools.csobservation):
             # Extract fitted model
             model = like.obs().models()[0].copy()
 
+            # Remove nodes with zero errors as they are not constrained
+            # by the data and may lead to fitting problems later
+            spectral = model.spectral()
+            nodes    = spectral.nodes()
+            for i in range(nodes):
+                ieng = 2*(nodes - i) - 2
+                iint = 2*(nodes - i) - 1
+                if spectral[iint].error() == 0.0:
+                    spectral.remove(nodes - i - 1)
+
         # Return model
         return model
 
