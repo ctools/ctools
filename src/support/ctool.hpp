@@ -93,6 +93,7 @@ protected:
 
     // Protected methods that create objects from user parameters
     GEbounds          create_ebounds(void);
+    GEnergies         create_energies(void);
     GSkyMap           create_map(const GObservations& obs);
     GCTAEventCube     create_cube(const GObservations& obs);
     GCTAObservation   create_cta_obs(void);

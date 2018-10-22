@@ -100,6 +100,7 @@ public:
     %rename(_setup_observations)       setup_observations;
     %rename(_setup_models)             setup_models;
     %rename(_create_ebounds)           create_ebounds;
+    %rename(_create_energies)          create_energies;
     %rename(_create_map)               create_map;
     %rename(_create_cube)              create_cube;
     %rename(_create_cta_obs)           create_cta_obs;
