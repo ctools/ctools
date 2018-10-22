@@ -65,6 +65,8 @@ class csbkgmodel(ctools.csobservation):
         if self['spatial'].string() == 'GAUSS':
             self['gradient'].boolean()
         self['spectral'].string()
+        if self['spatial'].string() == 'NODES':
+            self._create_energies()
         self['runwise'].boolean()
         self['rad'].real()
 
@@ -204,16 +206,8 @@ class csbkgmodel(ctools.csobservation):
         # Extract spectral model of background component
         spectrum = model.spectral()
 
-        # Define 8 node energies
-        energies = gammalib.GEnergies()
-        energies.append(gammalib.GEnergy(0.1, 'TeV'))
-        energies.append(gammalib.GEnergy(0.2, 'TeV'))
-        energies.append(gammalib.GEnergy(0.4, 'TeV'))
-        energies.append(gammalib.GEnergy(0.8, 'TeV'))
-        energies.append(gammalib.GEnergy(1.6, 'TeV'))
-        energies.append(gammalib.GEnergy(3.2, 'TeV'))
-        energies.append(gammalib.GEnergy(6.4, 'TeV'))
-        energies.append(gammalib.GEnergy(12.8, 'TeV'))
+        # Define node energies
+        energies  = self._create_energies()
 
         # Create node spectrum
         nodes = gammalib.GModelSpectralNodes(spectrum, energies)
@@ -221,7 +215,7 @@ class csbkgmodel(ctools.csobservation):
 
         # Set minimum node intensities (this avoids NaNs during model fitting)
         for i in range(nodes.size()):
-            nodes[i].min(1.0e-6*nodes[i].value())
+            nodes[i].min(1.0e-10*nodes[i].value())
 
         # Set node spectrum
         model.spectral(nodes)
@@ -270,9 +264,9 @@ class csbkgmodel(ctools.csobservation):
         # Extract fitted model
         model = like.obs().models()[0].copy()
 
-        # If a HESS model is requested then refit a node spectrum
-        if self['spectral'].string() == 'HESS':
-        
+        # If a NODES model is requested then refit a node spectrum
+        if self['spectral'].string() == 'NODES':
+
             # Create nodes spectrum from fitted initial model
             model = self._create_nodes(model)
 

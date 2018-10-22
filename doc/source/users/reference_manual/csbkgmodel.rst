@@ -42,6 +42,25 @@ General parameters
     ``HESS`` specifies a piecewise broken power-law using 8 energy nodes
     spread over the energy range from 100 GeV to 12.8 TeV.
 
+``ebinalg <FILE|LIN|LOG> [string]``
+    Algorithm for defining energy nodes. For ``FILE``, the energy nodes are
+    defined in a FITS file that is specified by the ``ebinfile`` parameter,
+    for ``LIN`` and ``LOG`` there will be ``enumbins`` energy nodes spaced
+    linearly or logarithmically between ``emin`` and ``emax``, respectively.
+
+``emin [real]``
+    First node energy (in TeV) if ``LIN`` or ``LOG`` energy algorithms are
+    used.
+
+``emax [real]``
+    Last node energy (in TeV) if ``LIN`` or ``LOG`` energy algorithms are used.
+
+``enumbins [integer]``
+    Number of energy nodes if ``LIN`` or ``LOG`` energy algorithms are used.
+
+``ebinfile [file]``
+    Name of the file containing the energy node definition if ``ebinalg=FILE``.
+
 ``runwise [boolean]``
     Generate runwise background model? If ``yes`` is specified a background
     model component for each observation in the observation definition XML
