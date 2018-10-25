@@ -289,6 +289,10 @@ def plot_edisp(edisp, emin=None, emax=None, tmin=None, tmax=None,
     image_mean = []
     image_std  = []
 
+    # Initialise true and reconstructed energies
+    etrue = gammalib.GEnergy()
+    ereco = gammalib.GEnergy()
+
     # Loop over offset angles
     for theta in thetas:
 
@@ -303,14 +307,17 @@ def plot_edisp(edisp, emin=None, emax=None, tmin=None, tmax=None,
         # Loop over energies
         for logenergy in logenergies:
 
+            # Set true energy
+            etrue.log10TeV(logenergy)
+
             # Compute mean migration
             mean = 0.0
             std  = 0.0
             num  = 0.0
             for migra in migras:
                 if migra > 0.0:
-                    logobs = math.log10(migra) + logenergy
-                    value  = edisp(logobs, logenergy, theta*gammalib.deg2rad)
+                    etrue.log10TeV(math.log10(migra) + logenergy)
+                    value  = edisp(ereco, etrue, theta*gammalib.deg2rad)
                     mean  += migra * value
                     std   += migra * migra * value
                     num   += value
