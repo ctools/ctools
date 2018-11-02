@@ -205,12 +205,12 @@ def add_ctool(name, tokens, baseclass):
         os.mkdir('src/%s' % name)
 
     # Set template file names
-    inctemp  = 'src/template/ctool_%s.hpp'      % (baseclass)
-    srctemp  = 'src/template/ctool_%s.cpp'      % (baseclass)
-    partemp  = 'src/template/ctool_%s.par'      % (baseclass)
-    maintemp = 'src/template/main_%s.cpp'       % (baseclass)
+    inctemp  = 'src/template/ctool_%s.hpp' % (baseclass)
+    srctemp  = 'src/template/ctool_%s.cpp' % (baseclass)
+    pytemp   = 'src/template/ctool_%s.i'   % (baseclass)
+    partemp  = 'src/template/ctool.par'
+    maintemp = 'src/template/main.cpp'
     maketemp = 'src/template/ctool_Makefile.am'
-    pytemp   = 'src/template/ctool_%s.i'        % (baseclass)
     testtemp = 'src/template/ctool_test.py'
 
     # Set destination file names
