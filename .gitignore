@@ -74,6 +74,9 @@ src/ctulimit/ctulimit
 src/cterror/cterror
 src/ctprob/ctprob
 src/ctphase/ctphase
+src/template/ctool_base
+src/template/ctool_like
+src/template/ctool_obs
 test/pfiles/
 test/caldb/
 test/prod3

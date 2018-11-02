@@ -1,5 +1,5 @@
 /***************************************************************************
- *                           xxx - [WHAT] tool                             *
+ *                        ctool_obs - [WHAT] tool                          *
  * ----------------------------------------------------------------------- *
  *  copyright (C) [YEAR] by [AUTHOR]                                       *
  * ----------------------------------------------------------------------- *
@@ -19,29 +19,29 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file xxx.i
+ * @file ctool_obs.i
  * @brief [WHAT] tool definition
  * @author [AUTHOR]
  */
 %{
 /* Put headers and other declarations here that are needed for compilation */
-#include "xxx.hpp"
+#include "ctool_obs.hpp"
 %}
 
 
 /***********************************************************************//**
- * @class xxx
+ * @class ctool_obs
  *
  * @brief [WHAT] tool
  ***************************************************************************/
-class xxx : public ctobservation {
+class ctool_obs : public ctobservation {
 public:
     // Constructors and destructors
-    xxx(void);
-    explicit xxx(const GObservations& obs);
-    xxx(int argc, char *argv[]);
-    xxx(const xxx& app);
-    virtual ~xxx(void);
+    ctool_obs(void);
+    explicit ctool_obs(const GObservations& obs);
+    ctool_obs(int argc, char *argv[]);
+    ctool_obs(const ctool_obs& app);
+    virtual ~ctool_obs(void);
 
     // Methods
     void clear(void);
@@ -53,8 +53,8 @@ public:
 /***********************************************************************//**
  * @brief [WHAT] tool Python extension
  ***************************************************************************/
-%extend xxx {
-    xxx copy() {
+%extend ctool_obs {
+    ctool_obs copy() {
         return (*self);
     }
 }

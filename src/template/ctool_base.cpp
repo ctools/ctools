@@ -1,5 +1,5 @@
 /***************************************************************************
- *                           xxx - [WHAT] tool                             *
+ *                        ctool_base - [WHAT] tool                         *
  * ----------------------------------------------------------------------- *
  *  copyright (C) [YEAR] by [AUTHOR]                                       *
  * ----------------------------------------------------------------------- *
@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file xxx.cpp
+ * @file ctool_base.cpp
  * @brief [WHAT] tool implementation
  * @author [AUTHOR]
  */
@@ -28,7 +28,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include "xxx.hpp"
+#include "ctool_base.hpp"
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
 
@@ -57,7 +57,7 @@
  *
  * Constructs empty [what] tool.
  ***************************************************************************/
-xxx::xxx(void) : ctool(XXX_NAME, VERSION)
+ctool_base::ctool_base(void) : ctool(CTOOL_BASE_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -76,7 +76,7 @@ xxx::xxx(void) : ctool(XXX_NAME, VERSION)
  * Constructs [what] tool using command line arguments for user
  * parameter setting.
  ***************************************************************************/
-xxx::xxx(int argc, char *argv[]) : ctool(XXX_NAME, VERSION, argc, argv)
+ctool_base::ctool_base(int argc, char *argv[]) : ctool(CTOOL_BASE_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -93,7 +93,7 @@ xxx::xxx(int argc, char *argv[]) : ctool(XXX_NAME, VERSION, argc, argv)
  *
  * Constructs [what] tool from another [what] tool.
  ***************************************************************************/
-xxx::xxx(const xxx& app) : ctool(app)
+ctool_base::ctool_base(const ctool_base& app) : ctool(app)
 {
     // Initialise members
     init_members();
@@ -111,7 +111,7 @@ xxx::xxx(const xxx& app) : ctool(app)
  *
  * Destructs [what] tool.
  ***************************************************************************/
-xxx::~xxx(void)
+ctool_base::~ctool_base(void)
 {
     // Free members
     free_members();
@@ -135,7 +135,7 @@ xxx::~xxx(void)
  *
  * Assigns [what] tool.
  ***************************************************************************/
-xxx& xxx::operator=(const xxx& app)
+ctool_base& ctool_base::operator=(const ctool_base& app)
 {
     // Execute only if object is not identical
     if (this != &app) {
@@ -170,7 +170,7 @@ xxx& xxx::operator=(const xxx& app)
  *
  * Clears [what] tool.
  ***************************************************************************/
-void xxx::clear(void)
+void ctool_base::clear(void)
 {
     // Free members
     free_members();
@@ -194,7 +194,7 @@ void xxx::clear(void)
 /***********************************************************************//**
  * @brief Run [what] tool
  ***************************************************************************/
-void xxx::run(void)
+void ctool_base::run(void)
 {
     // If we're in debug mode then all output is also dumped on the screen
     if (logDebug()) {
@@ -216,7 +216,7 @@ void xxx::run(void)
  *
  * Saves something.
  ***************************************************************************/
-void xxx::save(void)
+void ctool_base::save(void)
 {
     // Write header
     log_header1(TERSE, "Save something");
@@ -237,7 +237,7 @@ void xxx::save(void)
 /***********************************************************************//**
  * @brief Initialise class members
  ***************************************************************************/
-void xxx::init_members(void)
+void ctool_base::init_members(void)
 {
     // Initialise members
     // TODO: Your code goes here
@@ -252,7 +252,7 @@ void xxx::init_members(void)
  *
  * @param[in] app [WHAT] tool.
  ***************************************************************************/
-void xxx::copy_members(const xxx& app)
+void ctool_base::copy_members(const ctool_base& app)
 {
     // Copy attributes
     // TODO: Your code goes here
@@ -265,7 +265,7 @@ void xxx::copy_members(const xxx& app)
 /***********************************************************************//**
  * @brief Delete class members
  ***************************************************************************/
-void xxx::free_members(void)
+void ctool_base::free_members(void)
 {
     // Return
     return;
@@ -277,7 +277,7 @@ void xxx::free_members(void)
  *
  * @todo Implement method
  ***************************************************************************/
-void xxx::get_parameters(void)
+void ctool_base::get_parameters(void)
 {
     // TODO: Your code goes here
 

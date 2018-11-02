@@ -149,8 +149,8 @@ def add_file(infile, outfile, tokens):
             elif n_header == 4:
                 line = ' *'+gammalib.left('  '+text,73)+'*\n'
         if is_header_hash:
-            text = line.strip(' #\n')
-            line = '# '+gammalib.left(text,74)+'#\n'
+            text = line.strip('#\n')
+            line = '#'+text[0:75]+'#\n'
 
         # Write out line
         file.write(line)
@@ -165,7 +165,7 @@ def add_file(infile, outfile, tokens):
 # ========== #
 # Set tokens #
 # ========== #
-def set_tokens(classname, author, what):
+def set_tokens(classname, author, what, basename):
     """
     Set replacement tokens for a ctool or cscript
     """
@@ -173,7 +173,9 @@ def set_tokens(classname, author, what):
     year = str(date.today().year)
 
     # Set tokens
-    tokens = [{'pattern': 'xxx', 'string': classname},
+    tokens = [{'pattern': 'ctool_%s' % basename, 'string': classname},
+              {'pattern': 'CTOOL_%s' % basename.upper(), 'string': classname.upper()},
+              {'pattern': 'xxx', 'string': classname},
               {'pattern': 'XXX', 'string': classname.upper()},
               {'pattern': '[WHAT]', 'string': what},
               {'pattern': '[what]', 'string': what.lower()},
@@ -208,18 +210,18 @@ def add_ctool(name, tokens, baseclass):
     inctemp  = 'src/template/ctool_%s.hpp' % (baseclass)
     srctemp  = 'src/template/ctool_%s.cpp' % (baseclass)
     pytemp   = 'src/template/ctool_%s.i'   % (baseclass)
+    maintemp = 'src/template/main_%s.cpp'  % (baseclass)
     partemp  = 'src/template/ctool.par'
-    maintemp = 'src/template/main.cpp'
     maketemp = 'src/template/ctool_Makefile.am'
     testtemp = 'src/template/ctool_test.py'
 
     # Set destination file names
     incfile  = 'src/%s/%s.hpp'      % (name, name)
     srcfile  = 'src/%s/%s.cpp'      % (name, name)
-    parfile  = 'src/%s/%s.par'      % (name, name)
-    mainfile = 'src/%s/main.cpp'    % (name)
-    makefile = 'src/%s/Makefile.am' % (name)
     pyfile   = 'pyext/%s.i'         % (name)
+    mainfile = 'src/%s/main.cpp'    % (name)
+    parfile  = 'src/%s/%s.par'      % (name, name)
+    makefile = 'src/%s/Makefile.am' % (name)
     testfile = 'test/test_%s.py'    % (name)
     
     # Add files
@@ -325,7 +327,7 @@ def ctool_menu():
             break
 
     # Set tokens
-    tokens = set_tokens(ctoolname, author, what)
+    tokens = set_tokens(ctoolname, author, what, basename)
 
     # Add ctool
     add_ctool(ctoolname, tokens, basename)

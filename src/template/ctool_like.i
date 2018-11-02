@@ -1,5 +1,5 @@
 /***************************************************************************
- *                           xxx - [WHAT] tool                             *
+ *                       ctool_like - [WHAT] tool                          *
  * ----------------------------------------------------------------------- *
  *  copyright (C) [YEAR] by [AUTHOR]                                       *
  * ----------------------------------------------------------------------- *
@@ -19,29 +19,29 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file xxx.i
+ * @file ctool_like.i
  * @brief [WHAT] tool definition
  * @author [AUTHOR]
  */
 %{
 /* Put headers and other declarations here that are needed for compilation */
-#include "xxx.hpp"
+#include "ctool_like.hpp"
 %}
 
 
 /***********************************************************************//**
- * @class xxx
+ * @class ctool_like
  *
  * @brief [WHAT] tool
  ***************************************************************************/
-class xxx : public ctlikelihood {
+class ctool_like : public ctlikelihood {
 public:
     // Constructors and destructors
-    xxx(void);
-    explicit xxx(const GObservations& obs);
-    xxx(int argc, char *argv[]);
-    xxx(const xxx& app);
-    virtual ~xxx(void);
+    ctool_like(void);
+    explicit ctool_like(const GObservations& obs);
+    ctool_like(int argc, char *argv[]);
+    ctool_like(const ctool_like& app);
+    virtual ~ctool_like(void);
 
     // Methods
     void clear(void);
@@ -53,8 +53,8 @@ public:
 /***********************************************************************//**
  * @brief [WHAT] tool Python extension
  ***************************************************************************/
-%extend xxx {
-    xxx copy() {
+%extend ctool_like {
+    ctool_like copy() {
         return (*self);
     }
 }

@@ -1,5 +1,5 @@
 /***************************************************************************
- *                       xxx - [WHAT] tool main code                       *
+ *                    ctool_like - [WHAT] tool main code                   *
  * ----------------------------------------------------------------------- *
  *  copyright (C) [YEAR] by [AUTHOR]                                       *
  * ----------------------------------------------------------------------- *
@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file xxx/main.cpp
+ * @file ctool_like/main.cpp
  * @brief [WHAT] tool main code
  * @author [AUTHOR]
  */
@@ -29,7 +29,7 @@
 #include <config.h>
 #endif
 #include "support.hpp"
-#include "xxx.hpp"
+#include "ctool_like.hpp"
 
 
 /***********************************************************************//**
@@ -38,8 +38,8 @@
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  *
- * This is the main entry point of the xxx application. It allocates a
- * xxx object and executes the application. Any exceptions that occur
+ * This is the main entry point of the ctool_like application. It allocates a
+ * ctool_like object and executes the application. Any exceptions that occur
  * will be catched and corresponding error messages written in the
  * application logger and into the standard output.
  ***************************************************************************/
@@ -49,13 +49,13 @@ int main (int argc, char *argv[])
     int rc = 1;
 
     // Initialise pointer on application
-    xxx* application = NULL;
+    ctool_like* application = NULL;
 
     // Try creating an instance of the application and executing the instance
     try {
 
         // Create instance of application
-        application = new xxx(argc, argv);
+        application = new ctool_like(argc, argv);
 
         // Execute ctool
         rc = execute_ctool(application);
@@ -65,7 +65,7 @@ int main (int argc, char *argv[])
     catch (std::exception &e) {
 
         // Report exception
-        report_ctool_failure("xxx", e.what());
+        report_ctool_failure("ctool_like", e.what());
 
     }
 

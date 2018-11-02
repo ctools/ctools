@@ -1,5 +1,5 @@
 /***************************************************************************
- *                           xxx - [WHAT] tool                             *
+ *                        ctool_base - [WHAT] tool                         *
  * ----------------------------------------------------------------------- *
  *  copyright (C) [YEAR] by [AUTHOR]                                       *
  * ----------------------------------------------------------------------- *
@@ -19,38 +19,38 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file xxx.hpp
+ * @file ctool_base.hpp
  * @brief [WHAT] tool definition
  * @author [AUTHOR]
  */
 
-#ifndef XXX_HPP
-#define XXX_HPP
+#ifndef CTOOL_BASE_HPP
+#define CTOOL_BASE_HPP
 
 /* __ Includes ___________________________________________________________ */
 #include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define XXX_NAME "xxx"
+#define CTOOL_BASE_NAME "ctool_base"
 
 
 /***********************************************************************//**
- * @class xxx
+ * @class ctool_base
  *
  * @brief [WHAT] tool
  *
  * @todo Add tool description.
  ***************************************************************************/
-class xxx : public ctool {
+class ctool_base : public ctool {
 public:
     // Constructors and destructors
-    xxx(void);
-    xxx(int argc, char *argv[]);
-    xxx(const xxx& app);
-    virtual ~xxx(void);
+    ctool_base(void);
+    ctool_base(int argc, char *argv[]);
+    ctool_base(const ctool_base& app);
+    virtual ~ctool_base(void);
 
     // Operators
-    xxx& operator=(const xxx& app);
+    ctool_base& operator=(const ctool_base& app);
 
     // Methods
     void clear(void);
@@ -60,7 +60,7 @@ public:
 protected:
     // Protected methods
     void init_members(void);
-    void copy_members(const xxx& app);
+    void copy_members(const ctool_base& app);
     void free_members(void);
     void get_parameters(void);
 
@@ -68,4 +68,4 @@ protected:
     // TODO: Add any data members that are necessary
 };
 
-#endif /* XXX_HPP */
+#endif /* CTOOL_BASE_HPP */

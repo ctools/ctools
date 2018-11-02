@@ -1,5 +1,5 @@
 /***************************************************************************
- *                           xxx - [WHAT] tool                             *
+ *                        ctool_obs - [WHAT] tool                          *
  * ----------------------------------------------------------------------- *
  *  copyright (C) [YEAR] by [AUTHOR]                                       *
  * ----------------------------------------------------------------------- *
@@ -19,39 +19,39 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file xxx.hpp
+ * @file ctool_obs.hpp
  * @brief [WHAT] tool definition
  * @author [AUTHOR]
  */
 
-#ifndef XXX_HPP
-#define XXX_HPP
+#ifndef CTOOL_OBS_HPP
+#define CTOOL_OBS_HPP
 
 /* __ Includes ___________________________________________________________ */
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define XXX_NAME "xxx"
+#define CTOOL_OBS_NAME "ctool_obs"
 
 
 /***********************************************************************//**
- * @class xxx
+ * @class ctool_obs
  *
  * @brief [WHAT] tool
  *
  * @todo Add tool description.
  ***************************************************************************/
-class xxx : public ctobservation {
+class ctool_obs : public ctobservation {
 public:
     // Constructors and destructors
-    xxx(void);
-    explicit xxx(const GObservations& obs);
-    xxx(int argc, char *argv[]);
-    xxx(const xxx& app);
-    virtual ~xxx(void);
+    ctool_obs(void);
+    explicit ctool_obs(const GObservations& obs);
+    ctool_obs(int argc, char *argv[]);
+    ctool_obs(const ctool_obs& app);
+    virtual ~ctool_obs(void);
 
     // Operators
-    xxx& operator=(const xxx& app);
+    ctool_obs& operator=(const ctool_obs& app);
 
     // Methods
     void clear(void);
@@ -61,7 +61,7 @@ public:
 protected:
     // Protected methods
     void init_members(void);
-    void copy_members(const xxx& app);
+    void copy_members(const ctool_obs& app);
     void free_members(void);
     void get_parameters(void);
 
@@ -69,4 +69,4 @@ protected:
     // TODO: Add any data members that are necessary
 };
 
-#endif /* XXX_HPP */
+#endif /* CTOOL_OBS_HPP */

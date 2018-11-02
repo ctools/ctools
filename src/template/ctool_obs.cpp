@@ -1,5 +1,5 @@
 /***************************************************************************
- *                           xxx - [WHAT] tool                             *
+ *                        ctool_obs - [WHAT] tool                          *
  * ----------------------------------------------------------------------- *
  *  copyright (C) [YEAR] by [AUTHOR]                                       *
  * ----------------------------------------------------------------------- *
@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file xxx.cpp
+ * @file ctool_obs.cpp
  * @brief [WHAT] tool implementation
  * @author [AUTHOR]
  */
@@ -28,7 +28,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include "xxx.hpp"
+#include "ctool_obs.hpp"
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
 
@@ -57,7 +57,7 @@
  *
  * Constructs empty [what] tool.
  ***************************************************************************/
-xxx::xxx(void) : ctobservation(XXX_NAME, VERSION)
+ctool_obs::ctool_obs(void) : ctobservation(CTOOL_OBS_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -74,7 +74,7 @@ xxx::xxx(void) : ctobservation(XXX_NAME, VERSION)
  *
  * Constructs [what] tool from an observation container.
  ***************************************************************************/
-xxx::xxx(const GObservations& obs) : ctobservation(XXX_NAME, VERSION, obs)
+ctool_obs::ctool_obs(const GObservations& obs) : ctobservation(CTOOL_OBS_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -93,7 +93,7 @@ xxx::xxx(const GObservations& obs) : ctobservation(XXX_NAME, VERSION, obs)
  * Constructs [what] tool using command line arguments for user
  * parameter setting.
  ***************************************************************************/
-xxx::xxx(int argc, char *argv[]) : ctobservation(XXX_NAME, VERSION, argc, argv)
+ctool_obs::ctool_obs(int argc, char *argv[]) : ctobservation(CTOOL_OBS_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -110,7 +110,7 @@ xxx::xxx(int argc, char *argv[]) : ctobservation(XXX_NAME, VERSION, argc, argv)
  *
  * Constructs [what] tool from another [what] tool.
  ***************************************************************************/
-xxx::xxx(const xxx& app) : ctobservation(app)
+ctool_obs::ctool_obs(const ctool_obs& app) : ctobservation(app)
 {
     // Initialise members
     init_members();
@@ -128,7 +128,7 @@ xxx::xxx(const xxx& app) : ctobservation(app)
  *
  * Destructs [what] tool.
  ***************************************************************************/
-xxx::~xxx(void)
+ctool_obs::~ctool_obs(void)
 {
     // Free members
     free_members();
@@ -152,7 +152,7 @@ xxx::~xxx(void)
  *
  * Assigns [what] tool.
  ***************************************************************************/
-xxx& xxx::operator=(const xxx& app)
+ctool_obs& ctool_obs::operator=(const ctool_obs& app)
 {
     // Execute only if object is not identical
     if (this != &app) {
@@ -187,7 +187,7 @@ xxx& xxx::operator=(const xxx& app)
  *
  * Clears [what] tool.
  ***************************************************************************/
-void xxx::clear(void)
+void ctool_obs::clear(void)
 {
     // Free members
     free_members();
@@ -213,7 +213,7 @@ void xxx::clear(void)
 /***********************************************************************//**
  * @brief Run [what] tool
  ***************************************************************************/
-void xxx::run(void)
+void ctool_obs::run(void)
 {
     // If we're in debug mode then all output is also dumped on the screen
     if (logDebug()) {
@@ -238,7 +238,7 @@ void xxx::run(void)
  *
  * Saves something.
  ***************************************************************************/
-void xxx::save(void)
+void ctool_obs::save(void)
 {
     // Write header
     log_header1(TERSE, "Save something");
@@ -259,7 +259,7 @@ void xxx::save(void)
 /***********************************************************************//**
  * @brief Initialise class members
  ***************************************************************************/
-void xxx::init_members(void)
+void ctool_obs::init_members(void)
 {
     // Initialise members
     // TODO: Your code goes here
@@ -274,7 +274,7 @@ void xxx::init_members(void)
  *
  * @param[in] app [WHAT] tool.
  ***************************************************************************/
-void xxx::copy_members(const xxx& app)
+void ctool_obs::copy_members(const ctool_obs& app)
 {
     // Copy attributes
     // TODO: Your code goes here
@@ -287,7 +287,7 @@ void xxx::copy_members(const xxx& app)
 /***********************************************************************//**
  * @brief Delete class members
  ***************************************************************************/
-void xxx::free_members(void)
+void ctool_obs::free_members(void)
 {
     // Return
     return;
@@ -299,7 +299,7 @@ void xxx::free_members(void)
  *
  * @todo Implement method
  ***************************************************************************/
-void xxx::get_parameters(void)
+void ctool_obs::get_parameters(void)
 {
     // TODO: Your code goes here
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *                       ctool_like - [WHAT] tool                          *
+ *                    ctool_obs - [WHAT] tool main code                    *
  * ----------------------------------------------------------------------- *
  *  copyright (C) [YEAR] by [AUTHOR]                                       *
  * ----------------------------------------------------------------------- *
@@ -19,54 +19,59 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctool_like.hpp
- * @brief [WHAT] tool definition
+ * @file ctool_obs/main.cpp
+ * @brief [WHAT] tool main code
  * @author [AUTHOR]
  */
 
-#ifndef CTOOL_LIKE_HPP
-#define CTOOL_LIKE_HPP
-
 /* __ Includes ___________________________________________________________ */
-#include "ctlikelihood.hpp"
-
-/* __Definitions _________________________________________________________ */
-#define CTOOL_LIKE_NAME "ctool_like"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+#include "support.hpp"
+#include "ctool_obs.hpp"
 
 
 /***********************************************************************//**
- * @class ctool_like
+ * @brief Main entry point of application
  *
- * @brief [WHAT] tool
+ * @param[in] argc Number of command line arguments.
+ * @param[in] argv Command line arguments.
  *
- * @todo Add tool description.
+ * This is the main entry point of the ctool_obs application. It allocates a
+ * ctool_obs object and executes the application. Any exceptions that occur
+ * will be catched and corresponding error messages written in the
+ * application logger and into the standard output.
  ***************************************************************************/
-class ctool_like : public ctlikelihood {
-public:
-    // Constructors and destructors
-    ctool_like(void);
-    explicit ctool_like(const GObservations& obs);
-    ctool_like(int argc, char *argv[]);
-    ctool_like(const ctool_like& app);
-    virtual ~ctool_like(void);
+int main (int argc, char *argv[])
+{
+    // Initialise return code
+    int rc = 1;
 
-    // Operators
-    ctool_like& operator=(const ctool_like& app);
+    // Initialise pointer on application
+    ctool_obs* application = NULL;
 
-    // Methods
-    void clear(void);
-    void run(void);
-    void save(void);
+    // Try creating an instance of the application and executing the instance
+    try {
 
-protected:
-    // Protected methods
-    void init_members(void);
-    void copy_members(const ctool_like& app);
-    void free_members(void);
-    void get_parameters(void);
+        // Create instance of application
+        application = new ctool_obs(argc, argv);
 
-    // Protected members
-    // TODO: Add any data members that are necessary
-};
+        // Execute ctool
+        rc = execute_ctool(application);
 
-#endif /* CTOOL_LIKE_HPP */
+    }
+
+    catch (std::exception &e) {
+
+        // Report exception
+        report_ctool_failure("ctool_obs", e.what());
+
+    }
+
+    // Delete application
+    delete application;
+
+    // Return
+    return rc;
+}

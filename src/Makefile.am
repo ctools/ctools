@@ -25,6 +25,7 @@ MACOSX_DEPLOYMENT_TARGET=@CONFIGURE_MACOSX_DEPLOYMENT_TARGET@
 
 # Set sub directories
 SUBDIRS = support \
+          template \
           ctbin \
           ctlike \
           ctmodel \
