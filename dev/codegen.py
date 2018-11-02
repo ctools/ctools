@@ -214,6 +214,7 @@ def add_ctool(name, tokens, baseclass):
     partemp  = 'src/template/ctool.par'
     maketemp = 'src/template/ctool_Makefile.am'
     testtemp = 'src/template/ctool_test.py'
+    doctemp  = 'src/template/ctool.rst'
 
     # Set destination file names
     incfile  = 'src/%s/%s.hpp'      % (name, name)
@@ -223,6 +224,7 @@ def add_ctool(name, tokens, baseclass):
     parfile  = 'src/%s/%s.par'      % (name, name)
     makefile = 'src/%s/Makefile.am' % (name)
     testfile = 'test/test_%s.py'    % (name)
+    docfile  = 'doc/source/users/reference_manual/%s.rst' % (name)
     
     # Add files
     add_file(inctemp,  incfile,  tokens)
@@ -232,6 +234,7 @@ def add_ctool(name, tokens, baseclass):
     add_file(maketemp, makefile, tokens)
     add_file(pytemp,   pyfile,   tokens)
     add_file(testtemp, testfile, tokens)
+    add_file(doctemp,  docfile,  tokens)
 
     # Update src/Makefile.am
     filename    = 'src/Makefile.am'
@@ -270,6 +273,12 @@ def add_ctool(name, tokens, baseclass):
     for line in fileinput.FileInput('configure.ac',inplace=1):
         if 'src/ctbin/Makefile' in line:
             print('                 src/%s/Makefile' % (name))
+        print line,
+
+    # Update reference manual index file
+    for line in fileinput.FileInput('doc/source/users/reference_manual/index.rst',inplace=1):
+        if 'ctbin --- Generates counts cube <ctbin>' in line:
+            print('   %s --- ToDo: Describe what tool is doing <%s>' % (name, name))
         print line,
 
     # Return
