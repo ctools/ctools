@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-18 October 2018
+3 November 2018
 
 
 Introduction
@@ -11,6 +11,12 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
+A Code Generator was added to the development directory that can be started
+using dev/codegen.py and that requires GammaLib to be installed. The code
+generator allows adding ctools and cscripts, including unit tests and code
+documentation, that are fully functional. The developer then only needs to
+fill the skeleton with the relevant code (#2709).
+
 Keep existing library path in installation script on Mac OS X (#2420).
 
 

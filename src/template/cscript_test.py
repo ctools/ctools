@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the xxx tool.
+# This scripts performs unit tests for the xxx script.
 #
 # Copyright (C) [YEAR] [AUTHOR]
 #
@@ -20,18 +20,18 @@
 # ==========================================================================
 import os
 import gammalib
-import ctools
+import cscripts
 from testing import test
 
 
-# ======================= #
-# Test class for xxx tool #
-# ======================= #
+# ========================= #
+# Test class for xxx script #
+# ========================= #
 class Test(test):
     """
-    Test class for xxx tool
+    Test class for xxx script
 
-    This test class makes unit tests for the xxx tool by using it from
+    This test class makes unit tests for the xxx script by using it from
     the command line and from Python.
     """
 
@@ -57,6 +57,7 @@ class Test(test):
         # Append tests
         self.append(self._test_cmd, 'Test xxx on command line')
         self.append(self._test_python, 'Test xxx from Python')
+        self.append(self._test_pickeling, 'Test xxx pickeling')
 
         # Return
         return
@@ -66,8 +67,8 @@ class Test(test):
         """
         Test xxx on the command line
         """
-        # Set tool name
-        xxx = self._tool('xxx')
+        # Set script name
+        xxx = self._script('xxx')
 
         # Setup xxx command
         cmd = xxx+' logfile="xxx_cmd1.log" chatter=1'
@@ -88,58 +89,69 @@ class Test(test):
         Test xxx from Python
         """
         # Allocate xxx
-        tool = ctools.xxx()
+        script = cscripts.xxx()
 
         # Check that saving does not nothing
-        tool['logfile'] = 'xxx_py0.log'
-        tool.logFileOpen()
-        tool.save()
+        script['logfile'] = 'xxx_py0.log'
+        script.logFileOpen()
+        script.save()
         self.test_assert(not os.path.isfile('xxx_py0.fits'),
              'Check that no FITS file has been created')
 
         # Check that clearing does not lead to an exception or segfault
-        tool.clear()
+        script.clear()
 
         # Now set xxx parameters
-        tool['logfile'] = 'xxx_py1.log'
-        tool['chatter'] = 2
+        script['logfile'] = 'xxx_py1.log'
+        script['chatter'] = 2
 
-        # Run xxx tool
-        tool.logFileOpen()
-        tool.run()
-
-        # Check result
-        self._check_result(tool)
-
-        # Copy xxx tool
-        cpy_tool = tool.copy()
+        # Run xxx script
+        script.logFileOpen()
+        script.run()
 
         # Check result
-        self._check_result(cpy_tool)
+        self._check_result(script)
 
-        # Run copy of xxx tool again
-        cpy_tool['logfile'] = 'xxx_py2.log'
-        cpy_tool['chatter'] = 3
-        cpy_tool.logFileOpen()
-        cpy_tool.run()
+        # Return
+        return
 
-        # Check result
-        self._check_result(cpy_tool)
+    # Test xxx pickeling
+    def _test_pickeling(self):
+        """
+        Test xxx pickeling
+        """
+        # Perform pickeling test of empty class
+        self._pickeling(cscripts.xxx())
+
+        # Setup script for pickling text
+        script = cscripts.xxx()
+        script['logfile'] = 'xxx_py1_pickle.log'
+        script['chatter'] = 2
+
+        # Perform pickeling tests of filled class
+        obj = self._pickeling(script)
+
+        # Run xxx script and save result
+        obj.logFileOpen()   # Make sure we get a log file
+        obj.run()
+        obj.save()
+
+        # TODO: Check result file
 
         # Return
         return
 
     # Check xxx result
-    def _check_result(self, tool):
+    def _check_result(self, script):
         """
-        Check content of tool
+        Check content of script
 
         Parameters
         ----------
-        tool : `~ctools.xxx`
+        script : `~cscripts.xxx`
             xxx instance
         """
-        # TODO: Implement test on tool result
+        # TODO: Implement test on script result
 
         # Return
         return

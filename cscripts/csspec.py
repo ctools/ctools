@@ -61,7 +61,7 @@ class csspec(ctools.csobservation):
         # Return
         return
 
-    # State methods por pickling
+    # State methods for pickling
     def __getstate__(self):
         """
         Extend ctools.csobservation getstate method to include some members

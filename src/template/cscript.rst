@@ -3,13 +3,13 @@
 xxx
 ==============================
 
-ToDo: Describe in a one liner what the tool is doing.
+ToDo: Describe in a one liner what the script is doing.
 
 
 Synopsis
 --------
 
-ToDo: Desribe in detail what the tool is doing, what it takes on input and
+ToDo: Desribe in detail what the script is doing, what it takes on input and
 what it produces on output. Please do not write more than 80 characters per
 line since this file is also used to produce a help text for the terminal.
 

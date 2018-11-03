@@ -15,6 +15,7 @@ In particular, this release provides:
 * Improved computation speed for :ref:`ctskymap` and :ref:`csphagen`
 * Parallelisation of various cscripts
 * Support for Python pickeling
+* A Code Generator to facilitate adding ctools and cscripts
 
 
 Bug fixes
@@ -90,6 +91,8 @@ Improvements
 New features
 ------------
 
+* [`2709 <https://cta-redmine.irap.omp.eu/issues/2709>`_] -
+  Add code generator
 * [`2694 <https://cta-redmine.irap.omp.eu/issues/2694>`_] -
   Add :ref:`csbkgmodel` script
 * [`2421 <https://cta-redmine.irap.omp.eu/issues/2421>`_] -

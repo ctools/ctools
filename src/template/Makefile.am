@@ -46,18 +46,25 @@ ctool_like_CPPFLAGS = @CPPFLAGS@
 ctool_like_LDADD = $(top_builddir)/src/support/libsupport.la
 
 # Extra files to be distributed in the tar file
-EXTRA_DIST = ctool.par \
+EXTRA_DIST = cscript.par \
+             cscript.rst \
+             cscript_base.py \
+             cscript_like.py \
+             cscript_obs.py \
+             cscript_test.py \
+             ctool.par \
+             ctool.rst \
              ctool_base.cpp \
              ctool_base.hpp \
              ctool_base.i \
-             main_base.cpp \
              ctool_like.cpp \
              ctool_like.hpp \
              ctool_like.i \
-             main_like.cpp \
+             ctool_Makefile.am \
              ctool_obs.cpp \
              ctool_obs.hpp \
              ctool_obs.i \
-             main_obs.cpp \
-             ctool_Makefile.am \
-             ctool_test.py
+             ctool_test.py \
+             main_base.cpp \
+             main_like.cpp \
+             main_obs.cpp

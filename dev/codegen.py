@@ -143,13 +143,13 @@ def add_file(infile, outfile, tokens):
 
         # If we have a header line than format the line
         if is_header_ast:
-            text = line.strip(' *\n')
+            text = line.strip(' *\n')+'                            '
             if n_header == 2:
                 line = ' *'+gammalib.centre(text,73)+'*\n'
             elif n_header == 4:
                 line = ' *'+gammalib.left('  '+text,73)+'*\n'
         if is_header_hash:
-            text = line.strip('#\n')
+            text = line.strip('#\n')+'                            '
             line = '#'+text[0:75]+'#\n'
 
         # Write out line
@@ -162,12 +162,12 @@ def add_file(infile, outfile, tokens):
     return
 
 
-# ========== #
-# Set tokens #
-# ========== #
-def set_tokens(classname, author, what, basename):
+# ================ #
+# Set ctool tokens #
+# ================ #
+def set_ctool_tokens(classname, basename, what, author, email, affiliation):
     """
-    Set replacement tokens for a ctool or cscript
+    Set replacement tokens for a ctool
     """
     # Get current year
     year = str(date.today().year)
@@ -180,6 +180,34 @@ def set_tokens(classname, author, what, basename):
               {'pattern': '[WHAT]', 'string': what},
               {'pattern': '[what]', 'string': what.lower()},
               {'pattern': '[AUTHOR]', 'string': author},
+              {'pattern': '[EMAIL]', 'string': email},
+              {'pattern': '[AFFILIATION]', 'string': affiliation},
+              {'pattern': '[YEAR]', 'string': year}]
+
+    # Return tokens
+    return tokens
+
+
+# ================== #
+# Set cscript tokens #
+# ================== #
+def set_cscript_tokens(classname, basename, what, author, email, affiliation):
+    """
+    Set replacement tokens for a cscript
+    """
+    # Get current year
+    year = str(date.today().year)
+
+    # Set tokens
+    tokens = [{'pattern': 'cscript_%s' % basename, 'string': classname},
+              {'pattern': 'CSCRIPT_%s' % basename.upper(), 'string': classname.upper()},
+              {'pattern': 'xxx', 'string': classname},
+              {'pattern': 'XXX', 'string': classname.upper()},
+              {'pattern': '[WHAT]', 'string': what},
+              {'pattern': '[what]', 'string': what.lower()},
+              {'pattern': '[AUTHOR]', 'string': author},
+              {'pattern': '[EMAIL]', 'string': email},
+              {'pattern': '[AFFILIATION]', 'string': affiliation},
               {'pattern': '[YEAR]', 'string': year}]
 
     # Return tokens
@@ -191,12 +219,12 @@ def set_tokens(classname, author, what, basename):
 # ========= #
 def add_ctool(name, tokens, baseclass):
     """
-    Add an instrument class
+    Add a ctool
 
     Parameters
     ----------
     name : str
-        ctool or script name
+        ctool name
     tokens : str
         Tokens for replacement
     baseclass : str
@@ -285,12 +313,87 @@ def add_ctool(name, tokens, baseclass):
     return
 
 
-# ============ #
-# Manage ctool #
-# ============ #
+# =========== #
+# Add cscript #
+# =========== #
+def add_cscript(name, tokens, baseclass):
+    """
+    Add a cscript
+
+    Parameters
+    ----------
+    name : str
+        cscript name
+    tokens : str
+        Tokens for replacement
+    baseclass : str
+        Baseclass
+    """
+    # Set template file names
+    pytemp   = 'src/template/cscript_%s.py' % (baseclass)
+    partemp  = 'src/template/cscript.par'
+    testtemp = 'src/template/cscript_test.py'
+    doctemp  = 'src/template/cscript.rst'
+
+    # Set destination file names
+    pyfile   = 'cscripts/%s.py'  % (name)
+    parfile  = 'cscripts/%s.par' % (name)
+    testfile = 'test/test_%s.py' % (name)
+    docfile  = 'doc/source/users/reference_manual/%s.rst' % (name)
+    
+    # Add files
+    add_file(pytemp,   pyfile,   tokens)
+    add_file(partemp,  parfile,  tokens)
+    add_file(testtemp, testfile, tokens)
+    add_file(doctemp,  docfile,  tokens)
+
+    # Set file permissions
+    os.chmod(pyfile, 0o755)
+
+    # Update cscripts/__init__.py.in file
+    for line in fileinput.FileInput('cscripts/__init__.py.in',inplace=1):
+        if '"csworkflow",' in line:
+            print('    "%s",' % (name))
+        elif 'from cscripts.csworkflow    import csworkflow' in line:
+            print('from cscripts.%s    import %s' % (name, name))
+        print line,
+
+    # Update cscripts/Makefile.am file
+    for line in fileinput.FileInput('cscripts/Makefile.am',inplace=1):
+        if '$(srcdir)/csworkflow.py' in line:
+            print('                $(srcdir)/%s.py \\' % (name))
+        elif '$(srcdir)/csworkflow.par' in line:
+            print('           $(srcdir)/%s.par \\' % (name))
+        elif 'csworkflow \\' in line:
+            print('              %s \\' % (name))
+        elif '$(top_srcdir)/test/test_csworkflow.py' in line:
+            print('              $(top_srcdir)/test/test_%s.py \\' % (name))
+        print line,
+
+    # Update test/test_python_cscripts.py file
+    for line in fileinput.FileInput('test/test_python_cscripts.py',inplace=1):
+        if 'import test_csworkflow' in line:
+            print('import test_%s' % (name))
+        elif 'test_csworkflow.Test()' in line:
+            print('             test_%s.Test(),' % (name))
+        print line,
+
+    # Update reference manual index file
+    for line in fileinput.FileInput('doc/source/users/reference_manual/index.rst',inplace=1):
+        if 'csbkgmodel --- Generates background model for 3D analysis <csbkgmodel>' in line:
+            print('   %s --- ToDo: Describe what script is doing <%s>' % (name, name))
+        print line,
+
+    # Return
+    return
+
+
+# ========== #
+# ctool menu #
+# ========== #
 def ctool_menu():
     """
-    Manage ctool
+    ctool menu
     """
     # Annonce actions
     print("")
@@ -300,10 +403,8 @@ def ctool_menu():
     # Stay in loop until there is a final confirmation
     while True:
 
-        # Enter information
+        # Enter tool name
         ctoolname = response('Please enter a ctool name (e.g. "ctpntsim")')
-        what      = response('Please say what the tool is for (e.g. "Pointing simulation")')
-        author    = response('Please enter your name (e.g. "Joe Public")')
 
         # Enter baseclass
         print('From which baseclass should the ctool derive?')
@@ -326,20 +427,94 @@ def ctool_menu():
             basename  = 'like'
             baseclass = 'ctlikelihood'
 
+        # Enter further information
+        what        = response('Please say what the tool is for (e.g. "Pointing simulation")')
+        author      = response('Please enter your name (e.g. "Joe Public")')
+        email       = response('Please enter your e-mail (e.g. "joe.public@dot.com")')
+        affiliation = response('Please enter your affiliation (e.g. "ESA")')
+
         # Ask to confirm module summary
         print('\nAll right. Have now:')
-        print('ctool name ......: "%s"' % ctoolname)
-        print('Tools descriptor : "%s"' % what)
-        print('Your name .......: "%s"' % author)
-        print('Base class ......: "%s"' % baseclass)
+        print('ctool name .......: "%s"' % ctoolname)
+        print('Base class .......: "%s"' % baseclass)
+        print('Tools descriptor .: "%s"' % what)
+        print('Your name ........: "%s"' % author)
+        print('Your e-mail ......: "%s"' % email)
+        print('Your affiliation .: "%s"' % affiliation)
         if confirm('Is this correct?'):
             break
 
     # Set tokens
-    tokens = set_tokens(ctoolname, author, what, basename)
+    tokens = set_ctool_tokens(ctoolname, basename, what, author, email, affiliation)
 
     # Add ctool
     add_ctool(ctoolname, tokens, basename)
+
+    # Return
+    return
+
+
+# ============ #
+# cscript menu #
+# ============ #
+def cscript_menu():
+    """
+    cscript menu
+    """
+    # Annonce actions
+    print("")
+    print("Add cscript")
+    print("-----------")
+
+    # Stay in loop until there is a final confirmation
+    while True:
+
+        # Enter tool name
+        cscriptname = response('Please enter a cscript name (e.g. "cspntsim")')
+
+        # Enter baseclass
+        print('From which baseclass should the cscript derive?')
+        print('[1] cscript')
+        print('[2] csobservation')
+        print('[3] cslikelihood')
+        waiting = True
+        choice  = 1
+        while waiting:
+            choice = str(raw_input('Enter your choice: '))
+            if choice == '1' or choice == '2' or choice == '3':
+                waiting = False
+        if choice == '1':
+            basename  = 'base'
+            baseclass = 'cscript'
+        elif choice == '2':
+            basename  = 'obs'
+            baseclass = 'csobservation'
+        elif choice == '3':
+            basename  = 'like'
+            baseclass = 'cslikelihood'
+
+        # Enter further information
+        what        = response('Please say what the script is for (e.g. "Pointing simulation")')
+        author      = response('Please enter your name (e.g. "Joe Public")')
+        email       = response('Please enter your e-mail (e.g. "joe.public@dot.com")')
+        affiliation = response('Please enter your affiliation (e.g. "ESA")')
+
+        # Ask to confirm module summary
+        print('\nAll right. Have now:')
+        print('cscript name .....: "%s"' % cscriptname)
+        print('Base class .......: "%s"' % baseclass)
+        print('Script descriptor : "%s"' % what)
+        print('Your name ........: "%s"' % author)
+        print('Your e-mail ......: "%s"' % email)
+        print('Your affiliation .: "%s"' % affiliation)
+        if confirm('Is this correct?'):
+            break
+
+    # Set tokens
+    tokens = set_cscript_tokens(cscriptname, basename, what, author, email, affiliation)
+
+    # Add cscript
+    add_cscript(cscriptname, tokens, basename)
 
     # Return
     return
