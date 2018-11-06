@@ -79,13 +79,15 @@ protected:
     bool gtis_overlap(const GGti& gti1, const GGti& gti2);
 
     // Protected members
-    GSkyMap m_counts;                    //!< Counts for each time interval
-    GGti    m_gti;                            //!< List of time intervals
+    GSkyMap m_counts;                 //!< Counts for each time interval
+    GGti    m_gti;                    //!< List of time intervals
 };
 
 
 /***********************************************************************//**
  * @brief Return reference to significance cube object
+ * 
+ * @return Reference to counts cube
  ***************************************************************************/
 inline
 const GSkyMap& ctfindvar::counts(void)
