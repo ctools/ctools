@@ -503,6 +503,13 @@ void ctfindvar::get_parameters(void)
     init_gtis();
     init_cube();
 
+    // Get the rest of the parameters
+    if (read_ahead()) {
+        (*this)["prefix"].string();
+        (*this)["xsrc"].real();
+        (*this)["ysrc"].real();
+    }
+
     // Write parameters into logger
     log_parameters(TERSE);
 
