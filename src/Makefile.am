@@ -25,6 +25,7 @@ MACOSX_DEPLOYMENT_TARGET=@CONFIGURE_MACOSX_DEPLOYMENT_TARGET@
 
 # Set sub directories
 SUBDIRS = support \
+          ctfindvar \
           template \
           ctbin \
           ctlike \
@@ -60,6 +61,7 @@ pkginclude_HEADERS = ctools.hpp
 lib_LTLIBRARIES = libctools.la
 libctools_la_SOURCES = 
 libctools_la_LIBADD = support/libsupport.la \
+                      ctfindvar/libctfindvar.la \
                       ctbin/libctbin.la \
                       ctlike/libctlike.la \
                       ctmodel/libctmodel.la \
