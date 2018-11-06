@@ -707,8 +707,8 @@ void ctfindvar::init_gtis(void)
 
     // Log information
     log_value(NORMAL, "treference (mjd)", tstart.reference().mjdref());
-    log_value(NORMAL, "tstart (sec)",  tstart.mjd());
-    log_value(NORMAL, "tstop  (sec)",  tstop.mjd());
+    log_value(NORMAL, "tstart (sec)",  tstart.secs());
+    log_value(NORMAL, "tstop  (sec)",  tstop.secs());
     log_value(NORMAL, "Total time",    tstop_sec-tstart_sec);
     log_value(NORMAL, "Time interval", tinterval);
     log_value(NORMAL, "nbins",         bins);
