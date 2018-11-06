@@ -75,6 +75,7 @@ protected:
     void free_members(void);
     void get_parameters(void);
     void get_variability_sig(const int& pix_number, const int& nbins, GNdarray& sig_histogram);
+    bool gtis_overlap(const GGti& gti1, const GGti& gti2);
 
     // Protected members
     GSkyMap m_counts;                    //!< Counts for each time interval
