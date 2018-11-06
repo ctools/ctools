@@ -315,7 +315,18 @@ void ctfindvar::run(void)
     }
     return;
 }
-void ctfindvar::get_variability_sig(const int& pix_number, const int& nbins, GNdarray& sig_histogram)
+
+
+/***********************************************************************//**
+ * @brief Obtain the significance of variability in a given bin
+ * 
+ * @param[in]  pix_number        Pixel in the skymap
+ * @param[in]  nbins             Number of bins in the skymap
+ * @param[out] sig_histogram     Histogram for storing returned significances
+ ***************************************************************************/
+void ctfindvar::get_variability_sig(const int& pix_number, 
+                                    const int& nbins, 
+                                    GNdarray&  sig_histogram)
 {
     std::vector<bool> accepted_bin_bckg_vector;
     std::vector<double> excess_bin_vector;
