@@ -116,7 +116,7 @@ class Test(test):
         # Check joint (unstacked) binning
 
         # Setup ctbin command
-        cmd = ctbin+' inobs="obs_unbinned_two.xml"'+ \
+        cmd = ctbin+' inobs="'+self._datadir+'/obs_unbinned_two.xml"'+ \
                     ' outcube="cntmap_cmd4.fits"'+\
                     ' emin=1.0 emax=100.0 enumbins=10 ebinalg="LOG"'+ \
                     ' nxpix=40 nypix=40 binsz=0.1 coordsys="CEL"'+ \
