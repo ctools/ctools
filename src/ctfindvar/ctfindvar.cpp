@@ -32,6 +32,7 @@
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
 #include <cmath>
+#include <sstream>
 
 /* __ OpenMP section _____________________________________________________ */
 //#ifdef _OPENMP
@@ -40,6 +41,8 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_FILL_CUBE                  "ctfindvar::fill_cube(GCTAObservation*)"
+#define G_INIT_CUBE                              "ctfindvar::init_cube(void)"
+#define G_INIT_GTIS                              "ctfindvar::init_gtis(void)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -406,8 +409,16 @@ GGti ctfindvar::inx2gti(const int& index)
  ***************************************************************************/
 void ctfindvar::save(void)
 {
-    // Write header
-    log_header1(TERSE, "Save something");
+    log_header1(TERSE, "Saving results");
+
+    // Filenames
+    GFilename outcube((*this)["prefix"].string() + "countscube.fits");
+
+    // Write counts cube
+    log_value(TERSE, "Saving counts cube", outcube);
+    m_counts.save(outcube, (*this)["clobber"].boolean());
+    
+    // Write individual source distributions
 
     // TODO: Your code goes here
 
@@ -623,8 +634,10 @@ void ctfindvar::init_gtis(void)
 
     // Set the start time
     if ((*this)["tmin"].is_valid()) {
+        log_string(NORMAL, "Setting start time from command line");
         GTime tstart = (*this)["tmin"].time();
     } else {
+        log_string(NORMAL, "Setting start time from observations");
         for (int o=0; o<m_obs.size(); o++) {
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
             
@@ -637,13 +650,16 @@ void ctfindvar::init_gtis(void)
 
     // Set the stop time
     if ((*this)["tmax"].is_valid()) {
+        log_string(NORMAL, "Setting stop time from command line");
         GTime tstop = (*this)["tmax"].time();
     } else {
+
+        log_string(NORMAL, "Setting stop time from observations");
         for (int o=0; o<m_obs.size(); o++) {
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
             
             // Check that the stop time of the run is larger than tstop
-            if (obs->gti().tstop() < tstop) {
+            if (obs->gti().tstop() > tstop) {
                 tstop = obs->gti().tstop();
             }
         }
@@ -653,6 +669,26 @@ void ctfindvar::init_gtis(void)
     double tstart_sec = tstart.secs();
     double tstop_sec  = tstop.secs();
     int    bins       = (tstop_sec - tstart_sec) / tinterval + 0.5;
+
+    // Log information
+    log_value(NORMAL, "treference (mjd)", tstart.reference().mjdref());
+    log_value(NORMAL, "tstart (sec)",  tstart.mjd());
+    log_value(NORMAL, "tstop  (sec)",  tstop.mjd());
+    log_value(NORMAL, "Total time",    tstop_sec-tstart_sec);
+    log_value(NORMAL, "Time interval", tinterval);
+    log_value(NORMAL, "nbins",         bins);
+
+    // Throw if tstart == tstop
+    if (tstart == tstop) {
+        throw GException::invalid_value(G_INIT_GTIS,
+                                        "Start time is equal to stop time");
+    } else if (bins < 2) {
+        std::stringstream msg;
+        msg << "Method requires at least two time bins (" 
+            << bins << " bins found).";
+        throw GException::invalid_value(G_INIT_GTIS, msg.str());
+    }
+
     for (int i=0; i<bins; i++) {
         
         // Get the next time interval
