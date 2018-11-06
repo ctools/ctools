@@ -64,6 +64,7 @@ protected:
     void copy_members(const ctfindvar& app);
     void free_members(void);
     void get_parameters(void);
+    void get_variability_sig(void)
 
     // Protected members
     // TODO: Add any data members that are necessary
