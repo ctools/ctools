@@ -404,6 +404,7 @@ void ctbin::init_members(void)
     // Initialise members
     m_outcube.clear();
     m_usepnt  = false;
+    m_stack   = true;
     m_publish = false;
     m_chatter = static_cast<GChatter>(2);
 
@@ -434,6 +435,7 @@ void ctbin::copy_members(const ctbin& app)
     // Copy attributes
     m_outcube = app.m_outcube;
     m_usepnt  = app.m_usepnt;
+    m_stack   = app.m_stack;
     m_publish = app.m_publish;
     m_chatter = app.m_chatter;
 
@@ -490,6 +492,9 @@ void ctbin::get_parameters(void)
 
     // Get energy boundaries
     m_ebounds = cube.ebounds();
+
+    // Get stack parameter
+    m_stack = (*this)["stack"].boolean();
 
     // Get remaining parameters
     m_publish = (*this)["publish"].boolean();

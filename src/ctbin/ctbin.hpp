@@ -91,6 +91,7 @@ protected:
     // User parameters
     GFilename     m_outcube;  //!< Output counts map file name
     bool          m_usepnt;   //!< Use pointing instead of xref/yref parameters
+    bool          m_stack;    //!< Output one stacked cube or multiple cubes
     bool          m_publish;  //!< Publish counts cube?
     GChatter      m_chatter;  //!< Chattiness
 
