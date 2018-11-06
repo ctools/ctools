@@ -9,5 +9,6 @@ Analysing public H.E.S.S. data
    data
    selecting_events
    skymap
+   bkgmodel
    fitting
    classical
