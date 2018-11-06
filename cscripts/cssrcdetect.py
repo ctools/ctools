@@ -38,18 +38,18 @@ class cssrcdetect(ctools.cscript):
         """
         Constructor
         """
-        # Initialise application by calling the base class constructor
-        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
-
-        # Set protected members
-        self._models = gammalib.GModels()
-
         # Initialise sky map from constructor arguments
         if len(argv) > 0 and isinstance(argv[0], gammalib.GSkyMap):
             self._map = argv[0]
             argv      = argv[1:]
         else:
             self._map = gammalib.GSkyMap()
+
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
+
+        # Set protected members
+        self._models = gammalib.GModels()
 
         # Initialise other members
         self._map_dirs = []
