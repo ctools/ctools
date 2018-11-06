@@ -58,6 +58,7 @@ namespace std {
 %include "ctlikelihood.i"
 
 /* __ ctools _____________________________________________________________ */
+%include "ctfindvar.i"
 %include "ctbin.i"
 %include "ctobssim.i"
 %include "ctlike.i"
