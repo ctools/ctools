@@ -74,8 +74,7 @@ protected:
     void copy_members(const ctfindvar& app);
     void free_members(void);
     void get_parameters(void);
-    void get_variability_sig(void)
-    void get_variability_sig(const int& pix_number, const int& nbins, GNdarray& sig_histogram)
+    void get_variability_sig(const int& pix_number, const int& nbins, GNdarray& sig_histogram);
 
     // Protected members
     GSkyMap m_counts;                    //!< Counts for each time interval
