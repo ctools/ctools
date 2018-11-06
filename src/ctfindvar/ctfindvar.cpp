@@ -321,6 +321,48 @@ void ctfindvar::get_variability_sig(const int& pix_number, const int& nbins, GNd
 
     }
 }
+
+
+/***********************************************************************//**
+ * @brief Get the map index associated with a given time
+ *
+ * @param[in] time      Time
+ * @return Index of map in counts cube
+ ***************************************************************************/
+int ctfindvar::time2inx(const GTime& time)
+{
+    // Set default return value
+    int map_index = -1;
+
+    // Loop over all GTIs
+    for (int i=0; i<m_gti.size(); i++) {
+        // Check if interval contains the time
+        GGti interval = inx2gti(i);
+        if (interval.contains(time)) {
+            map_index = i;
+            break;
+        }
+    }
+
+    return map_index;
+}
+
+
+/***********************************************************************//**
+ * @brief Return reference to significance cube object
+ ***************************************************************************/
+GGti ctfindvar::inx2gti(const int& index)
+{
+    if ((index < 0) || (index >= m_gti.size())) {
+        // Index is invalid, so throw an error
+        throw GException::invalid_value("ctfindvar::inx2gti(const int&)",
+                                        "'index' parameter out of range");
+    }
+
+    return GGti(m_gti.tstart(index), m_gti.tstop(index));
+}
+
+
 /***********************************************************************//**
  * @brief Save something
  *
