@@ -30,6 +30,8 @@
 #endif
 #include "ctfindvar.hpp"
 #include "GammaLib.hpp"
+#include "GNdarray.hpp"
+#include "GSkymap.hpp"
 #include "GCTALib.hpp"
 
 /* __ OpenMP section _____________________________________________________ */
@@ -219,7 +221,7 @@ void ctfindvar::run(void)
     if (logDebug()) {
         log.cout(true);
     }
-
+    
     // Get task parameters
     get_parameters();
 
@@ -228,11 +230,86 @@ void ctfindvar::run(void)
 
     // TODO: Your code goes here
 
+   // //////////////////////////////////////////////////////////////////
+   // double max_sig=0;
+   // GNdarray GNdarray_temp(NBINS);
+   // for (int i=0, i<number of pixels; i++)
+   // {    
+   //     get_variability_sig(pix_number, GNdarray_temp) 
+   //     if (position == source position)
+   //     {
+   //         GNdarray_source= GNdarray_temp;
+   //     }
+   //     else
+   //     {
+   //         if (max(GNdarray_temp) > max_sig)
+   //         {
+   //             GNdarray_max = GNdarray_temp;
+   //         }
+   //     }
+   // }
+    //////////////////////////////////////////////////////////////////
     // Return
     return;
 }
+void ctfindvar::get_variability_sig(const int& pix_number, const int& nbins, GNdarray& sig_histogram)
+{
+    //const int nbins = hist->GetNbinsX();
+    //const int nbins = VECTOR.size() 
+    //const int nbins = GSKYMAP.maps(); 
+    int background_bin_array[nbins];
+    bool background_validated=false;
+    int non, noff;
+    double alpha, sig;
 
+    for (int i=0;i<nbins;i++)
+    {
+        background_bin_array[i]=0;
+        accepted_bin_bckg_vector.push_back(1);
+        //sig_bin_vector.push_back(0);
+        excess_bin_vector.push_back(0);
+    }
 
+    while (background_validated==false)
+    {
+        background_validated=true;
+
+        for (int i=0; i< nbins; i++) //looping over all the bins of the histo
+        {
+           alpha=0;
+           if (accepted_bin_bckg_vector[i]==0) continue;     //the run is discared from bck calculation and not checked again.
+           int background_count=0;
+           for (int j=0;j<nbins;j++)  // for one bin selected (i), looping over all the others (j).
+           {
+                if (j!=i &&accepted_bin_bckg_vector[j]==1)
+                {
+                    //background_count+=hist->GetBinContent(j+1);
+                    //background_count+=VECTOR(j+1).first(pix_number);
+                    background_count+=GSKYMAP(pix_number, j);
+                    alpha++;
+                 }
+           }
+
+           background_bin_array[i] = background_count; //The background is averaged on the number of bins -1
+           //non = hist->GetBinContent(i+1);
+           //non = VECTOR(i+1).first(pix_number); 
+           non = GSKYMAP(pix_number, i); 
+           noff = background_bin_array[i];
+           alpha = (1./alpha);
+           sig = Utilities::Statistics::Significance(non,noff,alpha);
+           //sig_bin_vector[i]=sig;
+           sig_histogram(i)=sig;
+           excess_bin_vector[i]=non - alpha*noff;
+           std::cout << "significance of the bin : " << i << " : " << sig << " - alpha : " << alpha << " - non: " << non << " - noff: " << noff << "- excess: " << non - alpha*noff <<  std::endl;
+           if (sig>4.5 ) // if the bin is significant, it is removed from the bckg and we loop again.
+           {
+               accepted_bin_bckg_vector[i]=0;
+               background_validated=false;
+           }
+        }
+
+    }
+}
 /***********************************************************************//**
  * @brief Save something
  *
