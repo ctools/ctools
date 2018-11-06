@@ -10,5 +10,5 @@ Analysing public H.E.S.S. data
    selecting_events
    skymap
    bkgmodel
-   fitting
+   unbinned
    classical

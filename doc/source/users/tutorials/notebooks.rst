@@ -26,5 +26,7 @@ this page.
     H.E.S.S. public data <hess_dr1/skymap.ipynb>`
 * :download:`Generating a background model from
     H.E.S.S. public data <hess_dr1/bkgmodel.ipynb>`
+* :download:`Performing an unbinned analysis of
+    H.E.S.S. public data <hess_dr1/unbinned.ipynb>`
 * :download:`Classical analysis of H.E.S.S. public data <hess_dr1/classical.ipynb>` 
   
