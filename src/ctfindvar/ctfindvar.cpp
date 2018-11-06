@@ -498,9 +498,6 @@ void ctfindvar::fill_cube(GCTAObservation* obs)
         throw GException::invalid_value(G_FILL_CUBE, msg);
     }
 
-    // Get counts cube usage flags
-    std::vector<bool> usage = cube_layer_usage(m_ebounds, events->ebounds());
-
     // Initialise binning statistics
     int num_outside_roi  = 0;
     int num_invalid_wcs  = 0;
