@@ -30,8 +30,6 @@
 #endif
 #include "ctfindvar.hpp"
 #include "GammaLib.hpp"
-#include "GNdarray.hpp"
-#include "GSkymap.hpp"
 #include "GCTALib.hpp"
 
 /* __ OpenMP section _____________________________________________________ */
