@@ -21,14 +21,12 @@ outcube,  f, a, varsig.fits,,, "Output counts cube file"
 emin,     r, a, 0.1,,, "Lower energy limit (TeV)"
 emax,     r, a, 100.0,,, "Upper energy limit (TeV)"
 
-
 #
 # Time binning parameters
 #===========================
 tinterval, r, a, 300,,, "Time interval for each bin (seconds)"
 tmin,      t, a, NONE,,, "Start time (UTC string, JD, MJD or MET in seconds)"
 tmax,      t, a, NONE,,, "Stop time (UTC string, JD, MJD or MET in seconds)"
-
 
 #
 # Spatial binning parameters
