@@ -473,8 +473,8 @@ void ctfindvar::init_cube(void)
 void ctfindvar::init_gtis(void)
 {
     double tinterval = (*this)["tinterval"].real();
-    GTime tstart("JD 999999999");          // large unreasonable Julian date
-    GTime tstop("JD 0");                   // small unreasonable Julian date
+    GTime tstart("JD 999999999");     // large unreasonable Julian date
+    GTime tstop("JD 0");              // small unreasonable Julian date
 
     // Set the start time
     if ((*this)["tmin"].is_valid()) {
@@ -497,7 +497,7 @@ void ctfindvar::init_gtis(void)
         for (int o=0; o<m_obs.size(); o++) {
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
             
-            // Check that the start time of the run is less than tstart
+            // Check that the stop time of the run is larger than tstop
             if (obs->gti().tstop() < tstop) {
                 tstop = obs->gti().tstop();
             }
