@@ -339,7 +339,8 @@ void ctfindvar::save(void)
 void ctfindvar::init_members(void)
 {
     // Initialise members
-    // TODO: Your code goes here
+    m_counts.clear();
+    m_gti.clear();
 
     // Return
     return;
@@ -378,11 +379,78 @@ void ctfindvar::free_members(void)
  ***************************************************************************/
 void ctfindvar::get_parameters(void)
 {
-    // TODO: Your code goes here
+    // Load the observations
+    setup_observations(m_obs, false, true, false);
+
+    // Create GTIs and counts cube
+    init_gtis();
+    init_cube();
+
 
     // Write parameters into logger
     log_parameters(TERSE);
 
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Initialize counts cube
+ *
+ * Sets up the required event cube and time interval storage objects 
+ * associated with this object
+ ***************************************************************************/
+void ctfindvar::init_cube(void)
+{
+    // Create the basic skymap
+    m_counts = create_map(m_obs);
+
+    // Resize to the appropriate number of time intervals
+    m_counts.nmaps(m_gti.size());
+}
+
+
+/***********************************************************************//**
+ * @brief Initialize counts cube
+ *
+ * Sets up the required event cube and time interval storage objects 
+ * associated with this object
+ ***************************************************************************/
+void ctfindvar::init_gtis(void)
+{
+    double tinterval = (*this)["tinterval"].real();
+    GTime tstart("JD 999999999");          // large unreasonable Julian date
+    GTime tstop("JD 0");                   // small unreasonable Julian date
+
+    // Set the start time
+    if ((*this)["tmin"].is_valid()) {
+        GTime tstart = (*this)["tmin"].time();
+    } else {
+        for (int o=0; o<m_obs.size(); o++) {
+            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
+            
+            // Check that the start time of the run is less than tstart
+            if (obs->gti().tstart() < tstart) {
+                tstart = obs->gti().tstart();
+            }
+        }
+    }
+
+    // Set the stop time
+    if ((*this)["tmax"].is_valid()) {
+        GTime tstop = (*this)["tmax"].time();
+    } else {
+        for (int o=0; o<m_obs.size(); o++) {
+            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
+            
+            // Check that the start time of the run is less than tstart
+            if (obs->gti().tstop() < tstop) {
+                tstop = obs->gti().tstop();
+            }
+        }
+    }
+
+    // ToDO: This is wrong only making 1 bin
+    m_gti = GGti(tstart, tstop);
 }
