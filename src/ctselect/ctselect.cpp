@@ -1118,7 +1118,7 @@ void ctselect::select_events(GCTAObservation*   obs,
  * returned:
  *
  *     NONE:    [max(emin,emin_exist),min(emax,emax_exist)]
- *     DEFAULT: [max(emin,emin_exist,emin_save),min(emax,emax_exist,emax_save)]
+ *     DEFAULT: [max(emin,emin_exist,emin_safe),min(emax,emax_exist,emax_safe)]
  *     USER:    [max(emin,emin_exist,emin_user),min(emax,emax_exist,emax_user)]
  *
  * where
@@ -1127,8 +1127,8 @@ void ctselect::select_events(GCTAObservation*   obs,
  *     emax is the value of the emax parameter
  *     emin_exist is the value of any existing minimum boundary
  *     emax_exist is the value of any existing maximum boundary
- *     emin_save is the lower save threshold
- *     emax_save is the upper save threshold
+ *     emin_safe is the lower safe threshold
+ *     emax_safe is the upper safe threshold
  *     emin_user is the lower user threshold
  *     emax_user is the upper user threshold
  *
@@ -1157,7 +1157,7 @@ GEbounds ctselect::set_ebounds(GCTAObservation* obs, const GEbounds& ebounds) co
 
     } // endif: there were already energy boundaries
 
-    // Check if default threshold (the one from the IRF, also known as save
+    // Check if default threshold (the one from the IRF, also known as safe
     // threshold) should be applied
     if (m_usethres == "DEFAULT") {
 
@@ -1171,29 +1171,29 @@ GEbounds ctselect::set_ebounds(GCTAObservation* obs, const GEbounds& ebounds) co
         }
 
         // Retrieve energy range from response information
-        double lo_save_thres = rsp->lo_save_thres();
-        double hi_save_thres = rsp->hi_save_thres();
+        double lo_safe_thres = rsp->lo_safe_thres();
+        double hi_safe_thres = rsp->hi_safe_thres();
 
         // Check threshold information for validity
-        if ((lo_save_thres > 0.0) &&
-            (hi_save_thres > 0.0) &&
-            (lo_save_thres >= hi_save_thres)) {
+        if ((lo_safe_thres > 0.0) &&
+            (hi_safe_thres > 0.0) &&
+            (lo_safe_thres >= hi_safe_thres)) {
             std::string msg = "IRF \""+obs->name()+"\" contains an invalid "
-                              "energy range ["+gammalib::str(lo_save_thres)+","+
-                              gammalib::str(hi_save_thres)+"] TeV.";
+                              "energy range ["+gammalib::str(lo_safe_thres)+","+
+                              gammalib::str(hi_safe_thres)+"] TeV.";
             throw GException::invalid_value(G_SET_EBOUNDS, msg);
         }
 
         // Raise minimum energy to lower threshold (if lower threshold exists)
         if ((emin == 0.0) ||
-            ((lo_save_thres > 0.0) && (emin < lo_save_thres))) {
-            emin = lo_save_thres;
+            ((lo_safe_thres > 0.0) && (emin < lo_safe_thres))) {
+            emin = lo_safe_thres;
         }
 
         // Lower maximum energy to upper threshold (if upper threshold exists)
         if ((emax == 0.0) ||
-            ((hi_save_thres > 0.0) && (emax > hi_save_thres))) {
-            emax = hi_save_thres;
+            ((hi_safe_thres > 0.0) && (emax > hi_safe_thres))) {
+            emax = hi_safe_thres;
         }
 
     } // endif: usethres was "DEFAULT"
