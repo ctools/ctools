@@ -20,6 +20,9 @@ this page.
 * :download:`How to perform a stacked analysis? <howto/howto_stacked_analysis.ipynb>`
 * :download:`How to do advanced model manipulation and fitting in Python? <howto/howto_advanced_python_fitting.ipynb>`
 * :download:`Data preparation for 1DC How-tos <howto/howto_prepare_1dc.ipynb>`
-* :download:`Selecting events for H.E.S.S. public data <hess_dr1/selecting_events.ipynb>`
+* :download:`Selecting events for H.E.S.S. public data
+  <hess_dr1/selecting_events.ipynb>`
+  * :download:`Generating a sky map and finding sources for
+    H.E.S.S. public data <hess_dr1/skymap.ipynb>`
 * :download:`Classical analysis of H.E.S.S. public data <hess_dr1/classical.ipynb>` 
   
