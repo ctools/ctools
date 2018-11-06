@@ -462,6 +462,49 @@ void ctfindvar::init_gtis(void)
         }
     }
 
-    // ToDO: This is wrong only making 1 bin
-    m_gti = GGti(tstart, tstop);
+    // Fill the number of good time intervals
+    double tstart_sec = tstart.secs();
+    double tstop_sec  = tstop.secs();
+    int    bins       = (tstop_sec - tstart_sec) / tinterval + 0.5;
+    for (int i=0; i<bins; i++) {
+        
+        // Get the next time interval
+        GTime next_tstart(tstart + i*tinterval);
+        GTime next_tstop(tstart + (i+1)*tinterval);
+        GGti  next_gti(next_tstart, next_tstop);
+
+        // Make sure there's an observation that overlaps with this GTI
+        bool has_obs = false;
+        for (int o=0; o<m_obs.size(); o++) {
+            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
+            
+            if (gtis_overlap(obs->gti(), next_gti)) {
+                m_gti.extend(next_gti);
+                break;
+            }
+        }
+    }
+}
+
+
+/***********************************************************************//**
+ * @brief Check if two GTIs overlap
+ *
+ * @param[in] gti1      First GTI
+ * @param[in] gti2      Second GTI
+ * @return Whether gti1 and gti2 overlap in time
+ ***************************************************************************/
+bool ctfindvar::gtis_overlap(const GGti& gti1, const GGti& gti2)
+{
+    bool overlap = false;
+    // Loop over all GTIs
+    if ((gti1.tstart() < gti2.tstart()) && (gti1.tstop() > gti2.tstart())) {
+        overlap = true;
+    } else if ((gti1.tstart() < gti2.tstop()) && (gti1.tstop() > gti2.tstop())) {
+        overlap = true;
+    } else if ((gti1.tstart() > gti2.tstart()) && (gti1.tstart() < gti2.tstop())) {
+        overlap = true;
+    }
+
+    return overlap;
 }
