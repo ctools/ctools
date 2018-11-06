@@ -62,7 +62,8 @@
  *
  * Constructs empty search time variability tool.
  ***************************************************************************/
-ctfindvar::ctfindvar(void) : ctobservation(CTFINDVAR_NAME, VERSION)
+ctfindvar::ctfindvar(void) :
+    ctobservation(CTFINDVAR_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -79,7 +80,8 @@ ctfindvar::ctfindvar(void) : ctobservation(CTFINDVAR_NAME, VERSION)
  *
  * Constructs search time variability tool from an observation container.
  ***************************************************************************/
-ctfindvar::ctfindvar(const GObservations& obs) : ctobservation(CTFINDVAR_NAME, VERSION, obs)
+ctfindvar::ctfindvar(const GObservations& obs) :
+    ctobservation(CTFINDVAR_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -98,7 +100,8 @@ ctfindvar::ctfindvar(const GObservations& obs) : ctobservation(CTFINDVAR_NAME, V
  * Constructs search time variability tool using command line arguments for user
  * parameter setting.
  ***************************************************************************/
-ctfindvar::ctfindvar(int argc, char *argv[]) : ctobservation(CTFINDVAR_NAME, VERSION, argc, argv)
+ctfindvar::ctfindvar(int argc, char *argv[]) :
+    ctobservation(CTFINDVAR_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -115,7 +118,8 @@ ctfindvar::ctfindvar(int argc, char *argv[]) : ctobservation(CTFINDVAR_NAME, VER
  *
  * Constructs search time variability tool from another search time variability tool.
  ***************************************************************************/
-ctfindvar::ctfindvar(const ctfindvar& app) : ctobservation(app)
+ctfindvar::ctfindvar(const ctfindvar& app) :
+    ctobservation(app)
 {
     // Initialise members
     init_members();
