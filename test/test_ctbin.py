@@ -113,6 +113,39 @@ class Test(test):
         evt = gammalib.GCTAEventCube('cntmap_cmd3.fits')
         self._check_cube(evt, 115)
 
+        # Check joint (unstacked) binning
+
+        # Setup ctbin command
+        cmd = ctbin+' inobs="obs_unbinned_two.xml"'+ \
+                    ' outcube="cntmap_cmd4.fits"'+\
+                    ' emin=1.0 emax=100.0 enumbins=10 ebinalg="LOG"'+ \
+                    ' nxpix=40 nypix=40 binsz=0.1 coordsys="CEL"'+ \
+                    ' xref=83.63 yref=22.01 proj="CAR"'+ \
+                    ' logfile="ctbin_cmd4.log" chatter=1 stack=no'
+
+        # Check if execution was successful
+        self.test_value(self._execute(cmd), 0,
+             'Check successful execution from command line with stack=no')
+
+        # Load counts cubes and check content.
+        evt = gammalib.GCTAEventCube('cntmap_cmd4_00001.fits')
+        self._check_cube(evt, 245)
+
+        # Load counts cubes and check content.
+        evt = gammalib.GCTAEventCube('cntmap_cmd4_00002.fits')
+        self._check_cube(evt, 245)
+
+        # Check observation definition out file
+        obs = gammalib.GObservations('obs_unbinned_two_binned.xml')
+        self.test_value(obs.size(), 2, 'Check for 2 observations in XML file')
+
+        # Check for content of observations file
+        self.test_value(obs[0].eventfile().file(), 'cntmap_cmd4_00001.fits',
+                        'Check counts cube file name')
+        self.test_value(obs[1].eventfile().file(), 'cntmap_cmd4_00002.fits',
+                        'Check counts cube file name')
+
+
         # Check ctbin --help
         self._check_help(ctbin)
 
