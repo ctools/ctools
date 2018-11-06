@@ -249,33 +249,54 @@ void ctfindvar::run(void)
 
     // TODO: Your code goes here
 
-   // //////////////////////////////////////////////////////////////////
-   // double max_sig=0;
-   // GNdarray GNdarray_temp(NBINS);
-   // for (int i=0, i<number of pixels; i++)
-   // {    
-   //     get_variability_sig(pix_number,nbins, G Ndarray_temp) 
-   //     if (position == source position)
-   //     {
-   //         GNdarray_source= GNdarray_temp;
-   //     }
-   //     else
-   //     {
-   //         if (max(GNdarray_temp) > max_sig)
-   //         {
-   //             GNdarray_max = GNdarray_temp;
-   //         }
-   //     }
-   // }
-    //////////////////////////////////////////////////////////////////
-    // Return
+    double max_sig=0;
+    const int nbins = m_counts.nmaps();
+
+    //preparing the histogram with significance evolution for the source center and the highest sig-pix
+    GNdarray pixSig(nbins), pixSigSrc(nbins), pixSigMax(nbins); //Storing the significance for each GTI of the pixels
+  
+    // creating GSkyDir to get the position of the source and each pixels
+    GSkyDir pixSkyDir;
+    GSkyDir srcSkyDir;
+
+    //Prepare the final skymap with the max significance of each pixel
+    GSkyMap pixVarSig = m_counts.extract(1);
+
+    //retrieving the source coordinate
+    if ((*this)["coordsys"].string()=="CEL")
+    {
+        srcSkyDir.radec_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
+    }
+    else
+    {
+        srcSkyDir.lb_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
+    }
+    //looping over all the pixels in the cube
+    for (int pix_number=0; pix_number<m_counts.npix(); pix_number++)
+    {    
+        if(pix_number%20==0) std::cout << "checking pixel number " << pix_number << std::endl;
+
+        pixSkyDir = m_counts.inx2dir(pix_number); //Getting the sky direction of each pixel
+        get_variability_sig(pix_number,nbins, pixSig);
+        if (pixSkyDir == srcSkyDir) //Getting the significance evolutioin for the source
+        {
+            pixSigSrc=pixSig;
+        }
+        else
+        {
+            // Getting the evolution for the pix with highest significance
+            if (max(pixSig) > max_sig)  
+            {
+                pixSigMax=pixSig;
+            }
+        }
+        //storing sig in skymap
+        pixVarSig(pix_number) = max(pixSig);
+    }
     return;
 }
 void ctfindvar::get_variability_sig(const int& pix_number, const int& nbins, GNdarray& sig_histogram)
 {
-    //const int nbins = hist->GetNbinsX();
-    //const int nbins = VECTOR.size() 
-    //const int nbins = m_counts.maps(); 
     std::vector<bool> accepted_bin_bckg_vector;
     std::vector<double> excess_bin_vector;
     int background_bin_array[nbins];
@@ -287,7 +308,6 @@ void ctfindvar::get_variability_sig(const int& pix_number, const int& nbins, GNd
     {
         background_bin_array[i]=0;
         accepted_bin_bckg_vector.push_back(1);
-        //sig_bin_vector.push_back(0);
         excess_bin_vector.push_back(0);
     }
 
@@ -295,25 +315,21 @@ void ctfindvar::get_variability_sig(const int& pix_number, const int& nbins, GNd
     {
         background_validated=true;
 
-        for (int i=0; i< nbins; i++) //looping over all the bins of the histo
+        for (int i=0; i< nbins; i++) //looping over all the GTIs of the pixel
         {
            alpha=0;
-           if (accepted_bin_bckg_vector[i]==0) continue;     //the run is discared from bck calculation and not checked again.
+           if (accepted_bin_bckg_vector[i]==0) continue;     //the GTI is discared from bckg calculation and not checked again.
            int background_count=0;
-           for (int j=0;j<nbins;j++)  // for one bin selected (i), looping over all the others (j).
+           for (int j=0;j<nbins;j++)  // for one GTI selected (i), looping over all the others (j).
            {
                 if (j!=i &&accepted_bin_bckg_vector[j]==1)
                 {
-                    //background_count+=hist->GetBinContent(j+1);
-                    //background_count+=VECTOR(j+1).first(pix_number);
                     background_count+= m_counts(pix_number, j);
                     alpha++;
                  }
            }
 
            background_bin_array[i] = background_count; //The background is averaged on the number of bins -1
-           //non = hist->GetBinContent(i+1);
-           //non = VECTOR(i+1).first(pix_number); 
            non = m_counts(pix_number, i); 
            noff = background_bin_array[i];
            alpha = (1./alpha);
