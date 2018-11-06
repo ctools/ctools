@@ -250,11 +250,12 @@ void ctfindvar::run(void)
 
     } // endfor: looped over observations
 
-    // Smooth the maps
-    // TODO: Add parameters to define map smoothing
-    m_counts.smooth("GAUSSIAN", 0.05);
-
-    // TODO: Your code goes here
+    // Smooth the maps if requested
+    if ((*this)["smoothkrnl"].is_valid() && 
+        (*this)["smoothkrnl"].string() != "NONE") {
+        m_counts.smooth((*this)["smoothkrnl"].string(),
+                        (*this)["smoothpar"].real());
+    }
 
     const int nbins = m_counts.nmaps();
 
