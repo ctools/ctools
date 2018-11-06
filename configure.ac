@@ -1019,7 +1019,6 @@ DX_INIT_DOXYGEN([ctools], [doc/Doxyfile], [doc/doxygen])
 #############################################################################
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 src/ctfindvar/Makefile
                  src/ctbin/Makefile
                  src/ctlike/Makefile
                  src/ctmodel/Makefile
