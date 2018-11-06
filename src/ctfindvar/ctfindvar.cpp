@@ -228,6 +228,25 @@ void ctfindvar::run(void)
     // Write input observation container into logger
     log_observations(NORMAL, m_obs, "Input observation");
 
+     // Loop over all unbinned CTA observations in the container
+    #pragma omp parallel for
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Get pointer to observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+
+        // Fill the cube
+        fill_cube(obs);
+
+        // Dispose events to free memory
+        obs->dispose_events();
+
+    } // endfor: looped over observations
+
+    // Smooth the maps
+    // TODO: Add parameters to define map smoothing
+    m_counts.smooth("GAUSSIAN", 0.05);
+
     // TODO: Your code goes here
 
    // //////////////////////////////////////////////////////////////////
@@ -439,7 +458,6 @@ void ctfindvar::get_parameters(void)
     // Create GTIs and counts cube
     init_gtis();
     init_cube();
-
 
     // Write parameters into logger
     log_parameters(TERSE);
