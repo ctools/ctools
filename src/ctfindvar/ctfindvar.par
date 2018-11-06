@@ -16,10 +16,12 @@
 #
 # General parameters
 #===================
-inobs,    f, a, events.fits,,, "Input event list, counts cube or observation definition XML file"
-prefix,   s, a, findvar_,,, "Prefix for output files"
-emin,     r, a, 0.1,,, "Lower energy limit (TeV)"
-emax,     r, a, 100.0,,, "Upper energy limit (TeV)"
+inobs,      f, a, events.fits,,, "Input event list, counts cube or observation definition XML file"
+prefix,     s, a, findvar_,,, "Prefix for output files"
+emin,       r, a, 0.1,,, "Lower energy limit (TeV)"
+emax,       r, a, 100.0,,, "Upper energy limit (TeV)"
+smoothkrnl, s, h, NONE, GAUSSIAN|DISK|NONE,, "Smoothing kernel for counts maps"
+smoothpar,  r, h, 0.05,,, "Parameter for the smoothing kernel"
 
 #
 # Time binning parameters
