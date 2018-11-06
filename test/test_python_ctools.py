@@ -26,6 +26,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import test_ctobssim
 import test_ctselect
 import test_ctphase
+import test_ctfindvar
 import test_ctbin
 import test_ctlike
 import test_cttsmap
@@ -105,6 +106,7 @@ def test(installed=False):
     tests = [test_ctobssim.Test(),
              test_ctselect.Test(),
              test_ctphase.Test(),
+             test_ctfindvar.Test(),
              test_ctbin.Test(),
              test_ctlike.Test(),
              test_cttsmap.Test(),

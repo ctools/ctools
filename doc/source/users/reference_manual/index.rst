@@ -17,6 +17,7 @@ ctools
 .. toctree::
    :maxdepth: 1
 
+   ctfindvar --- ToDo: Describe what tool is doing <ctfindvar>
    ctbin --- Generates counts cube <ctbin>
    ctbkgcube --- Generates background cube <ctbkgcube>
    ctbutterfly --- Compute butterfly <ctbutterfly>
