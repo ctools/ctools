@@ -29,6 +29,9 @@
 
 /* __ Includes ___________________________________________________________ */
 #include "ctobservation.hpp"
+#include "GSkyMap.hpp"
+#include "GGti.hpp"
+
 
 /* __Definitions _________________________________________________________ */
 #define CTFINDVAR_NAME "ctfindvar"
@@ -58,8 +61,15 @@ public:
     void run(void);
     void save(void);
 
+    // Get the information on the time interval from 
+    int            time2inx(const GTime& time);
+    GGti           inx2gti(const int& indx);
+    const GSkyMap& counts(void);
+
 protected:
     // Protected methods
+    void init_cube(void);
+    void init_gtis(void);
     void init_members(void);
     void copy_members(const ctfindvar& app);
     void free_members(void);
@@ -68,7 +78,19 @@ protected:
     void get_variability_sig(const int& pix_number, const int& nbins, GNdarray& sig_histogram)
 
     // Protected members
-    // TODO: Add any data members that are necessary
+    GSkyMap m_counts;                    //!< Counts for each time interval
+    GGti    m_gti;                            //!< List of time intervals
 };
+
+
+/***********************************************************************//**
+ * @brief Return reference to significance cube object
+ ***************************************************************************/
+inline
+const GSkyMap& ctfindvar::counts(void)
+{
+    return m_counts;
+}
+
 
 #endif /* CTFINDVAR_HPP */
