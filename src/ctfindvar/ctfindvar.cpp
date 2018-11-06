@@ -31,6 +31,7 @@
 #include "ctfindvar.hpp"
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
+#include <cmath>
 
 /* __ OpenMP section _____________________________________________________ */
 //#ifdef _OPENMP
@@ -233,7 +234,7 @@ void ctfindvar::run(void)
    // GNdarray GNdarray_temp(NBINS);
    // for (int i=0, i<number of pixels; i++)
    // {    
-   //     get_variability_sig(pix_number, GNdarray_temp) 
+   //     get_variability_sig(pix_number,nbins, G Ndarray_temp) 
    //     if (position == source position)
    //     {
    //         GNdarray_source= GNdarray_temp;
@@ -254,7 +255,9 @@ void ctfindvar::get_variability_sig(const int& pix_number, const int& nbins, GNd
 {
     //const int nbins = hist->GetNbinsX();
     //const int nbins = VECTOR.size() 
-    //const int nbins = GSKYMAP.maps(); 
+    //const int nbins = m_counts.maps(); 
+    std::vector<bool> accepted_bin_bckg_vector;
+    std::vector<double> excess_bin_vector;
     int background_bin_array[nbins];
     bool background_validated=false;
     int non, noff;
@@ -283,7 +286,7 @@ void ctfindvar::get_variability_sig(const int& pix_number, const int& nbins, GNd
                 {
                     //background_count+=hist->GetBinContent(j+1);
                     //background_count+=VECTOR(j+1).first(pix_number);
-                    background_count+=GSKYMAP(pix_number, j);
+                    background_count+= m_counts(pix_number, j);
                     alpha++;
                  }
            }
@@ -291,10 +294,20 @@ void ctfindvar::get_variability_sig(const int& pix_number, const int& nbins, GNd
            background_bin_array[i] = background_count; //The background is averaged on the number of bins -1
            //non = hist->GetBinContent(i+1);
            //non = VECTOR(i+1).first(pix_number); 
-           non = GSKYMAP(pix_number, i); 
+           non = m_counts(pix_number, i); 
            noff = background_bin_array[i];
            alpha = (1./alpha);
-           sig = Utilities::Statistics::Significance(non,noff,alpha);
+          
+           ///////////////////////////////////////////////////////////////////////////////// 
+           // Compute sensitivity in Gaussian sigma
+           double alpha1 = alpha + 1.0;
+           double ntotal = non+noff;
+           double arg1   = non/ntotal;
+           double arg2   = noff/ntotal;
+           double term1  = non * std::log((alpha1/alpha)*arg1);
+           double term2  = noff * std::log(alpha1*arg2);
+           sig  = sqrt(2.0 * (term1 + term2));
+           /////////////////////////////////////////////////
            //sig_bin_vector[i]=sig;
            sig_histogram(i)=sig;
            excess_bin_vector[i]=non - alpha*noff;
