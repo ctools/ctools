@@ -73,6 +73,7 @@ protected:
     void init_members(void);
     void copy_members(const ctfindvar& app);
     void free_members(void);
+    void fill_cube(GCTAObservation* obs);
     void get_parameters(void);
     void get_variability_sig(const int& pix_number, const int& nbins, GNdarray& sig_histogram);
     bool gtis_overlap(const GGti& gti1, const GGti& gti2);

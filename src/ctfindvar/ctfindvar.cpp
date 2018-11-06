@@ -39,6 +39,7 @@
 //#endif
 
 /* __ Method name definitions ____________________________________________ */
+#define G_FILL_CUBE                  "ctfindvar::fill_cube(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -442,6 +443,119 @@ void ctfindvar::get_parameters(void)
 
     // Write parameters into logger
     log_parameters(TERSE);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Fill the cube from the events in the map
+ *
+ * Sets up the required event cube and time interval storage objects 
+ * associated with this object
+ ***************************************************************************/
+void ctfindvar::fill_cube(GCTAObservation* obs)
+{
+    // Make sure that the observation holds a CTA event list. If this
+    // is not the case then throw an exception.
+    const GCTAEventList* events = dynamic_cast<const GCTAEventList*>
+                                  (obs->events());
+    if (events == NULL) {
+        std::string msg = "CTA Observation does not contain an event "
+                          "list. An event list is needed to fill the "
+                          "counts cube.";
+        throw GException::invalid_value(G_FILL_CUBE, msg);
+    }
+
+    // Get the RoI
+    const GCTARoi& roi = events->roi();
+
+    // Check for RoI sanity
+    if (!roi.is_valid()) {
+        std::string msg = "No valid RoI found in input observation "
+                          "\""+obs->name()+"\". Run ctselect to specify "
+                          "an RoI for this observation before running "
+                          "ctbin.";
+        throw GException::invalid_value(G_FILL_CUBE, msg);
+    }
+
+    // Get counts cube usage flags
+    std::vector<bool> usage = cube_layer_usage(m_ebounds, events->ebounds());
+
+    // Initialise binning statistics
+    int num_outside_roi  = 0;
+    int num_invalid_wcs  = 0;
+    int num_outside_map  = 0;
+    int num_outside_time = 0;
+    int num_in_map       = 0;
+
+    // Fill counts sky map
+    for (int i = 0; i < events->size(); ++i) {
+
+        // Get event
+        const GCTAEventAtom* event = (*events)[i];
+
+        // Determine event time
+        GTime evnt_time = event->time();
+        int time_indx = time2inx(evnt_time);
+        
+        // Check if event is in the GTIs
+        if ((time_indx > -1) && (time_indx < m_counts.nmaps())) {
+
+            // Get event direction
+            GSkyDir evnt_dir = GCTAInstDir(event->dir()).dir();
+
+            // Skip event if it is outside the RoI
+            if (roi.centre().dir().dist_deg(evnt_dir) > roi.radius()) {
+                num_outside_roi++;
+                continue;
+            }
+
+            // Determine sky pixel
+            GSkyPixel pixel;
+            try {
+                pixel = m_counts.dir2pix(evnt_dir);
+            }
+            catch (std::exception &e) {
+                num_invalid_wcs++;
+                continue;
+            }
+
+            // Skip event if corresponding counts cube pixel is outside the
+            // counts cube map range
+            if (pixel.x() < -0.5 || pixel.x() > (m_counts.nx()-0.5) ||
+                pixel.y() < -0.5 || pixel.y() > (m_counts.ny()-0.5)) {
+                num_outside_map++;
+                continue;
+            }
+
+            // Fill event in skymap
+            #pragma omp critical(ctfindvar_fill_cube)
+            m_counts(pixel, time_indx) += 1.0;
+
+            // Increment number of maps
+            num_in_map++;
+
+        } else {
+            // Event falls outside the events
+            num_outside_time++;
+            continue;
+        }
+
+    } // endfor: looped over all events
+
+    // Log filling results
+    #pragma omp critical(ctfindvar_fill_cube)
+    {
+        log_header3(TERSE, get_obs_header(obs));
+        log_value(NORMAL, "Events in list", obs->events()->size());
+        log_value(NORMAL, "Events in cube", num_in_map);
+        log_value(NORMAL, "Events outside RoI", num_outside_roi);
+        log_value(NORMAL, "Events with invalid WCS", num_invalid_wcs);
+        log_value(NORMAL, "Events outside cube area", num_outside_map);
+        log_value(NORMAL, "Events outside time bins", num_outside_time);
+    }
 
     // Return
     return;
