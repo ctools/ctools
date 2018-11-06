@@ -1037,6 +1037,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctbutterfly/Makefile
                  src/ctulimit/Makefile
                  src/cterror/Makefile
+                 src/ctfindvar/Makefile
                  src/support/Makefile
                  src/template/Makefile
                  src/ctools-setup
