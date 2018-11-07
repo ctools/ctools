@@ -286,15 +286,15 @@ void ctfindvar::run(void)
     } 
     // ... otherwise only one source position is queried
     else {
-    GSkyDir srcSkyDir;
-    if ((*this)["coordsys"].string()=="CEL")
-    {
-        srcSkyDir.radec_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
-    }
-    else
-    {
-        srcSkyDir.lb_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
-    }
+        GSkyDir srcSkyDir;
+        if ((*this)["coordsys"].string()=="CEL")
+        {
+            srcSkyDir.radec_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
+        }
+        else
+        {
+            srcSkyDir.lb_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
+        }
 
         // Store the index of this source
         int src_map_index = m_counts.dir2inx(srcSkyDir);
@@ -333,10 +333,22 @@ void ctfindvar::run(void)
 
             // Store the distribution if the source is located at this position
             if (srcInxPix[src] == pix_number) {
+<<<<<<< HEAD
             for (int i=0; i<nbins; i++) {
 
+=======
+                for (int i=0; i<nbins; i++) {
+>>>>>>> Wrap additional debug statement in 'G_DEBUG' check (#2713)
                     m_pixsigsrc(src,i) = pixSig(i);
+                }
+                #ifdef G_DEBUG
+                std::cout << "checking pixel number of the source of interest" << pix_number << std::endl;
+                std::cout << "checking pixel number " << pix_number << " with total number of counts of: " << total_counts << std::endl;
+                std::cout << "number of counts in pixel of the source of interest" << total_counts << std::endl;
+                std::cin.ignore();
+                #endif
             }
+<<<<<<< HEAD
             #ifdef G_DEBUG
             std::cout << "checking pixel number of the source of interest" << pix_number << std::endl;
             std::cout << "number of counts in pixel of the source of interest" << total_counts << std::endl;
@@ -346,11 +358,13 @@ void ctfindvar::run(void)
             std::cout << "checking pixel number of the source of interest: " << pix_number << " - with total number of counts of: " << total_counts << std::endl;
             #endif
         }
+=======
+>>>>>>> Wrap additional debug statement in 'G_DEBUG' check (#2713)
         }
         
-            // Getting the evolution for the pix with highest significance
-            if (max(pixSig) > max_sig)  
-            {
+        // Getting the evolution for the pix with highest significance
+        if (max(pixSig) > max_sig)  
+        {
             max_sig = max(pixSig);
             // Store information for pixel with the maximum significance
             for (int i=0; i<nbins; i++) {
@@ -896,9 +910,9 @@ void ctfindvar::write_srchist(void)
 
         // Loop over every source
         for (int src=0; src<nsources; src++) {
-        if (index >= 0) {
+            if (index >= 0) {
                 src_info(src,i) = m_pixsigsrc(src,index);
-        } else {
+            } else {
                 src_info(src,i) = 0.0;
             }
         }
@@ -969,6 +983,8 @@ void ctfindvar::write_srchist_fits(const GNdarray& time_info,
         }
         table.append(src_sig);
     }
+
+    // Store information regarding the source positions
 
     // Write the table to a file
     GFilename outfile((*this)["prefix"].string() + "srcsig.fits");
