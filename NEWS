@@ -124,6 +124,13 @@ None
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
+When running ctmodel on a counts cube, and specifically a stacked count cube,
+the event bin weighting is taken into account in the model evaluation. This
+is needed to properly take into account the changing thresholds. No such
+weighting is done if the model is computed from an event list, since in that
+case the model is properly computed for each observation using the run-wise
+response (#2721).
+
 The tools now computes DETX and DETY for every event bin if they are not
 available so that model that rely on the existence of these parameters can
 be handled (#2694).

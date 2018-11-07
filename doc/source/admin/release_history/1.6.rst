@@ -21,6 +21,8 @@ In particular, this release provides:
 Bug fixes
 ---------
 
+* [`2721 <https://cta-redmine.irap.omp.eu/issues/2721>`_] -
+  Apply event bin weighting in :ref:`ctmodel` for stacked computation
 * [`2694 <https://cta-redmine.irap.omp.eu/issues/2694>`_] -
   Compute ``DETX`` and ``DETY`` in :ref:`ctmodel` if they are not available
 * [`2686 <https://cta-redmine.irap.omp.eu/issues/2686>`_] -
