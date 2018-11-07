@@ -13,6 +13,22 @@ ToDo: Desribe in detail what the tool is doing, what it takes on input and
 what it produces on output. Please do not write more than 80 characters per
 line since this file is also used to produce a help text for the terminal.
 
+The ctfindvar tool is used to search for source variability. 
+The tool takes in input some observation files.
+It will make a cube with several maps, each one with a count number integrated
+over a time period defined by the tinterval parameter for each pixel. 
+The tinterval parameter is the time scale over which the variability
+will be searched.
+
+Several output files are made:
+- countscube.fits
+    provides all the count-skymaps contained in the cube.
+- peaksigmap.fits
+    a skymap of the highest significance for each pixel
+- srcsig.fits
+    a table containing the GTIs together with the significance
+    for all the sources with a significant variability detected.
+
 
 General parameters
 ------------------
