@@ -90,7 +90,7 @@ protected:
     GGti     m_gti;                    //!< List of time intervals
     GModels  m_inmodel;                //!< List of models for source positions
     GSkyMap  m_peaksigmap;             //!< Skymap holding the maximum significance
-    GNdarray m_pixsigsrc;              //!< Store the distributions of the source significances
+    GNdarray m_pixsigsrc;              //!< Store distributions of the source significances
     GTime    m_tstart;                 //!< Start time for variability study
     GTime    m_tstop;                  //!< Stop time for variability study
 
