@@ -108,6 +108,9 @@ Spatial binning parameters
 Standard parameters
 -------------------
 
+``(nthreads = 0) [integer]``
+    Number of parallel processes (0=use all available CPUs).
+
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
