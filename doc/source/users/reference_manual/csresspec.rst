@@ -32,13 +32,13 @@ residuals are calculated separately for each observation.
 
 Four options exist then for residual computation:
 
-- the subtraction of the model from the counts (SUB)
-- the subtraction and division by the model (SUBDIV)
-- the subtraction and division by the square root of the model (SUBDIVSQRT)
+- the subtraction of the model from the counts (``SUB``)
+- the subtraction and division by the model (``SUBDIV``)
+- the subtraction and division by the square root of the model (``SUBDIVSQRT``)
 - the computation of the significance based on the likelihood-ratio
-  test for Poisson statistics (SIGNIFICANCE)
+  test for Poisson statistics (``SIGNIFICANCE``)
 
-The SUBDIVSQRT and SIGNIFICANCE algorithms approximate the residual
+The ``SUBDIVSQRT`` and ``SIGNIFICANCE`` algorithms approximate the residual
 significance and may become inaccurate in the low-counting regime.
 
 The counts, model, and residual spectra are written into a FITS file.
