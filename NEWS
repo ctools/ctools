@@ -55,6 +55,14 @@ of the filename is now done by the GApplicationPar class.
 
 ctbin - CTA event binning
 -------------------------
+Added the option to produce an individual counts cube for each event list in
+the input observation definition XML file. The option is enabled by setting
+the new hidden parameter "stack" to "no". The cube() method now has an optional
+index argument, providing access to the i'th counts cube that was produced.
+The cubes() method specifies the number of counts cubes that were produced.
+If no counts cube was produced, the cube() method now throws an exception
+(#2714).
+
 ctbin now accouts for varying energy thresholds when computing the weight
 array (#2685).
 

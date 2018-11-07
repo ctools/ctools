@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -81,10 +81,10 @@ public:
     // Methods
     void                 clear(void);
     void                 run(void);
+    int                  cubes(void) const;
+    const GCTAEventCube& cube(const int& index = 0) const;
     void                 save(void);
     void                 publish(const std::string& name = "");
-    const GCTAEventCube& cube(void) const;
-    const GCTAEventCube& cube(const size_t& index) const;
 
 protected:
     // Protected methods
@@ -92,60 +92,46 @@ protected:
     void    copy_members(const ctbin& app);
     void    free_members(void);
     void    get_parameters(void);
-    GSkyMap fill_cube(GCTAObservation* obs);
-    GSkyMap set_weights(GCTAObservation* obs);
-    void    obs_cube(void);
+    void    init_sky_dir_cache(void);
+    GSkyMap create_cube(const GCTAObservation* obs);
+    GSkyMap fill_cube(const GCTAObservation* obs);
+    GSkyMap set_weights(const GCTAObservation* obs);
+    void    obs_cube_stacked(void);
 
     // User parameters
-    GFilename     m_outcube;  //!< Output counts map file name
-    bool          m_usepnt;   //!< Use pointing instead of xref/yref parameters
-    bool          m_stack;    //!< Output one stacked cube or multiple cubes
-    std::string   m_prefix;   //!< Prefix for output path of multiple cubes
-    bool          m_publish;  //!< Publish counts cube?
-    GChatter      m_chatter;  //!< Chattiness
+    GFilename   m_outcube;  //!< Output counts map file name
+    bool        m_usepnt;   //!< Use pointing instead of xref/yref parameters
+    bool        m_stack;    //!< Output one stacked cube or multiple cubes
+    std::string m_prefix;   //!< Prefix for output path of multiple cubes
+    bool        m_publish;  //!< Publish counts cube?
+    GChatter    m_chatter;  //!< Chattiness
 
     // Protected members
-    GSkyMap       m_counts;   //!< Event cube counts
-    GSkyMap       m_weights;  //!< Event cube weights
-    GEbounds      m_ebounds;  //!< Energy boundaries
-    GGti          m_gti;      //!< Good time intervals
-    GCTAEventCube m_cube;     //!< Events cube (for cube() method)
-    double        m_ontime;   //!< Total ontime
-    double        m_livetime; //!< Total livetime
-    std::vector<GCTAEventCube> m_cubes; //!< Event cubes (for cube() method)
-    std::vector<std::string> m_ids;     //!< Observation ids
+    std::vector<GCTAEventCube> m_cubes;    //!< Event cubes
+    std::vector<GSkyMap>       m_counts;   //!< List of event cube counts
+    std::vector<GSkyMap>       m_weights;  //!< List of event cube weights
+    std::vector<std::string>   m_ids;      //!< List of observation ids
+    GEbounds                   m_ebounds;  //!< Energy boundaries
+    GGti                       m_gti;      //!< Stacked Good time intervals
+    double                     m_ontime;   //!< Total ontime
+    double                     m_livetime; //!< Total livetime
 
     // Cache members
-    std::vector<GSkyDir> m_dirs; //!< Cached GSkyDir for each pixel in m_counts
+    std::vector<GSkyDir>       m_dirs;     //!< Cached GSkyDir for all pixels
 };
 
 
 /***********************************************************************//**
- * @brief Return event cube
+ * @brief Return number of event cubes
  *
- * @return Reference to event cube
+ * @return Number of event cubes.
  *
- * Returns a reference to the event cube.
+ * Returns number of event cubes.
  ***************************************************************************/
 inline
-const GCTAEventCube& ctbin::cube(void) const
+int ctbin::cubes(void) const
 {
-    return m_cube;
-}
-
-
-/***********************************************************************//**
- * @brief Return event cube at index
- *
- * @param[in] index Index of cube
- * @return Reference to event cube
- *
- * Returns a reference to the event cube at the given index.
- ***************************************************************************/
-inline
-const GCTAEventCube& ctbin::cube(const size_t& index) const
-{
-    return m_cubes[index];
+    return m_cubes.size();
 }
 
 #endif /* CTBIN_HPP */

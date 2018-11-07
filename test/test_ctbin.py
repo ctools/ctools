@@ -165,7 +165,7 @@ class Test(test):
         # cube
         self.test_value(binning.obs().size(), 0,
              'Check that empty ctbin has an empty observation container')
-        self.test_value(binning.cube().size(), 0,
+        self.test_value(binning.cubes(), 0,
              'Check that empty ctbin has an empty counts cube')
 
         # Check that saving does not nothing
@@ -220,11 +220,13 @@ class Test(test):
         cpy_bin.logFileOpen()
         cpy_bin.run()
 
-        # Check content of observation container and counts cube. Now an empty
-        # event cube is expected since on input the observation is binned, and
-        # any binned observation will be skipped.
-        self._check_observation(cpy_bin, 0)
-        self._check_cube(cpy_bin.cube(), 0)
+        # Check content of observation container and number of counts cubes.
+        # There should be a single binned observation in the observation
+        # container, which is the one that was produced in the run before.
+        # Since ctbin finds no unbinned observation in the container, the
+        # number of cubes should be zero.
+        self._check_observation(cpy_bin, 245)
+        self.test_value(cpy_bin.cubes(), 0, 'Check that there are no counts cubes')
 
         # Save counts cube
         binning.save()
@@ -240,7 +242,7 @@ class Test(test):
         # counts cube
         self.test_value(binning.obs().size(), 0,
              'Check that empty ctbin has an empty observation container')
-        self.test_value(binning.cube().size(), 0,
+        self.test_value(binning.cubes(), 0,
              'Check that empty ctbin has an empty counts cube')
 
         # Prepare observation container for stacking of events into a

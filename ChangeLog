@@ -1,8 +1,9 @@
-2018-11-03
+2018-11-07
 
         * Version 1.6.0 released
         ========================
 
+        Enable ctbin to produce counts cubes for a joint binned analysis (#2714)
         Add code generator (#2709)
         Add csbkgmodel script (#2694)
         Compute DETX and DETY in ctmodel if they are not available (#2694)

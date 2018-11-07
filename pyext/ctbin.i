@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -46,10 +46,10 @@ public:
     // Methods
     void                 clear(void);
     void                 run(void);
+    int                  cubes(void) const;
+    const GCTAEventCube& cube(const int& index = 0) const;
     void                 save(void);
     void                 publish(const std::string& name = "");
-    const GCTAEventCube& cube(void) const;
-    const GCTAEventCube& cube(const size_t& index) const;
 };
 
 
