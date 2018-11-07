@@ -294,6 +294,42 @@ class Test(test):
         evt = gammalib.GCTAEventCube('ctbin_py4.fits')
         self._check_cube(evt, 245)
 
+        # Test unstacked version
+        pars = {'inobs': self._datadir+'/obs_unbinned_two.xml', 'ebinalg': 'LIN', 'emin': 1.0,
+                'emax': 100.0, 'enumbins': 10, 'nxpix': 40, 'nypix': 40,
+                'binsz': 0.1, 'coordsys': 'CEL', 'proj': 'CAR',
+                'xref': 83.63, 'yref': 22.01, 'outcube': 'ctbin_py5.xml',
+                'logfile': 'ctbin_py5.log', 'chatter': 2,
+                'prefix': 'cntcube_py5_', 'stack' : False}
+        binning = ctools.ctbin()
+        binning.pardict(pars)
+
+        binning.logFileOpen()
+        binning.run()
+
+        # Check individual cubes
+        self._check_cube(binning.cube(0), 245)
+        self._check_cube(binning.cube(1), 245)
+
+        # Save counts cube
+        binning.save()
+
+        # Load observations
+        obs = gammalib.GObservations('ctbin_py5.xml')
+        self.test_value(obs.size(), 2, 'Check number of output observations')
+
+        # Check counts cubes
+        evt = obs[0].events()
+        self._check_cube(evt, 245)
+        evt = obs[1].events()
+        self._check_cube(evt, 245)
+
+        # Load counts cubes and check content
+        evt = gammalib.GCTAEventCube('cntcube_py5_00001.fits')
+        self._check_cube(evt, 245)
+        evt = gammalib.GCTAEventCube('cntcube_py5_00002.fits')
+        self._check_cube(evt, 245)
+
         # Return
         return
 

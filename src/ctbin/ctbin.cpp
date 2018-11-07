@@ -398,7 +398,6 @@ void ctbin::save(void)
     log_header1(TERSE, "Save counts cube");
 
     if (!m_stack) {
-	std::cout << m_prefix << std::endl;
 
 	// Loop over all observations
 	for (size_t i = 0; i < m_obs.size(); ++i) {
@@ -428,32 +427,33 @@ void ctbin::save(void)
 	    m_outcube = (*this)["outcube"].filename();
 	    m_obs.save(m_outcube);
 	}
-	return;
-    }
+	
+    } else { // else: stack
 
-    // Save only if filename is valid and if there is at least one
-    // observation
-    if ((*this)["outcube"].is_valid() && m_obs.size() > 0) {
-
-        // Get counts cube filename
-        m_outcube = (*this)["outcube"].filename();
-
-        // Get CTA observation from observation container
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
-
-        // Save only if observation is valid
-        if (obs != NULL) {
-
-            // Log counts cube file name
-            log_value(NORMAL, "Counts cube file", m_outcube.url());
-
-            // Save cube
-            obs->save(m_outcube, clobber());
-
-        } // endif: observation was valid
-
-    } // endif: outcube file was valid
-
+	// Save only if filename is valid and if there is at least one
+	// observation
+	if ((*this)["outcube"].is_valid() && m_obs.size() > 0) {
+	    
+	    // Get counts cube filename
+	    m_outcube = (*this)["outcube"].filename();
+	    
+	    // Get CTA observation from observation container
+	    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+	    
+	    // Save only if observation is valid
+	    if (obs != NULL) {
+		
+		// Log counts cube file name
+		log_value(NORMAL, "Counts cube file", m_outcube.url());
+		
+		// Save cube
+		obs->save(m_outcube, clobber());
+		
+	    } // endif: observation was valid
+	    
+	} // endif: outcube file was valid
+	
+    } // endelse: stack 
     // Return
     return;
 }

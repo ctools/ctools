@@ -39,13 +39,20 @@
  *
  * @brief Event binning tool
  *
- * This class bins event list(s) into a single counts cube. The class can
+ * This class bins event list(s) into counts cubes. The class can
  * operate on predefined observation containers, on individual event list
  * FITS files, and on observation definition XML files.
  *
  * If multiple event lists are specified in the observation container or the
  * XML definition file, the class will merge these events into a single
  * counts cube.
+ *
+ * If the hidden parameter stack=no is used, one counts cube is generated for
+ * each individual observation. These cubes are saved to a path that can be
+ * specified by the hidden parameter prefix, followed by the corresponding
+ * observation id. An observation definition XML file containing the paths
+ * to the newly generated counts cubes is written to path given in the 
+ * parameter outcube.
  *
  * Results are stored in an observation container that can be written to disk
  * in form of a single FITS file. On output, the observation container will
@@ -77,6 +84,7 @@ public:
     void                 save(void);
     void                 publish(const std::string& name = "");
     const GCTAEventCube& cube(void) const;
+    const GCTAEventCube& cube(const size_t& index) const;
 
 protected:
     // Protected methods
@@ -104,8 +112,8 @@ protected:
     GCTAEventCube m_cube;     //!< Events cube (for cube() method)
     double        m_ontime;   //!< Total ontime
     double        m_livetime; //!< Total livetime
-    std::vector<GCTAEventCube> m_cubes;
-    std::vector<std::string> m_ids;
+    std::vector<GCTAEventCube> m_cubes; //!< Event cubes (for cube() method)
+    std::vector<std::string> m_ids;     //!< Observation ids
 
     // Cache members
     std::vector<GSkyDir> m_dirs; //!< Cached GSkyDir for each pixel in m_counts
@@ -123,6 +131,21 @@ inline
 const GCTAEventCube& ctbin::cube(void) const
 {
     return m_cube;
+}
+
+
+/***********************************************************************//**
+ * @brief Return event cube at index
+ *
+ * @param[in] index Index of cube
+ * @return Reference to event cube
+ *
+ * Returns a reference to the event cube at the given index.
+ ***************************************************************************/
+inline
+const GCTAEventCube& ctbin::cube(const size_t& index) const
+{
+    return m_cubes[index];
 }
 
 #endif /* CTBIN_HPP */
