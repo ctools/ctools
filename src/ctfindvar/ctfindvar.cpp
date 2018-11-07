@@ -877,6 +877,7 @@ void ctfindvar::write_srchist_fits(const GNdarray& time_info,
     // Create the table
     int           nrows = time_info.shape()[1];
     GFitsBinTable table(nrows);
+    table.extname("SRCSIGNIF");
 
     // Append the start and stop time columns
     GFitsTableFloatCol start_mjd("TSTART", nrows);
