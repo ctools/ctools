@@ -334,12 +334,8 @@ void ctfindvar::run(void)
 
             // Store the distribution if the source is located at this position
             if (srcInxPix[src] == pix_number) {
-<<<<<<< HEAD
-            for (int i=0; i<nbins; i++) {
 
-=======
                 for (int i=0; i<nbins; i++) {
->>>>>>> Wrap additional debug statement in 'G_DEBUG' check (#2713)
                     m_pixsigsrc(src,i) = pixSig(i);
                 }
                 #ifdef G_DEBUG
@@ -349,7 +345,6 @@ void ctfindvar::run(void)
                 std::cin.ignore();
                 #endif
             }
-<<<<<<< HEAD
             #ifdef G_DEBUG
             std::cout << "checking pixel number of the source of interest" << pix_number << std::endl;
             std::cout << "number of counts in pixel of the source of interest" << total_counts << std::endl;
@@ -359,13 +354,11 @@ void ctfindvar::run(void)
             std::cout << "checking pixel number of the source of interest: " << pix_number << " - with total number of counts of: " << total_counts << std::endl;
             #endif
         }
-=======
->>>>>>> Wrap additional debug statement in 'G_DEBUG' check (#2713)
         }
         
         // Getting the evolution for the pix with highest significance
         #pragma omp critical(ctfind_run)
-        {
+        {  
             if (max(pixSig) > max_sig)  
             {
                 max_sig = max(pixSig);
@@ -631,7 +624,6 @@ void ctfindvar::get_parameters(void)
             (*this)["xsrc"].real();
             (*this)["ysrc"].real();
         }
-
         // Get the file format for the output source histograms
         (*this)["histtype"].string();
     }
