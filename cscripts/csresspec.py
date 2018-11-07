@@ -532,6 +532,9 @@ class csresspec(ctools.csobservation):
 
                 # Run model cube
                 modelcube['edisp'] = self['edisp'].boolean()
+                # Reset base cube that was modified internally by ctmodel
+                if ccube != 'NONE':
+                    modelcube.cube(ccube)
                 modelcube.run()
 
                 # Extract spectrum of individual component
