@@ -301,9 +301,14 @@ void ctfindvar::run(void)
         srcInxPix.push_back(src_map_index);
     }
 
+    //preparing the histogram with significance evolution for the source center and the highest sig-pix
+    GNdarray pixSig(nbins), pixSigMax(nbins); //Storing the significance for each GTI of the pixels
+    m_pixsigsrc = GNdarray(srcInxPix.size(), nbins);
+    m_pixsigmax = GNdarray(1,nbins);
+
     //Prepare the final skymap with the max significance of each pixel
-    GSkyMap pixVarSig = m_counts.extract(1);
-    double max_sig=0;
+    double  max_sig=0;
+    GSkyDir max_sig_dir;
 
     //looping over all the pixels in the cube
     for (int pix_number=0; pix_number<m_counts.npix(); pix_number++)
@@ -346,15 +351,25 @@ void ctfindvar::run(void)
             // Getting the evolution for the pix with highest significance
             if (max(pixSig) > max_sig)  
             {
-                pixSigMax=pixSig;
+            max_sig = max(pixSig);
+            // Store information for pixel with the maximum significance
+            for (int i=0; i<nbins; i++) {
+                m_pixsigmax(0,i) = pixSig(i);
             }
+
+            // Update the pixel position with the maximum sigma
+            max_sig     = max(pixSig);
+            max_sig_dir = m_counts.inx2dir(pix_number);
         }
+
         //storing sig in skymap
         pixVarSig(pix_number) = max(pixSig);
     }
 
-    // TODO: Store this uptop
-    m_peaksigmap = pixVarSig;
+    log_header1(NORMAL, "Analysis finished");
+    log_value(NORMAL, "Maximum sigma", max_sig);
+    log_value(NORMAL, "Max pixel RA", max_sig_dir.ra_deg());
+    log_value(NORMAL, "Max pixel DEC", max_sig_dir.dec_deg());
 
     return;
 }

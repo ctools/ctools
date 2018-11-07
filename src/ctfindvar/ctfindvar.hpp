@@ -91,6 +91,7 @@ protected:
     GModels  m_inmodel;                //!< List of models for source positions
     GSkyMap  m_peaksigmap;             //!< Skymap holding the maximum significance
     GNdarray m_pixsigsrc;              //!< Store distributions of the source significances
+    GNdarray m_pixsigmax;              //!< Store distribution for pixel with max significance
     GTime    m_tstart;                 //!< Start time for variability study
     GTime    m_tstop;                  //!< Stop time for variability study
 
