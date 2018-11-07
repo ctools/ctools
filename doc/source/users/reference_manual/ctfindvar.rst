@@ -52,10 +52,12 @@ General parameters
     Minimum number of off counts to compute the significance
 
 ``emin [real]``
-    Minimum energy for extracting data
+    Minimum energy (TeV) for extracting events. A value of 0 results in no cut
+    being applied.
 
 ``emax [real]``
-    Maximum energy for extracting data
+    Maximum energy (TeV) for extracting events. A value of 0 results in no cut
+    being applied.
 
 ``(smoothkrnl = NONE) <GAUSSIAN|DISK|NONE> [string]``
     Kernel to be used in smoothing the counts maps before computing 
