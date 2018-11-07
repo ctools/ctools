@@ -356,6 +356,10 @@ void ctfindvar::run(void)
         }
         }
         
+        #ifdef G_DEBUG
+        std::cout << "checking pixel number of the source of interest: " << pix_number << " - with total number of counts of: " << total_counts << std::endl;
+        #endif
+
         // Getting the evolution for the pix with highest significance
         #pragma omp critical(ctfind_run)
         {  
