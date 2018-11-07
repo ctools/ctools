@@ -41,6 +41,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`2712 <https://cta-redmine.irap.omp.eu/issues/2712>`_] -
+  Add Jupyter notebooks for H.E.S.S. DR1
 * [`2685 <https://cta-redmine.irap.omp.eu/issues/2685>`_] -
   Add ``ctbkgcube::cntcube()`` method
   Account for varying energy thresholds in :ref:`ctbin` weight computation

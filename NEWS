@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-3 November 2018
+7 November 2018
 
 
 Introduction
@@ -18,6 +18,12 @@ documentation, that are fully functional. The developer then only needs to
 fill the skeleton with the relevant code (#2709).
 
 Keep existing library path in installation script on Mac OS X (#2420).
+
+
+Documentation
+-------------
+Added documentation for analysing data of the H.E.S.S. public data release.
+A bunch of Jupyter notebooks were also added (#2712).
 
 
 Python interface
