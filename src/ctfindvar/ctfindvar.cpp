@@ -610,6 +610,13 @@ void ctfindvar::free_members(void)
  ***************************************************************************/
 void ctfindvar::get_parameters(void)
 {
+    #ifdef _OPENMP
+    int nthreads = (*this)["nthreads"].integer();
+    if (nthreads > 0) {
+        omp_set_num_threads(nthreads);
+    }
+    #endif
+
     // Load the observations
     setup_observations(m_obs, false, true, false);
 
