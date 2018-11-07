@@ -302,7 +302,6 @@ void ctfindvar::run(void)
     }
 
     //preparing the histogram with significance evolution for the source center and the highest sig-pix
-    GNdarray pixSig(nbins), pixSigMax(nbins); //Storing the significance for each GTI of the pixels
     m_pixsigsrc = GNdarray(srcInxPix.size(), nbins);
     m_pixsigmax = GNdarray(1,nbins);
 
@@ -311,8 +310,10 @@ void ctfindvar::run(void)
     GSkyDir max_sig_dir;
 
     //looping over all the pixels in the cube
+    #pragma omp parallel for
     for (int pix_number=0; pix_number<m_counts.npix(); pix_number++)
     {    
+        GNdarray pixSig(nbins);
         double total_counts=0;
         for (int k=0;k<m_counts.nmaps();k++)
         {
@@ -363,19 +364,21 @@ void ctfindvar::run(void)
         }
         
         // Getting the evolution for the pix with highest significance
-        if (max(pixSig) > max_sig)  
+        #pragma omp critical(ctfind_run)
         {
-            max_sig = max(pixSig);
-            // Store information for pixel with the maximum significance
-            for (int i=0; i<nbins; i++) {
-                m_pixsigmax(0,i) = pixSig(i);
+            if (max(pixSig) > max_sig)  
+            {
+                max_sig = max(pixSig);
+                // Store information for pixel with the maximum significance
+                for (int i=0; i<nbins; i++) {
+                    m_pixsigmax(0,i) = pixSig(i);
+                }
+
+                // Update the pixel position with the maximum sigma
+                max_sig     = max(pixSig);
+                max_sig_dir = m_counts.inx2dir(pix_number);
             }
-
-            // Update the pixel position with the maximum sigma
-            max_sig     = max(pixSig);
-            max_sig_dir = m_counts.inx2dir(pix_number);
         }
-
         //storing sig in skymap
         m_peaksigmap(pix_number) = max(pixSig);
     }
@@ -627,10 +630,10 @@ void ctfindvar::get_parameters(void)
             // Get the desired source position from user
             (*this)["xsrc"].real();
             (*this)["ysrc"].real();
-
-            // Get the file format for the output source histograms
-            (*this)["histtype"].string();
         }
+
+        // Get the file format for the output source histograms
+        (*this)["histtype"].string();
     }
 
     // Write parameters into logger
