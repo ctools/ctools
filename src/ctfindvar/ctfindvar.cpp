@@ -259,11 +259,33 @@ void ctfindvar::run(void)
 
     const int nbins = m_counts.nmaps();
 
-    //preparing the histogram with significance evolution for the source center and the highest sig-pix
-    GNdarray pixSig(nbins), pixSigMax(nbins); //Storing the significance for each GTI of the pixels
-    m_pixsigsrc = GNdarray(1, nbins); //TODO: Update this to allow for multiple sources in 1st dimension
-
     // creating GSkyDir to get the position of the source and each pixels
+
+    // Extract which pixel in the map each source is located in
+    std::vector<int> srcInxPix;
+    if (m_inmodel.size() > 0) {
+        for (int mod=0; mod<m_inmodel.size(); mod++) {
+
+            // Extract the model
+            GModelSky* model = dynamic_cast<GModelSky*>(m_inmodel[mod]);
+            if (model != NULL) {
+                // Get the source position
+                GModelSpatial* model_spatial = model->spatial();
+                GSkyRegion*    model_region  = model_spatial->region();
+                GSkyDir        srcSkyDir     = 
+                        dynamic_cast<GSkyRegionCircle*>(model_region)->centre();
+
+                // Store the map index of this source
+                int src_map_index = m_counts.dir2inx(srcSkyDir);
+                srcInxPix.push_back(src_map_index);
+            } else {
+                m_inmodel.remove(mod);
+                mod--;
+            }
+        }
+    } 
+    // ... otherwise only one source position is queried
+    else {
     GSkyDir srcSkyDir;
     if ((*this)["coordsys"].string()=="CEL")
     {
@@ -274,8 +296,10 @@ void ctfindvar::run(void)
         srcSkyDir.lb_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
     }
 
-    //Getting the index of pixel on which falls the source of interest
-    int srcInxPix = m_counts.dir2inx(srcSkyDir);
+        // Store the index of this source
+        int src_map_index = m_counts.dir2inx(srcSkyDir);
+        srcInxPix.push_back(src_map_index);
+    }
 
     //Prepare the final skymap with the max significance of each pixel
     GSkyMap pixVarSig = m_counts.extract(1);
@@ -300,11 +324,13 @@ void ctfindvar::run(void)
         get_variability_sig(pix_number,nbins, pixSig);
 
         //Getting the significance evolution for the source
-        if (srcInxPix == pix_number) 
-        {
+        for (int src=0; src<srcInxPix.size(); src++) {
+
+            // Store the distribution if the source is located at this position
+            if (srcInxPix[src] == pix_number) {
             for (int i=0; i<nbins; i++) {
-                m_pixsigsrc(0,i) = pixSig(i);
-               
+
+                    m_pixsigsrc(src,i) = pixSig(i);
             }
             #ifdef G_DEBUG
             std::cout << "checking pixel number of the source of interest" << pix_number << std::endl;
@@ -315,8 +341,8 @@ void ctfindvar::run(void)
             std::cout << "checking pixel number of the source of interest: " << pix_number << " - with total number of counts of: " << total_counts << std::endl;
             #endif
         }
-        else
-        {
+        }
+        
             // Getting the evolution for the pix with highest significance
             if (max(pixSig) > max_sig)  
             {
@@ -833,8 +859,9 @@ void ctfindvar::write_srchist(void)
     // Setup data storage for time and source significances
     double   tinterval = (*this)["tinterval"].real();
     int      nentries = (m_tstop-m_tstart) / tinterval + 0.5;
+    int      nsources = m_pixsigsrc.shape()[0];
     GNdarray time_info(2,nentries);
-    GNdarray src_info(m_pixsigsrc.shape()[0], nentries);
+    GNdarray src_info(nsources, nentries);
 
     // Store the full set of information
     for (int i=0; i<nentries; i++) {
@@ -848,10 +875,14 @@ void ctfindvar::write_srchist(void)
 
         // Get the index associated with this time
         int index = time2inx(midpoint);
+
+        // Loop over every source
+        for (int src=0; src<nsources; src++) {
         if (index >= 0) {
-            src_info(0,i) = m_pixsigsrc(0,index);
+                src_info(src,i) = m_pixsigsrc(src,index);
         } else {
-            src_info(0,i) = 0.0;
+                src_info(src,i) = 0.0;
+            }
         }
     }
 
@@ -908,7 +939,12 @@ void ctfindvar::write_srchist_fits(const GNdarray& time_info,
     // Append the distribution for each source
     int src_count = src_info.shape()[0];
     for (int src=0; src<src_count; src++) {
-        GFitsTableFloatCol src_sig("SOURCE", nrows);
+        std::string src_name("SOURCE");
+        if (m_inmodel.size() > 0) {
+            src_name = m_inmodel[src]->name();
+        }
+        
+        GFitsTableFloatCol src_sig(src_name, nrows);
 
         for (int i=0; i<nrows; i++) {
             src_sig(i) = src_info(src, i);
