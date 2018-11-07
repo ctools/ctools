@@ -303,6 +303,7 @@ class Test(test):
         binning = ctools.ctbin()
         binning['inobs']    = self._inobs_two
         binning['stack']    = False
+        binning['prefix']   = 'cntcube_py5_'
         binning['ebinalg']  = 'LOG'
         binning['emin']     = 1.0
         binning['emax']     = 100.0
@@ -314,7 +315,7 @@ class Test(test):
         binning['proj']     = 'CAR'
         binning['xref']     = 83.63
         binning['yref']     = 22.01
-        binning['outobs']   = 'ctbin_py5.fits'
+        binning['outobs']   = 'ctbin_py5.xml'
         binning['logfile']  = 'ctbin_py5.log'
         binning['chatter']  = 2
         binning.logFileOpen()
