@@ -164,6 +164,7 @@ testscripts = $(srcdir)/tests/__init__.py \
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data
 testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/obs_unbinned.xml \
+           $(top_srcdir)/test/data/obs_unbinned_two.xml \
            $(top_srcdir)/test/data/obs_stacked.xml \
            $(top_srcdir)/test/data/obs_stacked_two.xml \
            $(top_srcdir)/test/data/crab_events.fits \

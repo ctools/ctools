@@ -14,16 +14,26 @@ a 3-dimensional data cube spanned by Right Ascension or Galactic longitude,
 Declination or Galactic latitude, and energy. The energy binning may be either
 linear, logarithmic, or custom defined using an input file. The events are 
 either taken from a single event list file or from the event lists that are 
-specified in an observation definition file. In case that multiple event 
-lists are given in an observation definition file, the tool will loop over
-all event lists and fill all events into a single counts cube.
+specified in an observation definition file.
 
-:ref:`ctbin` generates a counts cube FITS file comprising three extensions. The
+In case that multiple event lists are given in an observation definition file
+there are two options. By default, the tool will loop over all event lists and
+fill all events into a single counts cube. If ``stack=no`` is specified, the
+tool will bin each event list into a separate counts cube.
+
+:ref:`ctbin` generates counts cube FITS file(s) comprising three extensions. The
 primary extension contains a 3-dimensional image that contains the counts
 cube values. The next extension named ``EBOUNDS`` contains a binary table
 that defines the energy boundaries of the counts cube. The last extension
 named ``GTI`` contains a binary table that defines the Good Time Intervals
 of all event lists that have been filled into the counts cube.
+
+By default, the tool will write out a single, stacked, counts cube. If ``stack=no``
+is specified, the tool will write all counts cubes into a separate FITS file,
+prefixing the input event list file name with the string that is specified by
+the hidden ``prefix`` parameter. In addition, the tool will create an observation
+definition XML file that lists all produced counts cubes, and that can be used
+as input for any further analysis step.
 
 
 General parameters
@@ -32,8 +42,18 @@ General parameters
 ``inobs [file]``
     Input event list or observation definition XML file.
 
-``outcube [file]``
-    Output counts cube file.
+``outobs [file]``
+    Output counts cube file or observation definition XML file.
+
+``(stack = yes) [boolean]``
+    Specify whether stacking of the events in a single counts cube is requested.
+    By default this hidden parameter is set to yes, and the tool produces a
+    single counts cube FITS file on output. If ``no`` is specified, the tool
+    will produce a counts cube for each event list that is found in the input
+    observation, and will also write an observation definition XML file.
+
+``(prefix = cntcube_) [string]``
+    Prefix for output counts cube in observation definition XML file.
 
 ``ebinalg <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins. For ``FILE``, the energy bins are defined

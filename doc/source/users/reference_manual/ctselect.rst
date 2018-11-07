@@ -52,7 +52,7 @@ General parameters
     Output event list or observation definition XML file.
 
 ``(prefix = "selected_") [string]``
-    Prefix for output event lists in observation definition file.
+    Prefix for output event lists in observation definition XML file.
 
 ``(usepnt = yes) [boolean]``
     Use pointing instead of RA/DEC parameters?

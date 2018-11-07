@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -39,13 +39,20 @@
  *
  * @brief Event binning tool
  *
- * This class bins event list(s) into a single counts cube. The class can
+ * This class bins event list(s) into counts cubes. The class can
  * operate on predefined observation containers, on individual event list
  * FITS files, and on observation definition XML files.
  *
  * If multiple event lists are specified in the observation container or the
  * XML definition file, the class will merge these events into a single
  * counts cube.
+ *
+ * If the hidden parameter stack=no is used, one counts cube is generated for
+ * each individual observation. These cubes are saved to a path that can be
+ * specified by the hidden parameter prefix, followed by the corresponding
+ * observation id. An observation definition XML file containing the paths
+ * to the newly generated counts cubes is written to path given in the 
+ * parameter outcube.
  *
  * Results are stored in an observation container that can be written to disk
  * in form of a single FITS file. On output, the observation container will
@@ -74,51 +81,55 @@ public:
     // Methods
     void                 clear(void);
     void                 run(void);
+    int                  cubes(void) const;
+    const GCTAEventCube& cube(const int& index = 0) const;
     void                 save(void);
     void                 publish(const std::string& name = "");
-    const GCTAEventCube& cube(void) const;
 
 protected:
     // Protected methods
-    void init_members(void);
-    void copy_members(const ctbin& app);
-    void free_members(void);
-    void get_parameters(void);
-    void fill_cube(GCTAObservation* obs);
-    void set_weights(GCTAObservation* obs);
-    void obs_cube(void);
+    void    init_members(void);
+    void    copy_members(const ctbin& app);
+    void    free_members(void);
+    void    get_parameters(void);
+    void    init_sky_dir_cache(void);
+    GSkyMap create_cube(const GCTAObservation* obs);
+    GSkyMap fill_cube(const GCTAObservation* obs);
+    GSkyMap set_weights(const GCTAObservation* obs);
+    void    obs_cube_stacked(void);
 
     // User parameters
-    GFilename     m_outcube;  //!< Output counts map file name
-    bool          m_usepnt;   //!< Use pointing instead of xref/yref parameters
-    bool          m_publish;  //!< Publish counts cube?
-    GChatter      m_chatter;  //!< Chattiness
+    bool        m_usepnt;   //!< Use pointing instead of xref/yref parameters
+    bool        m_stack;    //!< Output one stacked cube or multiple cubes
+    std::string m_prefix;   //!< Prefix for multiple cubes
+    bool        m_publish;  //!< Publish counts cube?
+    GChatter    m_chatter;  //!< Chattiness
 
     // Protected members
-    GSkyMap       m_counts;   //!< Event cube counts
-    GSkyMap       m_weights;  //!< Event cube weights
-    GEbounds      m_ebounds;  //!< Energy boundaries
-    GGti          m_gti;      //!< Good time intervals
-    GCTAEventCube m_cube;     //!< Events cube (for cube() method)
-    double        m_ontime;   //!< Total ontime
-    double        m_livetime; //!< Total livetime
+    std::vector<GCTAEventCube> m_cubes;    //!< Event cubes
+    std::vector<GSkyMap>       m_counts;   //!< List of event cube counts
+    std::vector<GSkyMap>       m_weights;  //!< List of event cube weights
+    GEbounds                   m_ebounds;  //!< Energy boundaries
+    GGti                       m_gti;      //!< Stacked Good time intervals
+    double                     m_ontime;   //!< Total ontime
+    double                     m_livetime; //!< Total livetime
 
     // Cache members
-    std::vector<GSkyDir> m_dirs; //!< Cached GSkyDir for each pixel in m_counts
+    std::vector<GSkyDir>       m_dirs;     //!< Cached GSkyDir for all pixels
 };
 
 
 /***********************************************************************//**
- * @brief Return event cube
+ * @brief Return number of event cubes
  *
- * @return Reference to event cube
+ * @return Number of event cubes.
  *
- * Returns a reference to the event cube.
+ * Returns number of event cubes.
  ***************************************************************************/
 inline
-const GCTAEventCube& ctbin::cube(void) const
+int ctbin::cubes(void) const
 {
-    return m_cube;
+    return m_cubes.size();
 }
 
 #endif /* CTBIN_HPP */

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<observation_list title="observation list">
+  <observation name="" id="00001" instrument="CTA">
+    <parameter name="EventList"           file="$(TEST_DATA)/crab_events.fits" />
+    <parameter name="EffectiveArea"       file="$(TEST_DATA)/irf_file.fits" />
+    <parameter name="PointSpreadFunction" file="$(TEST_DATA)/irf_file.fits" />
+    <parameter name="EnergyDispersion"    file="$(TEST_DATA)/irf_file.fits" />
+    <parameter name="Background"          file="$(TEST_DATA)/irf_file.fits" />
+  </observation>
+  <observation name="" id="00002" instrument="CTA">
+    <parameter name="EventList"           file="$(TEST_DATA)/crab_events.fits" />
+    <parameter name="EffectiveArea"       file="$(TEST_DATA)/irf_file.fits" />
+    <parameter name="PointSpreadFunction" file="$(TEST_DATA)/irf_file.fits" />
+    <parameter name="EnergyDispersion"    file="$(TEST_DATA)/irf_file.fits" />
+    <parameter name="Background"          file="$(TEST_DATA)/irf_file.fits" />
+  </observation>
+</observation_list>
