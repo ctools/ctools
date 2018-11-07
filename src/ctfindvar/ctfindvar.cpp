@@ -35,9 +35,9 @@
 #include <sstream>
 
 /* __ OpenMP section _____________________________________________________ */
-//#ifdef _OPENMP
-//#include <omp.h>
-//#endif
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 /* __ Method name definitions ____________________________________________ */
 #define G_FILL_CUBE                  "ctfindvar::fill_cube(GCTAObservation*)"
