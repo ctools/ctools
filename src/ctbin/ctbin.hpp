@@ -99,7 +99,6 @@ protected:
     void    obs_cube_stacked(void);
 
     // User parameters
-    GFilename   m_outcube;  //!< Output counts map file name
     bool        m_usepnt;   //!< Use pointing instead of xref/yref parameters
     bool        m_stack;    //!< Output one stacked cube or multiple cubes
     std::string m_prefix;   //!< Prefix for output path of multiple cubes

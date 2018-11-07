@@ -462,10 +462,10 @@ void ctbin::save(void)
 
         // Save only if filename is valid and if there is at least one
         // observation
-        if ((*this)["outcube"].is_valid() && m_obs.size() > 0) {
+        if ((*this)["outobs"].is_valid() && m_obs.size() > 0) {
 
             // Get counts cube filename
-            m_outcube = (*this)["outcube"].filename();
+            GFilename outobs = (*this)["outobs"].filename();
 
             // Get CTA observation from observation container
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
@@ -474,14 +474,14 @@ void ctbin::save(void)
             if (obs != NULL) {
 
                 // Log counts cube file name
-                log_value(NORMAL, "Counts cube file", m_outcube.url());
+                log_value(NORMAL, "Counts cube file", outobs.url());
 
                 // Save cube
-                obs->save(m_outcube, clobber());
+                obs->save(outobs, clobber());
 
             } // endif: observation was valid
 
-        } // endif: outcube file was valid
+        } // endif: outobs file was valid
 
     } // endif: counts cube was stacked
 
@@ -495,7 +495,7 @@ void ctbin::save(void)
             // Loop over all ids of observations that were binned
             for (int j = 0; j < m_ids.size(); ++j) {
 
-                // Skip if ID differes
+                // Skip if ID differs
                 if (m_ids[j] != m_obs[i]->id()) {
                     continue;
                 }
@@ -517,9 +517,16 @@ void ctbin::save(void)
         } // endfor: looped over all observations
 
         // Write XML file
-        if ((*this)["outcube"].is_valid()) {
-            m_outcube = (*this)["outcube"].filename();
-            m_obs.save(m_outcube);
+        if ((*this)["outobs"].is_valid()) {
+
+            // Get observation definition XML filename
+            std::string outobs = (*this)["outobs"].filename();
+
+            // Issue warning if output filename has no .xml suffix
+            log_string(TERSE, warn_xml_suffix(outobs));
+
+            // Save XML file
+            m_obs.save(outobs);
         }
 
     } // endelse: counts cube were not stacked
@@ -570,7 +577,6 @@ void ctbin::publish(const std::string& name)
 void ctbin::init_members(void)
 {
     // Initialise members
-    m_outcube.clear();
     m_usepnt  = false;
     m_stack   = true;
     m_publish = false;
@@ -602,7 +608,6 @@ void ctbin::init_members(void)
 void ctbin::copy_members(const ctbin& app)
 {
     // Copy attributes
-    m_outcube = app.m_outcube;
     m_usepnt  = app.m_usepnt;
     m_stack   = app.m_stack;
     m_publish = app.m_publish;
@@ -669,7 +674,7 @@ void ctbin::get_parameters(void)
 
     // If needed later, query output filename now
     if (read_ahead()) {
-        (*this)["outcube"].query();
+        (*this)["outobs"].query();
     }
 
     // Set number of OpenMP threads

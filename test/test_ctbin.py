@@ -71,7 +71,7 @@ class Test(test):
 
         # Setup ctbin command
         cmd = ctbin+' inobs="'+self._events+'"'+ \
-                    ' outcube="cntmap_cmd1.fits"'+\
+                    ' outobs="cntmap_cmd1.fits"'+\
                     ' emin=1.0 emax=100.0 enumbins=10 ebinalg="LOG"'+ \
                     ' nxpix=40 nypix=40 binsz=0.1 coordsys="CEL"'+ \
                     ' xref=83.63 yref=22.01 proj="CAR"'+ \
@@ -87,7 +87,7 @@ class Test(test):
 
         # Setup ctbin command
         cmd = ctbin+' inobs="events_that_do_not_exist.fits"'+ \
-                    ' outcube="cntmap_cmd2.fits"'+\
+                    ' outobs="cntmap_cmd2.fits"'+\
                     ' emin=1.0 emax=100.0 enumbins=10 ebinalg="LOG"'+ \
                     ' nxpix=40 nypix=40 binsz=0.1 coordsys="CEL"'+ \
                     ' xref=83.63 yref=22.01 proj="CAR"'+ \
@@ -99,7 +99,7 @@ class Test(test):
 
         # Setup ctbin command with different ebounds than input
         cmd = ctbin+' inobs="'+self._events+'"'+ \
-                    ' outcube="cntmap_cmd3.fits"'+\
+                    ' outobs="cntmap_cmd3.fits"'+\
                     ' emin=2.0 emax=20.0 enumbins=10 ebinalg="LOG"'+ \
                     ' nxpix=40 nypix=40 binsz=0.1 coordsys="CEL"'+ \
                     ' xref=83.63 yref=22.01 proj="CAR"'+ \
@@ -117,7 +117,7 @@ class Test(test):
 
         # Setup ctbin command
         cmd = ctbin+' inobs="'+self._datadir+'/obs_unbinned_two.xml"'+ \
-                    ' outcube="obs_unbinned_two_binned.xml"'+\
+                    ' outobs="obs_unbinned_two_binned.xml"'+\
                     ' emin=1.0 emax=100.0 enumbins=10 ebinalg="LOG"'+ \
                     ' nxpix=40 nypix=40 binsz=0.1 coordsys="CEL"'+ \
                     ' xref=83.63 yref=22.01 proj="CAR"'+ \
@@ -170,7 +170,7 @@ class Test(test):
 
         # Check that saving does not nothing
         binning['logfile'] = 'ctbin_py0.log'
-        binning['outcube'] = 'ctbin_py0.fits'
+        binning['outobs']  = 'ctbin_py0.fits'
         binning.logFileOpen()
         binning.save()
         self.test_assert(not os.path.isfile('ctbin_py0.fits'),
@@ -184,7 +184,7 @@ class Test(test):
 
         # Now set ctbin parameters
         binning['inobs']    = self._events
-        binning['outcube']  = 'ctbin_py1.fits'
+        binning['outobs']   = 'ctbin_py1.fits'
         binning['ebinalg']  = 'LOG'
         binning['emin']     = 1.0
         binning['emax']     = 100.0
@@ -251,7 +251,7 @@ class Test(test):
 
         # Set-up ctbin using an observation container
         binning = ctools.ctbin(obs)
-        binning['outcube']  = 'ctbin_py3.fits'
+        binning['outobs']   = 'ctbin_py3.fits'
         binning['ebinalg']  = 'LOG'
         binning['emin']     = 1.0
         binning['emax']     = 100.0
@@ -285,7 +285,7 @@ class Test(test):
         pars = {'inobs': self._events, 'ebinalg': 'LIN', 'emin': 1.0,
                 'emax': 100.0, 'enumbins': 10, 'nxpix': 40, 'nypix': 40,
                 'binsz': 0.1, 'coordsys': 'CEL', 'proj': 'CAR',
-                'xref': 83.63, 'yref': 22.01, 'outcube': 'ctbin_py4.fits',
+                'xref': 83.63, 'yref': 22.01, 'outobs': 'ctbin_py4.fits',
                 'logfile': 'ctbin_py4.log', 'chatter': 2}
         binning = ctools.ctbin()
         binning.pardict(pars)
@@ -300,7 +300,7 @@ class Test(test):
         pars = {'inobs': self._datadir+'/obs_unbinned_two.xml', 'ebinalg': 'LIN', 'emin': 1.0,
                 'emax': 100.0, 'enumbins': 10, 'nxpix': 40, 'nypix': 40,
                 'binsz': 0.1, 'coordsys': 'CEL', 'proj': 'CAR',
-                'xref': 83.63, 'yref': 22.01, 'outcube': 'ctbin_py5.xml',
+                'xref': 83.63, 'yref': 22.01, 'outobs': 'ctbin_py5.xml',
                 'logfile': 'ctbin_py5.log', 'chatter': 2,
                 'prefix': 'cntcube_py5_', 'stack' : False}
         binning = ctools.ctbin()

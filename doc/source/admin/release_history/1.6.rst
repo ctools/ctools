@@ -42,7 +42,8 @@ Improvements
 ------------
 
 * [`2714 <https://cta-redmine.irap.omp.eu/issues/2714>`_] -
-  Enable :ref:`ctbin` to produce counts cubes for a joint binned analysis
+  Enable :ref:`ctbin` to produce counts cubes for a joint binned analysis.
+  Rename ``outcube`` to ``outobs`` parameter.
 * [`2685 <https://cta-redmine.irap.omp.eu/issues/2685>`_] -
   Add ``ctbkgcube::cntcube()`` method
   Account for varying energy thresholds in :ref:`ctbin` weight computation
