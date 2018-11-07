@@ -301,9 +301,11 @@ void ctfindvar::run(void)
             for (int i=0; i<nbins; i++) {
                 m_pixsigsrc(0,i) = pixSig(i);
             }
+            #ifdef G_DEBUG
             std::cout << "checking pixel number of the source of interest" << pix_number << std::endl;
             std::cout << "number of counts in pixel of the source of interest" << total_counts << std::endl;
             std::cin.ignore();
+            #endif
         }
         else
         {
@@ -395,7 +397,9 @@ void ctfindvar::get_variability_sig(const int& pix_number,
            //sig_bin_vector[i]=sig;
            sig_histogram(i)=sig;
            excess_bin_vector[i]=non - alpha*noff;
+           #ifdef G_DEBUG
            std::cout << "significance of the bin : " << i << " : " << sig << " - alpha : " << alpha << " - non: " << non << " - noff: " << noff << "- excess: " << non - alpha*noff <<  std::endl;
+           #endif
            if (sig>4.5 ) // if the bin is significant, it is removed from the bckg and we loop again.
            {
                accepted_bin_bckg_vector[i]=0;
@@ -856,6 +860,14 @@ void ctfindvar::write_srchist_csv(const GNdarray& time_info,
 
 /***********************************************************************//**
  * @brief Write individual histograms in FITS format
+ * 
+ * @param[in] time_info     Start and stop time in MJD for each bin
+ * @param[in] src_info      Significance distribution for each source
+
+ * This method stores the extracted significance for each source at each time
+ * interval between tstart and tstop. Each time bin contains information on
+ * the start and stop time of that bin (in MJD) and the extracted variability
+ * significance of the source in that time bin.
  ***************************************************************************/
 void ctfindvar::write_srchist_fits(const GNdarray& time_info,
                                    const GNdarray& src_info)
