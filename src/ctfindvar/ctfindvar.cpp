@@ -313,6 +313,10 @@ void ctfindvar::run(void)
         //storing sig in skymap
         pixVarSig(pix_number) = max(pixSig);
     }
+
+    // TODO: Store this uptop
+    m_peaksigmap = pixVarSig;
+
     return;
 }
 
@@ -440,12 +444,18 @@ void ctfindvar::save(void)
     log_header1(TERSE, "Saving results");
 
     // Filenames
-    GFilename outcube((*this)["prefix"].string() + "countscube.fits");
+    std::string prefix((*this)["prefix"].string());
+    GFilename outcube(prefix + "countscube.fits");
+    GFilename peaksigmap(prefix + "peaksigmap.fits");
 
     // Write counts cube
     log_value(TERSE, "Saving counts cube", outcube);
     m_counts.save(outcube, (*this)["clobber"].boolean());
     
+    // Write the most significant values for each pixel
+    log_value(TERSE, "Saving maximum significances map", peaksigmap);
+    m_peaksigmap.save(peaksigmap, (*this)["clobber"].boolean());
+
     // Write individual source distributions
 
     // TODO: Your code goes here

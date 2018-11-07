@@ -81,6 +81,7 @@ protected:
     // Protected members
     GSkyMap m_counts;                 //!< Counts for each time interval
     GGti    m_gti;                    //!< List of time intervals
+    GSkyMap m_peaksigmap;             //!< Skymap holding the maximum significance
 };
 
 
