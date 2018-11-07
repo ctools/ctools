@@ -639,6 +639,10 @@ void ctfindvar::get_parameters(void)
         (*this)["histtype"].string();
     }
 
+    // Get the energy limits
+    m_emin = GEnergy((*this)["emin"].real(), "TeV");
+    m_emax = GEnergy((*this)["emax"].real(), "TeV");
+
     // Write parameters into logger
     log_parameters(TERSE);
 
@@ -681,15 +685,27 @@ void ctfindvar::fill_cube(GCTAObservation* obs)
     // Initialise binning statistics
     int num_outside_roi  = 0;
     int num_invalid_wcs  = 0;
+    int num_outside_ecut = 0;
     int num_outside_map  = 0;
     int num_outside_time = 0;
     int num_in_map       = 0;
+
+    // Specify whether we are cutting on energy or not
+    bool cut_emin = (m_emin.TeV() > 0.0) ? true : false;
+    bool cut_emax = (m_emax.TeV() > 0.0) ? true : false;
 
     // Fill counts sky map
     for (int i = 0; i < events->size(); ++i) {
 
         // Get event
         const GCTAEventAtom* event = (*events)[i];
+
+        // Check that the energy is valid
+        if ((cut_emin && event->energy() < m_emin) ||
+            (cut_emax && event->energy() > m_emax)) {
+            num_outside_ecut++;
+            continue;
+        }
 
         // Determine event time
         GTime evnt_time = event->time();
