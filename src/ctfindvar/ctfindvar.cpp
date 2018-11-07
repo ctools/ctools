@@ -252,20 +252,14 @@ void ctfindvar::run(void)
 
     // TODO: Your code goes here
 
-    double max_sig=0;
     const int nbins = m_counts.nmaps();
 
     //preparing the histogram with significance evolution for the source center and the highest sig-pix
     GNdarray pixSig(nbins), pixSigSrc(nbins), pixSigMax(nbins); //Storing the significance for each GTI of the pixels
   
     // creating GSkyDir to get the position of the source and each pixels
-    GSkyDir pixSkyDir;
     GSkyDir srcSkyDir;
 
-    //Prepare the final skymap with the max significance of each pixel
-    GSkyMap pixVarSig = m_counts.extract(1);
-
-    //retrieving the source coordinate
     if ((*this)["coordsys"].string()=="CEL")
     {
         srcSkyDir.radec_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
@@ -274,16 +268,34 @@ void ctfindvar::run(void)
     {
         srcSkyDir.lb_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
     }
+    //Getting the index of pixel on which falls the source of interest
+    int srcInxPix = m_counts.dir2inx(srcSkyDir);
+
+    //Prepare the final skymap with the max significance of each pixel
+    GSkyMap pixVarSig = m_counts.extract(1);
+    double max_sig=0;
+
     //looping over all the pixels in the cube
     for (int pix_number=0; pix_number<m_counts.npix(); pix_number++)
     {    
-        if(pix_number%20==0) std::cout << "checking pixel number " << pix_number << std::endl;
+        double total_counts=0;
+        for (int i=0;i<m_counts.nmaps();i++)
+        {
+            total_counts += m_counts(pix_number, i);
+        }
+        if(pix_number%20==0)
+        {
+            std::cout << "checking pixel number " << pix_number << std::endl;
+            std::cout << "number of counts in pixel" << total_counts<< std::endl;
+        }
 
-        pixSkyDir = m_counts.inx2dir(pix_number); //Getting the sky direction of each pixel
         get_variability_sig(pix_number,nbins, pixSig);
-        if (pixSkyDir == srcSkyDir) //Getting the significance evolutioin for the source
+        if (srcInxPix == pix_number) //Getting the significance evolution for the source
         {
             pixSigSrc=pixSig;
+            std::cout << "checking pixel number of the source of interest" << pix_number << std::endl;
+            std::cout << "number of counts in pixel of the source of interest" << total_counts << std::endl;
+            std::cin.ignore();
         }
         else
         {
