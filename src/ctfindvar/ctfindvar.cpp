@@ -363,7 +363,7 @@ void ctfindvar::run(void)
         }
 
         //storing sig in skymap
-        pixVarSig(pix_number) = max(pixSig);
+        m_peaksigmap(pix_number) = max(pixSig);
     }
 
     log_header1(NORMAL, "Analysis finished");
@@ -750,6 +750,9 @@ void ctfindvar::init_cube(void)
 
     // Resize to the appropriate number of time intervals
     m_counts.nmaps(m_gti.size());
+
+    // Create the peaksigmap
+    m_peaksigmap = m_counts.extract(1);
 }
 
 
