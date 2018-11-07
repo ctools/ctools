@@ -893,6 +893,9 @@ void ctmodel::fill_cube(const GCTAObservation* obs, GModels& models)
     bin.ontime(obs->ontime());
     bin.weight(1.0);
 
+    // Flag if the CTA observation is a counts cube
+    bool obs_is_cube = (obs->eventtype() == "CountsCube");
+
     // Loop over all the spatial bins
     for (int i = 0; i < npix; ++i) {
 
@@ -923,11 +926,16 @@ void ctmodel::fill_cube(const GCTAObservation* obs, GModels& models)
                 continue;
             }
 
-            // Set energy, energy width, energy index and weight of bin
+            // Set energy, energy width and energy index
             bin.energy(m_energy[iebin]);
             bin.ewidth(m_ewidth[iebin]);
             bin.ieng(iebin);
-            //bin.weight(m_cube[ibin]->weight()); // Bad residuals for H.E.S.S. Crab
+
+            // If observation is a counts cube then set the proper weight for
+            // this bin
+            if (obs_is_cube) {
+                bin.weight(m_cube[ibin]->weight());
+            }
 
             // Compute model value for cube bin
             double model = models.eval(bin, *obs) * bin.size();
