@@ -76,6 +76,7 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/model_temporal_phasecurve.xml \
            $(top_srcdir)/test/data/model_temporal_phasecurve.fits \
            $(top_srcdir)/test/data/obs_unbinned.xml \
+           $(top_srcdir)/test/data/obs_unbinned_two.xml \
            $(top_srcdir)/test/data/exclusion.reg \
            $(top_srcdir)/test/data/exclusion.fits \
            $(top_srcdir)/test/data/irf_file.fits.gz \
