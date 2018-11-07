@@ -37,10 +37,9 @@ General parameters
     Allow for a spatial gradient in the background event distribution?
     This option only applies to the ``GAUSS`` spatial model component.
 
-``spectral <PLAW|HESS> [string]``
+``spectral <PLAW|NODES> [string]``
     Spectral model component. ``PLAW`` specifies a simple power law model,
-    ``HESS`` specifies a piecewise broken power-law using 8 energy nodes
-    spread over the energy range from 100 GeV to 12.8 TeV.
+    ``NODES`` specifies a piecewise broken power-law.
 
 ``ebinalg <FILE|LIN|LOG> [string]``
     Algorithm for defining energy nodes. For ``FILE``, the energy nodes are

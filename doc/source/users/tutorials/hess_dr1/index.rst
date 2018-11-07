@@ -7,7 +7,8 @@ Analysing public H.E.S.S. data
    :maxdepth: 1
 
    data
-   select_events
+   selecting_events
    skymap
-   fitting
+   bkgmodel
+   unbinned
    classical

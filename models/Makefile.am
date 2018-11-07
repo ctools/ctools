@@ -31,6 +31,7 @@ models = 1dc_howto.xml \
          crab.xml \
          crab_beyond.xml \
          crab_2bkg.xml \
+	 crab_nobkg.xml \
          crab_poly.xml \
          crab_profile.xml \
          disk.xml \

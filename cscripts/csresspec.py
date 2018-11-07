@@ -102,7 +102,7 @@ class csresspec(ctools.csobservation):
         # If there is more than one observation, and observations are all
         # unbinned or all onoff query user to know if they wish stacked results
         if self.obs().size() > 1 and \
-           (n_unbinned == self.obs().size() or n_onoff == self.obs().size()):
+                (n_unbinned == self.obs().size() or n_onoff == self.obs().size()):
             self._stack = self['stack'].boolean()
             # If we are to stack event lists query parameters for cube creation
             if self._stack and n_unbinned == self.obs().size():
@@ -162,11 +162,11 @@ class csresspec(ctools.csobservation):
 
         # Log for unbinned observations
         if n_unbinned != 0:
-            msg = ' User defined energy binning will be used for %d unbinned '\
+            msg = ' User defined energy binning will be used for %d unbinned ' \
                   'observations.' % (n_unbinned)
             self._log_string(gammalib.TERSE, msg)
             if n_cta > n_unbinned:
-                msg = ' The intrinsic binning will be used for the remaining '\
+                msg = ' The intrinsic binning will be used for the remaining ' \
                       '%d CTA observations.' % (n_notunbin)
                 self._log_string(gammalib.TERSE, msg)
 
@@ -179,51 +179,20 @@ class csresspec(ctools.csobservation):
         # Return
         return
 
-    def _stack_observations(self):
-        """
-        Stack multiple observations and replace observation container
-        with single stacked observation
-
-        Returns
-        -------
-        obs : `~gammalib.GObservations'
-            Observation container with a single stacked observation
-        """
-        # Use first observation to determine the type and apply the
-        # appropriate stacking method
-
-        # If On/Off use the GCTAOnOffObservation constructor
-        if self.obs()[0].classname() == 'GCTAOnOffObservation':
-            msg = 'Stacking %d On/Off observations.' % (self.obs().size())
-            self._log_string(gammalib.NORMAL, msg)
-            stacked     = gammalib.GCTAOnOffObservation(self.obs())
-            stacked_obs = gammalib.GObservations()
-            stacked_obs.append(stacked)
-            stacked_obs.models(self.obs().models())
-
-        # If event list then bin observations
-        elif self.obs()[0].classname() == 'GCTAObservation':
-            msg = 'Stacking %d event lists.' % (self.obs().size())
-            self._log_string(gammalib.NORMAL, msg)
-            stacked_obs = obsutils.get_stacked_obs(self, self.obs())
-
-        # Return
-        return stacked_obs
-
     def _bin_evlist(self, obs):
         """
         Turn single event list into counts cube
 
         Parameters
         ----------
-        obs : `~gammalib.GObservations()`
+        obs : `~gammalib.GObservations`
             Observation container with single event list
 
         Returns
         -------
-        obs : `~gammalib.GObservations()`
-            Binned observation container dict with event list ROI and energy
-            range information
+        obs, info : `~gammalib.GObservations`, dict
+            Binned observation container and dictionary with event list ROI
+            and energy range information
         """
         # Retrieve information about ROI in event list
         roi = obs[0].roi()
@@ -287,7 +256,7 @@ class csresspec(ctools.csobservation):
 
         Parameters
         ----------
-        cube : `~gammalib.GCTAEventCube()`
+        cube : `~gammalib.GCTAEventCube`
             Event cube
         ra : float (str 'INDEF' for no selection on direction)
             Right Ascension (deg)
@@ -302,7 +271,7 @@ class csresspec(ctools.csobservation):
 
         Returns
         -------
-        cube : `~gammalib.GCTAEventCube()`
+        cube : `~gammalib.GCTAEventCube`
             Event cube
         """
         # Turn cube into observation container to feed to ctcubemask
@@ -337,14 +306,14 @@ class csresspec(ctools.csobservation):
 
         Parameters
         ----------
-        cube : `~gammalib.GCTAEventCube()`
+        cube : `~gammalib.GCTAEventCube`
             Event cube
         evlist_info : dict
             Dictionary with information on original event list
 
         Returns
         -------
-        array : `~gammalib.GNdarray()'
+        array : `~gammalib.GNdarray'
             Counts spectrum
         """
         # If we started from event list mask the ROI only
@@ -388,13 +357,13 @@ class csresspec(ctools.csobservation):
         ----------
         obs_id : str
             Observation id
-        ebounds : `~gammalib.GEbounds()'
+        ebounds : `~gammalib.GEbounds'
             Energy boundaries
-        counts : `~gammalib.GNdarray()'
+        counts : `~gammalib.GNdarray'
             Counts spectrum
-        model : `~gammalib.GNdarray()'
+        model : `~gammalib.GNdarray'
             Model spectrum
-        residuals : `~gammalib.GNdarray()'
+        residuals : `~gammalib.GNdarray'
             Residual spectrum
 
         Returns
@@ -403,7 +372,7 @@ class csresspec(ctools.csobservation):
             Residual spectrum as FITS binary table
         """
         # Create FITS table columns
-        nrows       = ebounds.size()
+        nrows = ebounds.size()
         energy_low  = gammalib.GFitsTableDoubleCol('Emin', nrows)
         energy_high = gammalib.GFitsTableDoubleCol('Emax', nrows)
         counts_col  = gammalib.GFitsTableDoubleCol('Counts', nrows)
@@ -444,16 +413,16 @@ class csresspec(ctools.csobservation):
 
         Parameters
         ----------
-        table : `~gammalib.GFitsBinTable()'
+        table : `~gammalib.GFitsBinTable'
             FITS binary table
         name : str
             Column name
-        data : `~gammalib.GEbounds()'
+        data : `~gammalib.GEbounds'
             Data to be filled into new column
 
         Returns
         -------
-        table : `~gammalib.GFitsBinTable()'
+        table : `~gammalib.GFitsBinTable'
             FITS binary table
         """
         # Check size compatibility
@@ -478,6 +447,202 @@ class csresspec(ctools.csobservation):
         # Return modified table
         return table
 
+    def _residuals_3D(self, obs, obs_id, ccube='NONE'):
+        """
+        Calculate residuals for 3D observation
+
+        Parameters
+        ----------
+        obs : `~gammalib.GObservations`
+            Observation container with a single observations of type GCTAObservation
+        obs_id : str
+            Observation ID
+        ccube : `~gammalib.GCTAEventCube'
+            Count cube with stacked events lists
+
+        Returns
+        -------
+        table : `~gammalib.GFitsBinTable()'
+            Residual spectrum as FITS binary table
+        """
+
+        # If binned data already exist set the evlist_info dictionary to have
+        # attribute was_list False
+        if obs[0].eventtype() == 'CountsCube' or ccube!='NONE':
+            evlist_info = {'was_list': False}
+
+        # ... otherwise bin now
+        else:
+            # we remember if we binned an event list so that we can
+            # mask only the ROI for residual calculation
+            msg = 'Setting up binned observation'
+            self._log_string(gammalib.NORMAL, msg)
+            obs, evlist_info = self._bin_evlist(obs)
+
+        # Calculate Model and residuals. If model cube is provided load
+        # it
+        if self._use_maps:
+            modcube = gammalib.GCTAEventCube(self['modcube'].filename())
+
+        # ... otherwise calculate it now
+        else:
+            msg = 'Computing model cube'
+            self._log_string(gammalib.NORMAL, msg)
+            modelcube = ctools.ctmodel(obs)
+            if ccube != 'NONE':
+                modelcube.cube(ccube)
+            modelcube['edisp'] = self['edisp'].boolean()
+            modelcube.run()
+            modcube = modelcube.cube().copy()
+
+        # Extract cntcube for residual computation
+        if ccube != 'NONE':
+            cntcube = ccube
+        else:
+            cntcube = obs[0].events().copy()
+
+        # Derive count spectra from cubes
+        msg = 'Computing counts, model, and residual spectra'
+        self._log_string(gammalib.NORMAL, msg)
+        counts = self._cube_to_spectrum(cntcube, evlist_info)
+        model  = self._cube_to_spectrum(modcube, evlist_info)
+
+        # Calculate residuals
+        residuals = obsutils.residuals(self, counts, model)
+
+        # Extract energy bounds
+        ebounds = cntcube.ebounds()
+
+        # Fill results table
+        msg = 'Filling residual table'
+        self._log_string(gammalib.NORMAL, msg)
+        table = self._residuals_table(obs_id, ebounds, counts, model,
+                                      residuals)
+
+        # Calculate models of individual components if requested
+        if self['components'].boolean():
+            for component in obs.models():
+                # Log component
+                self._log_value(gammalib.NORMAL,
+                                'Computing model component',
+                                component.name())
+
+                # Set model cube models to individual component
+                model_cont = gammalib.GModels()
+                model_cont.append(component)
+                modelcube.obs().models(model_cont)
+
+                # Reset base cube that was modified internally by ctmodel
+                if ccube != 'NONE':
+                    modelcube.cube(ccube)
+
+                # Run model cube
+                modelcube['edisp'] = self['edisp'].boolean()
+                modelcube.run()
+
+                # Extract spectrum of individual component
+                modcube = modelcube.cube().copy()
+                model = self._cube_to_spectrum(modcube, evlist_info)
+
+                # append component to table
+                table = self._append_column(table, component.name(),
+                                            model)
+
+        return table
+
+    def _residuals_OnOff(self,obs,obs_id):
+        """
+        Calculate residual for OnOff observation
+
+        Parameters
+        ----------
+        obs : `~gammalib.GObservations`
+            Observation container with a single observations of type GCTAOnOffObservation
+        obs_id : str
+            Observation ID
+
+        Returns
+        -------
+        table : `~gammalib.GFitsBinTable'
+            Residual spectrum as FITS binary table
+        """
+
+        # Calculate Counts, Model and residuals
+        msg = 'Computing counts, model, and residual spectra'
+        self._log_string(gammalib.NORMAL, msg)
+
+        onoff = obs[0]
+
+        # On spectrum
+        counts = onoff.on_spec().counts_spectrum()
+
+        # Model for On region
+        background = onoff.model_background(obs.models()).counts_spectrum()
+        alpha      = onoff.on_spec().backscal_spectrum()
+        model      = background.copy()
+        model     *= alpha
+        model     += onoff.model_gamma(obs.models()).counts_spectrum()
+
+        # On Residuals
+        residuals = obsutils.residuals(self, counts, model)
+
+        # Extract energy bounds
+        ebounds = onoff.on_spec().ebounds()
+
+        # Fill results table
+        msg = 'Filling residual table'
+        self._log_string(gammalib.NORMAL, msg)
+        table = self._residuals_table(obs_id, ebounds, counts, model,
+                                      residuals)
+
+        # Get Off spectrum and add to table
+        msg = 'Computing counts, model, and residual spectra for Off regions'
+        self._log_string(gammalib.NORMAL, msg)
+        counts_off = onoff.off_spec().counts_spectrum()
+        table = self._append_column(table, 'Counts_Off',
+                                    counts_off)
+
+        # Add background/Off model to table
+        table = self._append_column(table, 'Model_Off',
+                                    background)
+
+        # Calculate Off residuals and add to table
+        residuals_off = obsutils.residuals(self, counts_off, background)
+        table = self._append_column(table, 'Residuals_Off',
+                                    residuals_off)
+
+        # Calculate models of individual components if requested
+        if self['components'].boolean():
+            for component in obs.models():
+                # If background pass
+                # We always add the background at the end so that
+                # we accommodate WSTAT for which the background is not
+                # mandatory in the model
+                if component.classname() == 'GCTAModelIrfBackground':
+                    pass
+                # Otherwise calculate gamma component and append to Table
+                else:
+                    self._log_value(gammalib.NORMAL,
+                                    'Computing model for component',
+                                    component.name())
+                    # Create observation container for individual components
+                    model_cont = gammalib.GModels()
+                    model_cont.append(component)
+                    # Calculate gamma model
+                    model = onoff.model_gamma(model_cont)
+                    model = model.counts_spectrum()
+                    # Append to table
+                    table = self._append_column(table, component.name(),
+                                                model)
+            # Add background already calculated
+            self._log_value(gammalib.NORMAL,
+                            'Computing model for component',
+                            'Background')
+            background *= onoff.on_spec().backscal_spectrum()
+            table = self._append_column(table, 'Background',
+                                        background)
+
+        return table
 
     # Public methods
     def run(self):
@@ -494,192 +659,84 @@ class csresspec(ctools.csobservation):
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
 
-        # Stack observations if requested
-        if self._stack:
-            self._log_header1(gammalib.TERSE, 'Stacking Observations')
-            self.obs(self._stack_observations())
+        # Stack On/Off observations if requested
+        if self._stack and self.obs()[0].classname() == 'GCTAOnOffObservation':
+            msg = 'Stacking %d On/Off observations.' % (self.obs().size())
+            self._log_string(gammalib.NORMAL, msg)
+            stacked = gammalib.GCTAOnOffObservation(self.obs())
+            stacked_obs = gammalib.GObservations()
+            stacked_obs.append(stacked)
+            stacked_obs.models(self.obs().models())
+            self.obs(stacked_obs)
 
         # Log processing header
         self._log_header1(gammalib.TERSE, 'Processing Observations')
 
-        # Loop over observations and calculate residuals
-        for s, observation in enumerate(self.obs()):
+        #If observations are unbinned and we stack
+        if self._stack and self.obs()[0].classname() == 'GCTAObservation':
 
-            # Retrieve and store obs id
-            obs_id = observation.id()
+            msg = 'Computing count cube from multiple unbinned observations'
+            self._log_string(gammalib.NORMAL, msg)
 
-            # If observation id is empty and there is more than one observation
-            # replace with incremental number
-            if obs_id == '' and self.obs().size() > 1:
-                obs_id = str(s)
+            # Build count cube
+            binning = ctools.ctbin(self.obs())
+            binning['xref']     = self['xref'].real()
+            binning['yref']     = self['yref'].real()
+            binning['proj']     = self['proj'].string()
+            binning['coordsys'] = self['coordsys'].string()
+            binning['ebinalg']  = self['ebinalg'].string()
+            binning['nxpix']    = self['nxpix'].integer()
+            binning['nypix']    = self['nypix'].integer()
+            binning['binsz']    = self['binsz'].real()
+            if self['ebinalg'].string() == 'FILE':
+                binning['ebinfile'] = self['ebinfile'].filename().file()
+            else:
+                binning['enumbins'] = self['enumbins'].integer()
+                binning['emin']     = self['emin'].real()
+                binning['emax']     = self['emax'].real()
+            binning['chatter'] = self['chatter'].integer()
+            binning['clobber'] = self['clobber'].boolean()
+            binning['debug']   = self['debug'].boolean()
+            binning.run()
 
-            # Log processing of observation
-            if self.obs().size() > 1:
-                self._log_header2(gammalib.NORMAL,
-                                  'Processing observation %s' % obs_id)
-
-            # Turn into observation container and assign models
-            obs = gammalib.GObservations()
-            obs.append(observation)
-            obs.models(self.obs().models())
-
-            # If 3D observation
-            if obs[0].classname() == 'GCTAObservation':
-
-                # If already binned set the evlist_info dictionary to have
-                # attribute was_list False
-                if obs[0].eventtype() == 'CountsCube':
-                    evlist_info = {'was_list': False}
-
-                # ... otherwise bin now
-                else:
-                    # we remember if we binned an event list so that we can
-                    # mask only the ROI for residual calculation
-                    msg = 'Setting up binned observation'
-                    self._log_string(gammalib.NORMAL, msg)
-                    obs, evlist_info = self._bin_evlist(obs)
-
-                # Calculate Model and residuals. If model cube is provided load
-                # it
-                if self._use_maps:
-                    modcube = gammalib.GCTAEventCube(self['modcube'].filename())
-
-                # ... otherwise calculate it now
-                else:
-                    msg = 'Computing model cube'
-                    self._log_string(gammalib.NORMAL, msg)
-                    modelcube = ctools.ctmodel(obs)
-                    modelcube['edisp'] = self['edisp'].boolean()
-                    modelcube.run()
-                    modcube = modelcube.cube().copy()
-
-                # Extract cntcube for residual computation
-                cntcube = obs[0].events().copy()
-
-                # Derive count spectra from cubes
-                msg = 'Computing counts, model, and residual spectra'
-                self._log_string(gammalib.NORMAL, msg)
-                counts = self._cube_to_spectrum(cntcube, evlist_info)
-                model  = self._cube_to_spectrum(modcube, evlist_info)
-
-                # Calculate residuals
-                residuals = obsutils.residuals(self, counts, model)
-
-                # Extract energy bounds
-                ebounds = cntcube.ebounds()
-
-                # Fill results table
-                msg = 'Filling residual table'
-                self._log_string(gammalib.NORMAL, msg)
-                table = self._residuals_table(obs_id, ebounds, counts, model,
-                                              residuals)
-
-                # Calculate models of individual components if requested
-                if self['components'].boolean():
-                    for component in obs.models():
-
-                        # Log component
-                        self._log_value(gammalib.NORMAL,
-                                        'Computing model component',
-                                        component.name())
-
-                        # Set model cube models to individual component
-                        model_cont = gammalib.GModels()
-                        model_cont.append(component)
-                        modelcube.obs().models(model_cont)
-
-                        # Run model cube
-                        modelcube['edisp'] = self['edisp'].boolean()
-                        modelcube.run()
-
-                        # Extract spectrum of individual component
-                        modcube = modelcube.cube().copy()
-                        model   = self._cube_to_spectrum(modcube, evlist_info)
-
-                        # append component to table
-                        table = self._append_column(table, component.name(),
-                                                    model)
-
-            # otherwise, if On/Off
-            elif obs[0].classname() == 'GCTAOnOffObservation':
-
-                onoff = obs[0]
-
-                # Calculate Counts, Model and residuals
-                msg = 'Computing counts, model, and residual spectra'
-                self._log_string(gammalib.NORMAL, msg)
-
-                # On spectrum
-                counts = onoff.on_spec().counts_spectrum()
-
-                # Model for On region
-                background = onoff.model_background(obs.models()).counts_spectrum()
-                alpha      = onoff.on_spec().backscal_spectrum()
-                model      = background.copy()
-                model     *= alpha
-                model     += onoff.model_gamma(obs.models()).counts_spectrum()
-
-                # On Residuals
-                residuals = obsutils.residuals(self, counts, model)
-
-                # Extract energy bounds
-                ebounds = onoff.on_spec().ebounds()
-
-                # Fill results table
-                msg = 'Filling residual table'
-                self._log_string(gammalib.NORMAL, msg)
-                table = self._residuals_table(obs_id, ebounds, counts, model,
-                                              residuals)
-
-                # Get Off spectrum and add to table
-                msg = 'Computing counts, model, and residual spectra for Off regions'
-                self._log_string(gammalib.NORMAL, msg)
-                counts_off = onoff.off_spec().counts_spectrum()
-                table = self._append_column(table, 'Counts_Off',
-                                            counts_off)
-
-                # Add background/Off model to table
-                table = self._append_column(table, 'Model_Off',
-                                            background)
-
-                # Calculate Off residuals and add to table
-                residuals_off = obsutils.residuals(self, counts_off, background)
-                table = self._append_column(table, 'Residuals_Off',
-                                            residuals_off)
-
-                # Calculate models of individual components if requested
-                if self['components'].boolean():
-                    for component in obs.models():
-                        # If background pass
-                        # We always add the background at the end so that
-                        # we accommodate WSTAT for which the background is not
-                        # mandatory in the model
-                        if component.classname() == 'GCTAModelIrfBackground':
-                            pass
-                        # Otherwise calculate gamma component and append to Table
-                        else:
-                            self._log_value(gammalib.NORMAL,
-                                            'Computing model for component',
-                                            component.name())
-                            # Create observation container for individual components
-                            model_cont = gammalib.GModels()
-                            model_cont.append(component)
-                            # Calculate gamma model
-                            model = onoff.model_gamma(model_cont)
-                            model = model.counts_spectrum()
-                            # Append to table
-                            table = self._append_column(table, component.name(),
-                                                        model)
-                    # Add background already calculated
-                    self._log_value(gammalib.NORMAL,
-                                    'Computing model for component',
-                                    'Background')
-                    background *= onoff.on_spec().backscal_spectrum()
-                    table = self._append_column(table, 'Background',
-                                                background)
+            #compute residuals using cube
+            table = self._residuals_3D(self.obs(),'',binning.cube())
 
             # Append results table to output file
             self._fits.append(table)
+
+        # Otherwise, loop over observations and calculate residuals
+        else:
+            for s, observation in enumerate(self.obs()):
+
+                # Retrieve and store obs id
+                obs_id = observation.id()
+
+                # If observation id is empty and there is more than one observation
+                # replace with incremental number
+                if obs_id == '' and self.obs().size() > 1:
+                    obs_id = str(s)
+
+                # Log processing of observation
+                if self.obs().size() > 1:
+                    self._log_header2(gammalib.NORMAL,
+                                      'Processing observation %s' % obs_id)
+
+                # Turn into observation container and assign models
+                obs = gammalib.GObservations()
+                obs.append(observation)
+                obs.models(self.obs().models())
+
+                # If 3D observation
+                if obs[0].classname() == 'GCTAObservation':
+                    table = self._residuals_3D(obs,obs_id)
+
+                # otherwise, if On/Off
+                elif obs[0].classname() == 'GCTAOnOffObservation':
+                    table = self._residuals_OnOff(obs,obs_id)
+
+                # Append results table to output file
+                self._fits.append(table)
 
         # Return
         return
