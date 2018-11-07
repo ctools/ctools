@@ -251,7 +251,7 @@ void ctfindvar::run(void)
     } // endfor: looped over observations
 
     // Smooth the maps if requested
-    if ((*this)["smoothkrnl"].is_valid() && 
+    if ((*this)["smoothkrnl"].is_valid() &&
         (*this)["smoothkrnl"].string() != "NONE") {
         m_counts.smooth((*this)["smoothkrnl"].string(),
                         (*this)["smoothpar"].real());
