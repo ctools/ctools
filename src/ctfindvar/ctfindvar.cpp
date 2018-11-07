@@ -635,7 +635,7 @@ void ctfindvar::fill_cube(GCTAObservation* obs)
             num_in_map++;
 
         } else {
-            // Event falls outside the events
+            // Event falls outside the specified time range
             num_outside_time++;
             continue;
         }
