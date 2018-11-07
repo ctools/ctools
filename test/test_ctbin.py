@@ -132,11 +132,11 @@ class Test(test):
              'Check successful execution from command line with stack=no')
 
         # Load counts cubes and check content.
-        evt = gammalib.GCTAEventCube('cntmap_cmd4_00001.fits')
+        evt = gammalib.GCTAEventCube('cntmap_cmd4_cta_00001.fits')
         self._check_cube(evt, 245)
 
         # Load counts cubes and check content.
-        evt = gammalib.GCTAEventCube('cntmap_cmd4_00002.fits')
+        evt = gammalib.GCTAEventCube('cntmap_cmd4_cta_00002.fits')
         self._check_cube(evt, 245)
 
         # Check observation definition XML output file
@@ -283,8 +283,8 @@ class Test(test):
         evt = gammalib.GCTAEventCube('ctbin_py3.fits')
         self._check_cube(evt, 245, multiplier=3)
 
-        # And finally go for a fully Pythonic version with all parameters
-        # being specified in a dictionary
+        # Now go for a fully Pythonic version with all parameters being
+        # specified in a dictionary
         pars = {'inobs': self._events, 'ebinalg': 'LIN', 'emin': 1.0,
                 'emax': 100.0, 'enumbins': 10, 'nxpix': 40, 'nypix': 40,
                 'binsz': 0.1, 'coordsys': 'CEL', 'proj': 'CAR',
@@ -300,15 +300,23 @@ class Test(test):
         self._check_cube(evt, 245)
 
         # Test unstacked version
-        pars = {'inobs': self._datadir+'/obs_unbinned_two.xml', 'ebinalg': 'LIN', 'emin': 1.0,
-                'emax': 100.0, 'enumbins': 10, 'nxpix': 40, 'nypix': 40,
-                'binsz': 0.1, 'coordsys': 'CEL', 'proj': 'CAR',
-                'xref': 83.63, 'yref': 22.01, 'outobs': 'ctbin_py5.xml',
-                'logfile': 'ctbin_py5.log', 'chatter': 2,
-                'prefix': 'cntcube_py5_', 'stack' : False}
         binning = ctools.ctbin()
-        binning.pardict(pars)
-
+        binning['inobs']    = self._inobs_two
+        binning['stack']    = False
+        binning['ebinalg']  = 'LOG'
+        binning['emin']     = 1.0
+        binning['emax']     = 100.0
+        binning['enumbins'] = 10
+        binning['nxpix']    = 40
+        binning['nypix']    = 40
+        binning['binsz']    = 0.1
+        binning['coordsys'] = 'CEL'
+        binning['proj']     = 'CAR'
+        binning['xref']     = 83.63
+        binning['yref']     = 22.01
+        binning['outobs']   = 'ctbin_py5.fits'
+        binning['logfile']  = 'ctbin_py5.log'
+        binning['chatter']  = 2
         binning.logFileOpen()
         binning.run()
 
@@ -330,9 +338,9 @@ class Test(test):
         self._check_cube(evt, 245)
 
         # Load counts cubes and check content
-        evt = gammalib.GCTAEventCube('cntcube_py5_00001.fits')
+        evt = gammalib.GCTAEventCube('cntcube_py5_cta_00001.fits')
         self._check_cube(evt, 245)
-        evt = gammalib.GCTAEventCube('cntcube_py5_00002.fits')
+        evt = gammalib.GCTAEventCube('cntcube_py5_cta_00002.fits')
         self._check_cube(evt, 245)
 
         # Return
