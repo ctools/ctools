@@ -264,8 +264,8 @@ void ctfindvar::run(void)
     m_pixsigsrc = GNdarray(1, nbins); //TODO: Update this to allow for multiple sources in 1st dimension
 
     // creating GSkyDir to get the position of the source and each pixels
-    GSkyDir srcSkyDir;
 
+    GSkyDir srcSkyDir;
     if ((*this)["coordsys"].string()=="CEL")
     {
         srcSkyDir.radec_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
@@ -274,6 +274,7 @@ void ctfindvar::run(void)
     {
         srcSkyDir.lb_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
     }
+
     //Getting the index of pixel on which falls the source of interest
     int srcInxPix = m_counts.dir2inx(srcSkyDir);
 
@@ -285,18 +286,20 @@ void ctfindvar::run(void)
     for (int pix_number=0; pix_number<m_counts.npix(); pix_number++)
     {    
         double total_counts=0;
-        for (int i=0;i<m_counts.nmaps();i++)
+        for (int k=0;k<m_counts.nmaps();k++)
         {
-            total_counts += m_counts(pix_number, i);
+            total_counts += m_counts(pix_number, k);
         }
         if(pix_number%20==0)
         {
-            std::cout << "checking pixel number " << pix_number << std::endl;
-            std::cout << "number of counts in pixel" << total_counts<< std::endl;
+            std::cout << "checking pixel number " << pix_number << " with total number of counts of: " << total_counts << std::endl;
         }
 
+        //Getting the variability significance for the pixel
         get_variability_sig(pix_number,nbins, pixSig);
-        if (srcInxPix == pix_number) //Getting the significance evolution for the source
+
+        //Getting the significance evolution for the source
+        if (srcInxPix == pix_number) 
         {
             for (int i=0; i<nbins; i++) {
                 m_pixsigsrc(0,i) = pixSig(i);
@@ -304,6 +307,8 @@ void ctfindvar::run(void)
             #ifdef G_DEBUG
             std::cout << "checking pixel number of the source of interest" << pix_number << std::endl;
             std::cout << "number of counts in pixel of the source of interest" << total_counts << std::endl;
+            pixSigSrc=pixSig;
+            std::cout << "checking pixel number " << pix_number << " with total number of counts of: " << total_counts << std::endl;
             std::cin.ignore();
             #endif
         }
