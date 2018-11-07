@@ -264,7 +264,6 @@ void ctfindvar::run(void)
     m_pixsigsrc = GNdarray(1, nbins); //TODO: Update this to allow for multiple sources in 1st dimension
 
     // creating GSkyDir to get the position of the source and each pixels
-
     GSkyDir srcSkyDir;
     if ((*this)["coordsys"].string()=="CEL")
     {
@@ -290,10 +289,12 @@ void ctfindvar::run(void)
         {
             total_counts += m_counts(pix_number, k);
         }
+        #ifdef G_DEBUG
         if(pix_number%20==0)
         {
-            std::cout << "checking pixel number " << pix_number << " with total number of counts of: " << total_counts << std::endl;
+            std::cout << "Pixel number " << pix_number << " has a total number of counts of: " << total_counts << std::endl;
         }
+        #endif
 
         //Getting the variability significance for the pixel
         get_variability_sig(pix_number,nbins, pixSig);
@@ -303,6 +304,7 @@ void ctfindvar::run(void)
         {
             for (int i=0; i<nbins; i++) {
                 m_pixsigsrc(0,i) = pixSig(i);
+               
             }
             #ifdef G_DEBUG
             std::cout << "checking pixel number of the source of interest" << pix_number << std::endl;
@@ -310,6 +312,7 @@ void ctfindvar::run(void)
             pixSigSrc=pixSig;
             std::cout << "checking pixel number " << pix_number << " with total number of counts of: " << total_counts << std::endl;
             std::cin.ignore();
+            std::cout << "checking pixel number of the source of interest: " << pix_number << " - with total number of counts of: " << total_counts << std::endl;
             #endif
         }
         else
@@ -403,7 +406,7 @@ void ctfindvar::get_variability_sig(const int& pix_number,
            sig_histogram(i)=sig;
            excess_bin_vector[i]=non - alpha*noff;
            #ifdef G_DEBUG
-           std::cout << "significance of the bin : " << i << " : " << sig << " - alpha : " << alpha << " - non: " << non << " - noff: " << noff << "- excess: " << non - alpha*noff <<  std::endl;
+           //std::cout << "significance of the bin : " << i << " : " << sig << " - alpha : " << alpha << " - non: " << non << " - noff: " << noff << "- excess: " << non - alpha*noff <<  std::endl;
            #endif
            if (sig>4.5 ) // if the bin is significant, it is removed from the bckg and we loop again.
            {
@@ -412,6 +415,13 @@ void ctfindvar::get_variability_sig(const int& pix_number,
            }
         }
 
+    }
+    if (pix_number==19900)
+    {
+        for (int k=0;k<sig_histogram.size();k++)
+        {
+            std::cout << "value of the sig of the " << k << "th slice =" << sig_histogram(k) << std::endl;
+        } 
     }
 }
 
