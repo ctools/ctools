@@ -52,7 +52,7 @@ General parameters
     will produce a counts cube for each event list that is found in the input
     observation, and will also write an observation definition XML file.
 
-``(prefix = "binned_") [string]``
+``(prefix = cntcube_) [string]``
     Prefix for output counts cube in observation definition XML file.
 
 ``ebinalg <FILE|LIN|LOG> [string]``

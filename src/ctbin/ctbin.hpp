@@ -101,7 +101,7 @@ protected:
     // User parameters
     bool        m_usepnt;   //!< Use pointing instead of xref/yref parameters
     bool        m_stack;    //!< Output one stacked cube or multiple cubes
-    std::string m_prefix;   //!< Prefix for output path of multiple cubes
+    std::string m_prefix;   //!< Prefix for multiple cubes
     bool        m_publish;  //!< Publish counts cube?
     GChatter    m_chatter;  //!< Chattiness
 
@@ -109,7 +109,6 @@ protected:
     std::vector<GCTAEventCube> m_cubes;    //!< Event cubes
     std::vector<GSkyMap>       m_counts;   //!< List of event cube counts
     std::vector<GSkyMap>       m_weights;  //!< List of event cube weights
-    std::vector<std::string>   m_ids;      //!< List of observation ids
     GEbounds                   m_ebounds;  //!< Energy boundaries
     GGti                       m_gti;      //!< Stacked Good time intervals
     double                     m_ontime;   //!< Total ontime

@@ -257,7 +257,8 @@ void ctbin::run(void)
         std::string msg = " Including unbinned "+obs->instrument()+
                           " observation";
         log_string(NORMAL, msg);
-    }
+
+    } // endfor: looped over all unbinned observations
 
     // Set number of relevant observations
     int nobs = obs_list.size();
@@ -267,13 +268,11 @@ void ctbin::run(void)
         m_counts  = std::vector<GSkyMap>(nobs);
         m_weights = std::vector<GSkyMap>(nobs);
         m_cubes   = std::vector<GCTAEventCube>(nobs);
-        m_ids     = std::vector<std::string>(nobs);
     }
     else {
         m_counts.clear();
         m_weights.clear();
         m_cubes.clear();
-        m_ids.clear();
     }
 
     // Write header into logger
@@ -318,11 +317,10 @@ void ctbin::run(void)
                 }
             }
 
-            // ... otherwise store counts, weights and observation ID
+            // ... otherwise store counts and weights
         	else {
                 m_counts[i]  = counts;
                 m_weights[i] = weights;
-                m_ids[i]     = obs->id();
             }
 
         } // end: omp critical section
@@ -401,8 +399,25 @@ void ctbin::run(void)
             // container
             obs->events(m_cubes[i]);
 
-            // Store ID of the observation for saving of XML file
-            m_ids[i] = obs->id();
+            // Construct unique filename for possible saving of the counts
+            // cube into FITS files. Each observation has a unique pair of
+            // instrument() and id() attributes, hence we construct a lower
+            // case file name from these attributes, making sure that all
+            // whitespaces are converted into "_" characters. Note that the
+            // id() attribute is allowed to be blank, which can only happen
+            // for a single observation.
+            std::string inst = gammalib::tolower(obs->instrument());
+            std::string id   = gammalib::tolower(obs->id());
+            inst             = gammalib::replace_segment(inst, " ", "_");
+            id               = gammalib::replace_segment(id, " ", "_");
+            std::string filename = m_prefix + inst;
+            if (!id.empty()) {
+                filename += "_" + id;
+            }
+            filename += ".fits";
+
+            // Set filename of observation
+            obs->eventfile(filename);
 
         } // endfor: looped over relevant observations
 
@@ -492,27 +507,19 @@ void ctbin::save(void)
         // Loop over all observations
         for (int i = 0; i < m_obs.size(); ++i) {
 
-            // Loop over all ids of observations that were binned
-            for (int j = 0; j < m_ids.size(); ++j) {
+            // Get CTA observation from observation container
+            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-                // Skip if ID differs
-                if (m_ids[j] != m_obs[i]->id()) {
-                    continue;
-                }
+            // Continue only if observation is valid
+            if (obs != NULL) {
 
-                // Construct filename
-                std::string filename(m_ids[j]);
-                filename.insert(0, m_prefix);
-                filename.append(".fits");
+                // Retrieve filename
+                std::string filename = obs->eventfile();
 
-                // Set filename for counts cube
-                GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-                obs->eventfile(filename);
-
-                // Save countscube
+                // Save counts cube
                 obs->save(filename, clobber());
 
-            } // endfor: looped over all IDs
+            } // endif: observation was valid
 
         } // endfor: looped over all observations
 
@@ -579,6 +586,7 @@ void ctbin::init_members(void)
     // Initialise members
     m_usepnt  = false;
     m_stack   = true;
+    m_prefix.clear();
     m_publish = false;
     m_chatter = static_cast<GChatter>(2);
 
@@ -586,7 +594,6 @@ void ctbin::init_members(void)
     m_cubes.clear();
     m_counts.clear();
     m_weights.clear();
-    m_ids.clear();
     m_ebounds.clear();
     m_gti.clear();
     m_ontime   = 0.0;
@@ -610,6 +617,7 @@ void ctbin::copy_members(const ctbin& app)
     // Copy attributes
     m_usepnt  = app.m_usepnt;
     m_stack   = app.m_stack;
+    m_prefix  = app.m_prefix;
     m_publish = app.m_publish;
     m_chatter = app.m_chatter;
 
@@ -617,7 +625,6 @@ void ctbin::copy_members(const ctbin& app)
     m_cubes    = app.m_cubes;
     m_counts   = app.m_counts;
     m_weights  = app.m_weights;
-    m_ids      = app.m_ids;
     m_ebounds  = app.m_ebounds;
     m_gti      = app.m_gti;
     m_ontime   = app.m_ontime;
@@ -662,10 +669,8 @@ void ctbin::get_parameters(void)
     // Get energy boundaries
     m_ebounds = cube.ebounds();
 
-    // Get stack parameter
-    m_stack = (*this)["stack"].boolean();
-
-    // Get prefix parameter
+    // Get stack and prefix parameters
+    m_stack  = (*this)["stack"].boolean();
     m_prefix = (*this)["prefix"].string();
 
     // Get remaining parameters

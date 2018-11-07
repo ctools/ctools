@@ -43,6 +43,9 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set members
+        self._inobs_two = self._datadir + '/obs_unbinned_two.xml'
+
         # Return
         return
 
@@ -116,7 +119,7 @@ class Test(test):
         # Check joint (unstacked) binning
 
         # Setup ctbin command
-        cmd = ctbin+' inobs="'+self._datadir+'/obs_unbinned_two.xml"'+ \
+        cmd = ctbin+' inobs="'+self._inobs_two+'"'+ \
                     ' outobs="obs_unbinned_two_binned.xml"'+\
                     ' emin=1.0 emax=100.0 enumbins=10 ebinalg="LOG"'+ \
                     ' nxpix=40 nypix=40 binsz=0.1 coordsys="CEL"'+ \
@@ -136,15 +139,15 @@ class Test(test):
         evt = gammalib.GCTAEventCube('cntmap_cmd4_00002.fits')
         self._check_cube(evt, 245)
 
-        # Check observation definition out file
+        # Check observation definition XML output file
         obs = gammalib.GObservations('obs_unbinned_two_binned.xml')
         self.test_value(obs.size(), 2, 'Check for 2 observations in XML file')
 
         # Check for content of observations file
-        self.test_value(obs[0].eventfile().file(), 'cntmap_cmd4_00001.fits',
-                        'Check counts cube file name')
-        self.test_value(obs[1].eventfile().file(), 'cntmap_cmd4_00002.fits',
-                        'Check counts cube file name')
+        self.test_value(obs[0].eventfile().file(), 'cntmap_cmd4_cta_00001.fits',
+                        'Check first counts cube file name')
+        self.test_value(obs[1].eventfile().file(), 'cntmap_cmd4_cta_00002.fits',
+                        'Check second counts cube file name')
 
 
         # Check ctbin --help
