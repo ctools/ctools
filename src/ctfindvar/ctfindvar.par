@@ -17,7 +17,10 @@
 # General parameters
 #===================
 inobs,      f, a, events.fits,,, "Input event list, counts cube or observation definition XML file"
+inmodel,    f, h, NONE,,, "Input model definition file for extracting source positions"
+histtype,   s, a, FITS,CSV|FITS,, "File type for storing the individual source histograms"
 prefix,     s, a, findvar_,,, "Prefix for output files"
+minoff,     r, a, 0,,, "Minimum required events in off bin for computing Noff and alpha"
 emin,       r, a, 0.1,,, "Lower energy limit (TeV)"
 emax,       r, a, 100.0,,, "Upper energy limit (TeV)"
 smoothkrnl, s, h, NONE, GAUSSIAN|DISK|NONE,, "Smoothing kernel for counts maps"
