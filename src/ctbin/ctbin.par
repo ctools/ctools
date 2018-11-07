@@ -19,6 +19,7 @@
 inobs,   f, a, events.fits,,, "Input event list or observation definition XML file"
 outcube, f, a, cntcube.fits,,, "Output counts cube file"
 stack,   b, h, yes,,, "Stack events to one cube?"
+prefix,  s, h, binned_,,, "Prefix for counts cubes in observation definition XML file"
 
 #
 # Energy binning parameters

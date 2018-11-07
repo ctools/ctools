@@ -117,11 +117,12 @@ class Test(test):
 
         # Setup ctbin command
         cmd = ctbin+' inobs="'+self._datadir+'/obs_unbinned_two.xml"'+ \
-                    ' outcube="cntmap_cmd4.fits"'+\
+                    ' outcube="obs_unbinned_two_binned.xml"'+\
                     ' emin=1.0 emax=100.0 enumbins=10 ebinalg="LOG"'+ \
                     ' nxpix=40 nypix=40 binsz=0.1 coordsys="CEL"'+ \
                     ' xref=83.63 yref=22.01 proj="CAR"'+ \
-                    ' logfile="ctbin_cmd4.log" chatter=1 stack=no'
+                    ' logfile="ctbin_cmd4.log" chatter=1 stack=no'+ \
+                    ' prefix="cntmap_cmd4_"'
 
         # Check if execution was successful
         self.test_value(self._execute(cmd), 0,

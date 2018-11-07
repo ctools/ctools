@@ -80,18 +80,19 @@ public:
 
 protected:
     // Protected methods
-    void init_members(void);
-    void copy_members(const ctbin& app);
-    void free_members(void);
-    void get_parameters(void);
-    void fill_cube(GCTAObservation* obs);
-    void set_weights(GCTAObservation* obs);
-    void obs_cube(void);
+    void    init_members(void);
+    void    copy_members(const ctbin& app);
+    void    free_members(void);
+    void    get_parameters(void);
+    GSkyMap fill_cube(GCTAObservation* obs);
+    GSkyMap set_weights(GCTAObservation* obs);
+    void    obs_cube(void);
 
     // User parameters
     GFilename     m_outcube;  //!< Output counts map file name
     bool          m_usepnt;   //!< Use pointing instead of xref/yref parameters
     bool          m_stack;    //!< Output one stacked cube or multiple cubes
+    std::string   m_prefix;   //!< Prefix for output path of multiple cubes
     bool          m_publish;  //!< Publish counts cube?
     GChatter      m_chatter;  //!< Chattiness
 
@@ -103,6 +104,8 @@ protected:
     GCTAEventCube m_cube;     //!< Events cube (for cube() method)
     double        m_ontime;   //!< Total ontime
     double        m_livetime; //!< Total livetime
+    std::vector<GCTAEventCube> m_cubes;
+    std::vector<std::string> m_ids;
 
     // Cache members
     std::vector<GSkyDir> m_dirs; //!< Cached GSkyDir for each pixel in m_counts

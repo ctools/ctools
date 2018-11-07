@@ -255,6 +255,12 @@ void ctbin::run(void)
         log_string(NORMAL, msg);
     }
 
+    // Initialise cubes and ids if unstacked
+    if (!m_stack) {
+	m_cubes = std::vector<GCTAEventCube>(obs_list.size());
+	m_ids = std::vector<std::string>(obs_list.size());
+    }
+
     // Write header into logger
     log_header1(TERSE, gammalib::number("Bin observation", m_obs.size()));
 
@@ -265,52 +271,108 @@ void ctbin::run(void)
         // Get pointer to observation
         GCTAObservation* obs = obs_list[i];
 
+	// Make sure that the observation holds a CTA event list. If this
+	// is not the case then throw an exception.
+	const GCTAEventList* events = dynamic_cast<const GCTAEventList*>
+	    (obs->events());
+	if (events == NULL) {
+	    std::string msg = "CTA Observation does not contain an event "
+		"list. An event list is needed to fill the "
+		"counts cube.";
+	    throw GException::invalid_value(G_FILL_CUBE, msg);
+	}
+
         // Fill the cube
-        fill_cube(obs);
+        GSkyMap counts = fill_cube(obs);
 
         // Set the counts cube weights
-        set_weights(obs);
+        GSkyMap weights = set_weights(obs);
 
         // Dispose events to free memory
         obs->dispose_events();
 
+        #pragma omp critical(ctbin_fill_cube)
+	if (m_stack) {
+	    
+	    
+	    m_counts += counts;
+
+	    for (int iebin = 0; iebin < m_ebounds.size(); ++iebin) {
+		for (int pixel = 0; pixel < m_counts.npix(); ++pixel) {
+		    if (weights(pixel, iebin) == 1.0) {
+			m_weights(pixel, iebin) = 1.0;
+		    }
+		}
+	    }
+	
+	    
+	    // If GTI is empty then set its time reference from the observation.
+	    // From then on we keep that time reference
+	    if (m_gti.is_empty()) {
+		m_gti.reference(events->gti().reference());
+	    }
+	    
+	    // Append GTIs
+	    m_gti.extend(events->gti());
+	    
+	    // Update ontime and livetime
+	    m_ontime   += obs->ontime();
+	    m_livetime += obs->livetime();
+	    
+	} else { // don't stack cubes
+
+	    // Construct a cube from this observation
+	    GCTAEventCube cube(counts, weights, m_ebounds, events->gti());
+	    m_cubes[i] = cube;
+	    obs->events(cube);
+
+	    // Store id of the observation
+	    m_ids[i] = obs->id();
+	    
+	}
+
+
     } // endfor: looped over observations
 
-    // Compute total livetime in all observations
-    double livetime = 0.0;
-    for (int i = 0; i < obs_list.size(); ++i) {
-        livetime += obs_list[i]->livetime();
+    if (m_stack) {
+	// Compute total livetime in all observations
+	double livetime = 0.0;
+	for (int i = 0; i < obs_list.size(); ++i) {
+	    livetime += obs_list[i]->livetime();
+	}
+	
+	// Compute livetime fraction per energy bin so that varying energy
+	// thresholds are correctly taken into account in the weighting
+	// array. Computational speed is not optimum, we have to see later
+	// whether this is an issue.
+	for (int iebin = 0; iebin < m_ebounds.size(); ++iebin) {
+	    double livetime_ebin = 0.0;
+	    for (int i = 0; i < obs_list.size(); ++i) {
+		const GCTAEventList* events = dynamic_cast<const GCTAEventList*>
+		    (obs_list[i]->events());
+		std::vector<bool> usage  = cube_layer_usage(m_ebounds,
+							    events->ebounds());
+		if (usage[iebin]) {
+		    livetime_ebin += obs_list[i]->livetime();
+		}
+	    }
+	    if (livetime > 0.0) {
+		double fraction = livetime_ebin / livetime;
+		for (int pixel = 0; pixel < m_counts.npix(); ++pixel) {
+		    if (m_weights(pixel, iebin) > 0.0) {
+			m_weights(pixel, iebin) *= fraction;
+		    }
+		}
+	    }
+	}
+
+	// Build event cube (needs to come before obs_cube() since this method
+	// relies on correct setting of m_cube)
+	m_cube = GCTAEventCube(m_counts, m_weights, m_ebounds, m_gti);
+
+	// Set a single cube in the observation container
+	obs_cube();
     }
-
-    // Compute livetime fraction per energy bin so that varying energy
-    // thresholds are correctly taken into account in the weighting
-    // array. Computational speed is not optimum, we have to see later
-    // whether this is an issue.
-    for (int iebin = 0; iebin < m_ebounds.size(); ++iebin) {
-        double livetime_ebin = 0.0;
-        for (int i = 0; i < obs_list.size(); ++i) {
-            const GCTAEventList* events = dynamic_cast<const GCTAEventList*>(obs_list[i]->events());
-            std::vector<bool>    usage  = cube_layer_usage(m_ebounds, events->ebounds());
-            if (usage[iebin]) {
-                livetime_ebin += obs_list[i]->livetime();
-            }
-        }
-        if (livetime > 0.0) {
-            double fraction = livetime_ebin / livetime;
-            for (int pixel = 0; pixel < m_counts.npix(); ++pixel) {
-                if (m_weights(pixel, iebin) > 0.0) {
-                    m_weights(pixel, iebin) *= fraction;
-                }
-            }
-        }
-    }
-
-    // Build event cube (needs to come before obs_cube() since this method
-    // relies on correct setting of m_cube)
-    m_cube = GCTAEventCube(m_counts, m_weights, m_ebounds, m_gti);
-
-    // Set a single cube in the observation container
-    obs_cube();
 
     // Write resulting observation container into logger
     log_observations(NORMAL, m_obs, "Binned observation");
@@ -334,6 +396,40 @@ void ctbin::save(void)
 {
     // Write header
     log_header1(TERSE, "Save counts cube");
+
+    if (!m_stack) {
+	std::cout << m_prefix << std::endl;
+
+	// Loop over all observations
+	for (size_t i = 0; i < m_obs.size(); ++i) {
+	    
+	    // Loop over all ids of observations that were binned
+	    for (size_t j = 0; j < m_ids.size(); ++j) {
+	    
+		// Check if ids are equal
+		if (m_ids[j] == m_obs[i]->id()) {
+		    
+		    // Construct filename
+		    std::string filename(m_ids[j]);
+		    filename.insert(0, m_prefix);
+		    filename.append(".fits");
+
+		    // Set filename for counts cube 
+		    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+		    obs->eventfile(filename);
+
+		    // Save countscube
+		    obs->save(filename, clobber());
+		}
+	    }
+	}
+	if ((*this)["outcube"].is_valid()) {
+	    // Get counts cube filename
+	    m_outcube = (*this)["outcube"].filename();
+	    m_obs.save(m_outcube);
+	}
+	return;
+    }
 
     // Save only if filename is valid and if there is at least one
     // observation
@@ -416,6 +512,8 @@ void ctbin::init_members(void)
     m_cube.clear();
     m_ontime   = 0.0;
     m_livetime = 0.0;
+    m_cubes.clear();
+    m_ids.clear();
 
     // Initialise cache members
     m_dirs.clear();
@@ -447,6 +545,8 @@ void ctbin::copy_members(const ctbin& app)
     m_cube     = app.m_cube;
     m_ontime   = app.m_ontime;
     m_livetime = app.m_livetime;
+    m_cubes = app.m_cubes;
+    m_ids = app.m_ids;
 
     // Copy cache members
     m_dirs = app.m_dirs;
@@ -496,6 +596,9 @@ void ctbin::get_parameters(void)
     // Get stack parameter
     m_stack = (*this)["stack"].boolean();
 
+    // Get prefix parameter
+    m_prefix = (*this)["prefix"].string();
+
     // Get remaining parameters
     m_publish = (*this)["publish"].boolean();
     m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
@@ -538,7 +641,7 @@ void ctbin::get_parameters(void)
  *
  * Fills the events from an event list into the counts cube.
  ***************************************************************************/
-void ctbin::fill_cube(GCTAObservation* obs)
+GSkyMap ctbin::fill_cube(GCTAObservation* obs)
 {
     // Make sure that the observation holds a CTA event list. If this
     // is not the case then throw an exception.
@@ -572,6 +675,10 @@ void ctbin::fill_cube(GCTAObservation* obs)
     int num_outside_map  = 0;
     int num_outside_ebds = 0;
     int num_in_map       = 0;
+
+    // Initialise new empty counts map
+    GSkyMap counts(m_counts);
+    counts *= 0.;
 
     // Fill counts sky map
     for (int i = 0; i < events->size(); ++i) {
@@ -619,8 +726,8 @@ void ctbin::fill_cube(GCTAObservation* obs)
         }
 
         // Fill event in skymap
-        #pragma omp critical(ctbin_fill_cube)
-        m_counts(pixel, iebin) += 1.0;
+        //#pragma omp critical(ctbin_fill_cube)
+        counts(pixel, iebin) += 1.0;
 
         // Increment number of maps
         num_in_map++;
@@ -628,7 +735,7 @@ void ctbin::fill_cube(GCTAObservation* obs)
     } // endfor: looped over all events
 
     // Update time information
-    #pragma omp critical(ctbin_fill_cube)
+    /*#pragma omp critical(ctbin_fill_cube)
     {
         // If GTI is empty then set its time reference from the observation.
         // From then on we keep that time reference
@@ -642,7 +749,7 @@ void ctbin::fill_cube(GCTAObservation* obs)
         // Update ontime and livetime
         m_ontime   += obs->ontime();
         m_livetime += obs->livetime();
-    }
+	}*/
 
     // Log filling results
     #pragma omp critical(ctbin_fill_cube)
@@ -657,7 +764,7 @@ void ctbin::fill_cube(GCTAObservation* obs)
     }
 
     // Return
-    return;
+    return counts;
 }
 
 
@@ -672,7 +779,7 @@ void ctbin::fill_cube(GCTAObservation* obs)
  * Sets the counts cube weights for all bins that are considered for the
  * specific observation to unity.
  ***************************************************************************/
-void ctbin::set_weights(GCTAObservation* obs)
+GSkyMap ctbin::set_weights(GCTAObservation* obs)
 {
     // Make sure that the observation holds a CTA event list. If this
     // is not the case then throw an exception.
@@ -700,6 +807,10 @@ void ctbin::set_weights(GCTAObservation* obs)
     // Get counts cube usage flags
     std::vector<bool> usage = cube_layer_usage(m_ebounds, events->ebounds());
 
+    // Initialise new empty weights map
+    GSkyMap weights(m_weights);
+    weights *= 0.;
+
     // Loop over all pixels in counts cube
     for (int pixel = 0; pixel < m_counts.npix(); ++pixel) {
 
@@ -717,15 +828,15 @@ void ctbin::set_weights(GCTAObservation* obs)
             }
 
             // Signal that bin was filled
-            #pragma omp critical(ctbin_set_weights)
-            m_weights(pixel, iebin) = 1.0;
+            //#pragma omp critical(ctbin_set_weights)
+            weights(pixel, iebin) = 1.0;
 
         } // endfor: looped over energy layers of counts cube
 
     } // endfor: looped over pixels of counts cube
 
     // Return
-    return;
+    return weights;
 }
 
 
@@ -754,9 +865,9 @@ void ctbin::obs_cube(void)
 
             // Change the event type if we had an unbinned observation
             if (obs->eventtype() == "EventList") {
-
+		
                 // Assign cube to the observation
-                obs->events(this->cube());
+		obs->events(this->cube());
 
             }
 
@@ -788,48 +899,48 @@ void ctbin::obs_cube(void)
         // Allocate observation container
         GObservations container;
 
-        // Allocate CTA observation.
-        GCTAObservation obs;
-
-        // Attach event cube to CTA observation
-        obs.events(this->cube());
-
-        // Compute average pointing direction for all CTA event lists
-        double ra     = 0.0;
-        double dec    = 0.0;
-        double number = 0.0;
-        for (int i = 0; i < m_obs.size(); ++i) {
-            GCTAObservation* cta = dynamic_cast<GCTAObservation*>(m_obs[i]);
-            if ((cta != NULL) && (cta->eventtype() == "EventList")) {
-                ra     += cta->pointing().dir().ra();
-                dec    += cta->pointing().dir().dec();
-                number += 1.0;
-            }
-        }
-        if (number > 0.0) {
-            ra  /= number;
-            dec /= number;
-        }
-        GSkyDir dir;
-        dir.radec(ra, dec);
-        GCTAPointing pointing(dir);
-
-        // Compute deadtime correction
-        double deadc = (m_ontime > 0.0) ? m_livetime / m_ontime : 0.0;
-
-        // Set CTA observation attributes
-        obs.pointing(pointing);
-        obs.ra_obj(dir.ra_deg());   //!< Dummy
-        obs.dec_obj(dir.dec_deg()); //!< Dummy
-        obs.ontime(m_ontime);
-        obs.livetime(m_livetime);
-        obs.deadc(deadc);
+	// Allocate CTA observation.
+	GCTAObservation obs;
+	
+	// Attach event cube to CTA observation
+	obs.events(this->cube());
+	
+	// Compute average pointing direction for all CTA event lists
+	double ra     = 0.0;
+	double dec    = 0.0;
+	double number = 0.0;
+	for (int i = 0; i < m_obs.size(); ++i) {
+	    GCTAObservation* cta = dynamic_cast<GCTAObservation*>(m_obs[i]);
+	    if ((cta != NULL) && (cta->eventtype() == "EventList")) {
+		ra     += cta->pointing().dir().ra();
+		dec    += cta->pointing().dir().dec();
+		number += 1.0;
+	    }
+	}
+	if (number > 0.0) {
+	    ra  /= number;
+	    dec /= number;
+	}
+	GSkyDir dir;
+	dir.radec(ra, dec);
+	GCTAPointing pointing(dir);
+	
+	// Compute deadtime correction
+	double deadc = (m_ontime > 0.0) ? m_livetime / m_ontime : 0.0;
+	
+	// Set CTA observation attributes
+	obs.pointing(pointing);
+	obs.ra_obj(dir.ra_deg());   //!< Dummy
+	obs.dec_obj(dir.dec_deg()); //!< Dummy
+	obs.ontime(m_ontime);
+	obs.livetime(m_livetime);
+	obs.deadc(deadc);
+	
+	// Append CTA observation
+	container.append(obs);
 
         // Set models in observation container
         container.models(m_obs.models());
-
-        // Append CTA observation
-        container.append(obs);
 
         // Copy over all remaining non-CTA observations
         for (int i = 0; i < m_obs.size(); ++i) {
