@@ -78,10 +78,23 @@ protected:
     void get_variability_sig(const int& pix_number, const int& nbins, GNdarray& sig_histogram);
     bool gtis_overlap(const GGti& gti1, const GGti& gti2);
 
+    // Writing methods for individual source histograms
+    void write_srchist(void);
+    void write_srchist_csv(const GNdarray& time_info,
+                           const GNdarray& src_info);
+    void write_srchist_fits(const GNdarray& time_info,
+                            const GNdarray& src_info);
+
     // Protected members
-    GSkyMap m_counts;                 //!< Counts for each time interval
-    GGti    m_gti;                    //!< List of time intervals
-    GSkyMap m_peaksigmap;             //!< Skymap holding the maximum significance
+    GSkyMap  m_counts;                 //!< Counts for each time interval
+    GGti     m_gti;                    //!< List of time intervals
+    GModels  m_inmodel;                //!< List of models for source positions
+    GSkyMap  m_peaksigmap;             //!< Skymap holding the maximum significance
+    GNdarray m_pixsigsrc;              //!< Store the distributions of the source significances
+    GTime    m_tstart;                 //!< Start time for variability study
+    GTime    m_tstop;                  //!< Stop time for variability study
+
+
 };
 
 

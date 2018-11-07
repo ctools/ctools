@@ -260,8 +260,9 @@ void ctfindvar::run(void)
     const int nbins = m_counts.nmaps();
 
     //preparing the histogram with significance evolution for the source center and the highest sig-pix
-    GNdarray pixSig(nbins), pixSigSrc(nbins), pixSigMax(nbins); //Storing the significance for each GTI of the pixels
-  
+    GNdarray pixSig(nbins), pixSigMax(nbins); //Storing the significance for each GTI of the pixels
+    m_pixsigsrc = GNdarray(1, nbins); //TODO: Update this to allow for multiple sources in 1st dimension
+
     // creating GSkyDir to get the position of the source and each pixels
     GSkyDir srcSkyDir;
 
@@ -297,7 +298,9 @@ void ctfindvar::run(void)
         get_variability_sig(pix_number,nbins, pixSig);
         if (srcInxPix == pix_number) //Getting the significance evolution for the source
         {
-            pixSigSrc=pixSig;
+            for (int i=0; i<nbins; i++) {
+                m_pixsigsrc(0,i) = pixSig(i);
+            }
             std::cout << "checking pixel number of the source of interest" << pix_number << std::endl;
             std::cout << "number of counts in pixel of the source of interest" << total_counts << std::endl;
             std::cin.ignore();
@@ -467,6 +470,7 @@ void ctfindvar::save(void)
     m_peaksigmap.save(peaksigmap, (*this)["clobber"].boolean());
 
     // Write individual source distributions
+    write_srchist();
 
     // TODO: Your code goes here
 
@@ -489,6 +493,11 @@ void ctfindvar::init_members(void)
     // Initialise members
     m_counts.clear();
     m_gti.clear();
+    m_inmodel.clear();
+    m_peaksigmap.clear();
+    m_pixsigsrc.clear();
+    m_tstart.clear();
+    m_tstop.clear();
 
     // Return
     return;
@@ -537,8 +546,17 @@ void ctfindvar::get_parameters(void)
     // Get the rest of the parameters
     if (read_ahead()) {
         (*this)["prefix"].string();
-        (*this)["xsrc"].real();
-        (*this)["ysrc"].real();
+
+        if ((*this)["inmodel"].is_valid()) {
+            m_inmodel = GModels((*this)["inmodel"].filename());
+        } else {
+            // Get the desired source position from user
+            (*this)["xsrc"].real();
+            (*this)["ysrc"].real();
+
+            // Get the file format for the output source histograms
+            (*this)["histtype"].string();
+        }
     }
 
     // Write parameters into logger
@@ -684,21 +702,21 @@ void ctfindvar::init_cube(void)
 void ctfindvar::init_gtis(void)
 {
     double tinterval = (*this)["tinterval"].real();
-    GTime tstart("JD 999999999");     // large unreasonable Julian date
-    GTime tstop("JD 0");              // small unreasonable Julian date
+    m_tstart = GTime("JD 999999999");     // large unreasonable Julian date
+    m_tstop  = GTime("JD 0");              // small unreasonable Julian date
 
     // Set the start time
     if ((*this)["tmin"].is_valid()) {
         log_string(NORMAL, "Setting start time from command line");
-        GTime tstart = (*this)["tmin"].time();
+        m_tstart = (*this)["tmin"].time();
     } else {
         log_string(NORMAL, "Setting start time from observations");
         for (int o=0; o<m_obs.size(); o++) {
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
             
             // Check that the start time of the run is less than tstart
-            if (obs->gti().tstart() < tstart) {
-                tstart = obs->gti().tstart();
+            if (obs->gti().tstart() < m_tstart) {
+                m_tstart = obs->gti().tstart();
             }
         }
     }
@@ -706,7 +724,7 @@ void ctfindvar::init_gtis(void)
     // Set the stop time
     if ((*this)["tmax"].is_valid()) {
         log_string(NORMAL, "Setting stop time from command line");
-        GTime tstop = (*this)["tmax"].time();
+        m_tstop = (*this)["tmax"].time();
     } else {
 
         log_string(NORMAL, "Setting stop time from observations");
@@ -714,27 +732,27 @@ void ctfindvar::init_gtis(void)
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
             
             // Check that the stop time of the run is larger than tstop
-            if (obs->gti().tstop() > tstop) {
-                tstop = obs->gti().tstop();
+            if (obs->gti().tstop() > m_tstop) {
+                m_tstop = obs->gti().tstop();
             }
         }
     }
 
     // Fill the number of good time intervals
-    double tstart_sec = tstart.secs();
-    double tstop_sec  = tstop.secs();
+    double tstart_sec = m_tstart.secs();
+    double tstop_sec  = m_tstop.secs();
     int    bins       = (tstop_sec - tstart_sec) / tinterval + 0.5;
 
     // Log information
-    log_value(NORMAL, "treference (mjd)", tstart.reference().mjdref());
-    log_value(NORMAL, "tstart (sec)",  tstart.secs());
-    log_value(NORMAL, "tstop  (sec)",  tstop.secs());
+    log_value(NORMAL, "treference (mjd)", m_tstart.reference().mjdref());
+    log_value(NORMAL, "tstart (sec)",  tstart_sec);
+    log_value(NORMAL, "tstop  (sec)",  tstop_sec);
     log_value(NORMAL, "Total time",    tstop_sec-tstart_sec);
     log_value(NORMAL, "Time interval", tinterval);
     log_value(NORMAL, "nbins",         bins);
 
     // Throw if tstart == tstop
-    if (tstart == tstop) {
+    if (m_tstart == m_tstop) {
         throw GException::invalid_value(G_INIT_GTIS,
                                         "Start time is equal to stop time");
     } else if (bins < 2) {
@@ -747,8 +765,8 @@ void ctfindvar::init_gtis(void)
     for (int i=0; i<bins; i++) {
         
         // Get the next time interval
-        GTime next_tstart(tstart + i*tinterval);
-        GTime next_tstop(tstart + (i+1)*tinterval);
+        GTime next_tstart(m_tstart + i*tinterval);
+        GTime next_tstop(m_tstart + (i+1)*tinterval);
         GGti  next_gti(next_tstart, next_tstop);
 
         // Make sure there's an observation that overlaps with this GTI
@@ -785,4 +803,94 @@ bool ctfindvar::gtis_overlap(const GGti& gti1, const GGti& gti2)
     }
 
     return overlap;
+}
+
+
+/***********************************************************************//**
+ * @brief Write individual histograms in CSV format
+ ***************************************************************************/
+void ctfindvar::write_srchist(void)
+{
+    // Setup data storage for time and source significances
+    double   tinterval = (*this)["tinterval"].real();
+    int      nentries = (m_tstop-m_tstart) / tinterval + 0.5;
+    GNdarray time_info(2,nentries);
+    GNdarray src_info(m_pixsigsrc.shape()[0], nentries);
+
+    // Store the full set of information
+    for (int i=0; i<nentries; i++) {
+        GTime tstart_bin(m_tstart + i * tinterval);
+        GTime tstop_bin(m_tstart + (i+1) * tinterval);
+        GTime midpoint((tstop_bin.secs()+tstart_bin.secs())*0.5);
+
+        // Store the time of this bin
+        time_info(0,i) = tstart_bin.mjd();
+        time_info(1,i) = tstop_bin.mjd();
+
+        // Get the index associated with this time
+        int index = time2inx(midpoint);
+        if (index >= 0) {
+            src_info(0,i) = m_pixsigsrc(0,index);
+        } else {
+            src_info(0,i) = 0.0;
+        }
+    }
+
+    // Call the appropriate method for writing the data
+    if ((*this)["histtype"].string() == "CSV") {
+        write_srchist_csv(time_info, src_info);
+    } else {
+        write_srchist_fits(time_info, src_info);
+    }
+}
+
+/***********************************************************************//**
+ * @brief Write individual histograms in CSV format
+ ***************************************************************************/
+void ctfindvar::write_srchist_csv(const GNdarray& time_info,
+                                  const GNdarray& src_info)
+{
+    log_string(NORMAL,"Storing histograms in CSV format is not currently supported.");
+}
+
+
+/***********************************************************************//**
+ * @brief Write individual histograms in FITS format
+ ***************************************************************************/
+void ctfindvar::write_srchist_fits(const GNdarray& time_info,
+                                   const GNdarray& src_info)
+{
+    log_string(NORMAL, "Storing histograms in FITS format");
+
+    // Create the table
+    int           nrows = time_info.shape()[1];
+    GFitsBinTable table(nrows);
+
+    // Append the start and stop time columns
+    GFitsTableFloatCol start_mjd("TSTART", nrows);
+    GFitsTableFloatCol stop_mjd("TSTOP", nrows);
+
+    for (int i=0; i<nrows; i++) {
+        start_mjd(i) = time_info(0,i);
+        stop_mjd(i)  = time_info(1,i);
+    }
+    table.append(start_mjd);
+    table.append(stop_mjd);
+
+    // Append the distribution for each source
+    int src_count = src_info.shape()[0];
+    for (int src=0; src<src_count; src++) {
+        GFitsTableFloatCol src_sig("SOURCE", nrows);
+
+        for (int i=0; i<nrows; i++) {
+            src_sig(i) = src_info(src, i);
+        }
+        table.append(src_sig);
+    }
+
+    // Write the table to a file
+    GFilename outfile((*this)["prefix"].string() + "srcsig.fits");
+    GFits     fitsfile;
+    fitsfile.append(table);
+    fitsfile.saveto(outfile, (*this)["clobber"].boolean() );
 }
