@@ -336,7 +336,7 @@ void ctfindvar::get_variability_sig(const int& pix_number,
     std::vector<double> excess_bin_vector;
     int background_bin_array[nbins];
     bool background_validated=false;
-    int non, noff;
+    double non, noff;
     double alpha, sig;
 
     for (int i=0;i<nbins;i++)
@@ -375,9 +375,19 @@ void ctfindvar::get_variability_sig(const int& pix_number,
            double ntotal = non+noff;
            double arg1   = non/ntotal;
            double arg2   = noff/ntotal;
-           double term1  = non * std::log((alpha1/alpha)*arg1);
-           double term2  = noff * std::log(alpha1*arg2);
-           sig  = sqrt(2.0 * (term1 + term2));
+           if (noff == 0.0) {
+               sig = 0.0;
+           } else if (non > 0.0) {
+               double term1  = non * std::log((alpha1/alpha)*arg1);
+               double term2  = noff * std::log(alpha1*arg2);
+               sig  = std::sqrt(2.0 * (term1 + term2));
+           } else {
+               sig = std::sqrt(2.0 * noff * std::log(alpha1));
+           }
+
+           // Specify the sign of the significance
+           sig *= (non < alpha*noff) ? -1.0 : 1.0;
+
            /////////////////////////////////////////////////
            //sig_bin_vector[i]=sig;
            sig_histogram(i)=sig;
