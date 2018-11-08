@@ -14,9 +14,19 @@ what it produces on output. Please do not write more than 80 characters per
 line since this file is also used to produce a help text for the terminal.
 
 The ctfindvar tool is used to search for source variability. 
+The variability is computed by binning the arrival time of the photons 
+and applying the on-off method to each bin, integrating the background
+over all the other bins. 
+A Limit is set to include a bin in the background sample, i.e., its 
+significance with respect to all the others bins has to be lower than 4.5
+The significance of each bin is computed using Li&Ma eq. 17.
+A limit on the background sample can also be included, taking only into 
+account bins that have a number of counts which is higher than a threshold
+given by the user via the minoff parameter.
+
 The tool takes in input some observation files.
 It will make a cube with several maps, each one with a count number integrated
-over a time period defined by the tinterval parameter for each pixel. 
+over a time period defined by the tinterval parameter for, each pixel. 
 The tinterval parameter is the time scale over which the variability
 will be searched.
 
