@@ -81,14 +81,17 @@ protected:
     // Writing methods for individual source histograms
     void write_srchist(void);
     void write_srchist_csv(const GNdarray& time_info,
+                           const GNdarray& max_pixel_info,
                            const GNdarray& src_info);
     void write_srchist_fits(const GNdarray& time_info,
+                            const GNdarray& max_pixel_info,
                             const GNdarray& src_info);
 
     // Protected members
     GSkyMap  m_counts;                 //!< Counts for each time interval
     GGti     m_gti;                    //!< List of time intervals
     GModels  m_inmodel;                //!< List of models for source positions
+    GSkyDir  m_max_sig_dir;            //!< Sky direction associated with maximum significance
     double   m_minoff;                 //!< Minimum counts for use in significance calculation
     GSkyMap  m_peaksigmap;             //!< Skymap holding the maximum significance
     GNdarray m_pixsigsrc;              //!< Store distributions of the source significances
