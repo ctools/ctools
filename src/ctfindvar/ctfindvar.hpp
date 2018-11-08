@@ -89,6 +89,7 @@ protected:
     GSkyMap  m_counts;                 //!< Counts for each time interval
     GGti     m_gti;                    //!< List of time intervals
     GModels  m_inmodel;                //!< List of models for source positions
+    double   m_minoff;                 //!< Minimum counts for use in significance calculation
     GSkyMap  m_peaksigmap;             //!< Skymap holding the maximum significance
     GNdarray m_pixsigsrc;              //!< Store distributions of the source significances
     GNdarray m_pixsigmax;              //!< Store distribution for pixel with max significance

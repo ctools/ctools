@@ -421,11 +421,19 @@ void ctfindvar::get_variability_sig(const int& pix_number,
         for (int i=0; i< nbins; i++) //looping over all the GTIs of the pixel
         {
            alpha=0;
-           if (accepted_bin_bckg_vector[i]==0) continue;     //the GTI is discared from bckg calculation and not checked again.
+           //the GTI is discared from bckg calculation and not checked again.
+           if (accepted_bin_bckg_vector[i]==0) {
+               continue;
+           } 
+           // Check if bin fails minoff check
+           else if (m_counts(pix_number, i) < m_minoff) {
+               accepted_bin_bckg_vector[i]=0;
+               continue;
+           }
            int background_count=0;
            for (int j=0;j<nbins;j++)  // for one GTI selected (i), looping over all the others (j).
            {
-                if (j!=i &&accepted_bin_bckg_vector[j]==1)
+                if (j!=i && accepted_bin_bckg_vector[j]==1)
                 {
                     background_count+= m_counts(pix_number, j);
                     alpha++;
@@ -436,7 +444,7 @@ void ctfindvar::get_variability_sig(const int& pix_number,
            non = m_counts(pix_number, i); 
            noff = background_bin_array[i];
            alpha = (1./alpha);
-          
+
            ///////////////////////////////////////////////////////////////////////////////// 
            // Compute sensitivity in Gaussian sigma
            double alpha1 = alpha + 1.0;
@@ -642,6 +650,9 @@ void ctfindvar::get_parameters(void)
     // Get the energy limits
     m_emin = GEnergy((*this)["emin"].real(), "TeV");
     m_emax = GEnergy((*this)["emax"].real(), "TeV");
+
+    // Get minimum counts for a bin to be considered in Noff calculation
+    m_minoff = (*this)["minoff"].real();
 
     // Write parameters into logger
     log_parameters(TERSE);
