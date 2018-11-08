@@ -28,7 +28,7 @@ outcube,  f, a, psfcube.fits,,, "Output PSF cube file"
 ebinalg,   s, a, LOG,FILE|LIN|LOG,, "Algorithm for defining energy bins"
 emin,      r, a, 0.1,,, "Lower energy limit (TeV)"
 emax,      r, a, 100.0,,, "Upper energy limit (TeV)"
-enumbins,  i, a, 20,1,200, "Number of energy bins"
+enumbins,  i, a, 20,1,1000, "Number of energy bins"
 ebinfile,  f, a, NONE,,, "Name of the file containing the energy bin definition"
 addbounds, b, h, no,,, "Add energies at observation energy boundaries?"
 
