@@ -403,7 +403,7 @@ void ctfindvar::get_variability_sig(const int& pix_number,
 {
     std::vector<bool>   accepted_bin_bckg_vector(nbins, true);
     std::vector<double> excess_bin_vector(nbins, 0.0);
-    std::vector<int>    background_bin_array(nbins, 0);
+    std::vector<int>    background_bin_vector(nbins, 0);
     bool background_validated=false;
     double non, noff;
     double alpha, sig;
@@ -440,7 +440,7 @@ void ctfindvar::get_variability_sig(const int& pix_number,
 
            background_bin_vector[i] = background_count; //The background is averaged on the number of bins -1
            non = m_counts(pix_number, i); 
-           noff = background_bin_array[i];
+           noff = background_bin_vector[i];
            alpha = alpha_vector[i]/alpha;
 
            ///////////////////////////////////////////////////////////////////////////////// 
