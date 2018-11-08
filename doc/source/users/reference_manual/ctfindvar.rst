@@ -8,12 +8,7 @@ ToDo: Describe in a one liner what the tool is doing.
 
 Synopsis
 --------
-
-ToDo: Desribe in detail what the tool is doing, what it takes on input and
-what it produces on output. Please do not write more than 80 characters per
-line since this file is also used to produce a help text for the terminal.
-
-The ctfindvar tool is used to search for source variability. 
+This tool is used to search for source variability. 
 The variability is computed by binning the arrival time of the photons 
 and applying the on-off method to each bin, integrating the background
 over all the other bins. 
@@ -22,15 +17,23 @@ significance with respect to all the others bins has to be lower than 4.5
 The significance of each bin is computed using Li&Ma eq. 17.
 A limit on the background sample can also be included, taking only into 
 account bins that have a number of counts which is higher than a threshold
-given by the user via the minoff parameter.
+defined by the user via the "minoff" parameter.
 
-The tool takes in input some observation files.
-It will make a cube with several maps, each one with a count number integrated
-over a time period defined by the tinterval parameter for, each pixel. 
+Variability is calculated for each pixel of the sky given in the input files. 
+The results of the variability is further stored in the srcsig.fits file, 
+where the GTIs and the significance of each bin are stored.
+Only the sources with a significance > 4.5 sigmas are stored.
+
+:ref:`ctfindvar` takes in input some observation files.
+It calculates a cube with several maps, each one with a count number integrated
+over a time period defined by the tinterval parameter, for each pixel. 
 The tinterval parameter is the time scale over which the variability
 will be searched.
 
-Several output files are made:
+Inputs files:
+- observation file xml, or event list .fits
+
+Output files: 
 - countscube.fits
     provides all the count-skymaps contained in the cube.
 - peaksigmap.fits
@@ -39,6 +42,9 @@ Several output files are made:
     a table containing the GTIs together with the significance
     for all the sources with a significant variability detected.
 
+
+The significance of a source can be displayed using the 
+``show_variability_evolution.py`` script in the example forlder
 
 General parameters
 ------------------
