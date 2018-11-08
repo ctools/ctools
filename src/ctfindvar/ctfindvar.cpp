@@ -433,16 +433,16 @@ void ctfindvar::get_variability_sig(const int& pix_number,
                 if (j!=i && accepted_bin_bckg_vector[j]==1)
                 {
                     background_count+= m_counts(pix_number, j);
-                    alpha++;
-//                    alpha += alpha_vector[j];
+//                    alpha++;
+                    alpha += alpha_vector[j];
                  }
            }
 
            background_bin_vector[i] = background_count; //The background is averaged on the number of bins -1
            non = m_counts(pix_number, i); 
-           noff = background_bin_vector[i];
-           alpha = 1.0/alpha;
-//           alpha = (alpha_vector[i]/alpha);
+           noff = background_bin_array[i];
+//           alpha = 1.0/alpha;
+           alpha = (alpha_vector[i]/alpha);
 
            ///////////////////////////////////////////////////////////////////////////////// 
            // Compute sensitivity in Gaussian sigma
