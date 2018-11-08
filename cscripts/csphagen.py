@@ -828,15 +828,25 @@ class csphagen(ctools.csobservation):
         # Return
         return
 
-    def exclmap(self, mapobj=None):
+    def exclregmap(self, regmapobj=None):
         """
-        Access exclusion map object
+        Access exclusion region map object
+
+        Parameters
+        ----------
+        regmapobj : `~gammalib.GSkyRegionMap`
+            Excluded regions region map instance
+
+        Returns
+        -------
+        reg : `~gammalib.GSkyRegionMap`
+            Excluded regions region map instance
         """
         # Check if exclusion map object was provided
-        if mapobj is not None:
+        if regmapobj is not None:
 
             # Set exclusion region map
-            self._excl_reg = gammalib.GSkyRegionMap(mapobj)
+            self._excl_reg = gammalib.GSkyRegionMap(regmapobj)
 
             # Set has exclusion to yes
             self._has_exclusion = True
