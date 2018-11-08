@@ -344,7 +344,6 @@ void ctfindvar::run(void)
                 std::cout << "checking pixel number of the source of interest" << pix_number << std::endl;
                 std::cout << "checking pixel number " << pix_number << " with total number of counts of: " << total_counts << std::endl;
                 std::cout << "number of counts in pixel of the source of interest" << total_counts << std::endl;
-                std::cin.ignore();
                 #endif
             }
             #ifdef G_DEBUG
@@ -943,7 +942,6 @@ void ctfindvar::init_gtis(void)
     double tstart_sec = m_tstart.secs();
     double tstop_sec  = m_tstop.secs();
     int    bins       = (tstop_sec - tstart_sec) / tinterval + 0.5;
-
     // Log information
     log_value(NORMAL, "treference (mjd)", m_tstart.reference().mjdref());
     log_value(NORMAL, "tstart (sec)",  tstart_sec);
