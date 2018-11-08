@@ -814,6 +814,14 @@ def get_onoff_obs(cls, obs, nthreads=0):
     phagen['clobber']       = cls['clobber'].boolean()
     phagen['debug']         = cls['debug'].boolean()
     phagen['nthreads']      = nthreads
+
+    # Pipe exclusion region map
+    if hasattr(cls, 'exclregmap'):
+        excl_reg_map = cls.exclregmap()
+        if excl_reg_map is not None:
+            phagen.exclregmap(excl_reg_map)
+
+	# Run csphagen
     phagen.run()
 
     # Clone resulting observation container
