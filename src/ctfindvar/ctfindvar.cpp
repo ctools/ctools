@@ -302,7 +302,8 @@ void ctfindvar::run(void)
         srcInxPix.push_back(src_map_index);
     }
 
-    //preparing the histogram with significance evolution for the source center and the highest sig-pix
+    //preparing the histogram with significance evolution 
+    //for the source center and the highest sig-pix
     m_pixsigsrc = GNdarray(srcInxPix.size(), nbins);
     m_pixsigmax = GNdarray(nbins);
 
@@ -324,7 +325,9 @@ void ctfindvar::run(void)
         #ifdef G_DEBUG
         if(pix_number%20==0)
         {
-            std::cout << "Pixel number " << pix_number << " has a total number of counts of: " << total_counts << std::endl;
+            std::cout << "Pixel number " << pix_number ;
+            std::cout << " has a total number of counts of: ";
+            std::cout << total_counts << std::endl;
         }
         #endif
 
@@ -341,9 +344,8 @@ void ctfindvar::run(void)
                     m_pixsigsrc(src,i) = pixSig(i);
                 }
                 #ifdef G_DEBUG
-                std::cout << "checking pixel number of the source of interest" << pix_number << std::endl;
-                std::cout << "checking pixel number " << pix_number << " with total number of counts of: " << total_counts << std::endl;
-                std::cout << "number of counts in pixel of the source of interest" << total_counts << std::endl;
+                std::cout << "checking pixel of the source of interest: " << pix_number ;
+                std::cout << " with total number of counts of: " << total_counts << std::endl;
                 #endif
             }
             #ifdef G_DEBUG
@@ -358,7 +360,9 @@ void ctfindvar::run(void)
         }
         
         #ifdef G_DEBUG
-        std::cout << "checking pixel number of the source of interest: " << pix_number << " - with total number of counts of: " << total_counts << std::endl;
+        std::cout << "checking pixel number of the source of interest: " ;
+        std::cout << pix_number << " - with total number of counts of: " ;
+        std::cout << total_counts << std::endl;
         #endif
 
         // Getting the evolution for the pix with highest significance
@@ -396,9 +400,9 @@ void ctfindvar::get_variability_sig(const int& pix_number,
                                     const int& nbins, 
                                     GNdarray&  sig_histogram)
 {
-    std::vector<bool> accepted_bin_bckg_vector;
-    std::vector<double> excess_bin_vector;
-    int background_bin_array[nbins];
+    std::vector<bool> accepted_bin_bckg_vector(nbins, 1);
+    std::vector<double> excess_bin_vector(nbins, 0.0);
+    std::vector<int> background_bin_vector(nbins,0);
     bool background_validated=false;
     double non, noff;
     double alpha, sig;
@@ -406,13 +410,6 @@ void ctfindvar::get_variability_sig(const int& pix_number,
     // Fill the alpha values for each vector
     std::vector<double> alpha_vector(nbins, 0.0);
     fill_alpha_vector(pix_number, alpha_vector);
-
-    for (int i=0;i<nbins;i++)
-    {
-        background_bin_array[i]=0;
-        accepted_bin_bckg_vector.push_back(1);
-        excess_bin_vector.push_back(0);
-    }
 
     while (background_validated==false)
     {
@@ -441,9 +438,9 @@ void ctfindvar::get_variability_sig(const int& pix_number,
                  }
            }
 
-           background_bin_array[i] = background_count; //The background is averaged on the number of bins -1
+           background_bin_vector[i] = background_count; //The background is averaged on the number of bins -1
            non = m_counts(pix_number, i); 
-           noff = background_bin_array[i];
+           noff = background_bin_vector[i];
            alpha = 1.0/alpha;
 //           alpha = (alpha_vector[i]/alpha);
 
@@ -483,13 +480,6 @@ void ctfindvar::get_variability_sig(const int& pix_number,
            }
         }
 
-    }
-    if (pix_number==19900)
-    {
-        for (int k=0;k<sig_histogram.size();k++)
-        {
-            std::cout << "value of the sig of the " << k << "th slice =" << sig_histogram(k) << std::endl;
-        } 
     }
 }
 
