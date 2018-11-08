@@ -74,9 +74,11 @@ protected:
     void copy_members(const ctfindvar& app);
     void free_members(void);
     void fill_cube(GCTAObservation* obs);
+    void fill_alpha_vector(const int&           pix_number,
+                           std::vector<double>& alpha_vector);
     void get_parameters(void);
     void get_variability_sig(const int& pix_number, const int& nbins, GNdarray& sig_histogram);
-    bool gtis_overlap(const GGti& gti1, const GGti& gti2);
+    double gti_overlap(const GGti& gti1, const GGti& gti2);
 
     // Writing methods for individual source histograms
     void write_srchist(void);
