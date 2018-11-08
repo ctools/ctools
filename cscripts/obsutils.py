@@ -815,13 +815,13 @@ def get_onoff_obs(cls, obs, nthreads=0):
     inexclusion = 'NONE'
     use_irf_bkg = True
 
-    # Set inmodel, srcname, inexclusion and use_irf_bkg if possible
-    if 'inmodel' in cls:
+    # Set inmodel, srcname, inexclusion and use_irf_bkg if they are available
+    if cls.has_par('inmodel'):
         if cls['inmodel'].is_valid():
             inmodel = cls['inmodel'].value()
-    if 'srcname' in cls:
+    if cls.has_par('srcname'):
         srcname = cls['srcname'].value()
-    if 'inexclusion' in cls:
+    if cls.has_par('inexclusion'):
         if cls['inexclusion'].is_valid():
             inexclusion = cls['inexclusion'].value()
     if cls.has_par('use_irf_bkg'):
