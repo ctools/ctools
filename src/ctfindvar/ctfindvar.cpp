@@ -41,6 +41,7 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_FILL_CUBE                  "ctfindvar::fill_cube(GCTAObservation*)"
+#define G_FILL_ALPHA_VECTOR "ctfindvar::fill_alpha_vector(const int&, std::vector<double>&)"
 #define G_INIT_CUBE                              "ctfindvar::init_cube(void)"
 #define G_INIT_GTIS                              "ctfindvar::init_gtis(void)"
 
@@ -308,6 +309,8 @@ void ctfindvar::run(void)
     //Prepare the final skymap with the max significance of each pixel
     double  max_sig=0;
 
+    log_header1(NORMAL, "Looping Over Pixels");
+
     //looping over all the pixels in the cube
     #pragma omp parallel for
     for (int pix_number=0; pix_number<m_counts.npix(); pix_number++)
@@ -401,6 +404,10 @@ void ctfindvar::get_variability_sig(const int& pix_number,
     double non, noff;
     double alpha, sig;
 
+    // Fill the alpha values for each vector
+    std::vector<double> alpha_vector(nbins, 0.0);
+    fill_alpha_vector(pix_number, alpha_vector);
+
     for (int i=0;i<nbins;i++)
     {
         background_bin_array[i]=0;
@@ -419,8 +426,8 @@ void ctfindvar::get_variability_sig(const int& pix_number,
            if (accepted_bin_bckg_vector[i]==0) {
                continue;
            } 
-           // Check if bin fails minoff check
-           else if (m_counts(pix_number, i) < m_minoff) {
+           // Check if bin fails minoff check or no observations overlap it
+           else if (m_counts(pix_number, i) < m_minoff || alpha_vector[i]==0) {
                accepted_bin_bckg_vector[i]=0;
                continue;
            }
@@ -431,13 +438,15 @@ void ctfindvar::get_variability_sig(const int& pix_number,
                 {
                     background_count+= m_counts(pix_number, j);
                     alpha++;
+//                    alpha += alpha_vector[j];
                  }
            }
 
            background_bin_array[i] = background_count; //The background is averaged on the number of bins -1
            non = m_counts(pix_number, i); 
            noff = background_bin_array[i];
-           alpha = (1./alpha);
+           alpha = 1.0/alpha;
+//           alpha = (alpha_vector[i]/alpha);
 
            ///////////////////////////////////////////////////////////////////////////////// 
            // Compute sensitivity in Gaussian sigma
@@ -458,6 +467,9 @@ void ctfindvar::get_variability_sig(const int& pix_number,
            // Specify the sign of the significance
            sig *= (non < alpha*noff) ? -1.0 : 1.0;
 
+           if (alpha == 0.0) {
+               sig = 0.0;
+           }
            /////////////////////////////////////////////////
            //sig_bin_vector[i]=sig;
            sig_histogram(i)=sig;
@@ -481,6 +493,91 @@ void ctfindvar::get_variability_sig(const int& pix_number,
         } 
     }
 }
+
+
+/***********************************************************************//**
+ * @brief Get the map index associated with a given time
+ *
+ * @param[in]  pix_number       Spatial pixel
+ * @param[out] alpha_vector     Vector containing effective exposure
+ ***************************************************************************/
+void ctfindvar::fill_alpha_vector(const int&           pix_number,
+                                  std::vector<double>& alpha_vector)
+{
+    // Pixel position
+    GSkyDir pix_dir = m_counts.inx2dir(pix_number);
+
+    // Energy binning
+    GEbounds ebounds((*this)["enumbins"].integer(), m_emin, m_emax);
+
+    // Loop over all observations
+    for (int i=0; i<m_obs.size(); i++) {
+        // Skip if observation does not overlap with this pixel position
+        GCTAObservation* obs        = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        GCTARoi          roi        = obs->roi();
+        GSkyDir          roi_centre = roi.centre().dir();
+        
+        if (roi_centre.dist_deg(pix_dir) > roi.radius()) {
+            continue;
+        }
+        
+        // Convert sky direction to instrument direction
+        GCTAInstDir instdir = obs->pointing().instdir(pix_dir);
+
+        // Extract the good time intervals of the observation
+        GGti obs_gti = obs->gti();
+
+        // Loop over all time bins
+        for (int j=0; j<m_gti.size(); j++) {
+            GGti gti(m_gti.tstart(j), m_gti.tstop(j));
+
+            // Make sure observation overlaps with this time interval
+            double exposure = gti_overlap(gti, obs_gti);
+            if (exposure > 0.0) {
+
+                // Get IRF response
+                const GCTAResponseIrf* rsp = dynamic_cast<const GCTAResponseIrf*>
+                                 (obs->response());
+
+                // Throw an exception if observation has no instrument response function
+                if (rsp == NULL) {
+                    std::string msg = 
+                        "No response information available for "+
+                        get_obs_header(obs)+" to compute IRF background. "
+                        "Please specify response information or use "
+                        "another background subtraction method.";
+                    throw GException::invalid_value(G_FILL_ALPHA_VECTOR, msg);
+                }
+
+                // Get IRF background template
+                const GCTABackground* bkg = rsp->background();
+
+                // Throw an exception if observation has no IRF background template
+                if (bkg == NULL) {
+                    std::string msg = 
+                        "No IRF background template found in instrument "
+                        "response function for "+
+                        get_obs_header(obs)+". Please specify an instrument "
+                        "response function containing a background template.";
+                    throw GException::invalid_value(G_FILL_ALPHA_VECTOR, msg);
+                }
+
+                // Compute background value
+                double value = 0.0;
+                for (int e=0; e<ebounds.size(); e++) {
+                    value += bkg->rate_ebin(instdir, 
+                                            ebounds.emin(e), 
+                                            ebounds.emax(e));
+                }
+
+                // Multiply background rate with livetime and solid angle
+                alpha_vector[j] += exposure * value;
+            }
+        }
+    }
+
+    return;
+} 
 
 
 /***********************************************************************//**
@@ -620,7 +717,7 @@ void ctfindvar::get_parameters(void)
     #endif
 
     // Load the observations
-    setup_observations(m_obs, false, true, false);
+    setup_observations(m_obs, true, true, false);
 
     // Create GTIs and counts cube
     init_gtis();
@@ -870,15 +967,14 @@ void ctfindvar::init_gtis(void)
         
         // Get the next time interval
         GTime next_tstart(m_tstart + i*tinterval);
-        GTime next_tstop(m_tstart + (i+1)*tinterval);
+        GTime next_tstop(m_tstart + (i+1.0)*tinterval);
         GGti  next_gti(next_tstart, next_tstop);
 
         // Make sure there's an observation that overlaps with this GTI
-        bool has_obs = false;
         for (int o=0; o<m_obs.size(); o++) {
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
             
-            if (gtis_overlap(obs->gti(), next_gti)) {
+            if (gti_overlap(obs->gti(), next_gti) > 0.0) {
                 m_gti.extend(next_gti);
                 break;
             }
@@ -888,22 +984,25 @@ void ctfindvar::init_gtis(void)
 
 
 /***********************************************************************//**
- * @brief Check if two GTIs overlap
+ * @brief Returns number of seconds that two GTIs overlap
  *
  * @param[in] gti1      First GTI
  * @param[in] gti2      Second GTI
- * @return Whether gti1 and gti2 overlap in time
+ * @return Number of seconds that two GTIs overlap
  ***************************************************************************/
-bool ctfindvar::gtis_overlap(const GGti& gti1, const GGti& gti2)
+double ctfindvar::gti_overlap(const GGti& gti1, const GGti& gti2)
 {
-    bool overlap = false;
-    // Loop over all GTIs
-    if ((gti1.tstart() < gti2.tstart()) && (gti1.tstop() > gti2.tstart())) {
-        overlap = true;
-    } else if ((gti1.tstart() < gti2.tstop()) && (gti1.tstop() > gti2.tstop())) {
-        overlap = true;
-    } else if ((gti1.tstart() > gti2.tstart()) && (gti1.tstart() < gti2.tstop())) {
-        overlap = true;
+    double overlap = 0.0;
+    GGti   gti_1st = (gti1.tstart() <= gti2.tstart()) ? gti1 : gti2;
+    GGti   gti_2nd = (gti1.tstart() > gti2.tstart()) ? gti1 : gti2;
+
+    // gti1 starts earlier
+    if ((gti_1st.tstart() <= gti_2nd.tstart()) && (gti_1st.tstop() > gti_2nd.tstart())) {
+        if (gti_1st.tstop() <= gti_2nd.tstop()) {
+            overlap = gti_1st.tstop() - gti2.tstart();
+        } else if (gti_1st.tstop() > gti_2nd.tstop()) {
+            overlap = gti_2nd.tstop() - gti_2nd.tstart();
+        }
     }
 
     return overlap;
@@ -995,9 +1094,9 @@ void ctfindvar::write_srchist_fits(const GNdarray& time_info,
     table_dir.extname("SRCPOSITION");
 
     // Append the start/stop time and max pixel columns
-    GFitsTableFloatCol start_mjd("TSTART", nrows);
-    GFitsTableFloatCol stop_mjd("TSTOP", nrows);
-    GFitsTableFloatCol max_pix("MAXSIGPIXEL", nrows);
+    GFitsTableDoubleCol start_mjd("TSTART", nrows);
+    GFitsTableDoubleCol stop_mjd("TSTOP", nrows);
+    GFitsTableDoubleCol max_pix("MAXSIGPIXEL", nrows);
     for (int i=0; i<nrows; i++) {
         start_mjd(i) = time_info(0,i);
         stop_mjd(i)  = time_info(1,i);
@@ -1008,7 +1107,7 @@ void ctfindvar::write_srchist_fits(const GNdarray& time_info,
     table_signif.append(max_pix);
 
     // Store the position of the peak pixel
-    GFitsTableFloatCol max_pix_dir("MAXSIGPIXEL",2);
+    GFitsTableDoubleCol max_pix_dir("MAXSIGPIXEL",2);
     max_pix_dir(0) = m_max_sig_dir.ra_deg();
     max_pix_dir(1) = m_max_sig_dir.dec_deg();
     table_dir.append(max_pix_dir);
@@ -1040,14 +1139,14 @@ void ctfindvar::write_srchist_fits(const GNdarray& time_info,
         }
         
         // Create and fill a new column
-        GFitsTableFloatCol src_sig_col(src_name, nrows);
+        GFitsTableDoubleCol src_sig_col(src_name, nrows);
         for (int i=0; i<nrows; i++) {
             src_sig_col(i) = src_info(src, i);
         }
         table_signif.append(src_sig_col);
 
         // Store the positions of the source
-        GFitsTableFloatCol src_dir_col(src_name,2);
+        GFitsTableDoubleCol src_dir_col(src_name,2);
         src_dir_col(0) = src_dir.ra_deg();
         src_dir_col(1) = src_dir.dec_deg();
         table_dir.append(src_dir_col);

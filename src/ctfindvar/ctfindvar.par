@@ -21,10 +21,15 @@ inmodel,    f, h, NONE,,, "Input model definition file for extracting source pos
 histtype,   s, a, FITS,CSV|FITS,, "File type for storing the individual source histograms"
 prefix,     s, a, findvar_,,, "Prefix for output files"
 minoff,     r, h, 0,,, "Minimum required events in off bin for computing Noff and alpha"
-emin,       r, a, 0,,, "Lower energy limit (units of TeV; 0 => no cut)"
-emax,       r, a, 0,,, "Upper energy limit (units of TeV; 0 => no cut)"
 smoothkrnl, s, h, NONE, GAUSSIAN|DISK|NONE,, "Smoothing kernel for counts maps"
 smoothpar,  r, h, 0.05,,, "Parameter for the smoothing kernel"
+
+#
+# Alpha computation parameters
+#===========================
+emin,       r, a, 0,,, "Lower energy limit (units of TeV; 0 => no cut)"
+emax,       r, a, 0,,, "Upper energy limit (units of TeV; 0 => no cut)"
+enumbins,   i, h, 30,,,"Number of energy bins for integrating observation response"
 
 #
 # Time binning parameters
