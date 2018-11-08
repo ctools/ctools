@@ -73,12 +73,13 @@ class cslightcrv(ctools.csobservation):
         self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise some members
-        self._srcname  = ''
-        self._tbins    = gammalib.GGti()
-        self._onoff    = False
-        self._stacked  = False
-        self._fits     = gammalib.GFits()
-        self._nthreads = 0
+        self._srcname      = ''
+        self._tbins        = gammalib.GGti()
+        self._onoff        = False
+        self._stacked      = False
+        self._fits         = gammalib.GFits()
+        self._nthreads     = 0
+        self._excl_reg_map = None              # Exclusion region map for on/off analysis
 
         # Return
         return
@@ -94,13 +95,14 @@ class cslightcrv(ctools.csobservation):
             Pickled instance
         """
         # Set pickled dictionary
-        state = {'base'     : ctools.csobservation.__getstate__(self),
-                 'srcname'  : self._srcname,
-                 'tbins'    : self._tbins,
-                 'stacked'  : self._stacked,
-                 'onoff'    : self._onoff,
-                 'fits'     : self._fits,
-                 'nthreads' : self._nthreads}
+        state = {'base'         : ctools.csobservation.__getstate__(self),
+                 'srcname'      : self._srcname,
+                 'tbins'        : self._tbins,
+                 'stacked'      : self._stacked,
+                 'onoff'        : self._onoff,
+                 'fits'         : self._fits,
+                 'nthreads'     : self._nthreads,
+                 'excl_reg_map' : self._excl_reg_map}
 
         # Return pickled dictionary
         return state
@@ -115,12 +117,13 @@ class cslightcrv(ctools.csobservation):
             Pickled instance
         """
         ctools.csobservation.__setstate__(self, state['base'])
-        self._srcname  = state['srcname']
-        self._tbins    = state['tbins']
-        self._onoff    = state['onoff']
-        self._stacked  = state['stacked']
-        self._fits     = state['fits']
-        self._nthreads = state['nthreads']
+        self._srcname      = state['srcname']
+        self._tbins        = state['tbins']
+        self._onoff        = state['onoff']
+        self._stacked      = state['stacked']
+        self._fits         = state['fits']
+        self._nthreads     = state['nthreads']
+        self._excl_reg_map = state['excl_reg_map']
 
         # Return
         return
@@ -732,6 +735,29 @@ class cslightcrv(ctools.csobservation):
 
         # Return
         return
+
+    def exclregmap(self, regmapobj=None):
+        """
+        Access exclusion region map object
+
+        Parameters
+        ----------
+        regmapobj : `~gammalib.GSkyRegionMap`
+            Excluded regions region map instance
+
+        Returns
+        -------
+        reg : `~gammalib.GSkyRegionMap`
+            Excluded regions region map instance
+        """
+        # Check if exclusion map object was provided
+        if regmapobj is not None:
+
+            # Set exclusion region map
+            self._excl_reg_map = gammalib.GSkyRegionMap(regmapobj)
+
+        # Return
+        return self._excl_reg_map
 
 
 # ======================== #
