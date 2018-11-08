@@ -76,7 +76,10 @@ def plot_variability_evolution(filename, plotfile):
     axarr[1].set_title('Significance distribution')
     
     #IT SEEMS THAT THE LOG SCALE IS NOT WORKING WELL !!!!!! 
-    #axarr[1].set_yscale('log')
+    #axarr[1].gca().set_yscale('log')
+
+    if plotfile != "":
+        f.savefig(plotfile+".png") 
 
     plt.show()
 
