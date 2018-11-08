@@ -303,11 +303,10 @@ void ctfindvar::run(void)
 
     //preparing the histogram with significance evolution for the source center and the highest sig-pix
     m_pixsigsrc = GNdarray(srcInxPix.size(), nbins);
-    m_pixsigmax = GNdarray(1,nbins);
+    m_pixsigmax = GNdarray(nbins);
 
     //Prepare the final skymap with the max significance of each pixel
     double  max_sig=0;
-    GSkyDir max_sig_dir;
 
     //looping over all the pixels in the cube
     #pragma omp parallel for
@@ -365,15 +364,10 @@ void ctfindvar::run(void)
         {  
             if (max(pixSig) > max_sig)  
             {
-                max_sig = max(pixSig);
-                // Store information for pixel with the maximum significance
-                for (int i=0; i<nbins; i++) {
-                    m_pixsigmax(0,i) = pixSig(i);
-                }
-
                 // Update the pixel position with the maximum sigma
-                max_sig     = max(pixSig);
-                max_sig_dir = m_counts.inx2dir(pix_number);
+                max_sig       = max(pixSig);
+                m_max_sig_dir = m_counts.inx2dir(pix_number);
+                m_pixsigmax   = pixSig;
             }
         }
         //storing sig in skymap
@@ -382,8 +376,8 @@ void ctfindvar::run(void)
 
     log_header1(NORMAL, "Analysis finished");
     log_value(NORMAL, "Maximum sigma", max_sig);
-    log_value(NORMAL, "Max pixel RA", max_sig_dir.ra_deg());
-    log_value(NORMAL, "Max pixel DEC", max_sig_dir.dec_deg());
+    log_value(NORMAL, "Max pixel RA", m_max_sig_dir.ra_deg());
+    log_value(NORMAL, "Max pixel DEC", m_max_sig_dir.dec_deg());
 
     return;
 }
@@ -925,7 +919,8 @@ void ctfindvar::write_srchist(void)
     double   tinterval = (*this)["tinterval"].real();
     int      nentries = (m_tstop-m_tstart) / tinterval + 0.5;
     int      nsources = m_pixsigsrc.shape()[0];
-    GNdarray time_info(2,nentries);
+    GNdarray time_info(2, nentries);
+    GNdarray max_pixel_info(nentries);
     GNdarray src_info(nsources, nentries);
 
     // Store the full set of information
@@ -949,13 +944,18 @@ void ctfindvar::write_srchist(void)
                 src_info(src,i) = 0.0;
             }
         }
+
+        // Fill max pixel information
+        if (index >= 0) {
+            max_pixel_info(i) = m_pixsigmax(index);
+        }
     }
 
     // Call the appropriate method for writing the data
     if ((*this)["histtype"].string() == "CSV") {
-        write_srchist_csv(time_info, src_info);
+        write_srchist_csv(time_info, max_pixel_info, src_info);
     } else {
-        write_srchist_fits(time_info, src_info);
+        write_srchist_fits(time_info, max_pixel_info, src_info);
     }
 }
 
@@ -963,6 +963,7 @@ void ctfindvar::write_srchist(void)
  * @brief Write individual histograms in CSV format
  ***************************************************************************/
 void ctfindvar::write_srchist_csv(const GNdarray& time_info,
+                                  const GNdarray& max_pixel_info,
                                   const GNdarray& src_info)
 {
     log_string(NORMAL,"Storing histograms in CSV format is not currently supported.");
@@ -981,47 +982,83 @@ void ctfindvar::write_srchist_csv(const GNdarray& time_info,
  * significance of the source in that time bin.
  ***************************************************************************/
 void ctfindvar::write_srchist_fits(const GNdarray& time_info,
+                                   const GNdarray& max_pixel_info,
                                    const GNdarray& src_info)
 {
     log_string(NORMAL, "Storing histograms in FITS format");
 
     // Create the table
     int           nrows = time_info.shape()[1];
-    GFitsBinTable table(nrows);
-    table.extname("SRCSIGNIF");
+    GFitsBinTable table_signif(nrows);
+    GFitsBinTable table_dir(2);
+    table_signif.extname("SRCSIGNIF");
+    table_dir.extname("SRCPOSITION");
 
-    // Append the start and stop time columns
+    // Append the start/stop time and max pixel columns
     GFitsTableFloatCol start_mjd("TSTART", nrows);
     GFitsTableFloatCol stop_mjd("TSTOP", nrows);
-
+    GFitsTableFloatCol max_pix("MAXSIGPIXEL", nrows);
     for (int i=0; i<nrows; i++) {
         start_mjd(i) = time_info(0,i);
         stop_mjd(i)  = time_info(1,i);
+        max_pix(i)   = max_pixel_info(i);
     }
-    table.append(start_mjd);
-    table.append(stop_mjd);
+    table_signif.append(start_mjd);
+    table_signif.append(stop_mjd);
+    table_signif.append(max_pix);
+
+    // Store the position of the peak pixel
+    GFitsTableFloatCol max_pix_dir("MAXSIGPIXEL",2);
+    max_pix_dir(0) = m_max_sig_dir.ra_deg();
+    max_pix_dir(1) = m_max_sig_dir.dec_deg();
+    table_dir.append(max_pix_dir);
 
     // Append the distribution for each source
     int src_count = src_info.shape()[0];
     for (int src=0; src<src_count; src++) {
+        
         std::string src_name("SOURCE");
+        GSkyDir     src_dir;
+
+        // Get the name from the input model file
         if (m_inmodel.size() > 0) {
             src_name = m_inmodel[src]->name();
+
+            // Get source position
+            GModelSky*     model         = dynamic_cast<GModelSky*>(m_inmodel[src]);
+            GModelSpatial* model_spatial = model->spatial();
+            GSkyRegion*    model_region  = model_spatial->region();
+            src_dir = dynamic_cast<GSkyRegionCircle*>(model_region)->centre();
+        } 
+        // ... otherwise set the position from xsrc,ysrc
+        else {
+            if ((*this)["coordsys"].string() == "CEL") {
+                src_dir.radec_deg((*this)["xsrc"].real(), (*this)["yref"].real());
+            } else {
+                src_dir.lb_deg((*this)["xsrc"].real(), (*this)["yref"].real());
+            }
         }
         
-        GFitsTableFloatCol src_sig(src_name, nrows);
-
+        // Create and fill a new column
+        GFitsTableFloatCol src_sig_col(src_name, nrows);
         for (int i=0; i<nrows; i++) {
-            src_sig(i) = src_info(src, i);
+            src_sig_col(i) = src_info(src, i);
         }
-        table.append(src_sig);
+        table_signif.append(src_sig_col);
+
+        // Store the positions of the source
+        GFitsTableFloatCol src_dir_col(src_name,2);
+        src_dir_col(0) = src_dir.ra_deg();
+        src_dir_col(1) = src_dir.dec_deg();
+        table_dir.append(src_dir_col);
     }
 
     // Store information regarding the source positions
 
-    // Write the table to a file
+    // Write the tables to a file
     GFilename outfile((*this)["prefix"].string() + "srcsig.fits");
     GFits     fitsfile;
-    fitsfile.append(table);
+    fitsfile.append(table_signif);
+    fitsfile.append(table_dir);
     fitsfile.saveto(outfile, (*this)["clobber"].boolean() );
 }
