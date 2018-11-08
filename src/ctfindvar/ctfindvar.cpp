@@ -973,8 +973,8 @@ void ctfindvar::init_gtis(void)
 double ctfindvar::gti_overlap(const GGti& gti1, const GGti& gti2)
 {
     double overlap = 0.0;
-    GGti   gti_1st = (gti1.tstart() <= gti2.tstart()) ? gti1 : gti2;
-    GGti   gti_2nd = (gti1.tstart() > gti2.tstart()) ? gti1 : gti2;
+    const GGti& gti_1st = (gti1.tstart() <= gti2.tstart()) ? gti1 : gti2;
+    const GGti& gti_2nd = (gti1.tstart() > gti2.tstart()) ? gti1 : gti2;
 
     // gti1 starts earlier
     if (gti_1st.tstop() > gti_2nd.tstart()) {
