@@ -92,7 +92,7 @@ class csphasecrv(ctools.csobservation):
                  'onoff'        : self._onoff,
                  'fits'         : self._fits,
                  'fitmodels'    : self._fitmodels,
-                 'nthreads'     : self._nthreads
+                 'nthreads'     : self._nthreads,
                  'excl_reg_map' : self._excl_reg_map}
 
         # Return pickled dictionary
