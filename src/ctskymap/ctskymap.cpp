@@ -337,6 +337,21 @@ void ctskymap::publish(const std::string& name)
 }
 
 
+/***********************************************************************//**
+ * @brief Set the exclusion map
+ *
+ * @param[in] exclmap Exclusion map object.
+ ***************************************************************************/
+void ctskymap::exclmap(const GSkyMap& exclusionmap)
+{
+    // Assign exclusion map
+    m_exclmap = exclusionmap;
+
+    // Return
+    return;
+}
+
+
 /*==========================================================================
  =                                                                         =
  =                             Private methods                             =
@@ -522,6 +537,7 @@ void ctskymap::get_parameters(void)
         if (m_iterations > 0) {
             m_threshold  = (*this)["threshold"].real();
         }
+
         (*this)["inexclusion"].query();
         m_usefft      = (*this)["usefft"].boolean();
 
@@ -576,7 +592,12 @@ void ctskymap::setup_maps(void)
     if (m_bkgsubtract != "NONE") {
 
         // Setup the exclusions map
-        setup_exclusion_map();
+        if (m_exclmap.is_empty()) {
+            setup_exclusion_map();
+        }
+        else {
+            adjust_exclusion_map();
+        }
 
         // Cache the pixel solid angles and sky directions
         m_solidangle.reserve(m_counts.npix());
@@ -648,24 +669,11 @@ void ctskymap::setup_exclusion_map(void)
  ***************************************************************************/
 void ctskymap::setup_exclusion_map_fits(const GFilename& filename)
 {
-    // Load the fits image
-    GSkyMap inmap(filename);
+    // Load the fits image to the exclusion map
+    m_exclmap = GSkyMap(filename);
 
-    // Loop through the individual pixels in the exclusion map
-    for (int i = 0; i < m_exclmap.npix(); ++i) {
-
-        // Get the pixel direction
-        GSkyDir dir = m_exclmap.pix2dir(i);
-
-        // Check this sky position in the fits map
-        if (inmap.contains(dir) && (inmap(inmap.dir2inx(dir)) != 0.0)) {
-
-            // Set the pixel to 1
-            m_exclmap(i) = 1.0;
-
-        } // endif: pixel,region overlap check
-
-    } // endfor: looped over exclusion map pixels
+    // Verify exclusion map
+    adjust_exclusion_map();
 
     // Return
     return;
@@ -697,6 +705,45 @@ void ctskymap::setup_exclusion_map_region(const GFilename& filename)
         }
 
     } // endfor: looped over exclusion map pixels
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Verifys that exclusion map points in fov of counts
+ *
+ * Adjust exclusion map. Reinitialise exclusion map via the counts object 
+ * and transfer the masked areas provided by the current exclusion map to the
+ * updated fov.
+ ***************************************************************************/
+void ctskymap::adjust_exclusion_map(void)
+{
+    // Initialise working map
+    GSkyMap dest_map = m_counts;
+
+    // Set all pixels to 0 (no pixel excluded)
+    dest_map = 0.0;
+
+    // Loop through the individual pixels in the exclusion map
+    for (int i = 0; i < dest_map.npix(); ++i) {
+
+        // Get the pixel direction
+        GSkyDir dir = dest_map.pix2dir(i);
+
+        // Check this sky position in the exclusion map
+        if (m_exclmap.contains(dir) && (m_exclmap(m_exclmap.dir2inx(dir)) != 0.0)) {
+
+            // Set the pixel to 1
+            dest_map(i) = 1.0;
+
+        } // endif: pixel,region overlap check
+
+    } // endfor: looped over exclusion map pixels
+
+    // Set exclusion map
+    m_exclmap = dest_map;
 
     // Return
     return;

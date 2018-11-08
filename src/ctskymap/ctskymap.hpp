@@ -60,6 +60,9 @@ public:
     void           run(void);
     void           save(void);
     void           publish(const std::string& name = "");
+
+    void           exclmap(const GSkyMap& exclusionmap);
+    const GSkyMap& exclmap(void) const;
     const GSkyMap& skymap(void) const;
 
 protected:
@@ -72,6 +75,7 @@ protected:
     void     setup_exclusion_map(void);
     void     setup_exclusion_map_fits(const GFilename& filename);
     void     setup_exclusion_map_region(const GFilename& filename);
+    void     adjust_exclusion_map(void);
     void     fill_maps(void);
     void     fill_maps_counts(GCTAObservation* obs);
     void     fill_maps_acceptance(GCTAObservation* obs);
@@ -128,6 +132,18 @@ protected:
     double               m_cos_inradius;  //!< Cosine of inner ring radius
     double               m_cos_outradius; //!< Cosine of outer ring radius
 };
+
+
+/***********************************************************************//**
+ * @brief Return exclusion map
+ *
+ * @return Reference to exclusion map
+ ***************************************************************************/
+inline
+const GSkyMap& ctskymap::exclmap(void) const
+{
+    return m_exclmap;
+}
 
 
 /***********************************************************************//**
