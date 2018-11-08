@@ -510,7 +510,7 @@ void ctfindvar::fill_alpha_vector(const int&           pix_number,
         GCTAInstDir instdir = obs->pointing().instdir(pix_dir);
 
         // Extract the good time intervals of the observation
-        GGti obs_gti = obs->gti();
+        const GGti& obs_gti(obs->gti());
 
         // Loop over all time bins
         for (int j=0; j<m_gti.size(); j++) {
@@ -572,8 +572,7 @@ int ctfindvar::time2inx(const GTime& time)
     // Loop over all GTIs
     for (int i=0; i<m_gti.size(); i++) {
         // Check if interval contains the time
-        GGti interval = inx2gti(i);
-        if (interval.contains(time)) {
+        if (m_gti.tstart(i) < time && m_gti.tstop(i) > time) {
             map_index = i;
             break;
         }
