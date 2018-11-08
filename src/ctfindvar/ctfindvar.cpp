@@ -549,15 +549,10 @@ void ctfindvar::fill_alpha_vector(const int&           pix_number,
                 }
 
                 // Compute background value
-                double value = 0.0;
-                for (int e=0; e<m_ebounds.size(); e++) {
-                    value += bkg->rate_ebin(instdir, 
-                                            m_ebounds.emin(e), 
-                                            m_ebounds.emax(e));
-                }
+                double bkg_rate = bkg->rate_ebin(instdir, m_emin, m_emax);
 
                 // Multiply background rate with livetime and solid angle
-                alpha_vector[j] += exposure * value;
+                alpha_vector[j] += exposure * bkg_rate;
             }
         }
     }
@@ -725,9 +720,8 @@ void ctfindvar::get_parameters(void)
     }
 
     // Get the energy limits
-    m_emin    = GEnergy((*this)["emin"].real(), "TeV");
-    m_emax    = GEnergy((*this)["emax"].real(), "TeV");
-    m_ebounds = GEbounds((*this)["enumbins"].integer(), emin, emax);
+    m_emin = GEnergy((*this)["emin"].real(), "TeV");
+    m_emax = GEnergy((*this)["emax"].real(), "TeV");
 
     // Get minimum counts for a bin to be considered in Noff calculation
     m_minoff = (*this)["minoff"].real();
@@ -974,7 +968,7 @@ void ctfindvar::init_gtis(void)
  *
  * @param[in] gti1      First GTI
  * @param[in] gti2      Second GTI
- * @return Number of seconds that two GTIs overlap
+ * @return Number of seconds that @p gti1 and @p gti2 overlap
  ***************************************************************************/
 double ctfindvar::gti_overlap(const GGti& gti1, const GGti& gti2)
 {
@@ -983,9 +977,9 @@ double ctfindvar::gti_overlap(const GGti& gti1, const GGti& gti2)
     GGti   gti_2nd = (gti1.tstart() > gti2.tstart()) ? gti1 : gti2;
 
     // gti1 starts earlier
-    if ((gti_1st.tstart() <= gti_2nd.tstart()) && (gti_1st.tstop() > gti_2nd.tstart())) {
+    if (gti_1st.tstop() > gti_2nd.tstart()) {
         if (gti_1st.tstop() <= gti_2nd.tstop()) {
-            overlap = gti_1st.tstop() - gti2.tstart();
+            overlap = gti_1st.tstop() - gti_2nd.tstart();
         } else if (gti_1st.tstop() > gti_2nd.tstop()) {
             overlap = gti_2nd.tstop() - gti_2nd.tstart();
         }
