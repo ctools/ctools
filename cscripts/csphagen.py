@@ -228,15 +228,14 @@ class csphagen(ctools.csobservation):
         self._setup_observations(self.obs(), True, True, False)
 
         # Get spatial component of source model if an input model is defined
-        if self['inmodel'].is_valid():
+        if self.obs().models().size() > 0:
+            name            = self['srcname'].string()
+            self._src_model = self.obs().models()[name].spatial().clone()
+        elif self['inmodel'].is_valid():
             inmodel         = self['inmodel'].filename()
             models          = gammalib.GModels(inmodel)
             name            = self['srcname'].string()
             self._src_model = models[name].spatial().clone()
-        elif self.obs().models().size() > 0:
-            name = self['srcname'].string()
-            if self.obs().models().contains(name):
-                self._src_model = self.obs().models()[name].spatial()
 
         # Set energy bounds
         self._ebounds = self._create_ebounds()
