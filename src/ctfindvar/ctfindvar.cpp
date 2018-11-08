@@ -496,9 +496,6 @@ void ctfindvar::fill_alpha_vector(const int&           pix_number,
     // Pixel position
     GSkyDir pix_dir = m_counts.inx2dir(pix_number);
 
-    // Energy binning
-    GEbounds ebounds((*this)["enumbins"].integer(), m_emin, m_emax);
-
     // Loop over all observations
     for (int i=0; i<m_obs.size(); i++) {
         // Skip if observation does not overlap with this pixel position
@@ -553,10 +550,10 @@ void ctfindvar::fill_alpha_vector(const int&           pix_number,
 
                 // Compute background value
                 double value = 0.0;
-                for (int e=0; e<ebounds.size(); e++) {
+                for (int e=0; e<m_ebounds.size(); e++) {
                     value += bkg->rate_ebin(instdir, 
-                                            ebounds.emin(e), 
-                                            ebounds.emax(e));
+                                            m_ebounds.emin(e), 
+                                            m_ebounds.emax(e));
                 }
 
                 // Multiply background rate with livetime and solid angle
@@ -728,8 +725,9 @@ void ctfindvar::get_parameters(void)
     }
 
     // Get the energy limits
-    m_emin = GEnergy((*this)["emin"].real(), "TeV");
-    m_emax = GEnergy((*this)["emax"].real(), "TeV");
+    m_emin    = GEnergy((*this)["emin"].real(), "TeV");
+    m_emax    = GEnergy((*this)["emax"].real(), "TeV");
+    m_ebounds = GEbounds((*this)["enumbins"].integer(), emin, emax);
 
     // Get minimum counts for a bin to be considered in Noff calculation
     m_minoff = (*this)["minoff"].real();
