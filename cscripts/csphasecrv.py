@@ -62,13 +62,14 @@ class csphasecrv(ctools.csobservation):
 
         # Initialise some members. Phases are stored in a nested list
         # [[ph1min,ph1max], [ph2min,ph2max],..]
-        self._srcname   = ''
-        self._phbins    = [[0.0,1.0]]
-        self._onoff     = False
-        self._stacked   = False
-        self._fits      = gammalib.GFits()
-        self._fitmodels = {}
-        self._nthreads  = 0
+        self._srcname      = ''
+        self._phbins       = [[0.0,1.0]]
+        self._onoff        = False
+        self._stacked      = False
+        self._fits         = gammalib.GFits()
+        self._fitmodels    = {}
+        self._nthreads     = 0
+        self._excl_reg_map = None              # Exclusion region map for on/off analysis
 
         # Return
         return
@@ -84,14 +85,15 @@ class csphasecrv(ctools.csobservation):
             Pickled instance
         """
         # Set pickled dictionary
-        state = {'base'     : ctools.csobservation.__getstate__(self),
-                 'srcname'  : self._srcname,
-                 'phbins'   : self._phbins,
-                 'stacked'  : self._stacked,
-                 'onoff'    : self._onoff,
-                 'fits'     : self._fits,
-                 'fitmodels': self._fitmodels,
-                 'nthreads' : self._nthreads}
+        state = {'base'         : ctools.csobservation.__getstate__(self),
+                 'srcname'      : self._srcname,
+                 'phbins'       : self._phbins,
+                 'stacked'      : self._stacked,
+                 'onoff'        : self._onoff,
+                 'fits'         : self._fits,
+                 'fitmodels'    : self._fitmodels,
+                 'nthreads'     : self._nthreads
+                 'excl_reg_map' : self._excl_reg_map}
 
         # Return pickled dictionary
         return state
@@ -106,13 +108,14 @@ class csphasecrv(ctools.csobservation):
             Pickled instance
         """
         ctools.csobservation.__setstate__(self, state['base'])
-        self._srcname  = state['srcname']
-        self._phbins   = state['phbins']
-        self._onoff    = state['onoff']
-        self._stacked  = state['stacked']
-        self._fits     = state['fits']
-        self._fitmodels= state['fitmodels']
-        self._nthreads = state['nthreads']
+        self._srcname      = state['srcname']
+        self._phbins       = state['phbins']
+        self._onoff        = state['onoff']
+        self._stacked      = state['stacked']
+        self._fits         = state['fits']
+        self._fitmodels    = state['fitmodels']
+        self._nthreads     = state['nthreads']
+        self._excl_reg_map = state['excl_reg_map']
 
         # Return
         return
@@ -544,6 +547,29 @@ class csphasecrv(ctools.csobservation):
         """
         # Return
         return self._fitmodels
+
+    def exclregmap(self, regmapobj=None):
+        """
+        Access exclusion region map object
+
+        Parameters
+        ----------
+        regmapobj : `~gammalib.GSkyRegionMap`
+            Excluded regions region map instance
+
+        Returns
+        -------
+        reg : `~gammalib.GSkyRegionMap`
+            Excluded regions region map instance
+        """
+        # Check if exclusion map object was provided
+        if regmapobj is not None:
+
+            # Set exclusion region map
+            self._excl_reg_map = gammalib.GSkyRegionMap(regmapobj)
+
+        # Return
+        return self._excl_reg_map
 
         
 # ======================== #
