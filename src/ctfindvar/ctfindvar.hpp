@@ -100,7 +100,6 @@ protected:
     GNdarray m_pixsigmax;              //!< Store distribution for pixel with max significance
     GTime    m_tstart;                 //!< Start time for variability study
     GTime    m_tstop;                  //!< Stop time for variability study
-    GEbounds m_ebounds;                //!< Energy binning for response integration
     GEnergy  m_emin;                   //!< Minimum energy for events
     GEnergy  m_emax;                   //!< Maximum energy for events
 
