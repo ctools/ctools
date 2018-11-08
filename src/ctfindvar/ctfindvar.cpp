@@ -340,6 +340,7 @@ void ctfindvar::run(void)
             // Store the distribution if the source is located at this position
             if (srcInxPix[src] == pix_number) {
 
+                #pragma omp critical(ctfind_run)
                 for (int i=0; i<nbins; i++) {
                     m_pixsigsrc(src,i) = pixSig(i);
                 }
@@ -400,9 +401,9 @@ void ctfindvar::get_variability_sig(const int& pix_number,
                                     const int& nbins, 
                                     GNdarray&  sig_histogram)
 {
-    std::vector<bool> accepted_bin_bckg_vector(nbins, 1);
+    std::vector<bool>   accepted_bin_bckg_vector(nbins, true);
     std::vector<double> excess_bin_vector(nbins, 0.0);
-    std::vector<int> background_bin_vector(nbins,0);
+    std::vector<int>    background_bin_array(nbins, 0);
     bool background_validated=false;
     double non, noff;
     double alpha, sig;
@@ -433,7 +434,6 @@ void ctfindvar::get_variability_sig(const int& pix_number,
                 if (j!=i && accepted_bin_bckg_vector[j]==1)
                 {
                     background_count+= m_counts(pix_number, j);
-//                    alpha++;
                     alpha += alpha_vector[j];
                  }
            }
@@ -441,8 +441,7 @@ void ctfindvar::get_variability_sig(const int& pix_number,
            background_bin_vector[i] = background_count; //The background is averaged on the number of bins -1
            non = m_counts(pix_number, i); 
            noff = background_bin_array[i];
-//           alpha = 1.0/alpha;
-           alpha = (alpha_vector[i]/alpha);
+           alpha = alpha_vector[i]/alpha;
 
            ///////////////////////////////////////////////////////////////////////////////// 
            // Compute sensitivity in Gaussian sigma
@@ -502,7 +501,7 @@ void ctfindvar::fill_alpha_vector(const int&           pix_number,
         GCTAObservation* obs        = dynamic_cast<GCTAObservation*>(m_obs[i]);
         GCTARoi          roi        = obs->roi();
         GSkyDir          roi_centre = roi.centre().dir();
-        
+
         if (roi_centre.dist_deg(pix_dir) > roi.radius()) {
             continue;
         }
@@ -548,11 +547,9 @@ void ctfindvar::fill_alpha_vector(const int&           pix_number,
                     throw GException::invalid_value(G_FILL_ALPHA_VECTOR, msg);
                 }
 
-                // Compute background value
-                double bkg_rate = bkg->rate_ebin(instdir, m_emin, m_emax);
-
                 // Multiply background rate with livetime and solid angle
-                alpha_vector[j] += exposure * bkg_rate;
+                #pragma omp critical(ctfindvar_alpha_vector)
+                alpha_vector[j] += exposure * bkg->rate_ebin(instdir, m_emin, m_emax);
             }
         }
     }
