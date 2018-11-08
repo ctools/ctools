@@ -833,10 +833,10 @@ class csphagen(ctools.csobservation):
         Access exclusion map object
         """
         # Check if exclusion map object was provided
-        if type(mapobj) is gammalib.GSkyRegionMap:
+        if mapobj is not None:
 
-            # Set exclusion map
-            self._excl_reg = mapobj
+            # Set exclusion region map
+            self._excl_reg = gammalib.GSkyRegionMap(mapobj)
 
             # Set has exclusion to yes
             self._has_exclusion = True
