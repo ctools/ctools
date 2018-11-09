@@ -18,6 +18,7 @@
 #===================
 inobs,      f, a, events.fits,,, "Input event list, counts cube or observation definition XML file"
 inmodel,    f, h, NONE,,, "Input model definition file for extracting source positions"
+outcube,    f, h, NONE,,, "Filename for counts cube"
 caldb,      s, a, prod2,,, "Calibration database"
 irf,        s, a, South_0.5h,,, "Instrument response function"
 histtype,   s, a, FITS,CSV|FITS,, "File type for storing the individual source histograms"

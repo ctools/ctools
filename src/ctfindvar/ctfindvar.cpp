@@ -607,12 +607,14 @@ void ctfindvar::save(void)
 
     // Filenames
     std::string prefix((*this)["prefix"].string());
-    GFilename outcube(prefix + "countscube.fits");
     GFilename peaksigmap(prefix + "peaksigmap.fits");
 
     // Write counts cube
-    log_value(TERSE, "Saving counts cube", outcube);
-    m_counts.save(outcube, (*this)["clobber"].boolean());
+    if ((*this)["outcube"].is_valid()) {
+        GFilename outcube = (*this)["outcube"].filename();
+        log_value(TERSE, "Saving counts cube", outcube);
+        m_counts.save(outcube, (*this)["clobber"].boolean());
+    }
     
     // Write the most significant values for each pixel
     log_value(TERSE, "Saving maximum significances map", peaksigmap);
