@@ -714,6 +714,10 @@ void ctfindvar::get_parameters(void)
         (*this)["histtype"].string();
     }
 
+    // Create GTIs and counts cube
+    init_gtis();
+    init_cube();
+
     // Get the energy limits
     m_emin = GEnergy((*this)["emin"].real(), "TeV");
     m_emax = GEnergy((*this)["emax"].real(), "TeV");
