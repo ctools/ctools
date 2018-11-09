@@ -70,7 +70,17 @@ class Test(test):
         ctfindvar = self._tool('ctfindvar')
 
         # Setup ctfindvar command
-        cmd = ctfindvar+' logfile="ctfindvar_cmd1.log" chatter=1'
+        cmd = ctfindvar+' inobs="'+self._events+'"'+\
+                        ' logfile="ctfindvar_cmd1.log" chatter=1'+\
+                        ' prefix=ctfindvar_test_ histtype=FITS'+\
+                        ' tmin=NONE tmax=NONE tinterval=20'+\
+                        ' emin=0.2 emax=1.1'+\
+                        ' nxpix=200 nypix=200 binsz=0.05'+\
+                        ' proj=CAR coordsys=CEL'+\
+                        ' xref=83.63 yref=22.51'+\
+                        ' xsrc=83.63 ysrc=22.51'+\
+                        ' caldb=prod2 irf=South_0.5h'
+            
 
         # Check if execution was successful
         self.test_value(self._execute(cmd), 0,
@@ -87,50 +97,70 @@ class Test(test):
         """
         Test ctfindvar from Python
         """
+        print "here in the python test"
         # Allocate ctfindvar
-        tool = ctools.ctfindvar()
+        ctfindvar = ctools.ctfindvar()
 
-        # Check that saving does not nothing
-        tool['logfile'] = 'ctfindvar_py0.log'
-        tool.logFileOpen()
-        tool.save()
-        self.test_assert(not os.path.isfile('ctfindvar_py0.fits'),
-             'Check that no FITS file has been created')
+        #setup ctfindvar
+        ctfindvar['inobs']     = self._events
+        ctfindvar['logfile']   = 'ctfindvar_py0.log'
+        ctfindvar['chatter']   =  1
+        ctfindvar['prefix']    = 'ctfindvar_test_'
+        ctfindvar['histtype']  = 'FITS'
+        ctfindvar['tmin']      = 'NONE'
+        ctfindvar['tmax']      = 'NONE' 
+        ctfindvar['tinterval'] = 20 
+        ctfindvar['emin']      = 0.2 
+        ctfindvar['emax']      = 1.1 
+        ctfindvar['nxpix']     = 200 
+        ctfindvar['nypix']     = 200 
+        ctfindvar['binsx']     = 0.05 
+        ctfindvar['xref']      = 83.63 
+        ctfindvar['yref']      = 22.51
+        ctfindvar['xsrc']      = 83.63
+        ctfindvar['ysrc']      = 22.51
+        ctfindvar['caldb']     = 'prod2'
+        ctfindvar['irf']       = 'South_0.5h' 
 
-        # Check that clearing does not lead to an exception or segfault
-        tool.clear()
+        ## Check that saving does not nothing
+        #ctfindvar['logfile'] = 'ctfindvar_py0.log'
+        #ctfindvar.logFileOpen()
+        #ctfindvar.save()
+        #self.test_assert(not os.path.isfile('ctfindvar_test_srcsig.fits'),
+        #     'Check that no FITS file has been created')
 
-        # Now set ctfindvar parameters
-        tool['logfile'] = 'ctfindvar_py1.log'
-        tool['chatter'] = 2
 
-        # Run ctfindvar tool
-        tool.logFileOpen()
-        tool.run()
+        ## Run ctfindvar tool
+        #ctfindvar.logFileOpen()
+        ctfindvar.run()
 
-        # Check result
-        self._check_result(tool)
+        ## Check result
+        #self._check_result('ctfindvar_test_varsrcsig.fits')
 
-        # Copy ctfindvar tool
-        cpy_tool = tool.copy()
+        ## Copy ctfindvar tool
+        #cpy_tool = ctfindvar.copy()
 
-        # Check result
-        self._check_result(cpy_tool)
+        ## Check result
+        #self._check_result('ctfindvar_test_srcsig.fits')
 
-        # Run copy of ctfindvar tool again
-        cpy_tool['logfile'] = 'ctfindvar_py2.log'
-        cpy_tool['chatter'] = 3
-        cpy_tool.logFileOpen()
-        cpy_tool.run()
+        ## Run copy of ctfindvar tool again
+        #cpy_tool['logfile'] = 'ctfindvar_py2.log'
+        #cpy_tool['chatter'] = 3
+        #cpy_tool['prefix']  = 'ctfindvar_copytool_' 
+        #cpy_tool.logFileOpen()
+        #cpy_tool.run()
 
-        # Check result
-        self._check_result(cpy_tool)
+        ## Check result
+        #self._check_result('ctfindvar_copytool_srcsig.fits')
+
+        ## Check that clearing does not lead to an exception or segfault
+        #ctfindvar.clear()
 
         # Return
         return
 
     # Check ctfindvar result
-    def _check_result(self, tool):
+    def _check_result(self, filename):
         """
         Check content of tool
 
@@ -139,7 +169,9 @@ class Test(test):
         tool : `~ctools.ctfindvar`
             ctfindvar instance
         """
-        # TODO: Implement test on tool result
-
+        # Read variability  file
+        #fits    = gammalib.GFits(filename)
+        #self.test_value(fits.size(), 3,
+        #     'Check for 3 rows in srcsig file')
         # Return
         return
