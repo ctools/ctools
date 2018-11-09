@@ -514,10 +514,9 @@ void ctfindvar::fill_alpha_vector(const int&           pix_number,
 
         // Loop over all time bins
         for (int j=0; j<m_gti.size(); j++) {
-            GGti gti(m_gti.tstart(j), m_gti.tstop(j));
 
             // Make sure observation overlaps with this time interval
-            double exposure = gti_overlap(gti, obs_gti);
+            double exposure = gti_overlap(m_gti[j], obs_gti);
             if (exposure > 0.0) {
 
                 // Get IRF response
@@ -572,7 +571,7 @@ int ctfindvar::time2inx(const GTime& time)
     // Loop over all GTIs
     for (int i=0; i<m_gti.size(); i++) {
         // Check if interval contains the time
-        if (m_gti.tstart(i) < time && m_gti.tstop(i) > time) {
+        if (m_gti[i].contains(time)) {
             map_index = i;
             break;
         }
@@ -593,7 +592,7 @@ GGti ctfindvar::inx2gti(const int& index)
                                         "'index' parameter out of range");
     }
 
-    return GGti(m_gti.tstart(index), m_gti.tstop(index));
+    return m_gti[index];
 }
 
 
@@ -923,6 +922,7 @@ void ctfindvar::init_gtis(void)
     double tstart_sec = m_tstart.secs();
     double tstop_sec  = m_tstop.secs();
     int    bins       = (tstop_sec - tstart_sec) / tinterval + 0.5;
+
     // Log information
     log_value(NORMAL, "treference (mjd)", m_tstart.reference().mjdref());
     log_value(NORMAL, "tstart (sec)",  tstart_sec);
@@ -954,7 +954,7 @@ void ctfindvar::init_gtis(void)
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
             
             if (gti_overlap(obs->gti(), next_gti) > 0.0) {
-                m_gti.extend(next_gti);
+                m_gti.push_back(next_gti);
                 break;
             }
         }

@@ -91,7 +91,7 @@ protected:
 
     // Protected members
     GSkyMap  m_counts;                 //!< Counts for each time interval
-    GGti     m_gti;                    //!< List of time intervals
+    std::vector<GGti> m_gti;                    //!< List of time intervals
     GModels  m_inmodel;                //!< List of models for source positions
     GSkyDir  m_max_sig_dir;            //!< Sky direction associated with maximum significance
     double   m_minoff;                 //!< Minimum counts for use in significance calculation
