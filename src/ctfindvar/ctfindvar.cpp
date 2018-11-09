@@ -844,6 +844,7 @@ void ctfindvar::fill_cube(GCTAObservation* obs)
         log_value(NORMAL, "Events in list", obs->events()->size());
         log_value(NORMAL, "Events in cube", num_in_map);
         log_value(NORMAL, "Events outside RoI", num_outside_roi);
+        log_value(NORMAL, "Events outside energy", num_outside_ecut);
         log_value(NORMAL, "Events with invalid WCS", num_invalid_wcs);
         log_value(NORMAL, "Events outside cube area", num_outside_map);
         log_value(NORMAL, "Events outside time bins", num_outside_time);
