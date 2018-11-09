@@ -597,7 +597,7 @@ GGti ctfindvar::inx2gti(const int& index)
 
 
 /***********************************************************************//**
- * @brief Save something
+ * @brief Save peak significance map
  *
  * Saves something.
  ***************************************************************************/
@@ -615,15 +615,20 @@ void ctfindvar::save(void)
         log_value(TERSE, "Saving counts cube", outcube);
         m_counts.save(outcube, (*this)["clobber"].boolean());
     }
-    
+
+    // Create a FITS file for storing the output
+    m_outfile.clear();
+
     // Write the most significant values for each pixel
-    log_value(TERSE, "Saving maximum significances map", peaksigmap);
-    m_peaksigmap.save(peaksigmap, (*this)["clobber"].boolean());
+    log_string(TERSE, "Appending maximum significances map to output file");
+    m_peaksigmap.write(m_outfile, "PEAKSIGMAP");
 
     // Write individual source distributions
     write_srchist();
 
-    // TODO: Your code goes here
+    // Write the output file
+    GFilename outfile = prefix + "signifmap.fits";
+    m_outfile.saveto(outfile, (*this)["clobber"].boolean());
 
     // Return
     return;
@@ -696,10 +701,6 @@ void ctfindvar::get_parameters(void)
 
     // Load the observations
     setup_observations(m_obs, true, true, false);
-
-    // Create GTIs and counts cube
-    init_gtis();
-    init_cube();
 
     // Get the rest of the parameters
     if (read_ahead()) {
@@ -1141,9 +1142,6 @@ void ctfindvar::write_srchist_fits(const GNdarray& time_info,
     // Store information regarding the source positions
 
     // Write the tables to a file
-    GFilename outfile((*this)["prefix"].string() + "srcsig.fits");
-    GFits     fitsfile;
-    fitsfile.append(table_signif);
-    fitsfile.append(table_dir);
-    fitsfile.saveto(outfile, (*this)["clobber"].boolean() );
+    m_outfile.append(table_signif);
+    m_outfile.append(table_dir);
 }
