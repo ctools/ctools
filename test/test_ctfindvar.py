@@ -114,7 +114,9 @@ class Test(test):
         ctfindvar['emax']      = 1.1 
         ctfindvar['nxpix']     = 200 
         ctfindvar['nypix']     = 200 
-        ctfindvar['binsx']     = 0.05 
+        ctfindvar['binsz']     = 0.05 
+        ctfindvar['coordsys']  = 'CEL'
+        ctfindvar['proj']      = 'CAR'
         ctfindvar['xref']      = 83.63 
         ctfindvar['yref']      = 22.51
         ctfindvar['xsrc']      = 83.63
