@@ -555,6 +555,13 @@ class csspec(ctools.csobservation):
             cubemask['rad']     = 'UNDEFINED'
             cubemask['emin']    = emin.TeV()
             cubemask['emax']    = emax.TeV()
+
+            # If chatter level is verbose and debugging is requested then
+            # switch also on the debug model in ctcubemask
+            if self._logVerbose() and self._logDebug():
+                cubemask['debug'] = True
+
+            # Select layers
             cubemask.run() 
 
             # Set new binned observation
@@ -593,6 +600,13 @@ class csspec(ctools.csobservation):
             select['emax'] = emax.TeV()
             select['tmin'] = 'UNDEFINED'
             select['tmax'] = 'UNDEFINED'
+
+            # If chatter level is verbose and debugging is requested then
+            # switch also on the debug model in ctselect
+            if self._logVerbose() and self._logDebug():
+                select['debug'] = True
+
+            # Run ctselect
             select.run()
 
             # Retrieve observation
@@ -640,10 +654,17 @@ class csspec(ctools.csobservation):
         # Write header for fitting
         self._log_header3(gammalib.EXPLICIT, 'Performing fit')
 
-        # Perform maximum likelihood fit
+        # Setup maximum likelihood fit
         like = ctools.ctlike(obs)
         like['edisp']    = self['edisp'].boolean()
         like['nthreads'] = 1  # Avoids OpenMP conflict
+
+        # If chatter level is verbose and debugging is requested then
+        # switch also on the debug model in ctlike
+        if self._logVerbose() and self._logDebug():
+            like['debug'] = True
+
+        # Perform maximum likelihood fit
         like.run()
 
         # Continue only if log-likelihood is non-zero
@@ -673,6 +694,11 @@ class csspec(ctools.csobservation):
                 ulimit = ctools.ctulimit(like.obs())
                 ulimit['srcname'] = self['srcname'].string()
                 ulimit['eref']    = elogmean.TeV()
+
+                # If chatter level is verbose and debugging is requested
+                # then switch also on the debug model in ctulimit
+                if self._logVerbose() and self._logDebug():
+                    ulimit['debug'] = True
 
                 # Try to run upper limit and catch exceptions
                 try:
