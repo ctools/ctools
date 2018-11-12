@@ -301,7 +301,7 @@ void ctbin::run(void)
             // and set weights in the first slot of the m_counts and
             // m_weights arrays
             if (m_stack) {
-                if (i == 0) {
+                if (m_counts[0].is_empty()) {
                     m_counts[0]  = counts;
                     m_weights[0] = weights;
                 }
