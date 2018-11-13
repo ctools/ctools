@@ -472,7 +472,7 @@ void ctfindvar::get_variability_sig(const int& pix_number,
            #ifdef G_DEBUG
            //std::cout << "significance of the bin : " << i << " : " << sig << " - alpha : " << alpha << " - non: " << non << " - noff: " << noff << "- excess: " << non - alpha*noff <<  std::endl;
            #endif
-           if (sig>4.5 ) // if the bin is significant, it is removed from the bckg and we loop again.
+           if (sig>m_sig_threshold ) // if the bin is significant, it is removed from the bckg and we loop again.
            {
                accepted_bin_bckg_vector[i]=0;
                background_validated=false;
@@ -722,6 +722,9 @@ void ctfindvar::get_parameters(void)
 
     // Get minimum counts for a bin to be considered in Noff calculation
     m_minoff = (*this)["minoff"].real();
+
+    // Get minimum significance to set a source as variable
+    m_sig_threshold = (*this)["sig_thr"].real();
 
     // Write parameters into logger
     log_parameters(TERSE);
