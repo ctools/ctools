@@ -597,9 +597,11 @@ GGti ctfindvar::inx2gti(const int& index)
 
 
 /***********************************************************************//**
- * @brief Save peak significance map
+ * @brief Save peak significance map and significance distributions
  *
- * Saves something.
+ * Saves the peak significance and source signficance distributions.
+ * Optionally, the generated counts cube can also be saved if 'outcube' has
+ * been specified.
  ***************************************************************************/
 void ctfindvar::save(void)
 {
