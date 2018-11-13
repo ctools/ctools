@@ -96,6 +96,7 @@ protected:
     GSkyDir           m_max_sig_dir;   //!< Sky direction associated with maximum significance
     double            m_minoff;        //!< Minimum counts for use in significance calculation
     double            m_sig_threshold; //!< Minimum significance required to set source as variable 
+    GFits            m_outfile;        //!< FITS object to store output
     GSkyMap           m_peaksigmap;    //!< Skymap holding the maximum significance
     GNdarray          m_pixsigsrc;     //!< Store distributions of the source significances
     GNdarray          m_pixsigmax;     //!< Store distribution for pixel with max significance

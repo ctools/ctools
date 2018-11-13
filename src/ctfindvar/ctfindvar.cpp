@@ -609,7 +609,6 @@ void ctfindvar::save(void)
 
     // Filenames
     std::string prefix((*this)["prefix"].string());
-    GFilename peaksigmap(prefix + "peaksigmap.fits");
 
     // Write counts cube
     if ((*this)["outcube"].is_valid()) {
@@ -629,8 +628,8 @@ void ctfindvar::save(void)
     write_srchist();
 
     // Write the output file
-    GFilename outfile = prefix + "signifmap.fits";
-    m_outfile.saveto(outfile, (*this)["clobber"].boolean());
+    GFilename outfilename = prefix + "signifmap.fits";
+    m_outfile.saveto(outfilename, (*this)["clobber"].boolean());
 
     // Return
     return;
