@@ -97,7 +97,7 @@ class Test(test):
         """
         Test ctfindvar from Python
         """
-        print "here in the python test"
+
         # Allocate ctfindvar
         ctfindvar = ctools.ctfindvar()
 
@@ -105,7 +105,7 @@ class Test(test):
         ctfindvar['inobs']     = self._events
         ctfindvar['logfile']   = 'ctfindvar_py0.log'
         ctfindvar['chatter']   =  1
-        ctfindvar['prefix']    = 'ctfindvar_test_'
+        ctfindvar['prefix']    = 'ctfindvar_test_python_'
         ctfindvar['histtype']  = 'FITS'
         ctfindvar['tmin']      = 'NONE'
         ctfindvar['tmax']      = 'NONE' 
@@ -124,45 +124,40 @@ class Test(test):
         ctfindvar['caldb']     = 'prod2'
         ctfindvar['irf']       = 'South_0.5h' 
 
-        ## Check that saving does not nothing
-        #ctfindvar['logfile'] = 'ctfindvar_py0.log'
-        #ctfindvar.logFileOpen()
-        #ctfindvar.save()
-        #self.test_assert(not os.path.isfile('ctfindvar_test_srcsig.fits'),
-        #     'Check that no FITS file has been created')
-
-
         ## Run ctfindvar tool
-        #ctfindvar.logFileOpen()
+        ctfindvar.logFileOpen()
         ctfindvar.run()
 
-        ## Check result
-        #self._check_result('ctfindvar_test_varsrcsig.fits')
+        # Check that saving does not nothing
+        ctfindvar['logfile'] = 'ctfindvar_py1.log'
+        ctfindvar.logFileOpen()
+        ctfindvar.save()
+ 
+        # Check result
+        self._check_result_file('ctfindvar_test_python_srcsig.fits')
 
-        ## Copy ctfindvar tool
-        #cpy_tool = ctfindvar.copy()
+        # Copy ctfindvar tool
+        cpy_tool = ctfindvar
 
-        ## Check result
-        #self._check_result('ctfindvar_test_srcsig.fits')
+        # Run copy of ctfindvar tool again
+        cpy_tool['logfile'] = 'ctfindvar_py2.log'
+        cpy_tool['chatter'] = 3
+        cpy_tool['prefix']  = 'ctfindvar_test_copytool_' 
+        cpy_tool.logFileOpen()
+        cpy_tool.run()
+        cpy_tool.save()
 
-        ## Run copy of ctfindvar tool again
-        #cpy_tool['logfile'] = 'ctfindvar_py2.log'
-        #cpy_tool['chatter'] = 3
-        #cpy_tool['prefix']  = 'ctfindvar_copytool_' 
-        #cpy_tool.logFileOpen()
-        #cpy_tool.run()
+        # Check result
+        self._check_result_file('ctfindvar_test_copytool_srcsig.fits')
 
-        ## Check result
-        #self._check_result('ctfindvar_copytool_srcsig.fits')
-
-        ## Check that clearing does not lead to an exception or segfault
-        #ctfindvar.clear()
+        # Check that clearing does not lead to an exception or segfault
+        ctfindvar.clear()
 
         # Return
         return
 
     # Check ctfindvar result
-    def _check_result(self, filename):
+    def _check_result_file(self, filename):
         """
         Check content of tool
 
@@ -171,9 +166,10 @@ class Test(test):
         tool : `~ctools.ctfindvar`
             ctfindvar instance
         """
+        print "checking if you amazing file is valid"
         # Read variability  file
-        #fits    = gammalib.GFits(filename)
-        #self.test_value(fits.size(), 3,
-        #     'Check for 3 rows in srcsig file')
+        fits    = gammalib.GFits(filename)
+        self.test_value(fits.size(), 3,
+             'Check for 3 rows in srcsig file')
         # Return
         return
