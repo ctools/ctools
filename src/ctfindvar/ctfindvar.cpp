@@ -403,7 +403,6 @@ void ctfindvar::get_variability_sig(const int& pix_number,
 {
     std::vector<bool>   accepted_bin_bckg_vector(nbins, true);
     std::vector<double> excess_bin_vector(nbins, 0.0);
-    std::vector<int>    background_bin_vector(nbins, 0);
     bool background_validated=false;
     double non, noff;
     double alpha, sig;
@@ -418,7 +417,6 @@ void ctfindvar::get_variability_sig(const int& pix_number,
 
         for (int i=0; i< nbins; i++) //looping over all the GTIs of the pixel
         {
-           alpha=0;
            //the GTI is discared from bckg calculation and not checked again.
            if (accepted_bin_bckg_vector[i]==0) {
                continue;
@@ -428,19 +426,20 @@ void ctfindvar::get_variability_sig(const int& pix_number,
                accepted_bin_bckg_vector[i]=0;
                continue;
            }
-           int background_count=0;
+
+           noff  = 0.0;
+           alpha = 0;
            for (int j=0;j<nbins;j++)  // for one GTI selected (i), looping over all the others (j).
            {
                 if (j!=i && accepted_bin_bckg_vector[j]==1)
                 {
-                    background_count+= m_counts(pix_number, j);
+                    noff  += m_counts(pix_number, j);
                     alpha += alpha_vector[j];
                  }
            }
 
-           background_bin_vector[i] = background_count; //The background is averaged on the number of bins -1
-           non = m_counts(pix_number, i); 
-           noff = background_bin_vector[i];
+            //The background is averaged on the number of bins -1
+           non   = m_counts(pix_number, i); 
            alpha = alpha_vector[i]/alpha;
 
            ///////////////////////////////////////////////////////////////////////////////// 
