@@ -25,6 +25,7 @@ prefix,     s, a, findvar_,,, "Prefix for output files"
 minoff,     r, h, 0,,, "Minimum required events in off bin for computing Noff and alpha"
 emin,       r, a, 0,,, "Lower energy limit (units of TeV; 0 => no cut)"
 emax,       r, a, 0,,, "Upper energy limit (units of TeV; 0 => no cut)"
+sig_thr,    r, h, 4.5,,, "Significance threshold for variability detection"
 smoothkrnl, s, h, NONE, GAUSSIAN|DISK|NONE,, "Smoothing kernel for counts maps"
 smoothpar,  r, h, 0.05,,, "Parameter for the smoothing kernel"
 
