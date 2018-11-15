@@ -314,17 +314,19 @@ void ctfindvar::run(void)
 
     //looping over all the pixels in the cube
     #pragma omp parallel for
-    for (int pix_number=0; pix_number<m_counts.npix(); pix_number++)
-    {    
+    for (int pix_number=0; pix_number<m_counts.npix(); pix_number++) {    
+
+        //Preparing array to store significance evolution of 
+        //each pixel
         GNdarray pixSig(nbins);
         double total_counts=0;
-        for (int k=0;k<m_counts.nmaps();k++)
-        {
+        
+        //Checking the integrated count of each pixel
+        for (int k=0;k<m_counts.nmaps();k++) {
             total_counts += m_counts(pix_number, k);
         }
         #ifdef G_DEBUG
-        if(pix_number%20==0)
-        {
+        if(pix_number%20==0) {
             std::cout << "Pixel number " << pix_number ;
             std::cout << " has a total number of counts of: ";
             std::cout << total_counts << std::endl;
@@ -379,8 +381,16 @@ void ctfindvar::run(void)
         }
         //storing sig in skymap
         m_peaksigmap(pix_number) = max(pixSig);
-    }
 
+        //If the significance is greater than sig threshold, the position
+        //is stored in a model
+        if (max(pixSig)> m_sig_threshold) {
+        GSkyDir dir_pix = m_counts.inx2dir(pix_number);
+        fill_model_sig_pos(dir_pix);  
+        }
+    
+    }
+    
     log_header1(NORMAL, "Analysis finished");
     log_value(NORMAL, "Maximum sigma", max_sig);
     log_value(NORMAL, "Max pixel RA", m_max_sig_dir.ra_deg());
@@ -481,7 +491,34 @@ void ctfindvar::get_variability_sig(const int& pix_number,
     }
 }
 
+/***********************************************************************//**
+ * @brief Save the current sky direction to model if significance > thr
+ *
+ * @param[in]  dir_pix                 pixel sky direction 
+ * @param[out] m_model_sig_above_thr   model position with sig>thr 
+ ***************************************************************************/
+void ctfindvar::fill_model_sig_pos(const GSkyDir& dir_pix)
+{
+    //Set spatial components
+    GModelSpatialPointSource spatial(dir_pix);
 
+    //Set fake spectral component (powerlaw with 1% of Crab)
+    GModelSpectralPlaw spectral(5.7e-18, -2.48, GEnergy(0.3, "TeV"));
+
+    //Creat a sky model 
+    GModelSky model(spatial, spectral);
+    
+    //Extracting the coordinate to name the model
+    double ra  = dir_pix.ra_deg();
+    double dec = dir_pix.dec_deg();
+    std::stringstream name;
+    name << "Sky_direction_"<< ra << "_" << dec ;
+    model.name(name.str());
+    
+    //Add the model for this pixel to the output mode 
+    m_model_above_thr.append(model);
+    
+}
 /***********************************************************************//**
  * @brief Get the map index associated with a given time
  *
@@ -629,6 +666,12 @@ void ctfindvar::save(void)
     // Write the output file
     GFilename outfilename = prefix + "signifmap.fits";
     m_outfile.saveto(outfilename, (*this)["clobber"].boolean());
+
+    //Save the model file with position with significance 
+    if (m_model_above_thr.size() > 2){
+        GFilename model_filename = prefix + "model_significant_directions.xml";
+       m_model_above_thr.save(model_filename);
+    }
 
     // Return
     return;
