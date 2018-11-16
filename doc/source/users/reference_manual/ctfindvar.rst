@@ -55,8 +55,16 @@ General parameters
 ``(inmodel = NONE) [file]``
     Input model definition file for extracting source positions.
 
-``histtype [string]``
-    File type for storing the individual source histograms.
+``(outcube = NONE) [file]``
+    Filename for saving counts cube, NONE will result in no cube being saved.
+
+``caldb [string]``
+    Calibration database (only required for IRF background subtraction if no
+    response information is provided by ``inobs``).
+
+``irf [string]``
+    Instrument response function (only required for IRF background subtraction
+    if no response information is provided by ``inobs``).
 
 ``prefix [string]``
     Output file prefix. The method will save two files:
@@ -64,7 +72,7 @@ General parameters
     - File containing the significance as a function of time interval for each 
       source
 
-``minoff [real]``
+``(minoff = 0) [real]``
     Minimum number of off counts to compute the significance
 
 ``emin [real]``
@@ -74,6 +82,9 @@ General parameters
 ``emax [real]``
     Maximum energy (TeV) for extracting events. A value of 0 results in no cut
     being applied.
+
+``(sig_thr = 4.5) [real]``
+    Significance threshold for variability detection.
 
 ``(smoothkrnl = NONE) <GAUSSIAN|DISK|NONE> [string]``
     Kernel to be used in smoothing the counts maps before computing 
