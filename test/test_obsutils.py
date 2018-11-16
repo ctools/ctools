@@ -217,7 +217,7 @@ class Test(test):
         # Check simulation results
         self.test_value(res.size(), 1, 'Check number of observations')
         self.test_value(res.models().size(), 2, 'Check number of models')
-        self.test_value(res.nobserved(), 19, 'Check number of observed events')
+        self.test_value(res.nobserved(), 20, 'Check number of observed events')
         self.test_value(res.npred(), 0.0, 'Check number of predicted events')
         self.test_value(res[0].eventtype(), 'CountsCube', 'Check event type')
         self.test_value(res[0].events().ebounds().emin().TeV(), 1.0,
@@ -226,7 +226,7 @@ class Test(test):
                         'Check maximum energy')
         self.test_value(res[0].events().ebounds().size(), 5,
                         'Check number of energy bins')
-        self.test_value(res[0].events().number(), 19,
+        self.test_value(res[0].events().number(), 20,
                         'Check number of events in cube')
 
         # Check energy dispersion flag
@@ -261,7 +261,7 @@ class Test(test):
         # Check simulation results
         self.test_value(res.size(), 2, 'Check number of observations')
         self.test_value(res.models().size(), 2, 'Check number of models')
-        self.test_value(res.nobserved(), 46, 'Check number of observed events')
+        self.test_value(res.nobserved(), 48, 'Check number of observed events')
         self.test_value(res.npred(), 0.0, 'Check number of predicted events')
 
         # Check results of first observation
@@ -271,7 +271,7 @@ class Test(test):
                         'Check maximum energy of On spectrum')
         self.test_value(res[0].on_spec().ebounds().size(), 5,
                         'Check number of energy bins of On spectrum')
-        self.test_value(res[0].on_spec().counts(), 24,
+        self.test_value(res[0].on_spec().counts(), 26,
                         'Check number of events in of On spectrum')
         self.test_value(res[0].off_spec().ebounds().emin().TeV(), 1.0,
                         'Check minimum energy of Off spectrum')
@@ -315,7 +315,7 @@ class Test(test):
                         'Check maximum energy of Off spectrum')
         self.test_value(res[1].off_spec().ebounds().size(), 5,
                         'Check number of energy bins of Off spectrum')
-        self.test_value(res[1].off_spec().counts(), 0,
+        self.test_value(res[1].off_spec().counts(), 1,
                         'Check number of events in of Off spectrum')
         self.test_value(res[1].arf().ebounds().emin().TeV(), 0.5,
                         'Check minimum energy of ARF')

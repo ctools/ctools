@@ -264,8 +264,8 @@ class Test(test):
         prefactor_error        = 1.12920470341148e-16
         index                  = 2.39356360626209
         index_error            = 0.128468611886618
-        pre_background         = 1.01409721534593
-        pre_background_error   = 0.122650321517162
+        pre_background         = 0.993814959041969
+        pre_background_error   = 0.120197277367473
         index_background       = 0.0436264224948547
         index_background_error = 0.110703165254809
 

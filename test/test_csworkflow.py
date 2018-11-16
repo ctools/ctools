@@ -139,10 +139,10 @@ class Test(test):
         models = gammalib.GModels(filename)
 
         # Set reference values
-        prefactor        = 3.6507089091164e-16
-        index            = 2.39314305030239
-        pre_background   = 1.0405193333791
-        index_background = 0.0100808528325967
+        prefactor        = 3.62775976898809e-16
+        index            = 2.39100016863397
+        pre_background   = 1.05367124323594
+        index_background = 0.0421705243014668
 
         # Check fit result values
         self.test_value(models['Crab'][2].value(),

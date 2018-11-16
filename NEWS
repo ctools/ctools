@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-7 November 2018
+16 November 2018
 
 
 Introduction
@@ -11,6 +11,10 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
+CTA background rates are now per ontime and not livetime. This makes the IRF
+background consistent with the cube background, and is also consistent with
+the open gamma data format (#2758).
+
 A Code Generator was added to the development directory that can be started
 using dev/codegen.py and that requires GammaLib to be installed. The code
 generator allows adding ctools and cscripts, including unit tests and code

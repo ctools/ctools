@@ -1,8 +1,9 @@
-2018-11-07
+2018-11-16
 
         * Version 1.6.0 released
         ========================
 
+        CTA background rates are now per ontime (#2758)
         Apply event bin weighting in ctmodel for stacked computation (#2721)
         Enable ctbin to produce counts cubes for a joint binned analysis (#2714)
         Add Jupyter notebooks for H.E.S.S. DR1 (#2712)
