@@ -72,7 +72,7 @@ class Test(test):
         # Setup ctfindvar command
         cmd = ctfindvar+' inobs="'+self._events+'"'+\
                         ' logfile="ctfindvar_cmd1.log" chatter=1'+\
-                        ' prefix=ctfindvar_test_ histtype=FITS'+\
+                        ' prefix=ctfindvar_test_ '+\
                         ' tmin=NONE tmax=NONE tinterval=20'+\
                         ' emin=0.2 emax=1.1'+\
                         ' nxpix=200 nypix=200 binsz=0.05'+\
@@ -106,7 +106,6 @@ class Test(test):
         ctfindvar['logfile']   = 'ctfindvar_py0.log'
         ctfindvar['chatter']   =  1
         ctfindvar['prefix']    = 'ctfindvar_test_python_'
-        ctfindvar['histtype']  = 'FITS'
         ctfindvar['tmin']      = 'NONE'
         ctfindvar['tmax']      = 'NONE' 
         ctfindvar['tinterval'] = 20 
