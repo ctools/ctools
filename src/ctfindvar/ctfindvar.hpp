@@ -86,9 +86,6 @@ protected:
 
     // Writing methods for individual source histograms
     void write_srchist(void);
-    void write_srchist_csv(const GNdarray& time_info,
-                           const GNdarray& max_pixel_info,
-                           const GNdarray& src_info);
     void write_srchist_fits(const GNdarray& time_info,
                             const GNdarray& max_pixel_info,
                             const GNdarray& src_info);

@@ -735,8 +735,6 @@ void ctfindvar::get_parameters(void)
             (*this)["xsrc"].real();
             (*this)["ysrc"].real();
         }
-        // Get the file format for the output source histograms
-        (*this)["histtype"].string();
     }
 
     // Create GTIs and counts cube
@@ -1059,21 +1057,7 @@ void ctfindvar::write_srchist(void)
     }
 
     // Call the appropriate method for writing the data
-    if ((*this)["histtype"].string() == "CSV") {
-        write_srchist_csv(time_info, max_pixel_info, src_info);
-    } else {
-        write_srchist_fits(time_info, max_pixel_info, src_info);
-    }
-}
-
-/***********************************************************************//**
- * @brief Write individual histograms in CSV format
- ***************************************************************************/
-void ctfindvar::write_srchist_csv(const GNdarray& time_info,
-                                  const GNdarray& max_pixel_info,
-                                  const GNdarray& src_info)
-{
-    log_string(NORMAL,"Storing histograms in CSV format is not currently supported.");
+    write_srchist_fits(time_info, max_pixel_info, src_info);
 }
 
 
