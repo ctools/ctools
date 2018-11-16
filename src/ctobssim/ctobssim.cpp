@@ -1511,8 +1511,7 @@ void ctobssim::simulate_background(GCTAObservation* obs,
                           << std::endl;
                 #endif
 
-                // Get simulated CTA event list. Note that this method
-                // includes the deadtime correction.
+                // Get simulated CTA event list
                 GCTAEventList* list =
                      dynamic_cast<GCTAEventList*>(model->mc(*obs, ran));
 
