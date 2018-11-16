@@ -37,7 +37,8 @@ scripts = README.md \
           show_phases.py \
           show_ts_distribution.py \
           show_obs.py \
-          show_pointings.py
+          show_pointings.py \
+          show_variability_evolution.py
 
 # Set install directories
 scriptsdir    = $(datadir)/examples/python

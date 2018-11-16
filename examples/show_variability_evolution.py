@@ -21,7 +21,6 @@
 import sys
 import gammalib
 import cscripts
-import numpy as np
 try:
     import matplotlib.pyplot as plt
     plt.figure()
@@ -34,7 +33,7 @@ except (ImportError, RuntimeError):
 # ========================== #
 # Plot variability evolution #
 # ========================== #
-def plot_variability_evolution(filename, plotfile):
+def plot_variability_evolution(filename, plotfile, srcname):
     """
     Plot variability evolution 
 
@@ -50,7 +49,7 @@ def plot_variability_evolution(filename, plotfile):
     table   = fits.table(1)
     c_gti_start  = table['TSTART']
     c_gti_stop   = table['TSTOP']
-    c_sig        = table['SOURCE']
+    c_sig        = table[srcname]
 
     #convert the c_sig object to list
     table_c_sig=[]
@@ -91,20 +90,21 @@ def show_variability_evolution():
     Show variability 
     """
     # Set usage string
-    usage = 'show_variability_evolution.py [-p plotfile] [file]'
+    usage = 'show_variability_evolution.py [-p plotfile] [-s source_name] [file]'
 
     # Set default options
-    options = [{'option': '-p', 'value': ''}]
+    options = [{'option': '-p', 'value': ''},
+               {'option': '-s', 'value': 'MAXSIGPIXEL'}]
 
     # Get arguments and options from command line arguments
     args, options = cscripts.ioutils.get_args_options(options, usage)
 
     # Extract script parameters from options
     plotfile = options[0]['value']
-    #hdu      = int(options[1]['value'])
+    srcname  = options[1]['value']
 
     # Show variability evolution
-    plot_variability_evolution(args[0], plotfile)
+    plot_variability_evolution(args[0], plotfile, srcname)
 
     # Return
     return
