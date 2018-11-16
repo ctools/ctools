@@ -68,18 +68,21 @@ public:
 
 protected:
     // Protected methods
-    void init_cube(void);
-    void fill_model_sig_pos(const GSkyDir& dir_pix);
-    void init_gtis(void);
-    void init_members(void);
-    void copy_members(const ctfindvar& app);
-    void free_members(void);
-    void fill_cube(GCTAObservation* obs);
-    void fill_alpha_vector(const int&           pix_number,
-                           std::vector<double>& alpha_vector);
-    void get_parameters(void);
-    void get_variability_sig(const int& pix_number, const int& nbins, GNdarray& sig_histogram);
-    double gti_overlap(const GGti& gti1, const GGti& gti2);
+    void   init_cube(void);
+    void   fill_model_sig_pos(const GSkyDir& dir_pix);
+    void   init_gtis(void);
+    void   init_members(void);
+    void   copy_members(const ctfindvar& app);
+    void   free_members(void);
+    void   fill_cube(GCTAObservation* obs);
+    void   fill_alpha_vector(const int&           pix_number,
+                             std::vector<double>& alpha_vector);
+    void   get_parameters(void);
+    void   get_variability_sig(const int& pix_number, 
+                               const int& nbins, 
+                               GNdarray&  sig_histogram);
+    double gti_overlap(const GGti& gti1, 
+                       const GGti& gti2);
 
     // Writing methods for individual source histograms
     void write_srchist(void);
@@ -97,7 +100,7 @@ protected:
     GSkyDir           m_max_sig_dir;    //!< Sky direction associated with maximum significance
     double            m_minoff;         //!< Minimum counts for use in significance calculation
     double            m_sig_threshold;  //!< Minimum significance required to set source as variable 
-    GFits            m_outfile;         //!< FITS object to store output
+    GFits             m_outfile;        //!< FITS object to store output
     GSkyMap           m_peaksigmap;     //!< Skymap holding the maximum significance
     GNdarray          m_pixsigsrc;      //!< Store distributions of the source significances
     GNdarray          m_pixsigmax;      //!< Store distribution for pixel with max significance
