@@ -321,13 +321,6 @@ void ctfindvar::run(void)
         for (int k = 0; k < m_counts.nmaps(); k++) {
             total_counts += m_counts(pix_number, k);
         }
-        #ifdef G_DEBUG
-        if(pix_number%20==0) {
-            std::cout << "Pixel number " << pix_number ;
-            std::cout << " has a total number of counts of: ";
-            std::cout << total_counts << std::endl;
-        }
-        #endif
 
         //Getting the variability significance for the pixel
         get_variability_sig(pix_number,nbins, pixSig);
@@ -342,10 +335,6 @@ void ctfindvar::run(void)
                 for (int i = 0; i < nbins; i++) {
                     m_pixsigsrc(src,i) = pixSig(i);
                 }
-                #ifdef G_DEBUG
-                std::cout << "checking pixel of the source of interest: " << pix_number ;
-                std::cout << " with total number of counts of: " << total_counts << std::endl;
-                #endif
             }
             #ifdef G_DEBUG
             std::cout << "checking pixel number of the source of interest" << pix_number << std::endl;
@@ -357,12 +346,6 @@ void ctfindvar::run(void)
             #endif
         }
         }
-        
-        #ifdef G_DEBUG
-        std::cout << "checking pixel number of the source of interest: " ;
-        std::cout << pix_number << " - with total number of counts of: " ;
-        std::cout << total_counts << std::endl;
-        #endif
 
         // Getting the evolution for the pix with highest significance
         #pragma omp critical(ctfind_run)
@@ -380,8 +363,8 @@ void ctfindvar::run(void)
         //If the significance is greater than sig threshold, the position
         //is stored in a model
         if (max(pixSig) > m_sig_threshold) {
-        GSkyDir dir_pix = m_counts.inx2dir(pix_number);
-        fill_model_sig_pos(dir_pix);  
+            GSkyDir dir_pix = m_counts.inx2dir(pix_number);
+            fill_model_sig_pos(dir_pix);  
         }
     
     }
@@ -429,60 +412,58 @@ void ctfindvar::get_variability_sig(const int& pix_number,
 
             // The GTI is discared from bckg calculation and not checked again.
             if (!accepted_bin_bckg_vector[i]) {
-               continue;
-           } 
-           // Check if bin fails minoff check or no observations overlap it
+                continue;
+            } 
+            // Check if bin fails minoff check or no observations overlap it
             else if (m_counts(pix_number, i) < m_minoff || alpha_vector[i] == 0) {
                 accepted_bin_bckg_vector[i] = false;
-               continue;
-           }
+                continue;
+            }
 
-           noff  = 0.0;
+            noff  = 0.0;
             alpha = 0.0;
             // Gor one GTI selected (i), looping over all the others (j).
             for (int j = 0; j < nbins; j++) {
                 if (j != i && accepted_bin_bckg_vector[j] == 1) {
                     noff  += m_counts(pix_number, j);
                     alpha += alpha_vector[j];
-                 }
-           }
+                }
+            }
 
             // The background is averaged on the number of bins -1
-           non   = m_counts(pix_number, i); 
-           alpha = alpha_vector[i]/alpha;
+            non   = m_counts(pix_number, i); 
+            alpha = alpha_vector[i]/alpha;
 
             // Compute sensitivity in Gaussian sigma using Li & Ma
-           double alpha1 = alpha + 1.0;
-           double ntotal = non+noff;
-           double arg1   = non/ntotal;
-           double arg2   = noff/ntotal;
-           if (noff == 0.0) {
-               sig = 0.0;
-           } else if (non > 0.0) {
-               double term1  = non * std::log((alpha1/alpha)*arg1);
-               double term2  = noff * std::log(alpha1*arg2);
-               sig  = std::sqrt(2.0 * (term1 + term2));
-           } else {
-               sig = std::sqrt(2.0 * noff * std::log(alpha1));
-           }
+            double alpha1 = alpha + 1.0;
+            double ntotal = non+noff;
+            double arg1   = non/ntotal;
+            double arg2   = noff/ntotal;
+            if (noff == 0.0) {
+                sig = 0.0;
+            } else if (non > 0.0) {
+                double term1  = non * std::log((alpha1/alpha)*arg1);
+                double term2  = noff * std::log(alpha1*arg2);
+                sig  = std::sqrt(2.0 * (term1 + term2));
+            } else {
+                sig = std::sqrt(2.0 * noff * std::log(alpha1));
+            }
 
-           // Specify the sign of the significance
-           sig *= (non < alpha*noff) ? -1.0 : 1.0;
+            // Specify the sign of the significance
+            sig *= (non < alpha*noff) ? -1.0 : 1.0;
 
-           if (alpha == 0.0) {
-               sig = 0.0;
-           }
+            if (alpha == 0.0) {
+                sig = 0.0;
+            }
            
             // Update the significance
             sig_histogram(i) = sig;
-           #ifdef G_DEBUG
-           //std::cout << "significance of the bin : " << i << " : " << sig << " - alpha : " << alpha << " - non: " << non << " - noff: " << noff << "- excess: " << non - alpha*noff <<  std::endl;
-           #endif
+
             // If the bin is significant, it is removed from the bckg and we loop again.
             if (sig > m_sig_threshold) {
                 accepted_bin_bckg_vector[i] = false;
                 background_validated        = false;
-           }
+            }
         }
 
     }
@@ -668,7 +649,7 @@ void ctfindvar::save(void)
     //Save the model file with position with significance 
     if (m_model_above_thr.size() > 2) {
         GFilename model_filename = prefix + "model_significant_directions.xml";
-       m_model_above_thr.save(model_filename);
+        m_model_above_thr.save(model_filename);
     }
 
     // Return
