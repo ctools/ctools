@@ -401,6 +401,11 @@ void ctfindvar::run(void)
  * @param[in]  pix_number        Pixel in the skymap
  * @param[in]  nbins             Number of bins in the skymap
  * @param[out] sig_histogram     Histogram for storing returned significances
+ * 
+ * Significance is computed according to Li & Ma equation 17:
+ *    see: https://doi.org/10.1086/161295
+ * Some modification is made in order to handle the case where Non = 0, 
+ * but Noff != 0.
  ***************************************************************************/
 void ctfindvar::get_variability_sig(const int& pix_number, 
                                     const int& nbins, 
