@@ -40,7 +40,7 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_FILL_CUBE                  "ctfindvar::fill_cube(GCTAObservation*)"
-#define G_FILL_ALPHA_VECTOR "ctfindvar::fill_alpha_vector(const int&, std::vector<double>&)"
+#define G_FILL_ALPHA_VECTOR "ctfindvar::fill_alpha_vector(const int&, vector<double>&)"
 #define G_INIT_CUBE                              "ctfindvar::init_cube(void)"
 #define G_INIT_GTIS                              "ctfindvar::init_gtis(void)"
 
@@ -116,7 +116,8 @@ ctfindvar::ctfindvar(int argc, char *argv[]) :
  *
  * @param[in] app search time variability tool.
  *
- * Constructs search time variability tool from another search time variability tool.
+ * Constructs search time variability tool from another search time variability 
+ * tool.
  ***************************************************************************/
 ctfindvar::ctfindvar(const ctfindvar& app) :
     ctobservation(app)
@@ -459,7 +460,7 @@ void ctfindvar::get_variability_sig(const int& pix_number,
             // Update the significance
             sig_histogram(i) = sig;
 
-            // If the bin is significant, it is removed from the bckg and we loop again.
+            // If bin is significant, it's removed from bckg and we loop again.
             if (sig > m_sig_threshold) {
                 accepted_bin_bckg_vector[i] = false;
                 background_validated        = false;
