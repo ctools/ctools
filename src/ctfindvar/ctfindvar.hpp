@@ -91,20 +91,20 @@ protected:
                             const GNdarray& src_info);
 
     // Protected members
-    GSkyMap           m_counts;         //!< Counts for each time interval
-    std::vector<GGti> m_gti;            //!< List of time intervals
-    GModels           m_inmodel;        //!< List of models for source positions
-    GSkyDir           m_max_sig_dir;    //!< Sky direction associated with maximum significance
-    double            m_minoff;         //!< Minimum counts for use in significance calculation
-    double            m_sig_threshold;  //!< Minimum significance required to set source as variable 
-    GFits             m_outfile;        //!< FITS object to store output
-    GSkyMap           m_peaksigmap;     //!< Skymap holding the maximum significance
-    GNdarray          m_pixsigsrc;      //!< Store distributions of the source significances
-    GNdarray          m_pixsigmax;      //!< Store distribution for pixel with max significance
-    GTime             m_tstart;         //!< Start time for variability study
-    GTime             m_tstop;          //!< Stop time for variability study
-    GEnergy           m_emin;           //!< Minimum energy for events
-    GEnergy           m_emax;           //!< Maximum energy for events
+    GSkyMap           m_counts;          //!< Counts for each time interval
+    std::vector<GGti> m_gti;             //!< List of time intervals
+    GModels           m_inmodel;         //!< List of models for source positions
+    GSkyDir           m_max_sig_dir;     //!< Sky direction associated with maximum significance
+    double            m_minoff;          //!< Minimum counts for use in significance calculation
+    double            m_sig_threshold;   //!< Minimum significance required to set source as variable 
+    GFits             m_outfile;         //!< FITS object to store output
+    GSkyMap           m_peaksigmap;      //!< Skymap holding the maximum significance
+    GNdarray          m_pixsigsrc;       //!< Store distributions of the source significances
+    GNdarray          m_pixsigmax;       //!< Store distribution for pixel with max significance
+    GTime             m_tstart;          //!< Start time for variability study
+    GTime             m_tstop;           //!< Stop time for variability study
+    GEnergy           m_emin;            //!< Minimum energy for events
+    GEnergy           m_emax;            //!< Maximum energy for events
     GModels           m_model_above_thr; //!< Model storing position with significance above thr
 
 };
