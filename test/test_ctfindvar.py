@@ -133,7 +133,7 @@ class Test(test):
         ctfindvar.save()
  
         # Check result
-        self._check_result_file('ctfindvar_test_python_srcsig.fits')
+        self._check_result_file('ctfindvar_test_python_signifmap.fits')
 
         # Copy ctfindvar tool
         cpy_tool = ctfindvar
@@ -147,7 +147,7 @@ class Test(test):
         cpy_tool.save()
 
         # Check result
-        self._check_result_file('ctfindvar_test_copytool_srcsig.fits')
+        self._check_result_file('ctfindvar_test_copytool_signifmap.fits')
 
         # Check that clearing does not lead to an exception or segfault
         ctfindvar.clear()
