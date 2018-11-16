@@ -32,7 +32,6 @@
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
 #include <cmath>
-#include <sstream>
 
 /* __ OpenMP section _____________________________________________________ */
 #ifdef _OPENMP
@@ -288,12 +287,9 @@ void ctfindvar::run(void)
     // ... otherwise only one source position is queried
     else {
         GSkyDir srcSkyDir;
-        if ((*this)["coordsys"].string()=="CEL")
-        {
+        if ((*this)["coordsys"].string() == "CEL") {
             srcSkyDir.radec_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
-        }
-        else
-        {
+        } else {
             srcSkyDir.lb_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
         }
 
@@ -308,13 +304,13 @@ void ctfindvar::run(void)
     m_pixsigmax = GNdarray(nbins);
 
     //Prepare the final skymap with the max significance of each pixel
-    double  max_sig=0;
+    double  max_sig = 0;
 
     log_header1(NORMAL, "Looping Over Pixels");
 
     //looping over all the pixels in the cube
     #pragma omp parallel for
-    for (int pix_number=0; pix_number<m_counts.npix(); pix_number++) {    
+    for (int pix_number = 0; pix_number < m_counts.npix(); pix_number++) {    
 
         //Preparing array to store significance evolution of 
         //each pixel
@@ -322,7 +318,7 @@ void ctfindvar::run(void)
         double total_counts=0;
         
         //Checking the integrated count of each pixel
-        for (int k=0;k<m_counts.nmaps();k++) {
+        for (int k = 0; k < m_counts.nmaps(); k++) {
             total_counts += m_counts(pix_number, k);
         }
         #ifdef G_DEBUG
@@ -337,13 +333,13 @@ void ctfindvar::run(void)
         get_variability_sig(pix_number,nbins, pixSig);
 
         //Getting the significance evolution for the source
-        for (int src=0; src<srcInxPix.size(); src++) {
+        for (int src = 0; src < srcInxPix.size(); src++) {
 
             // Store the distribution if the source is located at this position
             if (srcInxPix[src] == pix_number) {
 
                 #pragma omp critical(ctfind_run)
-                for (int i=0; i<nbins; i++) {
+                for (int i = 0; i < nbins; i++) {
                     m_pixsigsrc(src,i) = pixSig(i);
                 }
                 #ifdef G_DEBUG
@@ -371,8 +367,7 @@ void ctfindvar::run(void)
         // Getting the evolution for the pix with highest significance
         #pragma omp critical(ctfind_run)
         {  
-            if (max(pixSig) > max_sig)  
-            {
+            if (max(pixSig) > max_sig) {
                 // Update the pixel position with the maximum sigma
                 max_sig       = max(pixSig);
                 m_max_sig_dir = m_counts.inx2dir(pix_number);
@@ -384,7 +379,7 @@ void ctfindvar::run(void)
 
         //If the significance is greater than sig threshold, the position
         //is stored in a model
-        if (max(pixSig)> m_sig_threshold) {
+        if (max(pixSig) > m_sig_threshold) {
         GSkyDir dir_pix = m_counts.inx2dir(pix_number);
         fill_model_sig_pos(dir_pix);  
         }
@@ -411,9 +406,8 @@ void ctfindvar::get_variability_sig(const int& pix_number,
                                     const int& nbins, 
                                     GNdarray&  sig_histogram)
 {
-    std::vector<bool>   accepted_bin_bckg_vector(nbins, true);
-    std::vector<double> excess_bin_vector(nbins, 0.0);
-    bool background_validated=false;
+    std::vector<bool> accepted_bin_bckg_vector(nbins, true);
+    bool background_validated = false;
     double non, noff;
     double alpha, sig;
 
@@ -421,39 +415,38 @@ void ctfindvar::get_variability_sig(const int& pix_number,
     std::vector<double> alpha_vector(nbins, 0.0);
     fill_alpha_vector(pix_number, alpha_vector);
 
-    while (background_validated==false)
-    {
-        background_validated=true;
+    // Loop over pixels until all background pixls are removed
+    while (background_validated == false) {
+        background_validated = true;
 
-        for (int i=0; i< nbins; i++) //looping over all the GTIs of the pixel
-        {
-           //the GTI is discared from bckg calculation and not checked again.
-           if (accepted_bin_bckg_vector[i]==0) {
+        // Loop over all the GTIs of the pixel
+        for (int i = 0; i < nbins; i++) {
+
+            // The GTI is discared from bckg calculation and not checked again.
+            if (!accepted_bin_bckg_vector[i]) {
                continue;
            } 
            // Check if bin fails minoff check or no observations overlap it
-           else if (m_counts(pix_number, i) < m_minoff || alpha_vector[i]==0) {
-               accepted_bin_bckg_vector[i]=0;
+            else if (m_counts(pix_number, i) < m_minoff || alpha_vector[i] == 0) {
+                accepted_bin_bckg_vector[i] = false;
                continue;
            }
 
            noff  = 0.0;
-           alpha = 0;
-           for (int j=0;j<nbins;j++)  // for one GTI selected (i), looping over all the others (j).
-           {
-                if (j!=i && accepted_bin_bckg_vector[j]==1)
-                {
+            alpha = 0.0;
+            // Gor one GTI selected (i), looping over all the others (j).
+            for (int j = 0; j < nbins; j++) {
+                if (j != i && accepted_bin_bckg_vector[j] == 1) {
                     noff  += m_counts(pix_number, j);
                     alpha += alpha_vector[j];
                  }
            }
 
-            //The background is averaged on the number of bins -1
+            // The background is averaged on the number of bins -1
            non   = m_counts(pix_number, i); 
            alpha = alpha_vector[i]/alpha;
 
-           ///////////////////////////////////////////////////////////////////////////////// 
-           // Compute sensitivity in Gaussian sigma
+            // Compute sensitivity in Gaussian sigma using Li & Ma
            double alpha1 = alpha + 1.0;
            double ntotal = non+noff;
            double arg1   = non/ntotal;
@@ -474,17 +467,16 @@ void ctfindvar::get_variability_sig(const int& pix_number,
            if (alpha == 0.0) {
                sig = 0.0;
            }
-           /////////////////////////////////////////////////
-           //sig_bin_vector[i]=sig;
-           sig_histogram(i)=sig;
-           excess_bin_vector[i]=non - alpha*noff;
+           
+            // Update the significance
+            sig_histogram(i) = sig;
            #ifdef G_DEBUG
            //std::cout << "significance of the bin : " << i << " : " << sig << " - alpha : " << alpha << " - non: " << non << " - noff: " << noff << "- excess: " << non - alpha*noff <<  std::endl;
            #endif
-           if (sig>m_sig_threshold ) // if the bin is significant, it is removed from the bckg and we loop again.
-           {
-               accepted_bin_bckg_vector[i]=0;
-               background_validated=false;
+            // If the bin is significant, it is removed from the bckg and we loop again.
+            if (sig > m_sig_threshold) {
+                accepted_bin_bckg_vector[i] = false;
+                background_validated        = false;
            }
         }
 
@@ -511,9 +503,9 @@ void ctfindvar::fill_model_sig_pos(const GSkyDir& dir_pix)
     //Extracting the coordinate to name the model
     double ra  = dir_pix.ra_deg();
     double dec = dir_pix.dec_deg();
-    std::stringstream name;
-    name << "Sky_direction_"<< ra << "_" << dec ;
-    model.name(name.str());
+    std::string name = "Sky_direction_" + gammalib::str(ra, 4) + 
+                       "_" + gammalib::str(dec, 4);
+    model.name(name);
     
     //Add the model for this pixel to the output mode 
     m_model_above_thr.append(model);
@@ -532,7 +524,7 @@ void ctfindvar::fill_alpha_vector(const int&           pix_number,
     GSkyDir pix_dir = m_counts.inx2dir(pix_number);
 
     // Loop over all observations
-    for (int i=0; i<m_obs.size(); i++) {
+    for (int i = 0; i < m_obs.size(); i++) {
         // Skip if observation does not overlap with this pixel position
         GCTAObservation* obs        = dynamic_cast<GCTAObservation*>(m_obs[i]);
         GCTARoi          roi        = obs->roi();
@@ -549,7 +541,7 @@ void ctfindvar::fill_alpha_vector(const int&           pix_number,
         const GGti& obs_gti(obs->gti());
 
         // Loop over all time bins
-        for (int j=0; j<m_gti.size(); j++) {
+        for (int j = 0; j < m_gti.size(); j++) {
 
             // Make sure observation overlaps with this time interval
             double exposure = gti_overlap(m_gti[j], obs_gti);
@@ -605,7 +597,7 @@ int ctfindvar::time2inx(const GTime& time)
     int map_index = -1;
 
     // Loop over all GTIs
-    for (int i=0; i<m_gti.size(); i++) {
+    for (int i = 0; i < m_gti.size(); i++) {
         // Check if interval contains the time
         if (m_gti[i].contains(time)) {
             map_index = i;
@@ -665,10 +657,11 @@ void ctfindvar::save(void)
 
     // Write the output file
     GFilename outfilename = prefix + "signifmap.fits";
+    log_value(TERSE, "Saving results to ", outfilename);
     m_outfile.saveto(outfilename, (*this)["clobber"].boolean());
 
     //Save the model file with position with significance 
-    if (m_model_above_thr.size() > 2){
+    if (m_model_above_thr.size() > 2) {
         GFilename model_filename = prefix + "model_significant_directions.xml";
        m_model_above_thr.save(model_filename);
     }
@@ -987,10 +980,9 @@ void ctfindvar::init_gtis(void)
         throw GException::invalid_value(G_INIT_GTIS,
                                         "Start time is equal to stop time");
     } else if (bins < 2) {
-        std::stringstream msg;
-        msg << "Method requires at least two time bins (" 
-            << bins << " bins found).";
-        throw GException::invalid_value(G_INIT_GTIS, msg.str());
+        std::string msg = "Method requires at least two time bins (" +
+                          gammalib::str(bins) + " bins found).";
+        throw GException::invalid_value(G_INIT_GTIS, msg);
     }
 
     for (int i=0; i<bins; i++) {
