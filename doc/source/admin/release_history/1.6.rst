@@ -52,7 +52,7 @@ Improvements
   Add ``ctbkgcube::cntcube()`` method
   Account for varying energy thresholds in :ref:`ctbin` weight computation
   Unnormalize background cube values in :ref:`ctbkgcube`
-* Add ``use_irf_bkg`` parameter to :ref:`cslightcrv`
+* Add ``use_model_bkg`` parameter to :ref:`cslightcrv`
 * [`2671 <https://cta-redmine.irap.omp.eu/issues/2671>`_] -
   Do not skip bins with zero counts in :ref:`csspec`
 * [`2670 <https://cta-redmine.irap.omp.eu/issues/2670>`_] -
@@ -63,7 +63,7 @@ Improvements
   :ref:`ctlike`, :ref:`cttsmap`, :ref:`ctulimit`, and :ref:`cstsmapsplit`
   to allow controlling the accuracy of the maximum likelihood computation
 * [`2659 <https://cta-redmine.irap.omp.eu/issues/2659>`_] -
-  Add hidden ``use_irf_bkg`` parameter to :ref:`csphagen`
+  Add hidden ``use_model_bkg`` parameter to :ref:`csphagen`
 * [`2656 <https://cta-redmine.irap.omp.eu/issues/2656>`_] -
   Use full ``RMF`` true energy range for On/Off analysis in :ref:`csspec`
 * [`2513 <https://cta-redmine.irap.omp.eu/issues/2513>`_] -

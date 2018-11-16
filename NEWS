@@ -270,7 +270,7 @@ None
 
 cslightcrv - Generate light curve
 ---------------------------------
-Add hidden "use_irf_bkg" parameter for forwarding to csphagen.
+Add hidden "use_model_bkg" parameter for forwarding to csphagen.
 
 Add hidden "nthreads" parameter and implement parallelisation of light
 curve computation (#2421).
@@ -323,16 +323,19 @@ Use time reference of input observations if time selection is given in MET
 
 csphagen - Generate On/Off observations
 ---------------------------------------
-Add hidden "use_irf_bkg" parameter. By default the parameter is set to "yes",
-which means that the background acceptance provided in the IRF is used for
-the computation of the alpha parameter and the background rate, stored in the
-"BACKSCAL" column of the On spectrum and the "BACKRESP" column of the Off
+The script now supports any kind of background model, not only IRF background
+models (#2710).
+
+Add hidden "use_model_bkg" parameter. By default the parameter is set to "yes",
+which means that the background model provided in the model container is used
+for the computation of the alpha parameter and the background rate, stored in
+the "BACKSCAL" column of the On spectrum and the "BACKRESP" column of the Off
 spectrum, respectively. If the parameter is set to "no" it is assumed that the
-background rate in the On and Off regions are the same, and the IRF background
-template is not used. In that case, the "BACKSCAL" column gives the ratio of
-the solid angles between On and Off regions, and the "BACKRESP" column is set
-to zero. The resulting data can only be fitted using the "wstat" statistic
-(#2659).
+background rate in the On and Off regions are the same, and the model background
+is not used. In that case, the "BACKSCAL" column gives the ratio of the solid
+angles between On and Off regions, and the "BACKRESP" column is set to the
+solid angle of the On region. The resulting data can only be fitted using the
+"WSTAT" statistic (#2659).
 
 Add hidden "nthreads" parameter and implement parallelisation of computations
 (#2421).

@@ -241,31 +241,31 @@ class Test(test):
 
         # cslightcrv with classical analysis
         lcrv = cscripts.cslightcrv()
-        lcrv['inobs']       = self._offaxis_events
-        lcrv['inmodel']     = self._model_onoff
-        lcrv['srcname']     = 'Crab'
-        lcrv['caldb']       = self._caldb
-        lcrv['irf']         = self._irf
-        lcrv['tbinalg']     = 'LIN'
-        lcrv['tmin']        = '2020-01-01T00:00:00'
-        lcrv['tmax']        = '2020-01-01T00:05:00'
-        lcrv['tbins']       = 2
-        lcrv['method']      = 'ONOFF'
-        lcrv['use_irf_bkg'] = False  # Needed even if WSTAT
-        lcrv['emin']        = 1.0
-        lcrv['emax']        = 100.0
-        lcrv['enumbins']    = 2
-        lcrv['coordsys']    = 'CEL'
-        lcrv['xref']        = 83.63
-        lcrv['yref']        = 22.01
-        lcrv['rad']         = 0.2
-        lcrv['etruemin']    = 1.0
-        lcrv['etruemax']    = 100.0
-        lcrv['etruebins']   = 5
-        lcrv['statistic']   = 'WSTAT'
-        lcrv['outfile']     = 'cslightcrv_py5.fits'
-        lcrv['logfile']     = 'cslightcrv_py5.log'
-        lcrv['chatter']     = 4
+        lcrv['inobs']         = self._offaxis_events
+        lcrv['inmodel']       = self._model_onoff
+        lcrv['srcname']       = 'Crab'
+        lcrv['caldb']         = self._caldb
+        lcrv['irf']           = self._irf
+        lcrv['tbinalg']       = 'LIN'
+        lcrv['tmin']          = '2020-01-01T00:00:00'
+        lcrv['tmax']          = '2020-01-01T00:05:00'
+        lcrv['tbins']         = 2
+        lcrv['method']        = 'ONOFF'
+        lcrv['use_model_bkg'] = False  # Needed even if WSTAT
+        lcrv['emin']          = 1.0
+        lcrv['emax']          = 100.0
+        lcrv['enumbins']      = 2
+        lcrv['coordsys']      = 'CEL'
+        lcrv['xref']          = 83.63
+        lcrv['yref']          = 22.01
+        lcrv['rad']           = 0.2
+        lcrv['etruemin']      = 1.0
+        lcrv['etruemax']      = 100.0
+        lcrv['etruebins']     = 5
+        lcrv['statistic']     = 'WSTAT'
+        lcrv['outfile']       = 'cslightcrv_py5.fits'
+        lcrv['logfile']       = 'cslightcrv_py5.log'
+        lcrv['chatter']       = 4
 
         # Execute cslightcrv script
         lcrv.execute()

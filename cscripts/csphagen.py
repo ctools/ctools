@@ -47,7 +47,9 @@ class csphagen(ctools.csobservation):
         self._etruebounds   = gammalib.GEbounds()
         self._src_dir       = gammalib.GSkyDir()
         self._src_reg       = gammalib.GSkyRegions()
-        self._src_model     = None
+        self._models        = gammalib.GModels()
+        self._srcname       = ''
+        self._use_model_bkg = True
         self._bkg_regs      = []
         self._excl_reg      = None
         self._has_exclusion = False
@@ -69,18 +71,20 @@ class csphagen(ctools.csobservation):
             Pickled instance
         """
         # Set pickled dictionary
-        state = {'base'         : ctools.csobservation.__getstate__(self),
-                 'ebounds'      : self._ebounds,
-                 'etruebounds'  : self._etruebounds,
-                 'src_dir'      : self._src_dir,
-                 'src_reg'      : self._src_reg,
-                 'src_model'    : self._src_model,
-                 'bkg_regs'     : self._bkg_regs,
-                 'excl_reg'     : self._excl_reg,
-                 'has_exclusion': self._has_exclusion,
-                 'srcshape'     : self._srcshape,
-                 'rad'          : self._rad,
-                 'nthreads'     : self._nthreads}
+        state = {'base'          : ctools.csobservation.__getstate__(self),
+                 'ebounds'       : self._ebounds,
+                 'etruebounds'   : self._etruebounds,
+                 'src_dir'       : self._src_dir,
+                 'src_reg'       : self._src_reg,
+                 'models'        : self._models,
+                 'srcname'       : self._srcname,
+                 'use_model_bkg' : self._use_model_bkg,
+                 'bkg_regs'      : self._bkg_regs,
+                 'excl_reg'      : self._excl_reg,
+                 'has_exclusion' : self._has_exclusion,
+                 'srcshape'      : self._srcshape,
+                 'rad'           : self._rad,
+                 'nthreads'      : self._nthreads}
 
         # Return pickled dictionary
         return state
@@ -99,7 +103,9 @@ class csphagen(ctools.csobservation):
         self._etruebounds   = state['etruebounds']
         self._src_dir       = state['src_dir']
         self._src_reg       = state['src_reg']
-        self._src_model     = state['src_model']
+        self._models        = state['models']
+        self._srcname       = state['srcname']
+        self._use_model_bkg = state['use_model_bkg']
         self._bkg_regs      = state['bkg_regs']
         self._excl_reg      = state['excl_reg']
         self._has_exclusion = state['has_exclusion']
@@ -157,8 +163,8 @@ class csphagen(ctools.csobservation):
             self._rad = self['rad'].real()
             self._src_reg.append(gammalib.GSkyRegionCircle(self._src_dir, self._rad))
 
-        # Query usage of IRF background template
-        self['use_irf_bkg'].boolean()
+        # Query usage of background model
+        self['use_model_bkg'].boolean()
 
         # Return
         return
@@ -223,19 +229,23 @@ class csphagen(ctools.csobservation):
         """
         Get parameters from parfile and setup observations
         """
+        # Clear source models
+        self._models.clear()
+
         # Setup observations (require response and allow event list, don't
         # allow counts cube)
         self._setup_observations(self.obs(), True, True, False)
 
-        # Get spatial component of source model if an input model is defined
+        # Get source model and source name. First try to extract models from
+        # observation container. If this does not work then try creating
+        # model from the inmodel parameter
         if self.obs().models().size() > 0:
-            name            = self['srcname'].string()
-            self._src_model = self.obs().models()[name].spatial().clone()
+            self._models  = self.obs().models().clone()
+            self._srcname = self['srcname'].string()
         elif self['inmodel'].is_valid():
             inmodel         = self['inmodel'].filename()
-            models          = gammalib.GModels(inmodel)
-            name            = self['srcname'].string()
-            self._src_model = models[name].spatial().clone()
+            self._models    = gammalib.GModels(inmodel)
+            self._srcname   = self['srcname'].string()
 
         # Set energy bounds
         self._ebounds = self._create_ebounds()
@@ -273,6 +283,16 @@ class csphagen(ctools.csobservation):
 
         # Set number of processes for multiprocessing
         self._nthreads = mputils.nthreads(self)
+
+        # If we have no model then create now a dummy model
+        if self._models.is_empty():
+            spatial  = gammalib.GModelSpatialPointSource(self._src_dir)
+            spectral = gammalib.GModelSpectralPlaw()
+            model    = gammalib.GModelSky(spatial, spectral)
+            model.name('Dummy')
+            self._models.append(model)
+            self._srcname       = 'Dummy'
+            self._use_model_bkg = False
 
         # Return
         return
@@ -481,21 +501,22 @@ class csphagen(ctools.csobservation):
             bkg_reg = self._set_background_regions(obs)
 
             # Get IRF background template usage flag
-            use_irf_bkg = self['use_irf_bkg'].boolean()
-            if not use_irf_bkg:
-                self._log_string(gammalib.NORMAL, 'IRF background template '
-                                 'not used, assume constant backround rate.')
+            use_model_bkg = self['use_model_bkg'].boolean()
+            if not use_model_bkg:
+                self._log_string(gammalib.NORMAL, 'Background model not used, '
+                                 'assume constant backround rate.')
 
             # If there are background regions then create On/Off observation
             # and append it to the output container
             if bkg_reg.size() >= self['bkgregmin'].integer():
                 onoff = gammalib.GCTAOnOffObservation(obs,
-                                                      self._src_model,
+                                                      self._models,
+                                                      self._srcname,
                                                       self._etruebounds,
                                                       self._ebounds,
                                                       self._src_reg,
                                                       bkg_reg,
-                                                      use_irf_bkg)
+                                                      use_model_bkg)
                 onoff.id(obs.id())
 
             else:
@@ -577,10 +598,6 @@ class csphagen(ctools.csobservation):
         # Initialise run variables
         outobs         = gammalib.GObservations()
         self._bkg_regs = []
-
-        # Set spatial model
-        if self._src_model == None:
-            self._src_model = gammalib.GModelSpatialPointSource(self._src_dir)
 
         # If there is more than one observation and we use multiprocessing
         if self._nthreads > 1 and self.obs().size() > 1:

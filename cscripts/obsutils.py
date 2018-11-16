@@ -809,13 +809,13 @@ def get_onoff_obs(cls, obs, nthreads=0):
     if cls._logExplicit():
         cls._log.header3('Creating On/Off observations')
 
-    # Initialise inmodel, srcname, inexclusion and use_irf_bkg
-    inmodel     = 'NONE'
-    srcname     = ''
-    inexclusion = 'NONE'
-    use_irf_bkg = True
+    # Initialise inmodel, srcname, inexclusion and use_model_bkg
+    inmodel       = 'NONE'
+    srcname       = ''
+    inexclusion   = 'NONE'
+    use_model_bkg = True
 
-    # Set inmodel, srcname, inexclusion and use_irf_bkg if they are available
+    # Set inmodel, srcname, inexclusion and use_model_bkg if they are available
     if cls.has_par('inmodel'):
         if cls['inmodel'].is_valid():
             inmodel = cls['inmodel'].value()
@@ -824,8 +824,8 @@ def get_onoff_obs(cls, obs, nthreads=0):
     if cls.has_par('inexclusion'):
         if cls['inexclusion'].is_valid():
             inexclusion = cls['inexclusion'].value()
-    if cls.has_par('use_irf_bkg'):
-        use_irf_bkg = cls['use_irf_bkg'].boolean()
+    if cls.has_par('use_model_bkg'):
+        use_model_bkg = cls['use_model_bkg'].boolean()
 
     # Create On/Off observations
     phagen = cscripts.csphagen(obs)
@@ -849,16 +849,16 @@ def get_onoff_obs(cls, obs, nthreads=0):
     phagen['bkgmethod'] = cls['bkgmethod'].string()
     if cls['bkgmethod'].string() == 'REFLECTED':
         phagen['bkgregmin'] = cls['bkgregmin'].integer()
-    phagen['use_irf_bkg'] = use_irf_bkg
-    phagen['maxoffset']   = cls['maxoffset'].real()
-    phagen['stack']       = True
-    phagen['etruemin']    = cls['etruemin'].real()
-    phagen['etruemax']    = cls['etruemax'].real()
-    phagen['etruebins']   = cls['etruebins'].integer()
-    phagen['chatter']     = cls['chatter'].integer()
-    phagen['clobber']     = cls['clobber'].boolean()
-    phagen['debug']       = cls['debug'].boolean()
-    phagen['nthreads']    = nthreads
+    phagen['use_model_bkg'] = use_model_bkg
+    phagen['maxoffset']     = cls['maxoffset'].real()
+    phagen['stack']         = True
+    phagen['etruemin']      = cls['etruemin'].real()
+    phagen['etruemax']      = cls['etruemax'].real()
+    phagen['etruebins']     = cls['etruebins'].integer()
+    phagen['chatter']       = cls['chatter'].integer()
+    phagen['clobber']       = cls['clobber'].boolean()
+    phagen['debug']         = cls['debug'].boolean()
+    phagen['nthreads']      = nthreads
     phagen.run()
 
     # Clone resulting observation container

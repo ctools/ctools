@@ -7,6 +7,7 @@
         Apply event bin weighting in ctmodel for stacked computation (#2721)
         Enable ctbin to produce counts cubes for a joint binned analysis (#2714)
         Add Jupyter notebooks for H.E.S.S. DR1 (#2712)
+        csphagen now supports any kind of background model (#2710)
         Add code generator (#2709)
         Add csbkgmodel script (#2694)
         Compute DETX and DETY in ctmodel if they are not available (#2694)
@@ -16,11 +17,11 @@
         Account for varying energy thresholds in ctbin weight computation (#2685)
         Add ctbkgcube::cntcube() method (#2685)
         Avoid ctselect error in case that RoI radius is unchanged (#2682)
-        Add "use_irf_bkg" parameter to cslightcrv
+        Add "use_model_bkg" parameter to cslightcrv
         Add "like_accuracy" parameter to likelihood tools and scripts (#2662)
         Do not skip bins with zero counts in csspec (#2671)
         Use "ENERG" instead of "ETRUE" in energy dispersion axis names in csroot2caldb (#2670)
-        Add hidden "use_irf_bkg" parameter to csphagen (#2659)
+        Add hidden "use_model_bkg" parameter to csphagen (#2659)
         Use full RMF true energy range for On/Off analysis in csspec (#2656)
         Defer import of ROOT module in csroot2caldb to run method (#2652)
         Transparently update parameter files (#2513)
