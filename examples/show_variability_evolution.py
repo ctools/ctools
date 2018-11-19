@@ -70,9 +70,13 @@ def plot_variability_evolution(filename, plotfile, srcname):
 
     axarr[0].plot(table_c_gti, table_c_sig)
     axarr[0].set_title('Significance evolution')
+    axarr[0].set_xlabel('MJD')
+    axarr[0].set_ylabel('Significance')
 
     axarr[1].hist(table_c_sig, 20, range=[min(table_c_sig), max(table_c_sig)], histtype='stepfilled', facecolor='g', alpha=0.75)
     axarr[1].set_title('Significance distribution')
+    axarr[1].set_xlabel('Significance')
+    axarr[1].set_ylabel('Counts')
     
     #IT SEEMS THAT THE LOG SCALE IS NOT WORKING WELL !!!!!! 
     #axarr[1].gca().set_yscale('log')
