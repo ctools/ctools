@@ -571,11 +571,11 @@ class Test(test):
         # Check result
         self.test_value(res['expcube'].cube().npix(), 100,
                         'Check number of exposure cube pixels')
-        self.test_value(res['expcube'].cube().nmaps(), 61,
+        self.test_value(res['expcube'].cube().nmaps(), 75,
                         'Check number of exposure cube maps')
         self.test_value(res['psfcube'].cube().npix(), 4,
                         'Check number of PSF cube pixels')
-        self.test_value(res['psfcube'].cube().nmaps(), 12200,
+        self.test_value(res['psfcube'].cube().nmaps(), 15000,
                         'Check number of PSF cube maps')
         self.test_value(res['bkgcube'].cube().npix(), 100,
                         'Check number of background cube pixels')
@@ -583,7 +583,7 @@ class Test(test):
                         'Check number of background cube maps')
         self.test_value(res['edispcube'].cube().npix(), 4,
                         'Check number of energy dispersion cube pixels')
-        self.test_value(res['edispcube'].cube().nmaps(), 6100,
+        self.test_value(res['edispcube'].cube().nmaps(), 7500,
                         'Check number of energy dispersion cube maps')
 
         # Return
