@@ -73,7 +73,6 @@ protected:
     // User parameters
     GFilename          m_outcube;     //!< Filename of output cube
     GFilename          m_outmodel;    //!< Filename of output XML model
-    bool               m_addbounds;   //!< Add energies at boundaries?
     bool               m_publish;     //!< Publish background cube?
     GChatter           m_chatter;     //!< Chattiness
 

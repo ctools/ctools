@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-16 November 2018
+22 November 2018
 
 
 Introduction
@@ -83,6 +83,11 @@ Copy the time reference from the first input observation (#2054).
 
 ctbkgcube - CTA background cube generation
 ------------------------------------------
+The tool now required a counts cube on input, either specified via the
+ctbkgcube::cntcube() method or the "incube" parameter. This assures that the
+background cube has the same dimension as the counts cube. All spatial and
+spectral binning parameters were removed from the parameter file (#2763).
+
 Add ctbkgcube::cntcube() method so that a counts cube be specified as
 instance before running the tool. This avoids storing the counts cube on
 disk if the counts cube definition should be used to generate a background

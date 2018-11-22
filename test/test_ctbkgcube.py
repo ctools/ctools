@@ -67,14 +67,11 @@ class Test(test):
 
         # Setup ctbkgcube command
         cmd = ctbkgcube+' inobs="'+self._events+'"'+ \
+                        ' incube="'+self._cntcube+'"'+ \
                         ' inmodel="'+self._model+'"'+ \
-                        ' incube="NONE"'+ \
                         ' outcube="ctbkgcube_cmd1.fits"'+ \
                         ' outmodel="ctbkgcube_cmd1.xml"'+ \
                         ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                        ' ebinalg="LOG" emin=1.0 emax=100.0 enumbins=5'+ \
-                        ' nxpix=10 nypix=10 binsz=0.4'+ \
-                        ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                         ' logfile="ctbkgcube_cmd1.log" chatter=1'
 
         # Check if execution was successful
@@ -86,14 +83,11 @@ class Test(test):
 
         # Setup ctbkgcube command
         cmd = ctbkgcube+' inobs="event_file_that_does_not_exist.fits"'+ \
+                        ' incube="'+self._cntcube+'"'+ \
                         ' inmodel="'+self._model+'"'+ \
-                        ' incube="NONE"'+ \
                         ' outcube="ctbkgcube_cmd2.fits"'+ \
                         ' outmodel="ctbkgcube_cmd2.xml"'+ \
                         ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                        ' ebinalg="LOG" emin=1.0 emax=100.0 enumbins=5'+ \
-                        ' nxpix=10 nypix=10 binsz=0.4'+ \
-                        ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                         ' logfile="ctbkgcube_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
@@ -153,21 +147,10 @@ class Test(test):
 
         # Now set ctbkgcube parameters
         bkgcube['inobs']    = self._events
+        bkgcube['incube']   = self._cntcube
         bkgcube['inmodel']  = self._model
-        bkgcube['incube']   = 'NONE'
         bkgcube['caldb']    = self._caldb
         bkgcube['irf']      = self._irf
-        bkgcube['ebinalg']  = 'LOG'
-        bkgcube['emin']     = 1.0
-        bkgcube['emax']     = 100.0
-        bkgcube['enumbins'] = 5
-        bkgcube['nxpix']    = 10
-        bkgcube['nypix']    = 10
-        bkgcube['binsz']    = 0.4
-        bkgcube['coordsys'] = 'CEL'
-        bkgcube['proj']     = 'CAR'
-        bkgcube['xref']     = 83.63
-        bkgcube['yref']     = 22.01
         bkgcube['outcube']  = 'ctbkgcube_py3.fits'
         bkgcube['outmodel'] = 'ctbkgcube_py3.xml'
         bkgcube['logfile']  = 'ctbkgcube_py3.log'
@@ -189,15 +172,12 @@ class Test(test):
         self._check_models(cpy_bkgcube.models())
 
         # Execute copy of ctbkgcube tool again, now with a higher chatter
-        # level than before. In addition, use counts cube to define the
-        # background cube
-        cpy_bkgcube['incube']    = self._cntcube
-        cpy_bkgcube['outcube']   = 'ctbkgcube_py4.fits'
-        cpy_bkgcube['outmodel']  = 'ctbkgcube_py4.xml'
-        cpy_bkgcube['logfile']   = 'ctbkgcube_py4.log'
-        cpy_bkgcube['chatter']   = 3
-        cpy_bkgcube['publish']   = True
-        cpy_bkgcube['addbounds'] = True
+        # level than before. In addition, publish the background cube.
+        cpy_bkgcube['outcube']  = 'ctbkgcube_py4.fits'
+        cpy_bkgcube['outmodel'] = 'ctbkgcube_py4.xml'
+        cpy_bkgcube['logfile']  = 'ctbkgcube_py4.log'
+        cpy_bkgcube['chatter']  = 3
+        cpy_bkgcube['publish']  = True
         cpy_bkgcube.logFileOpen()   # Make sure we get a log file
         cpy_bkgcube.execute()
 
@@ -218,25 +198,13 @@ class Test(test):
 
         # Set-up ctbkgcube from observation container
         bkgcube = ctools.ctbkgcube(obs)
-        bkgcube['incube']    = ''
-        bkgcube['caldb']     = self._caldb
-        bkgcube['irf']       = self._irf
-        bkgcube['ebinalg']   = 'LOG'
-        bkgcube['emin']      = 0.2
-        bkgcube['emax']      = 150.0
-        bkgcube['enumbins']  = 5
-        bkgcube['nxpix']     = 10
-        bkgcube['nypix']     = 10
-        bkgcube['binsz']     = 0.4
-        bkgcube['coordsys']  = 'CEL'
-        bkgcube['proj']      = 'CAR'
-        bkgcube['xref']      = 83.63
-        bkgcube['yref']      = 22.01
-        bkgcube['outcube']   = 'ctbkgcube_py5.fits'
-        bkgcube['outmodel']  = 'ctbkgcube_py5.xml'
-        bkgcube['logfile']   = 'ctbkgcube_py5.log'
-        bkgcube['addbounds'] = True
-        bkgcube['chatter']   = 4
+        bkgcube['incube']   = self._cntcube
+        bkgcube['caldb']    = self._caldb
+        bkgcube['irf']      = self._irf
+        bkgcube['outcube']  = 'ctbkgcube_py5.fits'
+        bkgcube['outmodel'] = 'ctbkgcube_py5.xml'
+        bkgcube['logfile']  = 'ctbkgcube_py5.log'
+        bkgcube['chatter']  = 4
 
         # Execute ctbkgcube tool
         bkgcube.logFileOpen()   # Make sure we get a log file
@@ -306,6 +274,6 @@ class Test(test):
         """
         # Check number of models
         self.test_value(models.size(), nmodels, 'Check number of models')
-        
+
         # Return
         return

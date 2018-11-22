@@ -1,8 +1,9 @@
-2018-11-16
+2018-11-22
 
         * Version 1.6.0 released
         ========================
 
+        ctbkgcube now requires an input counts cube (#2763)
         CTA background rates are now per ontime (#2758)
         Apply event bin weighting in ctmodel for stacked computation (#2721)
         Enable ctbin to produce counts cubes for a joint binned analysis (#2714)

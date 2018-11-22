@@ -18,21 +18,14 @@ background counts in each background cube bin.
 
 :ref:`ctbkgcube` requires on input the event list or observation definition file
 that has been used in the generation of the counts cube using :doc:`ctbin`.
-
-To assure consistency between an existing counts cube and the 
-corresponding background cube, it is recommended to specify the counts 
-cube as ``incube`` parameter. This will instruct ctbkgcube to extract the 
-background cube definition (such as sky coordinates and projection, number 
-of pixels, pixel scale, energy binning) from the counts cube.
-
-Note that there should at least be 25 bins per energy decade in the background
-cube to assure that the energy dependence of the background rate is sufficiently
-well sampled (in particular at low energies).
+To assure consistency between an existing counts cube and the
+corresponding background cube, the counts cube needs also to be specified via
+the ``incube`` parameter.
 
 :ref:`ctbkgcube` generates a background cube FITS file comprising two extensions.
 The primary extension contains a 3-dimensional image that contains the 
-background cube values. The next extension named ``ENERGIES`` contains a
-binary table that defines the energies of the background cube.
+background cube values. The next extension named ``EBOUNDS`` contains a
+binary table that defines the energy boundaries of the background cube.
 
 :ref:`ctbkgcube` generates also an output model XML file that can serve as input 
 for a maximum likelihood analysis. The output model XML file is a copy of
@@ -53,11 +46,11 @@ General parameters
 ``inobs [file]``
     Input event list or observation definition XML file.
 
-``inmodel [file]``
-    Input model XML file.
-
 ``incube [file]``
     Input counts cube file to extract background cube definition.
+
+``inmodel [file]``
+    Input model XML file.
 
 ``caldb [string]``
     Calibration database.
@@ -70,55 +63,6 @@ General parameters
 
 ``outmodel [file]``
     Output model XML file.
-
-``ebinalg <FILE|LIN|LOG> [string]``
-    Algorithm for defining energy bins. For ``FILE``, the energy bins are defined
-    in a FITS file that is specified by the ``ebinfile`` parameter, for ``LIN``
-    and ``LOG`` there will be ``enumbins`` energy bins spaced linearly or
-    logarithmically between ``emin`` and ``emax``, respectively.
-
-``emin [real]``
-    Lower energy value for first energy bin (in TeV) if ``LIN`` or ``LOG``
-    energy binning algorithms are used.
-
-``emax [real]``
-    Upper energy value for last energy bin (in TeV) if ``LIN`` or ``LOG``
-    energy binning algorithms are used.
-
-``enumbins [integer]``
-    Number of energy bins if ``LIN`` or ``LOG`` energy binning algorithms are
-    used.
-
-``ebinfile [file]``
-    Name of the file containing the energy binning definition if ``ebinalg=FILE``.
-    You may use :ref:`csebins` to generate a file with appropriate energy binning.
-
-``(addbounds = no) [boolean]``
-    Add energies to the background cube at the observation energy boundaries?
-
-``(usepnt = no) [boolean]``
-    Use CTA pointing direction for cube centre instead of xref/yref parameters?
-
-``nxpix [integer]``
-    Number of cube bins in Right Ascension or Galactic longitude.
-
-``nypix [integer]``
-    Number of cube bins in Declination or Galactic latitude.
-
-``binsz [real]``
-    Cube bin size (in degrees/pixel).
-
-``coordsysL <CEL|GAL> [string]``
-    Coordinate system (CEL - celestial, GAL - galactic).
-
-``proj <AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN> [string]``
-    Projection method.
-
-``xref [real]``
-    Right Ascension / Galactic longitude of cube centre (J2000, in degrees).
-
-``yref [real]``
-    Declination / Galactic latitude of cube centre (J2000, in degrees).
 
 
 Standard parameters

@@ -438,7 +438,6 @@ void ctbkgcube::init_members(void)
     // Initialise user parameters
     m_outcube.clear();
     m_outmodel.clear();
-    m_addbounds = true;
     m_publish   = false;
     m_chatter   = static_cast<GChatter>(2);
 
@@ -463,7 +462,6 @@ void ctbkgcube::copy_members(const ctbkgcube& app)
     // Copy user parameters
     m_outmodel  = app.m_outmodel;
     m_outcube   = app.m_outcube;
-    m_addbounds = app.m_addbounds;
     m_publish   = app.m_publish;
     m_chatter   = app.m_chatter;
 
@@ -500,17 +498,9 @@ void ctbkgcube::get_parameters(void)
     // event lists, but do not accept counts cubes.
     setup_observations(m_obs, true, true, false);
 
-    // If there is a valid event cube than use it for construction.
-    // Otherwise check if "incube" file name is valid then use the specified
-    // counts cube. Otherwise create a counts cube from the user
-    // parameters
+    // If no counts cube exists then load one from the "incube" filename
     if (m_cube.size() == 0) {
-        if ((*this)["incube"].is_valid()) {
-            m_cube = GCTAEventCube((*this)["incube"].filename());
-        }
-        else {
-            m_cube = create_cube(m_obs);
-        }
+        m_cube = GCTAEventCube((*this)["incube"].filename());
     }
 
     // Define background cube
@@ -520,9 +510,8 @@ void ctbkgcube::get_parameters(void)
     setup_models(m_obs);
 
     // Get remaining parameters
-    m_addbounds = (*this)["addbounds"].boolean();
-    m_publish   = (*this)["publish"].boolean();
-    m_chatter   = static_cast<GChatter>((*this)["chatter"].integer());
+    m_publish = (*this)["publish"].boolean();
+    m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
 
     // If needed later, query output filenames now
     if (read_ahead()) {

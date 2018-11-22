@@ -379,7 +379,7 @@ class Test(test):
 
         # Setup one CTA observation
         res = obsutils.set_obs(pnt, emin=1.0, emax=10.0)
-        
+
         # Check result
         self.test_value(res.eventtype(), 'EventList', 'Check event type')
         self.test_value(res.events().ebounds().emin().TeV(), 1.0,
@@ -498,84 +498,44 @@ class Test(test):
         # Set-up observation container
         obs = self._setup_sim()
 
-        # Get stacked response with xref/yref set
-        res = obsutils.get_stacked_response(obs, 83.6331, 22.0145,
-                                            coordsys='CEL',
-                                            binsz=0.1, nxpix=10, nypix=10,
-                                            emin=1.0, emax=100.0, enumbins=5,
-                                            edisp=False)
+        # Set-up counts cube
+        map     = gammalib.GSkyMap('CAR','CEL',83.6331,22.0145,0.1,0.1,10,10,5)
+        emin    = gammalib.GEnergy(0.1, 'TeV')
+        emax    = gammalib.GEnergy(100.0, 'TeV')
+        ebds    = gammalib.GEbounds(5, emin, emax)
+        tmin    = gammalib.GTime(0.0)
+        tmax    = gammalib.GTime(1000.0)
+        gti     = gammalib.GGti(tmin, tmax)
+        cntcube = gammalib.GCTAEventCube(map, ebds, gti)
+
+        # Get stacked response
+        res = obsutils.get_stacked_response(obs, cntcube, edisp=False)
 
         # Check result
         self.test_value(res['expcube'].cube().npix(), 100,
                         'Check number of exposure cube pixels')
-        self.test_value(res['expcube'].cube().nmaps(), 61,
+        self.test_value(res['expcube'].cube().nmaps(), 91,
                         'Check number of exposure cube maps')
         self.test_value(res['psfcube'].cube().npix(), 4,
                         'Check number of PSF cube pixels')
-        self.test_value(res['psfcube'].cube().nmaps(), 12200,
+        self.test_value(res['psfcube'].cube().nmaps(), 18200,
                         'Check number of PSF cube maps')
         self.test_value(res['bkgcube'].cube().npix(), 100,
                         'Check number of background cube pixels')
         self.test_value(res['bkgcube'].cube().nmaps(), 5,
-                        'Check number of background cube maps')
-
-        # Get stacked response with None xref/yref
-        res = obsutils.get_stacked_response(obs, None, None,
-                                            coordsys='CEL',
-                                            binsz=0.1, nxpix=10, nypix=10,
-                                            emin=1.0, emax=100.0, enumbins=5,
-                                            edisp=False)
-
-        # Check result
-        self.test_value(res['expcube'].cube().npix(), 100,
-                        'Check number of exposure cube pixels')
-        self.test_value(res['expcube'].cube().nmaps(), 61,
-                        'Check number of exposure cube maps')
-        self.test_value(res['psfcube'].cube().npix(), 4,
-                        'Check number of PSF cube pixels')
-        self.test_value(res['psfcube'].cube().nmaps(), 12200,
-                        'Check number of PSF cube maps')
-        self.test_value(res['bkgcube'].cube().npix(), 100,
-                        'Check number of background cube pixels')
-        self.test_value(res['bkgcube'].cube().nmaps(), 5,
-                        'Check number of background cube maps')
-
-        # Get stacked response with xref/yref set and large number of energy bins
-        res = obsutils.get_stacked_response(obs, 83.6331, 22.0145,
-                                            coordsys='CEL',
-                                            binsz=0.1, nxpix=10, nypix=10,
-                                            emin=1.0, emax=100.0, enumbins=100,
-                                            edisp=False)
-
-        # Check result
-        self.test_value(res['expcube'].cube().npix(), 100,
-                        'Check number of exposure cube pixels')
-        self.test_value(res['expcube'].cube().nmaps(), 101,
-                        'Check number of exposure cube maps')
-        self.test_value(res['psfcube'].cube().npix(), 4,
-                        'Check number of PSF cube pixels')
-        self.test_value(res['psfcube'].cube().nmaps(), 20200,
-                        'Check number of PSF cube maps')
-        self.test_value(res['bkgcube'].cube().npix(), 100,
-                        'Check number of background cube pixels')
-        self.test_value(res['bkgcube'].cube().nmaps(), 100,
                         'Check number of background cube maps')
 
         # Get stacked response with energy dispersion
-        res = obsutils.get_stacked_response(obs, 83.6331, 22.0145,
-                                            coordsys='CEL',
-                                            binsz=0.1, nxpix=10, nypix=10,
-                                            emin=1.0, emax=100.0, enumbins=5,
-                                            edisp=True)
+        res = obsutils.get_stacked_response(obs, cntcube, edisp=True)
 
         # Check result
         self.test_value(res['expcube'].cube().npix(), 100,
                         'Check number of exposure cube pixels')
-        self.test_value(res['expcube'].cube().nmaps(), 75,
+        self.test_value(res['expcube'].cube().nmaps(), 105,
                         'Check number of exposure cube maps')
         self.test_value(res['psfcube'].cube().npix(), 4,
                         'Check number of PSF cube pixels')
-        self.test_value(res['psfcube'].cube().nmaps(), 15000,
+        self.test_value(res['psfcube'].cube().nmaps(), 21000,
                         'Check number of PSF cube maps')
         self.test_value(res['bkgcube'].cube().npix(), 100,
                         'Check number of background cube pixels')
@@ -583,8 +543,29 @@ class Test(test):
                         'Check number of background cube maps')
         self.test_value(res['edispcube'].cube().npix(), 4,
                         'Check number of energy dispersion cube pixels')
-        self.test_value(res['edispcube'].cube().nmaps(), 7500,
+        self.test_value(res['edispcube'].cube().nmaps(), 10500,
                         'Check number of energy dispersion cube maps')
+
+        # Set-up counts cube with large number of energy bins
+        ebds    = gammalib.GEbounds(100, emin, emax)
+        cntcube = gammalib.GCTAEventCube(map, ebds, gti)
+
+        # Get stacked response with xref/yref set and large number of energy bins
+        res = obsutils.get_stacked_response(obs, cntcube, edisp=False)
+
+        # Check result
+        self.test_value(res['expcube'].cube().npix(), 100,
+                        'Check number of exposure cube pixels')
+        self.test_value(res['expcube'].cube().nmaps(), 91,
+                        'Check number of exposure cube maps')
+        self.test_value(res['psfcube'].cube().npix(), 4,
+                        'Check number of PSF cube pixels')
+        self.test_value(res['psfcube'].cube().nmaps(), 18200,
+                        'Check number of PSF cube maps')
+        self.test_value(res['bkgcube'].cube().npix(), 100,
+                        'Check number of background cube pixels')
+        self.test_value(res['bkgcube'].cube().nmaps(), 100,
+                        'Check number of background cube maps')
 
         # Return
         return

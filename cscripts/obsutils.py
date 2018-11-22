@@ -185,14 +185,10 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
                 # proper background cube.
                 cntcube = binning.cube()
 
-                # Get stacked response (use pointing for map centre)
-                response = get_stacked_response(obssim.obs(), None, None,
-                                                binsz=binsz, nxpix=npix, nypix=npix,
-                                                emin=emin, emax=emax, enumbins=nbins,
+                # Get stacked response
+                response = get_stacked_response(obssim.obs(), cntcube,
                                                 edisp=edisp,
-                                                coordsys=coord, proj=proj,
                                                 addbounds=addbounds,
-                                                cntcube=cntcube,
                                                 log=log, debug=debug,
                                                 chatter=chatter)
 
@@ -519,50 +515,24 @@ def set_observations(ra, dec, rad, tstart, duration, emin, emax, irf, caldb,
 # ==================== #
 # Get stacked response #
 # ==================== #
-def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
-                         emin=0.1, emax=100.0, enumbins=20, edisp=False,
-                         coordsys='GAL', proj='TAN', addbounds=False,
-                         cntcube=None, log=False, debug=False, chatter=2):
+def get_stacked_response(obs, cntcube, edisp=False, addbounds=False,
+                         log=False, debug=False, chatter=2):
     """
     Get stacked response cubes
 
-    The number of energies bins are set to at least 30 bins per decade, and
-    the "enumbins" parameter is only used if the number of bins is larger
-    than 30 bins per decade.
-
-    If the xref or yref arguments are "None" the response cube centre will be
-    determined from the pointing information in the observation container.
+    The number of energies bins are set to at least 30 bins per decade, unless
+    the counts cube has more energy bins per decade.
 
     Parameters
     ----------
     obs : `~gammalib.GObservations`
         Observation container
-    xref : float
-        Right Ascension or Galactic longitude of response centre (deg)
-    yref : float
-        Declination or Galactic latitude of response centre (deg)
-    binsz : float, optional
-        Pixel size (deg/pixel)
-    nxpix : int, optional
-        Number of pixels in X direction
-    nypix : int, optional
-        Number of pixels in Y direction
-    emin : float, optional
-        Minimum energy (TeV)
-    emax : float, optional
-        Maximum energy (TeV)
-    enumbins : int, optional
-        Number of energy bins
+    cntcube : `~gammalib.GCTAEventCube`
+        Counts cube
     edisp : bool, optional
         Apply energy dispersion?
-    coordsys : str, optional
-        Coordinate system
-    proj : str, optional
-        Projection
     addbounds : bool, optional
         Add boundaries at observation energies
-    cntcube : `~gammalib.GCTAEventCube`, optional
-        Counts cube
     log : bool, optional
         Create log file(s)
     debug : bool, optional
@@ -575,26 +545,32 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     result : dict
         Dictionary of response cubes
     """
-    # If no xref and yref arguments have been specified then use the pointing
-    # information
-    if xref == None or yref == None:
-        usepnt = True
-    else:
-        usepnt = False
+    # Derive binning parameters from counts cube
+    xref     = cntcube.counts().projection().crval(0)
+    yref     = cntcube.counts().projection().crval(1)
+    binsz    = cntcube.counts().projection().cdelt(1)
+    coordsys = cntcube.counts().projection().coordsys()
+    proj     = cntcube.counts().projection().code()
+    nxpix    = cntcube.nx()
+    nypix    = cntcube.ny()
+    emin     = cntcube.emin().TeV()
+    emax     = cntcube.emax().TeV()
+    ebins    = cntcube.ebins()
+
+    # Translate coordinate system
+    if coordsys == 'EQU':
+        coordsys = 'CEL'
 
     # Set energy limits, with larger etrue limits for the case that energy
     # dispersion is requested
     if edisp:
-        _emin = 0.5 * emin
-        _emax = 1.5 * emax
-    else:
-        _emin = emin
-        _emax = emax
+        emin *= 0.5
+        emax *= 1.5
 
     # Set number of energy bins to at least 30 per energy decade
-    _enumbins = int((math.log10(_emax) - math.log10(_emin)) * 30.0)
-    if enumbins > _enumbins:
-        _enumbins = enumbins
+    enumbins = int((math.log10(emax) - math.log10(emin)) * 30.0)
+    if ebins > enumbins:
+        enumbins = ebins
 
     # Compute spatial binning for point spread function and energy dispersion
     # cubes. The spatial binning is 10 times coarser than the spatial binning
@@ -606,22 +582,20 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     # Create exposure cube
     expcube = ctools.ctexpcube(obs)
     expcube['incube']    = 'NONE'
-    expcube['usepnt']    = usepnt
     expcube['ebinalg']   = 'LOG'
+    expcube['xref']      = xref
+    expcube['yref']      = yref
     expcube['binsz']     = binsz
     expcube['nxpix']     = nxpix
     expcube['nypix']     = nypix
-    expcube['enumbins']  = _enumbins
-    expcube['emin']      = _emin
-    expcube['emax']      = _emax
+    expcube['enumbins']  = enumbins
+    expcube['emin']      = emin
+    expcube['emax']      = emax
     expcube['coordsys']  = coordsys
     expcube['proj']      = proj
     expcube['addbounds'] = addbounds
     expcube['debug']     = debug
     expcube['chatter']   = chatter
-    if not usepnt:
-        expcube['xref'] = xref
-        expcube['yref'] = yref
     if log:
         expcube.logFileOpen()
     expcube.run()
@@ -629,22 +603,20 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     # Create point spread function cube
     psfcube = ctools.ctpsfcube(obs)
     psfcube['incube']    = 'NONE'
-    psfcube['usepnt']    = usepnt
     psfcube['ebinalg']   = 'LOG'
+    psfcube['xref']      = xref
+    psfcube['yref']      = yref
     psfcube['binsz']     = psf_binsz
     psfcube['nxpix']     = psf_nxpix
     psfcube['nypix']     = psf_nypix
-    psfcube['enumbins']  = _enumbins
-    psfcube['emin']      = _emin
-    psfcube['emax']      = _emax
+    psfcube['enumbins']  = enumbins
+    psfcube['emin']      = emin
+    psfcube['emax']      = emax
     psfcube['coordsys']  = coordsys
     psfcube['proj']      = proj
     psfcube['addbounds'] = addbounds
     psfcube['debug']     = debug
     psfcube['chatter']   = chatter
-    if not usepnt:
-        psfcube['xref'] = xref
-        psfcube['yref'] = yref
     if log:
         psfcube.logFileOpen()
     psfcube.run()
@@ -653,26 +625,9 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     # for the counts cube since no interpolation should be actually done
     # for the background cube.
     bkgcube = ctools.ctbkgcube(obs)
-    if cntcube != None:
-        bkgcube.cntcube(cntcube)
-    else:
-        bkgcube['incube']    = 'NONE'
-        bkgcube['ebinalg']   = 'LOG'
-        bkgcube['binsz']     = binsz
-        bkgcube['nxpix']     = nxpix
-        bkgcube['nypix']     = nypix
-        bkgcube['enumbins']  = enumbins
-        bkgcube['emin']      = emin
-        bkgcube['emax']      = emax
-        bkgcube['coordsys']  = coordsys
-        bkgcube['proj']      = proj
-        if not usepnt:
-            bkgcube['xref'] = xref
-            bkgcube['yref'] = yref
-    bkgcube['usepnt']    = usepnt
-    bkgcube['addbounds'] = addbounds
-    bkgcube['debug']     = debug
-    bkgcube['chatter']   = chatter
+    bkgcube.cntcube(cntcube)
+    bkgcube['debug']   = debug
+    bkgcube['chatter'] = chatter
     if log:
         bkgcube.logFileOpen()
     bkgcube.run()
@@ -681,22 +636,20 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     if edisp:
         edispcube = ctools.ctedispcube(obs)
         edispcube['incube']    = 'NONE'
-        edispcube['usepnt']    = usepnt
         edispcube['ebinalg']   = 'LOG'
+        edispcube['xref']      = xref
+        edispcube['yref']      = yref
         edispcube['binsz']     = psf_binsz
         edispcube['nxpix']     = psf_nxpix
         edispcube['nypix']     = psf_nypix
-        edispcube['enumbins']  = _enumbins
-        edispcube['emin']      = _emin
-        edispcube['emax']      = _emax
+        edispcube['enumbins']  = enumbins
+        edispcube['emin']      = emin
+        edispcube['emax']      = emax
         edispcube['coordsys']  = coordsys
         edispcube['proj']      = proj
         edispcube['addbounds'] = addbounds
         edispcube['debug']     = debug
         edispcube['chatter']   = chatter
-        if not usepnt:
-            edispcube['xref'] = xref
-            edispcube['yref'] = yref
         if log:
             edispcube.logFileOpen()
         edispcube.run()
@@ -756,26 +709,14 @@ def get_stacked_obs(cls, obs):
 
     # Store counts cube so that we can use it to build the background
     # cube
-    cube = cntcube.cube().copy()
+    cube = cntcube.cube()
 
     # Write header
     if cls._logExplicit():
         cls._log.header3('Creating stacked response')
 
     # Get stacked response
-    response = get_stacked_response(obs,
-                                    cls['xref'].real(),
-                                    cls['yref'].real(),
-                                    binsz=cls['binsz'].real(),
-                                    nxpix=cls['nxpix'].integer(),
-                                    nypix=cls['nypix'].integer(),
-                                    emin=cls['emin'].real(),
-                                    emax=cls['emax'].real(),
-                                    enumbins=cls['enumbins'].integer(),
-                                    edisp=cls['edisp'].boolean(),
-                                    coordsys=cls['coordsys'].string(),
-                                    proj=cls['proj'].string(),
-                                    cntcube=cube)
+    response = get_stacked_response(obs, cube, edisp=cls['edisp'].boolean())
 
     # Retrieve a new oberservation container
     new_obs = cntcube.obs().copy()
