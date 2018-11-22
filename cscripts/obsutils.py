@@ -181,6 +181,10 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
             # cubes and append them to the observation
             if len(obssim.obs()) > 1:
 
+                # Get counts cube. The counts cube is needed to obtained a
+                # proper background cube.
+                cntcube = binning.cube()
+
                 # Get stacked response (use pointing for map centre)
                 response = get_stacked_response(obssim.obs(), None, None,
                                                 binsz=binsz, nxpix=npix, nypix=npix,
@@ -188,6 +192,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
                                                 edisp=edisp,
                                                 coordsys=coord, proj=proj,
                                                 addbounds=addbounds,
+                                                cntcube=cntcube,
                                                 log=log, debug=debug,
                                                 chatter=chatter)
 
