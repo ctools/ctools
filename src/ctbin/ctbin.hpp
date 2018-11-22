@@ -99,7 +99,6 @@ protected:
     void    obs_cube_stacked(void);
 
     // User parameters
-    bool        m_usepnt;   //!< Use pointing instead of xref/yref parameters
     bool        m_stack;    //!< Output one stacked cube or multiple cubes
     std::string m_prefix;   //!< Prefix for multiple cubes
     bool        m_publish;  //!< Publish counts cube?
@@ -109,6 +108,7 @@ protected:
     std::vector<GCTAEventCube> m_cubes;    //!< Event cubes
     std::vector<GSkyMap>       m_counts;   //!< List of event cube counts
     std::vector<GSkyMap>       m_weights;  //!< List of event cube weights
+    GSkyDir                    m_mean_pnt; //!< Mean pointing
     GEbounds                   m_ebounds;  //!< Energy boundaries
     GGti                       m_gti;      //!< Stacked Good time intervals
     double                     m_ontime;   //!< Total ontime

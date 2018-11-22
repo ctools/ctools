@@ -232,7 +232,7 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.98, \
             irf='South_50h', caldb='prod2', obsid='000000', mjdref=51544.5):
     """
     Set a single CTA observation
-    
+
     The function sets a single CTA observation containing an empty CTA
     event list. By looping over this function CTA observations can be
     added to the observation container.
@@ -409,7 +409,7 @@ def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.98, \
 def set_obs_patterns(pattern, ra=83.6331, dec=22.0145, offset=1.5):
     """
     Sets a number of standard patterns
-    
+
     Parameters
     ----------
     pattern : str
@@ -466,7 +466,7 @@ def set_observations(ra, dec, rad, tstart, duration, emin, emax, irf, caldb,
                      deadc=0.98, pattern='single', offset=1.5):
     """
     Set an observation container filled with CTA observations
-    
+
     Parameters
     ----------
     ra : float
@@ -577,8 +577,17 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     else:
         usepnt = False
 
+    # Set energy limits, with larger etrue limits for the case that energy
+    # dispersion is requested
+    if edisp:
+        _emin = 0.5 * emin
+        _emax = 1.5 * emax
+    else:
+        _emin = emin
+        _emax = emax
+
     # Set number of energy bins to at least 30 per energy decade
-    _enumbins = int((math.log10(emax) - math.log10(emin)) * 30.0)
+    _enumbins = int((math.log10(_emax) - math.log10(_emin)) * 30.0)
     if enumbins > _enumbins:
         _enumbins = enumbins
 
@@ -598,8 +607,8 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     expcube['nxpix']     = nxpix
     expcube['nypix']     = nypix
     expcube['enumbins']  = _enumbins
-    expcube['emin']      = emin
-    expcube['emax']      = emax
+    expcube['emin']      = _emin
+    expcube['emax']      = _emax
     expcube['coordsys']  = coordsys
     expcube['proj']      = proj
     expcube['addbounds'] = addbounds
@@ -621,8 +630,8 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     psfcube['nxpix']     = psf_nxpix
     psfcube['nypix']     = psf_nypix
     psfcube['enumbins']  = _enumbins
-    psfcube['emin']      = emin
-    psfcube['emax']      = emax
+    psfcube['emin']      = _emin
+    psfcube['emax']      = _emax
     psfcube['coordsys']  = coordsys
     psfcube['proj']      = proj
     psfcube['addbounds'] = addbounds
@@ -673,8 +682,8 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
         edispcube['nxpix']     = psf_nxpix
         edispcube['nypix']     = psf_nypix
         edispcube['enumbins']  = _enumbins
-        edispcube['emin']      = emin
-        edispcube['emax']      = emax
+        edispcube['emin']      = _emin
+        edispcube['emax']      = _emax
         edispcube['coordsys']  = coordsys
         edispcube['proj']      = proj
         edispcube['addbounds'] = addbounds
@@ -723,7 +732,7 @@ def get_stacked_obs(cls, obs):
     # Write header
     if cls._logExplicit():
         cls._log.header3('Binning events')
-    
+
     # Bin events
     cntcube = ctools.ctbin(obs)
     cntcube['usepnt']   = False

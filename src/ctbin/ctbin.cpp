@@ -247,11 +247,20 @@ void ctbin::run(void)
 
     // Find all unbinned CTA observations in m_obs
     std::vector<GCTAObservation*> obs_list(0);
+    double                        mean_ra  = 0.0;
+    double                        mean_dec = 0.0;
     for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
             obs = next_unbinned_observation()) {
 
         // Push observation into list
         obs_list.push_back(obs);
+
+        // Get pointing
+        const GCTAPointing& pnt = obs->pointing();
+
+        // Add to coordinates
+        mean_ra  += pnt.dir().ra_deg();
+        mean_dec += pnt.dir().dec_deg();
 
         // Write message
         std::string msg = " Including unbinned "+obs->instrument()+
@@ -262,6 +271,13 @@ void ctbin::run(void)
 
     // Set number of relevant observations
     int nobs = obs_list.size();
+
+    // Compute mean pointing
+    if (nobs > 0) {
+        mean_ra  /= double(nobs);
+        mean_dec /= double(nobs);
+        m_mean_pnt.radec_deg(mean_ra, mean_dec);
+    }
 
     // Initialise arrays
     if (nobs > 0) {
@@ -274,6 +290,13 @@ void ctbin::run(void)
         m_weights.clear();
         m_cubes.clear();
     }
+
+    // Log observation selection results
+    std::string use = (*this)["usepnt"].boolean() ? "yes" : "no";
+    log_header3(NORMAL, "Summary");
+    log_value(NORMAL, "Number of observations", nobs);
+    log_value(NORMAL, "Mean pointing", m_mean_pnt.print());
+    log_value(NORMAL, "Use mean pointing", use);
 
     // Write header into logger
     log_header1(TERSE, gammalib::number("Bin observation", nobs));
@@ -584,7 +607,7 @@ void ctbin::publish(const std::string& name)
 void ctbin::init_members(void)
 {
     // Initialise members
-    m_usepnt  = false;
+    //m_usepnt  = false;
     m_stack   = true;
     m_prefix.clear();
     m_publish = false;
@@ -594,6 +617,7 @@ void ctbin::init_members(void)
     m_cubes.clear();
     m_counts.clear();
     m_weights.clear();
+    m_mean_pnt.clear();
     m_ebounds.clear();
     m_gti.clear();
     m_ontime   = 0.0;
@@ -615,7 +639,7 @@ void ctbin::init_members(void)
 void ctbin::copy_members(const ctbin& app)
 {
     // Copy attributes
-    m_usepnt  = app.m_usepnt;
+    //m_usepnt  = app.m_usepnt;
     m_stack   = app.m_stack;
     m_prefix  = app.m_prefix;
     m_publish = app.m_publish;
@@ -625,6 +649,7 @@ void ctbin::copy_members(const ctbin& app)
     m_cubes    = app.m_cubes;
     m_counts   = app.m_counts;
     m_weights  = app.m_weights;
+    m_mean_pnt = app.m_mean_pnt;
     m_ebounds  = app.m_ebounds;
     m_gti      = app.m_gti;
     m_ontime   = app.m_ontime;
@@ -746,7 +771,17 @@ GSkyMap ctbin::create_cube(const GCTAObservation* obs)
     double xref   = 0.0;
     double yref   = 0.0;
     bool   usepnt = (*this)["usepnt"].boolean();
-    if (!usepnt) {
+    if (usepnt) {
+        if (gammalib::toupper(coordsys) == "GAL") {
+            xref = m_mean_pnt.l_deg();
+            yref = m_mean_pnt.b_deg();
+        }
+        else {
+            xref = m_mean_pnt.ra_deg();
+            yref = m_mean_pnt.dec_deg();
+        }
+    }
+    else {
         xref = (*this)["xref"].real();
         yref = (*this)["yref"].real();
     }
@@ -759,28 +794,9 @@ GSkyMap ctbin::create_cube(const GCTAObservation* obs)
     // Read energy boundaries
     GEbounds ebounds = create_ebounds();
 
-    // If requested, get pointing from observations
-    if (usepnt) {
-
-        // Get pointing direction for observation
-        GSkyDir pnt = obs->pointing().dir();
-
-        // Set xref/yref based on the coordinate system
-        if (gammalib::toupper(coordsys) == "GAL") {
-            xref = pnt.l_deg();
-            yref = pnt.b_deg();
-        }
-        else {
-            xref = pnt.ra_deg();
-            yref = pnt.dec_deg();
-        }
-
-    } // endif: got pointing from observation
-
     // Initialise counts cube
     GSkyMap cube = GSkyMap(proj, coordsys, xref, yref, -binsz, binsz,
                            nxpix, nypix, ebounds.size());
-
 
     // Return cube
     return cube;
