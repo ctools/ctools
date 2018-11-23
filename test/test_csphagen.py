@@ -92,7 +92,8 @@ class Test(test):
                          ' rad=0.2 stack="no" inexclusion="' + \
                          self._exclusion + \
                          '" bkgmethod="REFLECTED" '+ \
-                         'outobs="csphagen_cmd1.xml" prefix="csphagen_cmd1" ' + \
+                         'outobs="csphagen_cmd1_obs.xml" prefix="csphagen_cmd1" ' + \
+                         'outmodel="csphagen_cmd1_model.xml" ' + \
                          'logfile="csphagen_cmd1.log" chatter=2'
 
         # Check if execution was successful
@@ -101,7 +102,7 @@ class Test(test):
 
         # Check output files
         self._check_output('csphagen_cmd1', self._nbins, self._nreg_with_excl)
-        self._check_outobs('csphagen_cmd1', 1)
+        self._check_outobs('csphagen_cmd1_obs.xml', 1)
 
         # Setup csphagen command
         cmd = csphagen + ' inobs="events_that_do_not_exist.fits" ' + \
@@ -114,7 +115,8 @@ class Test(test):
                          ' rad=0.2 stack="no" inexclusion="' + \
                          self._exclusion + \
                          '" bkgmethod="REFLECTED" '+ \
-                         'outobs="csphagen_cmd2.xml" prefix="csphagen_cmd2" ' + \
+                         'outobs="csphagen_cmd2_obs.xml" prefix="csphagen_cmd2" ' + \
+                         'outmodel="csphagen_cmd2_model.xml" ' + \
                          'logfile="csphagen_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
@@ -151,7 +153,8 @@ class Test(test):
         phagen['etruemin']    = 0.05
         phagen['etruemax']    = 150.0
         phagen['etruebins']   = 5
-        phagen['outobs']      = 'csphagen_py1.xml'
+        phagen['outobs']      = 'csphagen_py1_obs.xml'
+        phagen['outmodel']    = 'csphagen_py1_model.xml'
         phagen['prefix']      = 'csphagen_py1'
         phagen['logfile']     = 'csphagen_py1.log'
         phagen['chatter']     = 1
@@ -161,7 +164,7 @@ class Test(test):
 
         # Check output
         self._check_output('csphagen_py1', self._nbins, self._nreg_with_excl)
-        self._check_outobs('csphagen_py1', 1)
+        self._check_outobs('csphagen_py1_obs.xml', 1)
 
         # Now test without exclusion region
         phagen = cscripts.csphagen()
@@ -182,7 +185,8 @@ class Test(test):
         phagen['etruemin']  = 0.05
         phagen['etruemax']  = 150.0
         phagen['etruebins'] = 5
-        phagen['outobs']    = 'csphagen_py2.xml'
+        phagen['outobs']    = 'csphagen_py2_obs.xml'
+        phagen['outmodel']  = 'csphagen_py2_model.xml'
         phagen['prefix']    = 'csphagen_py2'
         phagen['logfile']   = 'csphagen_py2.log'
         phagen['chatter']   = 2
@@ -192,7 +196,7 @@ class Test(test):
 
         # Check output
         self._check_output('csphagen_py2', self._nbins, self._nreg_wo_excl)
-        self._check_outobs('csphagen_py2', 1)
+        self._check_outobs('csphagen_py2_obs.xml', 1)
 
         # Test with multiple input observations, no stacking
         # Create observation container
@@ -220,7 +224,8 @@ class Test(test):
         phagen['etruemin']    = 0.05
         phagen['etruemax']    = 150.0
         phagen['etruebins']   = 5
-        phagen['outobs']      = 'csphagen_py3.xml'
+        phagen['outobs']      = 'csphagen_py3_obs.xml'
+        phagen['outmodel']    = 'csphagen_py3_model.xml'
         phagen['prefix']      = 'csphagen_py3'
         phagen['logfile']     = 'csphagen_py3.log'
         phagen['chatter']     = 3
@@ -232,7 +237,7 @@ class Test(test):
         for s in range(2):
             self._check_output('csphagen_py3_' + str(s + 1), self._nbins,
                                self._nreg_mul[s])
-        self._check_outobs('csphagen_py3', 2)
+        self._check_outobs('csphagen_py3_obs.xml', 2)
 
         # Setup csphagen for test with multiple input observations and stacking
         phagen = cscripts.csphagen(obs)
@@ -251,7 +256,8 @@ class Test(test):
         phagen['etruemin']    = 0.05
         phagen['etruemax']    = 150.0
         phagen['etruebins']   = 5
-        phagen['outobs']      = 'csphagen_py4.xml'
+        phagen['outobs']      = 'csphagen_py4_obs.xml'
+        phagen['outmodel']    = 'csphagen_py4_model.xml'
         phagen['prefix']      = 'csphagen_py4'
         phagen['logfile']     = 'csphagen_py4.log'
         phagen['chatter']     = 4
@@ -263,7 +269,7 @@ class Test(test):
         for s in range(2):
             self._check_output('csphagen_py4_stacked', self._nbins,
                                0, check_regions=False)
-        self._check_outobs('csphagen_py4', 1)
+        self._check_outobs('csphagen_py4_obs.xml', 1)
 
         # Setup csphagen for test with custom On and Off regions provided
         phagen = cscripts.csphagen()
@@ -282,7 +288,8 @@ class Test(test):
         phagen['etruemax']   = 150.0
         phagen['etruebins']  = 5
         phagen['stack']      = False
-        phagen['outobs']     = 'csphagen_py5.xml'
+        phagen['outobs']     = 'csphagen_py5_obs.xml'
+        phagen['outmodel']   = 'csphagen_py5_model.xml'
         phagen['prefix']     = 'csphagen_py5'
         phagen['logfile']    = 'csphagen_py5.log'
         phagen['chatter']    = 2
@@ -292,7 +299,7 @@ class Test(test):
 
         # Check output
         self._check_output('csphagen_py5', self._nbins, self._nreg_bkg_reg)
-        self._check_outobs('csphagen_py5', 1)
+        self._check_outobs('csphagen_py5_obs.xml', 1)
 
         # Append off regions to observation container
         for run in obs:
@@ -313,7 +320,8 @@ class Test(test):
         phagen['etruemin']    = 0.05
         phagen['etruemax']    = 150.0
         phagen['etruebins']   = 5
-        phagen['outobs']      = 'csphagen_py6.xml'
+        phagen['outobs']      = 'csphagen_py6_obs.xml'
+        phagen['outmodel']    = 'csphagen_py6_model.xml'
         phagen['prefix']      = 'csphagen_py6'
         phagen['logfile']     = 'csphagen_py6.log'
         phagen['chatter']     = 4
@@ -325,7 +333,7 @@ class Test(test):
         for s in range(2):
             self._check_output('csphagen_py6_stacked', self._nbins,
                                0, check_regions=False)
-        self._check_outobs('csphagen_py6', 1)
+        self._check_outobs('csphagen_py6_obs.xml', 1)
 
         # Return
         return
@@ -358,7 +366,8 @@ class Test(test):
         phagen['etruemin']    = 0.05
         phagen['etruemax']    = 150.0
         phagen['etruebins']   = 5
-        phagen['outobs']      = 'csphagen_py1_pickle.xml'
+        phagen['outobs']      = 'csphagen_py1_obs_pickle.xml'
+        phagen['outmodel']    = 'csphagen_py1_model_pickle.xml'
         phagen['prefix']      = 'csphagen_py1_pickle'
         phagen['logfile']     = 'csphagen_py1_pickle.log'
         phagen['chatter']     = 1
@@ -373,7 +382,7 @@ class Test(test):
 
         # Check result files
         self._check_output('csphagen_py1_pickle', self._nbins, self._nreg_with_excl)
-        self._check_outobs('csphagen_py1_pickle', 1)
+        self._check_outobs('csphagen_py1_obs_pickle.xml', 1)
 
         # Return
         return
@@ -544,7 +553,7 @@ class Test(test):
         Check the output XML file containing ON/OFF observations
         """
         # Load observation container
-        obs = gammalib.GObservations(filenameroot + '.xml')
+        obs = gammalib.GObservations(filenameroot)
 
         # Check container size
         self.test_value(obs.size(), nout, 'Check for ' + str(nout) +

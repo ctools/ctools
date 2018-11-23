@@ -50,6 +50,8 @@ Improvements
   Rename ``outcube`` to ``outobs`` parameter.
 * [`2712 <https://cta-redmine.irap.omp.eu/issues/2712>`_] -
   Add Jupyter notebooks for H.E.S.S. DR1
+* [`2711 <https://cta-redmine.irap.omp.eu/issues/2711>`_] -
+  :ref:`csphagen` now creates appropriate model for likelihood fitting
 * [`2685 <https://cta-redmine.irap.omp.eu/issues/2685>`_] -
   Add ``ctbkgcube::cntcube()`` method
   Account for varying energy thresholds in :ref:`ctbin` weight computation

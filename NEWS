@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-22 November 2018
+23 November 2018
 
 
 Introduction
@@ -328,6 +328,11 @@ Use time reference of input observations if time selection is given in MET
 
 csphagen - Generate On/Off observations
 ---------------------------------------
+A "outmodel" parameter was added and the script now produces an appropriate
+background model for maximum likelihood model fitting. The script now also
+sets the appropriate fit statistic depending on the "use_model_bkg" parameter
+(#2711).
+
 The script now supports any kind of background model, not only IRF background
 models (#2710).
 

@@ -66,10 +66,6 @@ script will write out:
 General parameters
 ------------------
 
-
-``(nthreads = 0) [integer]``
-    Number of parallel processes (0=use all available CPUs).
-
 ``inobs [file]``
     Input event list or observation definition XML file.
 
@@ -91,8 +87,11 @@ General parameters
     Optional FITS file containing a WCS map in the first extension that defines
     sky regions not to be used for background estimation (where map value != 0).
 
-``outobs [string]``
+``outobs [file]``
     Output observation definition XML file.
+
+``outmodel [file]``
+    Output model XML file.
 
 ``(prefix = onoff) [string]``
     Prefix of the file name for output PHA, ARF, RMF, XML, and DS9 region files.
@@ -203,6 +202,9 @@ General parameters
 Standard parameters
 -------------------
 
+``(nthreads = 0) [integer]``
+    Number of parallel processes (0=use all available CPUs).
+
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
@@ -233,4 +235,3 @@ Related tools or scripts
 ------------------------
 
 None
-

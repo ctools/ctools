@@ -49,7 +49,6 @@ class csphagen(ctools.csobservation):
         self._src_reg       = gammalib.GSkyRegions()
         self._models        = gammalib.GModels()
         self._srcname       = ''
-        self._use_model_bkg = True
         self._bkg_regs      = []
         self._excl_reg      = None
         self._has_exclusion = False
@@ -78,7 +77,6 @@ class csphagen(ctools.csobservation):
                  'src_reg'       : self._src_reg,
                  'models'        : self._models,
                  'srcname'       : self._srcname,
-                 'use_model_bkg' : self._use_model_bkg,
                  'bkg_regs'      : self._bkg_regs,
                  'excl_reg'      : self._excl_reg,
                  'has_exclusion' : self._has_exclusion,
@@ -105,7 +103,6 @@ class csphagen(ctools.csobservation):
         self._src_reg       = state['src_reg']
         self._models        = state['models']
         self._srcname       = state['srcname']
-        self._use_model_bkg = state['use_model_bkg']
         self._bkg_regs      = state['bkg_regs']
         self._excl_reg      = state['excl_reg']
         self._has_exclusion = state['has_exclusion']
@@ -261,12 +258,14 @@ class csphagen(ctools.csobservation):
         else:
             self._has_exclusion = False
 
-        # Query remaining parametersStacking
+        # Query remaining parameters
+        self['use_model_bkg'].boolean()
         self['stack'].boolean()
 
         # Query ahead output parameters
         if (self._read_ahead()):
-            self['outobs'].string()
+            self['outobs'].filename()
+            self['outmodel'].filename()
             self['prefix'].string()
 
         # If there are no observations in container then get them from the
@@ -292,7 +291,7 @@ class csphagen(ctools.csobservation):
             model.name('Dummy')
             self._models.append(model)
             self._srcname       = 'Dummy'
-            self._use_model_bkg = False
+            self['use_model_bkg'].boolean(False)
 
         # Return
         return
@@ -361,41 +360,109 @@ class csphagen(ctools.csobservation):
         # Return reflected regions
         return regions
 
-    def _set_models(self, obs):
+    def _set_models(self, results):
         """
-        Set models in observation container
+        Set models for On/Off fitting
 
-        The method replaces all "CTA", "HESS", "VERITAS", and "MAGIC"
-        background models by "CTAOnOff" background models.
+        The method does the following
+        - append "OnOff" to the instrument name of all background models
+        - fix all spatial and temporal parameters
 
         Parameters
         ----------
-        obs : `~gammalib.GObservations()`
-            Observation container
+        results : list of dict
+            Result dictionaries
 
         Returns
         -------
-        obs : `~gammalib.GObservations()`
-            Observation container
+        models : `~gammalib.GModels()`
+            Model container
         """
+        # Write header
+        self._log_header1(gammalib.NORMAL, 'Set models')
+
         # Initialise model container
         models = gammalib.GModels()
 
-        # Loop over all models and replace CTA/HESS/VERITAS/MAGIC background
-        # models by CTAOnOff background model
-        for model in self.obs().models():
+        # Initialies stacked model flag
+        has_stacked_model = False
+
+        # Loop over all models in observation and append "OnOff" to instrument
+        # names
+        for model in self._models:
+
+            # If model is a background model then append "OnOff"
             if 'GCTA' in model.classname():
-                if 'CTA'     in model.instruments() or \
-                   'HESS'    in model.instruments() or \
-                   'VERITAS' in model.instruments() or \
-                   'MAGIC'   in model.instruments():
-                    model.instruments('CTAOnOff')
+
+                # Skip model is background model should not be used
+                if not self['use_model_bkg'].boolean():
+                    self._log_string(gammalib.NORMAL, ' Skip "%s" model "%s" (%s)' % \
+                         (model.instruments(), model.name(), model.ids()))
+                    continue
+
+                # Check if model corresponds to one of the relevant
+                # observations
+                is_onoff = False
+                for result in results:
+                    if model.is_valid(result['instrument'], result['id']):
+                        is_onoff = True
+                        break
+
+                # If stacked analysis is requested then just use for model
+                # and remove instrument ID
+                if self['stack'].boolean():
+
+                    # If there is already a model for stacked analysis then
+                    # skip this one
+                    if has_stacked_model:
+                        msg = ' Skip "%s" model "%s" (%s). There is already ' \
+                              'a model for stacked analysis.' % \
+                              (model.instruments(), model.name(), model.ids())
+                        self._log_string(gammalib.NORMAL, msg)
+                        continue
+
+                    # ... otherwise use model for stacked analysis
+                    else:
+                        has_stacked_model = True
+                        model.ids('')
+
+                # Set instrument name
+                model.instruments(model.instruments()+'OnOff')
+
+            # Log model usage
+            self._log_string(gammalib.NORMAL, ' Use "%s" model "%s" (%s)' % \
+                 (model.instruments(), model.name(), model.ids()))
+
+            # Append model to container
             models.append(model)
 
-        # Append model to observation container
-        obs.models(models)
+        # Return model container
+        return models
 
-        # Return observation container
+    def _set_statistic(self, obs):
+        """
+        Set statistic for observation
+
+        If the "use_model_bkg" is true then set statistic to "cstat",
+        otherwise set it to "wstat"
+
+        Parameters
+        ----------
+        obs : `~gammalib.GObservation()`
+            Observation
+
+        Returns
+        -------
+        obs : `~gammalib.GObservation()`
+            Observation
+        """
+        # Set statistic according to background model usage
+        if self['use_model_bkg'].boolean():
+            obs.statistic('cstat')
+        else:
+            obs.statistic('wstat')
+
+        # Return observation
         return obs
 
     def _etrue_ebounds(self):
@@ -494,7 +561,7 @@ class csphagen(ctools.csobservation):
         # Otherwise calculate On/Off spectra
         else:
             # Log current observation
-            self._log_string(gammalib.NORMAL, 'Process observation "%s"' % \
+            self._log_string(gammalib.NORMAL, ' Process observation "%s"' % \
                              (obs.id()))
 
             # Set background regions for this observation
@@ -503,7 +570,7 @@ class csphagen(ctools.csobservation):
             # Get IRF background template usage flag
             use_model_bkg = self['use_model_bkg'].boolean()
             if not use_model_bkg:
-                self._log_string(gammalib.NORMAL, 'Background model not used, '
+                self._log_string(gammalib.NORMAL, ' Background model not used, '
                                  'assume constant backround rate.')
 
             # If there are background regions then create On/Off observation
@@ -520,13 +587,14 @@ class csphagen(ctools.csobservation):
                 onoff.id(obs.id())
 
             else:
-                self._log_string(gammalib.NORMAL, 'Observation %s not included '
+                self._log_string(gammalib.NORMAL, ' Observation %s not included '
                                  'in spectra generation' % (obs.id()))
 
         # Construct dictionary with results
-        result = {'onoff'   : onoff,
-                  'bkg_reg' : bkg_reg,
-                  'id'      : obs.id()}
+        result = {'onoff'     : onoff,
+                  'bkg_reg'   : bkg_reg,
+                  'instrument': obs.instrument(),
+                  'id'        : obs.id()}
 
         # Return results
         return result
@@ -549,12 +617,15 @@ class csphagen(ctools.csobservation):
         """
         # Continue only if result is valid
         if result['onoff'] != None:
-        
+
             # If the results contain an On/Off observation
             if result['onoff'].classname() == 'GCTAOnOffObservation':
 
+                # Set statistic according to background model usage
+                obs = self._set_statistic(result['onoff'])
+
                 # Append observation to observation container
-                outobs.append(result['onoff'])
+                outobs.append(obs)
 
                 # Append background regions
                 self._bkg_regs.append({'regions': result['bkg_reg'],
@@ -598,6 +669,7 @@ class csphagen(ctools.csobservation):
         # Initialise run variables
         outobs         = gammalib.GObservations()
         self._bkg_regs = []
+        results        = []
 
         # If there is more than one observation and we use multiprocessing
         if self._nthreads > 1 and self.obs().size() > 1:
@@ -609,7 +681,9 @@ class csphagen(ctools.csobservation):
 
             # Construct results
             for i in range(self.obs().size()):
-                outobs = self._unpack_result(outobs,poolresults[i][0])
+                result = poolresults[i][0]
+                outobs = self._unpack_result(outobs, result)
+                results.append(result)
                 self._log_string(gammalib.TERSE, poolresults[i][1]['log'], False)
 
         # Otherwise, loop through observations and generate pha, arf, rmf files
@@ -618,9 +692,10 @@ class csphagen(ctools.csobservation):
                 # Process individual observation
                 result = self._process_observation(i)
                 outobs = self._unpack_result(outobs, result)
+                results.append(result)
 
         # Stack observations
-        if outobs.size() > 1 and self['stack'].boolean() == True:
+        if outobs.size() > 1 and self['stack'].boolean():
 
             # Write header
             self._log_header1(gammalib.NORMAL, 'Stacking %d observations' %
@@ -629,12 +704,18 @@ class csphagen(ctools.csobservation):
             # Stack observations
             stacked_obs = gammalib.GCTAOnOffObservation(outobs)
 
+            # Set statistic according to background model usage
+            stacked_obs = self._set_statistic(stacked_obs)
+
             # Put stacked observations in output container
             outobs = gammalib.GObservations()
             outobs.append(stacked_obs)
 
+        # Create models that allow On/Off fitting
+        models = self._set_models(results)
+
         # Set models in output container
-        outobs = self._set_models(outobs)
+        outobs.models(models)
 
         # Set observation container
         self.obs(outobs)
@@ -650,9 +731,10 @@ class csphagen(ctools.csobservation):
         self._log_header1(gammalib.TERSE, 'Save data')
 
         # Get XML output filename, prefix and clobber
-        outobs  = self['outobs'].string()
-        prefix  = self['prefix'].string()
-        clobber = self['clobber'].boolean()
+        outobs   = self['outobs'].filename()
+        outmodel = self['outmodel'].filename()
+        prefix   = self['prefix'].string()
+        clobber  = self['clobber'].boolean()
 
         # Loop over all observation in container
         for obs in self.obs():
@@ -694,8 +776,12 @@ class csphagen(ctools.csobservation):
         # Save observation definition XML file
         self.obs().save(outobs)
 
-        # Log file name
-        self._log_value(gammalib.NORMAL, 'Obs. definition XML file', outobs)
+        # Save model definition XML file
+        self.obs().models().save(outmodel)
+
+        # Log file names
+        self._log_value(gammalib.NORMAL, 'Obs. definition XML file', outobs.url())
+        self._log_value(gammalib.NORMAL, 'Model definition XML file', outmodel.url())
 
         # Save ds9 On region file
         regname = prefix + '_on.reg'
