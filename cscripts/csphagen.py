@@ -318,29 +318,51 @@ class csphagen(ctools.csobservation):
         pnt_dir = obs.pointing().dir()
         offset  = pnt_dir.dist_deg(self._src_dir)
 
-        # If ...
-        if offset <= self._rad or offset >= self['maxoffset'].real():
-            self._log_string(gammalib.EXPLICIT, 'Observation %s pointed at %.3f '
-                             'deg from source' % ((obs.id(), offset)))
+        # Skip observation if it is too close to source
+        if offset <= self._rad:
+            msg = ' Skip because observation is pointed at %.3f deg <= '\
+                  '"rad=%.3f" from source.' \
+                  % (offset, self._rad)
+            self._log_string(gammalib.NORMAL, msg)
+
+        # Skip observation if it is pointed too far from the source
+        elif offset >= self['maxoffset'].real():
+            msg = ' Skip because observation is pointed at %.3f deg >= '\
+                  '"maxoffset=%.3f" from source.' \
+                  % (offset, self['maxoffset'].real())
+            self._log_string(gammalib.NORMAL, msg)
 
         # ... otherwise
         else:
             posang = pnt_dir.posang_deg(self._src_dir)
             if self._srcshape == 'CIRCLE':
-                # angular separation of reflected regions wrt camera center
-                # and number
-                alpha = 1.05 * 2.0 * self._rad / offset
-                # 1.05 ensures background regions do not overlap due to
-                # numerical precision issues
-                N = int(2.0 * math.pi / alpha)
-                if N < self['bkgregmin'].integer() + 3:
-                    self._log_string(gammalib.EXPLICIT, 'Observation %s: '
-                                     'insufficient regions for background '
-                                     'estimation' % (obs.id()))
 
-                # Otherwise loop over position angle to create reflected
+                # Compute the angular separation of reflected regions wrt
+                # camera center. The factor 1.05 ensures background regions
+                # do not overlap due to numerical precision issues
+                alpha = 1.05 * 2.0 * self._rad / offset
+
+                # Compute number of reflected regions by dividing the angular
+                # separation by 2 pi.
+                N = int(2.0 * math.pi / alpha)
+
+                # If there are not enough reflected regions then skip the
+                # observation ...
+                if N < self['bkgregmin'].integer() + 3:
+                    msg = ' Skip because the number %d of reflected regions '\
+                          'for background estimation is smaller than '\
+                          '"bkgregmin"=%d.' % (N-3, self['bkgregmin'].integer())
+                    self._log_string(gammalib.NORMAL, msg)
+
+                # ... otherwise loop over position angle to create reflected
                 # regions
                 else:
+
+                    # Log appending of reflected regions
+                    msg = ' Use %d reflected regions.' % (N-3)
+                    self._log_string(gammalib.NORMAL, msg)
+
+                    # Append reflected regions
                     alpha = 360.0 / N
                     for s in range(2, N - 1):
                         dphi    = s * alpha
@@ -349,10 +371,9 @@ class csphagen(ctools.csobservation):
                         region = gammalib.GSkyRegionCircle(ctr_dir, self._rad)
                         if self._has_exclusion:
                             if self._excl_reg.overlaps(region):
-                                self._log_string(gammalib.VERBOSE, 'Observation '
-                                                 '%s: reflected region overlaps '
-                                                 'with exclusion region' %
-                                                 (obs.id()))
+                                msg = ' Reflected region overlaps with '\
+                                      'exclusion region.'
+                                self._log_string(gammalib.EXPLICIT, msg)
                             else:
                                 regions.append(region)
                         else:
@@ -554,29 +575,32 @@ class csphagen(ctools.csobservation):
         bkg_reg = None
         obs     = self.obs()[i]
 
+        # Log header
+        self._log_header3(gammalib.NORMAL,'%s observation "%s"' % \
+                          (obs.instrument(), obs.id()))
+
         # Skip non CTA observations
         if obs.classname() != 'GCTAObservation':
-            self._log_string(gammalib.NORMAL, 'Skip %s observation "%s"' % \
-                             (obs.instrument(), obs.id()))
+            self._log_string(gammalib.NORMAL, ' Skip because not a "GCTAObservation"')
 
         # Otherwise calculate On/Off spectra
         else:
-            # Log current observation
-            self._log_string(gammalib.NORMAL, ' Process observation "%s"' % \
-                             (obs.id()))
+            # Get background model usage flag and log flag
+            use_model_bkg = self['use_model_bkg'].boolean()
+            if use_model_bkg:
+                msg = ' Use background model.'
+            else:
+                msg = ' Background model not used, assume constant backround rate.'
+            self._log_string(gammalib.NORMAL, msg)
 
             # Set background regions for this observation
             bkg_reg = self._set_background_regions(obs)
 
-            # Get IRF background template usage flag
-            use_model_bkg = self['use_model_bkg'].boolean()
-            if not use_model_bkg:
-                self._log_string(gammalib.NORMAL, ' Background model not used, '
-                                 'assume constant backround rate.')
-
             # If there are background regions then create On/Off observation
             # and append it to the output container
             if bkg_reg.size() >= self['bkgregmin'].integer():
+
+                # Create On/Off observation
                 onoff = gammalib.GCTAOnOffObservation(obs,
                                                       self._models,
                                                       self._srcname,
@@ -585,11 +609,9 @@ class csphagen(ctools.csobservation):
                                                       self._src_reg,
                                                       bkg_reg,
                                                       use_model_bkg)
-                onoff.id(obs.id())
 
-            else:
-                self._log_string(gammalib.NORMAL, ' Observation %s not included '
-                                 'in spectra generation' % (obs.id()))
+                # Set On/Off observation ID
+                onoff.id(obs.id())
 
         # Construct dictionary with results
         result = {'onoff'     : onoff,
