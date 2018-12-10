@@ -22,6 +22,10 @@ outcube,    f, h, NONE,,, "Filename for counts cube"
 caldb,      s, a, prod2,,, "Calibration database"
 irf,        s, a, South_0.5h,,, "Instrument response function"
 prefix,     s, a, findvar_,,, "Prefix for output files"
+
+#
+# Variability search parameters
+#==============================
 minoff,     r, h, 0,,, "Minimum required events in off bin for computing Noff and alpha"
 emin,       r, a, 0,,, "Lower energy limit (units of TeV; 0 => no cut)"
 emax,       r, a, 0,,, "Upper energy limit (units of TeV; 0 => no cut)"
