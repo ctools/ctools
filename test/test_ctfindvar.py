@@ -71,8 +71,9 @@ class Test(test):
 
         # Setup ctfindvar command
         cmd = ctfindvar+' inobs="'+self._events+'"'+\
+                        ' outmap="ctfindvar_cmd1.fits"'+\
+                        ' outmodel="ctfindvar_cmd1.xml"'+\
                         ' logfile="ctfindvar_cmd1.log" chatter=1'+\
-                        ' prefix=ctfindvar_test_ '+\
                         ' tmin=NONE tmax=NONE tinterval=20'+\
                         ' emin=0.2 emax=1.1'+\
                         ' nxpix=200 nypix=200 binsz=0.05'+\
@@ -80,11 +81,27 @@ class Test(test):
                         ' xref=83.63 yref=22.51'+\
                         ' xsrc=83.63 ysrc=22.51'+\
                         ' caldb=prod2 irf=South_0.5h'
-            
-
+        
         # Check if execution was successful
         self.test_value(self._execute(cmd), 0,
              'Check successful execution from command line')
+
+        # Setup ctfindvar command
+        cmd = ctfindvar+' inobs="event_file_that_does_not_exist.fits"'+ \
+                        ' outmap="ctfindvar_cmd2.fits"'+ \
+                        ' outmodel="ctfindvar_cmd2.xml"'+ \
+                        ' logfile="ctfindvar_cmd2.log" chatter=1'+ \
+                        ' tmin=NONE tmax=NONE tinterval=20'+ \
+                        ' emin=0.2 emax=1.1'+ \
+                        ' nxpix=200 nypix=200 binsz=0.05'+ \
+                        ' proj=CAR coordsys=CEL'+ \
+                        ' xref=83.63 yref=22.51'+ \
+                        ' xsrc=83.63 ysrc=22.51'+ \
+                        ' caldb=prod2 irf=South_0.5h'
+        
+        # Check if execution was successful
+        self.test_assert(self._execute(cmd, success=False) != 0,
+             'Check invalid input file when executed from command line')
 
         # Check ctfindvar --help
         self._check_help(ctfindvar)
@@ -101,11 +118,8 @@ class Test(test):
         # Allocate ctfindvar
         ctfindvar = ctools.ctfindvar()
 
-        #setup ctfindvar
+        # Setup ctfindvar
         ctfindvar['inobs']     = self._events
-        ctfindvar['logfile']   = 'ctfindvar_py0.log'
-        ctfindvar['chatter']   =  1
-        ctfindvar['prefix']    = 'ctfindvar_test_python_'
         ctfindvar['tmin']      = 'NONE'
         ctfindvar['tmax']      = 'NONE' 
         ctfindvar['tinterval'] = 20 
@@ -122,32 +136,39 @@ class Test(test):
         ctfindvar['ysrc']      = 22.51
         ctfindvar['caldb']     = 'prod2'
         ctfindvar['irf']       = 'South_0.5h' 
+        ctfindvar['outmap']    = 'ctfindvar_py0.fits'
+        ctfindvar['outmodel']  = 'ctfindvar_py0.xml'
+        ctfindvar['logfile']   = 'ctfindvar_py0.log'
+        ctfindvar['chatter']   =  1
 
-        ## Run ctfindvar tool
+        # Run ctfindvar tool
         ctfindvar.logFileOpen()
         ctfindvar.run()
 
         # Check that saving does not nothing
-        ctfindvar['logfile'] = 'ctfindvar_py1.log'
+        ctfindvar['outmap']   = 'ctfindvar_py1.fits'
+        ctfindvar['outmodel'] = 'ctfindvar_py1.xml'
+        ctfindvar['logfile']  = 'ctfindvar_py1.log'
         ctfindvar.logFileOpen()
         ctfindvar.save()
  
         # Check result
-        self._check_result_file('ctfindvar_test_python_signifmap.fits')
+        self._check_result_file('ctfindvar_py1.fits')
 
         # Copy ctfindvar tool
         cpy_tool = ctfindvar
 
         # Run copy of ctfindvar tool again
-        cpy_tool['logfile'] = 'ctfindvar_py2.log'
-        cpy_tool['chatter'] = 3
-        cpy_tool['prefix']  = 'ctfindvar_test_copytool_' 
+        cpy_tool['outmap']   = 'ctfindvar_py2.fits'
+        cpy_tool['outmodel'] = 'ctfindvar_py2.xml'
+        cpy_tool['logfile']  = 'ctfindvar_py2.log'
+        cpy_tool['chatter']  = 3
         cpy_tool.logFileOpen()
         cpy_tool.run()
         cpy_tool.save()
 
         # Check result
-        self._check_result_file('ctfindvar_test_copytool_signifmap.fits')
+        self._check_result_file('ctfindvar_py2.fits')
 
         # Check that clearing does not lead to an exception or segfault
         ctfindvar.clear()
@@ -158,17 +179,16 @@ class Test(test):
     # Check ctfindvar result
     def _check_result_file(self, filename):
         """
-        Check content of tool
+        Check ctfindvar result
 
         Parameters
         ----------
-        tool : `~ctools.ctfindvar`
-            ctfindvar instance
+        filename : str
+            Output file
         """
-        print "checking if you amazing file is valid"
-        # Read variability  file
-        fits    = gammalib.GFits(filename)
-        self.test_value(fits.size(), 3,
-             'Check for 3 rows in srcsig file')
+        # Read variability file
+        fits = gammalib.GFits(filename)
+        self.test_value(fits.size(), 3, 'Check for 3 extensions in output file')
+
         # Return
         return

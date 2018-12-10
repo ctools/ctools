@@ -16,22 +16,26 @@
 #
 # General parameters
 #===================
-inobs,      f, a, events.fits,,, "Input event list, counts cube or observation definition XML file"
+inobs,      f, a, events.fits,,, "Input event list or observation definition XML file"
 inmodel,    f, h, NONE,,, "Input model definition file for extracting source positions"
-outcube,    f, h, NONE,,, "Filename for counts cube"
+outcube,    f, h, NONE,,, "Output counts cube file"
+outmap,     f, a, map.fits,,, "Output map file"
+outmodel,   f, a, model.xml,,, "Output model definition file"
 caldb,      s, a, prod2,,, "Calibration database"
 irf,        s, a, South_0.5h,,, "Instrument response function"
-prefix,     s, a, findvar_,,, "Prefix for output files"
 
 #
 # Variability search parameters
 #==============================
-minoff,     r, h, 0,,, "Minimum required events in off bin for computing Noff and alpha"
-emin,       r, a, 0,,, "Lower energy limit (units of TeV; 0 => no cut)"
-emax,       r, a, 0,,, "Upper energy limit (units of TeV; 0 => no cut)"
-sig_thr,    r, h, 4.5,,, "Significance threshold for variability detection"
-smoothkrnl, s, h, NONE, GAUSSIAN|DISK|NONE,, "Smoothing kernel for counts maps"
-smoothpar,  r, h, 0.05,,, "Parameter for the smoothing kernel"
+coordsys,      s, a, CEL,CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galactic)"
+xsrc,          r, a, 83.63,0,360, "First coordinate of the source of interest (RA or galactic l)"
+ysrc,          r, a, 22.01,-90,90, "Second coordinate of the source of interest (DEC or galactic b)"
+emin,          r, a, 0.1,,, "Lower energy limit (TeV)"
+emax,          r, a, 100.0,,, "Upper energy limit (TeV)"
+threshold,     r, h, 4.5,,, "Significance threshold for variability detection"
+minoff,        r, h, 0,,, "Minimum required events in off bin for computing Noff and alpha"
+smooth_kernel, s, h, NONE, GAUSSIAN|DISK|NONE,, "Smoothing kernel for counts maps"
+smooth_rad,    r, h, 0.05,,, "Smoothing kernel radius (deg)"
 
 #
 # Time binning parameters
@@ -47,12 +51,9 @@ usepnt,   b, h, no,,, "Use pointing instead of xref/yref parameters?"
 nxpix,    i, a, 200,,, "Size of the X axis in pixels"
 nypix,    i, a, 200,,, "Size of the Y axis in pixels"
 binsz,    r, a, 0.02,,, "Image scale (in degrees/pixel)"
-coordsys, s, a, CEL,CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galactic)"
 proj,     s, a, CAR,AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN,, "Projection method"
 xref,     r, a, 83.63,0,360, "First coordinate of image center in degrees (RA or galactic l)"
 yref,     r, a, 22.51,-90,90, "Second coordinate of image center in degrees (DEC or galactic b)"
-xsrc,     r, a, 83.63,0,360, "First coordinate of the source of interest (RA or galactic l)"
-ysrc,     r, a, 22.51,-90,90, "Second coordinate of the source of interest (DEC or galactic b)"
 
 #
 # Standard parameters

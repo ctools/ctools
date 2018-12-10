@@ -14,6 +14,7 @@ In particular, this release provides:
 * Support for Xspec spectral analysis
 * Improved computation speed for :ref:`ctskymap` and :ref:`csphagen`
 * Parallelisation of various cscripts
+* Support for source variability searches
 * Support for Python pickeling
 * A Code Generator to facilitate adding ctools and cscripts
 
@@ -102,6 +103,8 @@ Improvements
 New features
 ------------
 
+* [`2713 <https://cta-redmine.irap.omp.eu/issues/2713>`_] -
+  Add :ref:`ctfindvar` tool
 * [`2709 <https://cta-redmine.irap.omp.eu/issues/2709>`_] -
   Add code generator
 * [`2694 <https://cta-redmine.irap.omp.eu/issues/2694>`_] -

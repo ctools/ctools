@@ -39,6 +39,7 @@
 #endif
 
 /* __ Method name definitions ____________________________________________ */
+#define G_INX2GTI                                  "ctfindvar::inx2gti(int&)"
 #define G_FILL_CUBE                  "ctfindvar::fill_cube(GCTAObservation*)"
 #define G_FILL_ALPHA_VECTOR       "ctfindvar::fill_alpha_vector(const int&, "\
                                                            "vector<double>&)"
@@ -235,146 +236,16 @@ void ctfindvar::run(void)
     // Write input observation container into logger
     log_observations(NORMAL, m_obs, "Input observation");
 
-     // Loop over all unbinned CTA observations in the container
-    #pragma omp parallel for
-    for (int i = 0; i < m_obs.size(); ++i) {
+    // Create GTIs
+    init_gtis();
 
-        // Get pointer to observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+    // Create counts cube
+    create_cube();
 
-        // Fill the cube
-        fill_cube(obs);
+    // Analyse cube
+    analyse_cube();
 
-        // Dispose events to free memory
-        obs->dispose_events();
-
-    } // endfor: looped over observations
-
-    // Smooth the maps if requested
-    if ((*this)["smoothkrnl"].is_valid() &&
-        (*this)["smoothkrnl"].string() != "NONE") {
-        m_counts.smooth((*this)["smoothkrnl"].string(),
-                        (*this)["smoothpar"].real());
-    }
-
-    // Get number of maps
-    const int nbins = m_counts.nmaps();
-
-    // creating GSkyDir to get the position of the source and each pixels
-
-    // Extract which pixel in the map each source is located in
-    std::vector<int> srcInxPix;
-    if (m_inmodel.size() > 0) {
-        for (int mod = 0; mod < m_inmodel.size(); ++mod) {
-
-            // Extract the model
-            GModelSky* model = dynamic_cast<GModelSky*>(m_inmodel[mod]);
-            if (model != NULL) {
-                // Get the source position
-                GModelSpatial* model_spatial = model->spatial();
-                GSkyRegion*    model_region  = model_spatial->region();
-                GSkyDir        srcSkyDir     = 
-                        dynamic_cast<GSkyRegionCircle*>(model_region)->centre();
-
-                // Store the map index of this source
-                int src_map_index = m_counts.dir2inx(srcSkyDir);
-                srcInxPix.push_back(src_map_index);
-            } else {
-                m_inmodel.remove(mod);
-                mod--;
-            }
-        }
-    } 
-    // ... otherwise only one source position is queried
-    else {
-        GSkyDir srcSkyDir;
-        if ((*this)["coordsys"].string() == "CEL") {
-            srcSkyDir.radec_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
-        } else {
-            srcSkyDir.lb_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
-        }
-
-        // Store the index of this source
-        int src_map_index = m_counts.dir2inx(srcSkyDir);
-        srcInxPix.push_back(src_map_index);
-    }
-
-    //preparing the histogram with significance evolution 
-    //for the source center and the highest sig-pix
-    m_pixsigsrc = GNdarray(srcInxPix.size(), nbins);
-    m_pixsigmax = GNdarray(nbins);
-
-    //Prepare the final skymap with the max significance of each pixel
-    double  max_sig = 0;
-
-    log_header1(NORMAL, "Looping Over Pixels");
-
-    //looping over all the pixels in the cube
-    #pragma omp parallel for
-    for (int pix_number = 0; pix_number < m_counts.npix(); pix_number++) {    
-
-        //Preparing array to store significance evolution of 
-        //each pixel
-        GNdarray pixSig(nbins);
-        double total_counts=0;
-        
-        //Checking the integrated count of each pixel
-        for (int k = 0; k < m_counts.nmaps(); k++) {
-            total_counts += m_counts(pix_number, k);
-        }
-
-        //Getting the variability significance for the pixel
-        get_variability_sig(pix_number,nbins, pixSig);
-
-        //Getting the significance evolution for the source
-        for (int src = 0; src < srcInxPix.size(); src++) {
-
-            // Store the distribution if the source is located at this position
-            if (srcInxPix[src] == pix_number) {
-
-                #pragma omp critical(ctfind_run)
-                for (int i = 0; i < nbins; i++) {
-                    m_pixsigsrc(src,i) = pixSig(i);
-                }
-            }
-            #ifdef G_DEBUG
-            std::cout << "checking pixel number of the source of interest" << pix_number << std::endl;
-            std::cout << "number of counts in pixel of the source of interest" << total_counts << std::endl;
-            pixSigSrc=pixSig;
-            std::cout << "checking pixel number " << pix_number << " with total number of counts of: " << total_counts << std::endl;
-            std::cin.ignore();
-            std::cout << "checking pixel number of the source of interest: " << pix_number << " - with total number of counts of: " << total_counts << std::endl;
-            #endif
-        }
-        }
-
-        // Getting the evolution for the pix with highest significance
-        #pragma omp critical(ctfind_run)
-        {  
-            if (max(pixSig) > max_sig) {
-                // Update the pixel position with the maximum sigma
-                max_sig       = max(pixSig);
-                m_max_sig_dir = m_counts.inx2dir(pix_number);
-                m_pixsigmax   = pixSig;
-            }
-        }
-        //storing sig in skymap
-        m_peaksigmap(pix_number) = max(pixSig);
-
-        //If the significance is greater than sig threshold, the position
-        //is stored in a model
-        if (max(pixSig) > m_sig_threshold) {
-            GSkyDir dir_pix = m_counts.inx2dir(pix_number);
-            fill_model_sig_pos(dir_pix);  
-        }
-    
-    }
-    
-    log_header1(NORMAL, "Analysis finished");
-    log_value(NORMAL, "Maximum sigma", max_sig);
-    log_value(NORMAL, "Max pixel RA", m_max_sig_dir.ra_deg());
-    log_value(NORMAL, "Max pixel DEC", m_max_sig_dir.dec_deg());
-
+    // Return
     return;
 }
 
@@ -388,37 +259,52 @@ void ctfindvar::run(void)
  ***************************************************************************/
 void ctfindvar::save(void)
 {
+    // Write header
     log_header1(TERSE, "Saving results");
-
-    // Filenames
-    std::string prefix((*this)["prefix"].string());
 
     // Write counts cube
     if ((*this)["outcube"].is_valid()) {
+
+        // Get counts cube output filename
         GFilename outcube = (*this)["outcube"].filename();
-        log_value(TERSE, "Saving counts cube", outcube);
+
+        // Save counts cube
         m_counts.save(outcube, (*this)["clobber"].boolean());
+
+        // Log saving
+        log_value(TERSE, "Saving counts cube", outcube);
     }
 
     // Create a FITS file for storing the output
-    m_outfile.clear();
+    GFits fits;
 
     // Write the most significant values for each pixel
-    log_string(TERSE, "Appending maximum significances map to output file");
-    m_peaksigmap.write(m_outfile, "PEAKSIGMAP");
+    m_peaksigmap.write(fits, "PEAKSIGMAP");
 
-    // Write individual source distributions
-    write_srchist();
+    // Write source histograms
+    write_source_histograms(fits);
 
-    // Write the output file
-    GFilename outfilename = prefix + "signifmap.fits";
-    log_value(TERSE, "Saving results to ", outfilename);
-    m_outfile.saveto(outfilename, (*this)["clobber"].boolean());
+    // Get output map filename
+    GFilename outmap = (*this)["outmap"].filename();
 
-    //Save the model file with position with significance 
+    // Save output map
+    fits.saveto(outmap, (*this)["clobber"].boolean());
+
+    // Log saving
+    log_value(TERSE, "Saving output map", outmap);
+
+    // Save the model definition file
     if (m_model_above_thr.size() > 2) {
-        GFilename model_filename = prefix + "model_significant_directions.xml";
-        m_model_above_thr.save(model_filename);
+
+        // Get model output filename
+        GFilename outmodel = (*this)["outmodel"].filename();
+
+        // Save model
+        m_model_above_thr.save(outmodel);
+
+        // Log saving
+        log_value(TERSE, "Saving output model", outmodel);
+
     }
 
     // Return
@@ -429,7 +315,7 @@ void ctfindvar::save(void)
 /***********************************************************************//**
  * @brief Get the map index associated with a given time
  *
- * @param[in] time      Time
+ * @param[in] time Time
  * @return Index of map in counts cube
  ***************************************************************************/
 int ctfindvar::time2inx(const GTime& time)
@@ -438,29 +324,35 @@ int ctfindvar::time2inx(const GTime& time)
     int map_index = -1;
 
     // Loop over all GTIs
-    for (int i = 0; i < m_gti.size(); i++) {
-        // Check if interval contains the time
+    for (int i = 0; i < m_gti.size(); ++i) {
+
+        // If interval contains the time then break
         if (m_gti[i].contains(time)) {
             map_index = i;
             break;
         }
+
     }
 
+    // Return map index
     return map_index;
 }
 
 
 /***********************************************************************//**
- * @brief Return reference to significance cube object
+ * @brief Return Good Time Interval for index
+ *
+ * @param[in] index Index
+ * @return Good Time Interval
  ***************************************************************************/
 GGti ctfindvar::inx2gti(const int& index)
 {
+    // Throw an exception if index is invalid
     if ((index < 0) || (index >= m_gti.size())) {
-        // Index is invalid, so throw an error
-        throw GException::invalid_value("ctfindvar::inx2gti(const int&)",
-                                        "'index' parameter out of range");
+        throw GException::out_of_range(G_INX2GTI, "Time index", index, m_gti.size());
     }
 
+    // Return Good Time Interval
     return m_gti[index];
 }
 
@@ -483,7 +375,6 @@ void ctfindvar::init_members(void)
     m_max_sig_dir.clear();
     m_minoff        = 0.0;
     m_sig_threshold = 0.0;
-    m_outfile.clear();
     m_peaksigmap.clear();
     m_pixsigsrc.clear();
     m_tstart.clear();
@@ -511,7 +402,6 @@ void ctfindvar::copy_members(const ctfindvar& app)
     m_max_sig_dir     = app.m_max_sig_dir;
     m_minoff          = app.m_minoff;
     m_sig_threshold   = app.m_sig_threshold;
-    m_outfile         = app.m_outfile;
     m_peaksigmap      = app.m_peaksigmap;
     m_pixsigsrc       = app.m_pixsigsrc;
     m_tstart          = app.m_tstart;
@@ -537,39 +427,35 @@ void ctfindvar::free_members(void)
 
 /***********************************************************************//**
  * @brief Get application parameters
- *
- * @todo Implement method
  ***************************************************************************/
 void ctfindvar::get_parameters(void)
 {
-    #ifdef _OPENMP
-    int nthreads = (*this)["nthreads"].integer();
-    if (nthreads > 0) {
-        omp_set_num_threads(nthreads);
-    }
-    #endif
-
     // Load the observations
     setup_observations(m_obs, true, true, false);
 
-    // Get the rest of the parameters
-    if (read_ahead()) {
-        (*this)["prefix"].string();
-
-        if ((*this)["inmodel"].is_valid()) {
-            m_inmodel = GModels((*this)["inmodel"].filename());
-        } else {
-            // Get the desired source position from user
-            (*this)["xsrc"].real();
-            (*this)["ysrc"].real();
-        }
+    // Either load model or query source position parameters
+    if ((*this)["inmodel"].is_valid()) {
+        m_inmodel = GModels((*this)["inmodel"].filename());
+    }
+    else {
+        (*this)["coordsys"].string();
+        (*this)["xsrc"].real();
+        (*this)["ysrc"].real();
     }
 
-    // Create GTIs and counts cube
-    init_gtis();
-    init_cube();
+    // Query time limit parameters
+    (*this)["tinterval"].real();
+    if ((*this)["tmin"].is_valid()) {
+        (*this)["tmin"].time();
+    }
+    if ((*this)["tmax"].is_valid()) {
+        (*this)["tmax"].time();
+    }
 
-    // Get the energy limits
+    // Create map to query spatial parameters
+    create_map(m_obs);
+
+    // Read energy limits
     m_emin = GEnergy((*this)["emin"].real(), "TeV");
     m_emax = GEnergy((*this)["emax"].real(), "TeV");
 
@@ -577,7 +463,28 @@ void ctfindvar::get_parameters(void)
     m_minoff = (*this)["minoff"].real();
 
     // Get minimum significance to set a source as variable
-    m_sig_threshold = (*this)["sig_thr"].real();
+    m_sig_threshold = (*this)["threshold"].real();
+
+    // Query smoothing parameters
+    if ((*this)["smooth_kernel"].is_valid()) {
+        (*this)["smooth_kernel"].string();
+        (*this)["smooth_rad"].real();
+    }
+
+    // If needed later, query output filenames now
+    if (read_ahead()) {
+        (*this)["outcube"].query();
+        (*this)["outmap"].query();
+        (*this)["outmodel"].query();
+    }
+
+    // Set number of OpenMP threads
+    #ifdef _OPENMP
+    int nthreads = (*this)["nthreads"].integer();
+    if (nthreads > 0) {
+        omp_set_num_threads(nthreads);
+    }
+    #endif
 
     // Write parameters into logger
     log_parameters(TERSE);
@@ -588,13 +495,97 @@ void ctfindvar::get_parameters(void)
 
 
 /***********************************************************************//**
- * @brief Initialize counts cube
+ * @brief Initialize Good Time Intervals
  *
- * Sets up the required event cube and time interval storage objects 
- * associated with this object
+ * @exception GException::invalid_value
+ *            Invalid start or stop time or insufficient time bins
+ *
+ * Initialise Good Time Intervals for the variability search.
  ***************************************************************************/
-void ctfindvar::init_cube(void)
+void ctfindvar::init_gtis(void)
 {
+    // Log header
+    log_header1(NORMAL, "Initialise Good Time Intervals");
+
+    // Clear time intervals
+    m_gti.clear();
+
+    // Set start and stop times
+    m_tstart = get_tstart();
+    m_tstop  = get_tstop();
+
+    // Query time interval
+    double tinterval = (*this)["tinterval"].real();
+
+    // Compute time bins
+    double tstart_sec = m_tstart.secs();
+    double tstop_sec  = m_tstop.secs();
+    int    bins       = (tstop_sec - tstart_sec) / tinterval + 0.5;
+
+    // Log information
+    log_value(NORMAL, "Reference time (mjd)", m_tstart.reference().mjdref());
+    log_value(NORMAL, "Start time (sec)",    tstart_sec);
+    log_value(NORMAL, "Stop time (sec)",     tstop_sec);
+    log_value(NORMAL, "Total time (sec)",    tstop_sec-tstart_sec);
+    log_value(NORMAL, "Time interval (sec)", tinterval);
+    log_value(NORMAL, "Number of time bins", bins);
+
+    // Throw exception if tstart == tstop
+    if (m_tstart == m_tstop) {
+        throw GException::invalid_value(G_INIT_GTIS,
+                                        "Start time is equal to stop time");
+    }
+    else if (bins < 2) {
+        std::string msg = "Method requires at least two time bins (" +
+                          gammalib::str(bins) + " bins found).";
+        throw GException::invalid_value(G_INIT_GTIS, msg);
+    }
+
+    // Set up Good Time Intervals by appending all intervals that overlap
+    // with at least one of the observations
+    for (int i = 0; i < bins; ++i) {
+        
+        // Get time interval
+        GTime tstart(m_tstart + i*tinterval);
+        GTime tstop(m_tstart + (i+1.0)*tinterval);
+        GGti  gti(tstart, tstop);
+
+        // Make sure there's an observation that overlaps with this GTI
+        for (int k = 0; k < m_obs.size(); ++k) {
+
+            // Get CTA observation
+            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[k]);
+
+            // Continue only if observation is valid
+            if (obs != NULL) {
+
+                // Add GTI is the time intervals overlap
+                if (gti_overlap(obs->gti(), gti) > 0.0) {
+                    m_gti.push_back(gti);
+                    break;
+                }
+
+            } // endif: observation was valid
+
+        } // endfor: looped over observations
+
+    } // endfor: looped over Good Time Intervals
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Create counts cube
+ *
+ * Creates a counts cube comprising a sky map for each Good Time Interval.
+ ***************************************************************************/
+void ctfindvar::create_cube(void)
+{
+    // Log header
+    log_header1(NORMAL, "Create counts cube");
+
     // Create the basic skymap
     m_counts = create_map(m_obs);
 
@@ -603,102 +594,40 @@ void ctfindvar::init_cube(void)
 
     // Create the peaksigmap
     m_peaksigmap = m_counts.extract(1);
+
+    // Loop over all unbinned CTA observations in the container
+    #pragma omp parallel for
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Get pointer to observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+
+        // Fill the cube
+        fill_cube(obs);
+
+        // Dispose events to free memory
+        obs->dispose_events();
+
+    } // endfor: looped over observations
+
+    // Smooth the maps if requested
+    if ((*this)["smooth_kernel"].is_valid() &&
+        (*this)["smooth_kernel"].string() != "NONE") {
+        m_counts.smooth((*this)["smooth_kernel"].string(),
+                        (*this)["smooth_rad"].real());
+    }
+
+    // Return
+    return;
 }
 
 
 /***********************************************************************//**
- * @brief Initialize counts cube
+ * @brief Fill the cube from the events in an observation
  *
- * Sets up the required event cube and time interval storage objects 
- * associated with this object
- ***************************************************************************/
-void ctfindvar::init_gtis(void)
-{
-    double tinterval = (*this)["tinterval"].real();
-    m_tstart = GTime("JD 999999999");     // large unreasonable Julian date
-    m_tstop  = GTime("JD 0");              // small unreasonable Julian date
-
-    // Set the start time
-    if ((*this)["tmin"].is_valid()) {
-        log_string(NORMAL, "Setting start time from command line");
-        m_tstart = (*this)["tmin"].time();
-    } else {
-        log_string(NORMAL, "Setting start time from observations");
-        for (int o=0; o<m_obs.size(); o++) {
-            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
-            
-            // Check that the start time of the run is less than tstart
-            if (obs->gti().tstart() < m_tstart) {
-                m_tstart = obs->gti().tstart();
-            }
-        }
-    }
-
-    // Set the stop time
-    if ((*this)["tmax"].is_valid()) {
-        log_string(NORMAL, "Setting stop time from command line");
-        m_tstop = (*this)["tmax"].time();
-    } else {
-
-        log_string(NORMAL, "Setting stop time from observations");
-        for (int o=0; o<m_obs.size(); o++) {
-            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
-            
-            // Check that the stop time of the run is larger than tstop
-            if (obs->gti().tstop() > m_tstop) {
-                m_tstop = obs->gti().tstop();
-            }
-        }
-    }
-
-    // Fill the number of good time intervals
-    double tstart_sec = m_tstart.secs();
-    double tstop_sec  = m_tstop.secs();
-    int    bins       = (tstop_sec - tstart_sec) / tinterval + 0.5;
-
-    // Log information
-    log_value(NORMAL, "treference (mjd)", m_tstart.reference().mjdref());
-    log_value(NORMAL, "tstart (sec)",  tstart_sec);
-    log_value(NORMAL, "tstop  (sec)",  tstop_sec);
-    log_value(NORMAL, "Total time",    tstop_sec-tstart_sec);
-    log_value(NORMAL, "Time interval", tinterval);
-    log_value(NORMAL, "nbins",         bins);
-
-    // Throw if tstart == tstop
-    if (m_tstart == m_tstop) {
-        throw GException::invalid_value(G_INIT_GTIS,
-                                        "Start time is equal to stop time");
-    } else if (bins < 2) {
-        std::string msg = "Method requires at least two time bins (" +
-                          gammalib::str(bins) + " bins found).";
-        throw GException::invalid_value(G_INIT_GTIS, msg);
-    }
-
-    for (int i=0; i<bins; i++) {
-        
-        // Get the next time interval
-        GTime next_tstart(m_tstart + i*tinterval);
-        GTime next_tstop(m_tstart + (i+1.0)*tinterval);
-        GGti  next_gti(next_tstart, next_tstop);
-
-        // Make sure there's an observation that overlaps with this GTI
-        for (int o=0; o<m_obs.size(); o++) {
-            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
-            
-            if (gti_overlap(obs->gti(), next_gti) > 0.0) {
-                m_gti.push_back(next_gti);
-                break;
-            }
-        }
-    }
-}
-
-
-/***********************************************************************//**
- * @brief Fill the cube from the events in the map
+ * @param[in] obs Pointer to CTA observation.
  *
- * Sets up the required event cube and time interval storage objects 
- * associated with this object
+ * Fills the cube from the events in an observation.
  ***************************************************************************/
 void ctfindvar::fill_cube(GCTAObservation* obs)
 {
@@ -733,10 +662,6 @@ void ctfindvar::fill_cube(GCTAObservation* obs)
     int num_outside_time = 0;
     int num_in_map       = 0;
 
-    // Specify whether we are cutting on energy or not
-    bool cut_emin = (m_emin.TeV() > 0.0) ? true : false;
-    bool cut_emax = (m_emax.TeV() > 0.0) ? true : false;
-
     // Fill counts sky map
     for (int i = 0; i < events->size(); ++i) {
 
@@ -744,16 +669,14 @@ void ctfindvar::fill_cube(GCTAObservation* obs)
         const GCTAEventAtom* event = (*events)[i];
 
         // Check that the energy is valid
-        if ((cut_emin && event->energy() < m_emin) ||
-            (cut_emax && event->energy() > m_emax)) {
+        if ((event->energy() < m_emin) || (event->energy() > m_emax)) {
             num_outside_ecut++;
             continue;
         }
 
-        // Determine event time
-        GTime evnt_time = event->time();
-        int time_indx = time2inx(evnt_time);
-        
+        // Determine event time index
+        int time_indx = time2inx(event->time());
+
         // Check if event is in the GTIs
         if ((time_indx > -1) && (time_indx < m_counts.nmaps())) {
 
@@ -791,10 +714,11 @@ void ctfindvar::fill_cube(GCTAObservation* obs)
             // Increment number of maps
             num_in_map++;
 
-        } else {
-            // Event falls outside the specified time range
+        }
+
+        // ... otherwise, event falls outside the specified time range
+        else {
             num_outside_time++;
-            continue;
         }
 
     } // endfor: looped over all events
@@ -818,52 +742,332 @@ void ctfindvar::fill_cube(GCTAObservation* obs)
 
 
 /***********************************************************************//**
- * @brief Save the current sky direction to model if significance > thr
- *
- * @param[in]  dir_pix                 pixel sky direction 
- * @param[out] m_model_sig_above_thr   model position with sig>thr 
+ * @brief Analyse all pixels of counts cube
  ***************************************************************************/
-void ctfindvar::fill_model_sig_pos(const GSkyDir& dir_pix)
+void ctfindvar::analyse_cube(void)
 {
-    //Set spatial components
-    GModelSpatialPointSource spatial(dir_pix);
+    // Log header
+    log_header1(NORMAL, "Analyse sky map pixels");
 
-    //Set fake spectral component (powerlaw with 1% of Crab)
+    // Get number of GTIs
+    const int nbins = m_gti.size();
+
+    // Get relevant sky map pixels
+    std::vector<int> srcInxPix = get_pixels();
+
+    // Preparing the histogram with significance evolution for the source
+    // center and the highest sig-pix
+    m_pixsigsrc = GNdarray(srcInxPix.size(), nbins);
+    m_pixsigmax = GNdarray(nbins);
+
+    // Initialise maximum significance
+    double max_sig = 0;
+
+    // looping over all the pixels in the cube
+    #pragma omp parallel for
+    for (int ipix = 0; ipix < m_counts.npix(); ++ipix) {
+
+        // Compute total counts for pixel
+        double total_counts = 0.0;
+        for (int k = 0; k < nbins; ++k) {
+            total_counts += m_counts(ipix, k);
+        }
+
+        // Getting the variability significance for the current pixel
+        GNdarray pixSig = get_variability_sig(ipix);
+
+        // Getting the significance evolution for the source
+        for (int src = 0; src < srcInxPix.size(); ++src) {
+
+            // Store the distribution if the source is located at this position
+            if (srcInxPix[src] == ipix) {
+
+                #pragma omp critical(ctfindvar_analyse_cube)
+                for (int i = 0; i < nbins; i++) {
+                    m_pixsigsrc(src,i) = pixSig(i);
+                }
+            }
+
+        } // endfor: looped over sources
+
+        // Make sure that this code is not executed in parallel
+        #pragma omp critical(ctfindvar_analyse_cube)
+        {  
+            // Determine the pixel with the highest significance
+            if (max(pixSig) > max_sig) {
+                max_sig       = max(pixSig);
+                m_max_sig_dir = m_counts.inx2dir(ipix);
+                m_pixsigmax   = pixSig;
+            }
+
+            // Storing sig in skymap
+            m_peaksigmap(ipix) = max(pixSig);
+
+            // If the significance is greater than the significance threshold,
+            // the position is stored in a model
+            if (max(pixSig) > m_sig_threshold) {
+                GSkyDir dir_pix = m_counts.inx2dir(ipix);
+                m_model_above_thr.append(sky_model(dir_pix));
+            }
+        }
+    
+    } // endfor: looped over pixels
+
+    // Log results
+    log_value(NORMAL, "Maximum significance", max_sig);
+    log_value(NORMAL, "Right Ascension of maximum", m_max_sig_dir.ra_deg());
+    log_value(NORMAL, "Declination of maximum", m_max_sig_dir.dec_deg());
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Return pixel vector
+ *
+ * @return Vector of sky map pixels
+ *
+ * Returns a vector of sky map pixels that corresponds to the source model
+ * positions.
+ ***************************************************************************/
+std::vector<int> ctfindvar::get_pixels(void)
+{
+    // Initialise pixel array
+    std::vector<int> srcInxPix;
+
+    // If there are input models then extract
+    if (m_inmodel.size() > 0) {
+
+        // Loop over models
+        for (int i = 0; i < m_inmodel.size(); ++i) {
+
+            // Extract the model
+            GModelSky* model = dynamic_cast<GModelSky*>(m_inmodel[i]);
+
+            // If model is a sky model then extract the model centre. Note
+            // that this only works for a model that results a GSkyRegionCircle
+            // object as region.
+            if (model != NULL) {
+
+                // Get the source position
+                GModelSpatial*    spatial = model->spatial();
+                GSkyRegion*       region  = spatial->region();
+                GSkyRegionCircle* circle  = dynamic_cast<GSkyRegionCircle*>(region);
+
+                // If region circle is valid then
+                if (circle != NULL) {
+                    int ipix = m_counts.dir2inx(circle->centre());
+                    srcInxPix.push_back(ipix);
+                    continue;
+                }
+
+            } // endif: model was a sky model
+
+            // If we are still alive then remove the model since it is neither
+            // a sky model, nor does it have a region circle
+            m_inmodel.remove(i);
+            i--;
+
+        } // endfor: looped over all models
+
+    } // endif: there were input models
+    
+    // ... otherwise query the source position
+    else {
+
+        // Query source direction
+        GSkyDir dir;
+        if ((*this)["coordsys"].string() == "CEL") {
+            dir.radec_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
+        }
+        else {
+            dir.lb_deg((*this)["xsrc"].real(),(*this)["ysrc"].real());
+        }
+
+        // Store the index of this source
+        int ipix = m_counts.dir2inx(dir);
+        srcInxPix.push_back(ipix);
+
+    } // endelse: queried source position
+
+    // Return pixel array
+    return srcInxPix;
+}
+
+
+/***********************************************************************//**
+ * @brief Return sky model for a given sky direction
+ *
+ * @param[in]  dir Sky direction
+ * @return Sky model for a given sky direction
+ *
+ * Returns a point source sky model at the position of the current pixel
+ * with a power law spectral model corresponding to 1% of the Crab flux.
+ *
+ * The model name is built from the celestial coordinates of the source.
+ ***************************************************************************/
+GModelSky ctfindvar::sky_model(const GSkyDir& dir) const
+{
+    // Set point source spatial component from sky direction
+    GModelSpatialPointSource spatial(dir);
+
+    // Set fake spectral component (powerlaw with 1% of Crab)
     GModelSpectralPlaw spectral(5.7e-18, -2.48, GEnergy(0.3, "TeV"));
 
-    //Creat a sky model 
+    // Create a sky model
     GModelSky model(spatial, spectral);
     
-    //Extracting the coordinate to name the model
-    double ra  = dir_pix.ra_deg();
-    double dec = dir_pix.dec_deg();
-    std::string name = "Sky_direction_" + gammalib::str(ra, 4) + 
-                       "_" + gammalib::str(dec, 4);
+    // Build model name from celestial coordinates
+    double      ra   = dir.ra_deg();
+    double      dec  = dir.dec_deg();
+    std::string name = gammalib::str(ra, 4);
+    if (dec < 0.0) {
+        name += "-";
+    }
+    else {
+        name += "+";
+    }
+    name += gammalib::str(std::abs(dec), 4);
+
+    // Set model name
     model.name(name);
-    
-    //Add the model for this pixel to the output mode 
-    m_model_above_thr.append(model);
-    
+
+    // Return model
+    return model;
 }
+
+
 /***********************************************************************//**
- * @brief Get the map index associated with a given time
- *
- * @param[in]  pix_number       Spatial pixel
- * @param[out] alpha_vector     Vector containing effective exposure
+ * @brief Get the significance of variability for a given skymap pixel
+ * 
+ * @param[in] ipix Sky map pixel index.
+ * @return Histogram of significances.
+ * 
+ * Significance is computed according to Li & Ma equation 17:
+ *    see: https://doi.org/10.1086/161295
+ * Some modification is made in order to handle the case where Non = 0, 
+ * but Noff != 0.
  ***************************************************************************/
-void ctfindvar::fill_alpha_vector(const int&           pix_number,
-                                  std::vector<double>& alpha_vector)
+GNdarray ctfindvar::get_variability_sig(const int& ipix)
 {
-    // Pixel position
-    GSkyDir pix_dir = m_counts.inx2dir(pix_number);
+    // Initialise result
+    GNdarray sig_histogram(m_gti.size());
+
+    // Initialise vectors
+    std::vector<bool> accepted_bin_bckg_vector(m_gti.size(), true);
+
+    // Get alpha values for specified pixel
+    std::vector<double> alphas = get_alphas(ipix);
+
+    // Loop over pixels until all background pixels are removed
+    bool background_validated = false;
+    while (background_validated == false) {
+
+        // Signal that background was validated
+        background_validated = true;
+
+        // Loop over all the GTIs of the pixel
+        for (int i = 0; i < m_gti.size(); ++i) {
+
+            // The GTI is discared from background calculation and not
+            // checked again
+            if (!accepted_bin_bckg_vector[i]) {
+                continue;
+            }
+
+            // ... otherwise check if bin fails minoff check or no observations
+            // overlap it
+            else if (m_counts(ipix, i) < m_minoff || alphas[i] == 0) {
+                accepted_bin_bckg_vector[i] = false;
+                continue;
+            }
+
+            // ... otherwise
+            double noff  = 0.0;
+            double alpha = 0.0;
+
+            // Got one GTI selected (i), looping over all the others (j).
+            for (int j = 0; j < m_gti.size(); ++j) {
+                if (j != i && accepted_bin_bckg_vector[j] == 1) {
+                    noff  += m_counts(ipix, j);
+                    alpha += alphas[j];
+                }
+            }
+
+            // The background is averaged on the number of bins -1
+            double non = m_counts(ipix, i);
+            alpha      = alphas[i]/alpha;
+
+            // Compute sensitivity in Gaussian sigma using Li & Ma
+            double alpha1 = alpha + 1.0;
+            double ntotal = non+noff;
+            double arg1   = non/ntotal;
+            double arg2   = noff/ntotal;
+            double sig    = 0.0;
+            if (alpha != 0.0) {
+                if (noff == 0.0) {
+                    sig = 0.0;
+                }
+                else if (non > 0.0) {
+                    double term1  = non  * std::log((alpha1/alpha)*arg1);
+                    double term2  = noff * std::log(alpha1*arg2);
+                    sig  = std::sqrt(2.0 * (term1 + term2));
+                }
+                else {
+                    sig = std::sqrt(2.0 * noff * std::log(alpha1));
+                }
+                sig *= (non < alpha*noff) ? -1.0 : 1.0;
+            }
+           
+            // Update the significance
+            sig_histogram(i) = sig;
+
+            // If bin is significant, it's removed from the background and
+            // we loop again
+            if (sig > m_sig_threshold) {
+                accepted_bin_bckg_vector[i] = false;
+                background_validated        = false;
+            }
+
+        } // endfor: looped over all GTIs
+
+    } // endwhile: iterate until converged
+
+    // Return significance histogram
+    return sig_histogram;
+}
+
+
+/***********************************************************************//**
+ * @brief Get alpha vector
+ *
+ * @param[in] ipix Sky map pixel index
+ * @return Vector containing effective exposure
+ ***************************************************************************/
+std::vector<double> ctfindvar::get_alphas(const int& ipix) const
+{
+    // Initialise alpha vector
+    std::vector<double> alphas(m_gti.size(), 0.0);
+
+    // Convert pixel index into sky direction
+    GSkyDir pix_dir = m_counts.inx2dir(ipix);
 
     // Loop over all observations
-    for (int i = 0; i < m_obs.size(); i++) {
-        // Skip if observation does not overlap with this pixel position
-        GCTAObservation* obs        = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        GCTARoi          roi        = obs->roi();
-        GSkyDir          roi_centre = roi.centre().dir();
+    for (int i = 0; i < m_obs.size(); ++i) {
 
+        // Get CTA observation
+        const GCTAObservation* obs = dynamic_cast<const GCTAObservation*>(m_obs[i]);
+
+        // Fall through if observation is not valid
+        if (obs == NULL) {
+            continue;
+        }
+
+        // Get RoI. Fall through if  observation does not overlap with this
+        // pixel position
+        GCTARoi roi        = obs->roi();
+        GSkyDir roi_centre = roi.centre().dir();
         if (roi_centre.dist_deg(pix_dir) > roi.radius()) {
             continue;
         }
@@ -875,15 +1079,15 @@ void ctfindvar::fill_alpha_vector(const int&           pix_number,
         const GGti& obs_gti(obs->gti());
 
         // Loop over all time bins
-        for (int j = 0; j < m_gti.size(); j++) {
+        for (int j = 0; j < m_gti.size(); ++j) {
 
             // Make sure observation overlaps with this time interval
             double exposure = gti_overlap(m_gti[j], obs_gti);
             if (exposure > 0.0) {
 
                 // Get IRF response
-                const GCTAResponseIrf* rsp = dynamic_cast<const GCTAResponseIrf*>
-                                 (obs->response());
+                const GCTAResponseIrf* rsp =
+                      dynamic_cast<const GCTAResponseIrf*>(obs->response());
 
                 // Throw an exception if observation has no instrument response function
                 if (rsp == NULL) {
@@ -908,109 +1112,18 @@ void ctfindvar::fill_alpha_vector(const int&           pix_number,
                     throw GException::invalid_value(G_FILL_ALPHA_VECTOR, msg);
                 }
 
-                // Multiply background rate with livetime and solid angle
-                #pragma omp critical(ctfindvar_alpha_vector)
-                alpha_vector[j] += exposure * bkg->rate_ebin(instdir, m_emin, m_emax);
-            }
-        }
-    }
+                // Add up background rate
+                alphas[j] += exposure * bkg->rate_ebin(instdir, m_emin, m_emax);
 
-    return;
+            } // endif: exposure was positive
+
+        } // endfor: looped over all time bins
+
+    } // endfor: looped over all observations
+
+    // Return alphas
+    return alphas;
 } 
-
-
-
-
-/***********************************************************************//**
- * @brief Obtain the significance of variability in a given bin
- * 
- * @param[in]  pix_number        Pixel in the skymap
- * @param[in]  nbins             Number of bins in the skymap
- * @param[out] sig_histogram     Histogram for storing returned significances
- * 
- * Significance is computed according to Li & Ma equation 17:
- *    see: https://doi.org/10.1086/161295
- * Some modification is made in order to handle the case where Non = 0, 
- * but Noff != 0.
- ***************************************************************************/
-void ctfindvar::get_variability_sig(const int& pix_number, 
-                                    const int& nbins, 
-                                    GNdarray&  sig_histogram)
-{
-    std::vector<bool> accepted_bin_bckg_vector(nbins, true);
-    bool background_validated = false;
-    double non, noff;
-    double alpha, sig;
-
-    // Fill the alpha values for each vector
-    std::vector<double> alpha_vector(nbins, 0.0);
-    fill_alpha_vector(pix_number, alpha_vector);
-
-    // Loop over pixels until all background pixls are removed
-    while (background_validated == false) {
-        background_validated = true;
-
-        // Loop over all the GTIs of the pixel
-        for (int i = 0; i < nbins; i++) {
-
-            // The GTI is discared from bckg calculation and not checked again.
-            if (!accepted_bin_bckg_vector[i]) {
-                continue;
-            } 
-            // Check if bin fails minoff check or no observations overlap it
-            else if (m_counts(pix_number, i) < m_minoff || alpha_vector[i] == 0) {
-                accepted_bin_bckg_vector[i] = false;
-                continue;
-            }
-
-            noff  = 0.0;
-            alpha = 0.0;
-            // Gor one GTI selected (i), looping over all the others (j).
-            for (int j = 0; j < nbins; j++) {
-                if (j != i && accepted_bin_bckg_vector[j] == 1) {
-                    noff  += m_counts(pix_number, j);
-                    alpha += alpha_vector[j];
-                }
-            }
-
-            // The background is averaged on the number of bins -1
-            non   = m_counts(pix_number, i); 
-            alpha = alpha_vector[i]/alpha;
-
-            // Compute sensitivity in Gaussian sigma using Li & Ma
-            double alpha1 = alpha + 1.0;
-            double ntotal = non+noff;
-            double arg1   = non/ntotal;
-            double arg2   = noff/ntotal;
-            if (noff == 0.0) {
-                sig = 0.0;
-            } else if (non > 0.0) {
-                double term1  = non * std::log((alpha1/alpha)*arg1);
-                double term2  = noff * std::log(alpha1*arg2);
-                sig  = std::sqrt(2.0 * (term1 + term2));
-            } else {
-                sig = std::sqrt(2.0 * noff * std::log(alpha1));
-            }
-
-            // Specify the sign of the significance
-            sig *= (non < alpha*noff) ? -1.0 : 1.0;
-
-            if (alpha == 0.0) {
-                sig = 0.0;
-            }
-           
-            // Update the significance
-            sig_histogram(i) = sig;
-
-            // If bin is significant, it's removed from bckg and we loop again.
-            if (sig > m_sig_threshold) {
-                accepted_bin_bckg_vector[i] = false;
-                background_validated        = false;
-            }
-        }
-
-    }
-}
 
 
 /***********************************************************************//**
@@ -1020,40 +1133,166 @@ void ctfindvar::get_variability_sig(const int& pix_number,
  * @param[in] gti2      Second GTI
  * @return Number of seconds that @p gti1 and @p gti2 overlap
  ***************************************************************************/
-double ctfindvar::gti_overlap(const GGti& gti1, const GGti& gti2)
+double ctfindvar::gti_overlap(const GGti& gti1, const GGti& gti2) const
 {
+    // Initialise no overlap
     double overlap = 0.0;
-    const GGti& gti_1st = (gti1.tstart() <= gti2.tstart()) ? gti1 : gti2;
-    const GGti& gti_2nd = (gti1.tstart() > gti2.tstart()) ? gti1 : gti2;
 
-    // gti1 starts earlier
+    // Set first and second GTI so that gti_1st starts before gti_2nd
+    const GGti& gti_1st = (gti1.tstart() <= gti2.tstart()) ? gti1 : gti2;
+    const GGti& gti_2nd = (gti1.tstart()  > gti2.tstart()) ? gti1 : gti2;
+
+    // Compute overlap
     if (gti_1st.tstop() > gti_2nd.tstart()) {
         if (gti_1st.tstop() <= gti_2nd.tstop()) {
             overlap = gti_1st.tstop() - gti_2nd.tstart();
-        } else if (gti_1st.tstop() > gti_2nd.tstop()) {
+        }
+        else if (gti_1st.tstop() > gti_2nd.tstop()) {
             overlap = gti_2nd.tstop() - gti_2nd.tstart();
         }
     }
 
+    // Return overlap
     return overlap;
 }
 
 
 /***********************************************************************//**
- * @brief Write individual histograms in CSV format
+ * @brief Get start time
+ *
+ * @return Start time
  ***************************************************************************/
-void ctfindvar::write_srchist(void)
+GTime ctfindvar::get_tstart(void)
+{
+    // Initialise start time with large unreasonable Julian date
+    GTime tstart("JD 999999999");
+
+    // If tmin parameter is valid then set the start time
+    if ((*this)["tmin"].is_valid()) {
+
+        // Query tmin parameter
+        tstart = (*this)["tmin"].time();
+
+        // Log action
+        log_string(NORMAL, "Setting start time \"tmin\" parameter");
+
+    } // endif: tmin parameter was valid
+
+    // ... otherwise set start time from observations
+    else {
+
+        // Loop over all observations
+        for (int k = 0; k < m_obs.size(); ++k) {
+
+            // Get CTA observation
+            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[k]);
+            
+            // Continue only if observation is valid
+            if (obs != NULL) {
+
+                // Update start time if the start time of the observation is
+                // smaller than the current start time
+                if (obs->gti().tstart() < tstart) {
+                    tstart = obs->gti().tstart();
+                }
+
+            } // endif: observation was valid
+
+        } // endfor: looped over observations
+
+        // Log action
+        log_string(NORMAL, "Setting start time from observations");
+
+    } // endelse: no valid time specified
+
+    // Return start time
+    return tstart;
+}
+
+
+/***********************************************************************//**
+ * @brief Get stop time
+ *
+ * @return Stop time
+ ***************************************************************************/
+GTime ctfindvar::get_tstop(void)
+{
+    // Initialise stop time with small unreasonable Julian date
+    GTime tstop("JD 0");
+
+    // If tmax parameter is valid then set the stop time
+    if ((*this)["tmax"].is_valid()) {
+
+        // Query tmax parameter
+        tstop = (*this)["tmax"].time();
+
+        // Log action
+        log_string(NORMAL, "Setting stop time \"tmax\" parameter");
+
+    } // endif: tmax parameter was valid
+
+    // ... otherwise set stop time from observations
+    else {
+
+        // Loop over all observations
+        for (int k = 0; k < m_obs.size(); ++k) {
+
+            // Get CTA observation
+            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[k]);
+            
+            // Continue only if observation is valid
+            if (obs != NULL) {
+
+                // Update stop time if the stop time of the observation is
+                // larger than the current stop time
+                if (obs->gti().tstop() > tstop) {
+                    tstop = obs->gti().tstop();
+                }
+
+            } // endif: observation was valid
+
+        } // endfor: looped over observations
+
+        // Log action
+        log_string(NORMAL, "Setting stop time from observations");
+
+    } // endelse: no valid time specified
+
+    // Return stop time
+    return tstop;
+}
+
+
+/***********************************************************************//**
+ * @brief Write source histograms in FITS format
+ * 
+ * @param[in,out] fits FITS file
+ *
+ * This method creates two FITS binary table extensions and appends them to
+ * the FITS file.
+ *
+ * The first extension is named "SOURCE SIGNIFICANCE" and contains the
+ * significance of the variability as function of time bin for the pixel
+ * with the maximum significance and for each source.
+ *
+ * The second extension is named "SOURCE POSITION" and contains the Right
+ * Ascension and Declination for the maximum significance pixel and for each
+ * source.
+ ***************************************************************************/
+void ctfindvar::write_source_histograms(GFits& fits)
 {
     // Setup data storage for time and source significances
     double   tinterval = (*this)["tinterval"].real();
-    int      nentries = (m_tstop-m_tstart) / tinterval + 0.5;
-    int      nsources = m_pixsigsrc.shape()[0];
-    GNdarray time_info(2, nentries);
-    GNdarray max_pixel_info(nentries);
-    GNdarray src_info(nsources, nentries);
+    int      nbins     = (m_tstop-m_tstart) / tinterval + 0.5;
+    int      nsrc      = m_pixsigsrc.shape()[0];
+    GNdarray time_info(2, nbins);
+    GNdarray max_pixel_info(nbins);
+    GNdarray src_info(nsrc, nbins);
 
-    // Store the full set of information
-    for (int i=0; i<nentries; i++) {
+    // Loop over time bins
+    for (int i = 0; i < nbins; ++i) {
+
+        // Set time bin mid point
         GTime tstart_bin(m_tstart + i * tinterval);
         GTime tstop_bin(m_tstart + (i+1) * tinterval);
         GTime midpoint((tstop_bin.secs()+tstart_bin.secs())*0.5);
@@ -1066,111 +1305,125 @@ void ctfindvar::write_srchist(void)
         int index = time2inx(midpoint);
 
         // Loop over every source
-        for (int src=0; src<nsources; src++) {
-            if (index >= 0) {
-                src_info(src,i) = m_pixsigsrc(src,index);
-            } else {
-                src_info(src,i) = 0.0;
-            }
+        for (int k = 0; k < nsrc; ++k) {
+            src_info(k,i) = (index >= 0) ? m_pixsigsrc(k,index) : 0.0;
         }
 
-        // Fill max pixel information
-        if (index >= 0) {
-            max_pixel_info(i) = m_pixsigmax(index);
-        }
+        // Fill maximum pixel information
+        max_pixel_info(i) = (index >= 0) ? m_pixsigmax(index) : 0.0;
+
+    } // endfor: looped over time bins
+
+    // Create binary tables
+    GFitsBinTable table_signif(nbins);
+    GFitsBinTable table_pos(nsrc+1);
+    table_signif.extname("SOURCE SIGNIFICANCE");
+    table_pos.extname("SOURCE POSITION");
+
+    // Create columns for time bins
+    GFitsTableDoubleCol time_start("TSTART", nbins);
+    GFitsTableDoubleCol time_stop("TSTOP", nbins);
+    GFitsTableDoubleCol time_sigma("MAXSIGPIXEL", nbins);
+    time_start.unit("MJD");
+    time_stop.unit("MJD");
+    time_sigma.unit("sigma");
+
+    // Create columns for source position
+    GFitsTableStringCol pos_name("SOURCE", nsrc+1, 20);
+    GFitsTableDoubleCol pos_ra("RA", nsrc+1);
+    GFitsTableDoubleCol pos_dec("DEC", nsrc+1);
+    pos_ra.unit("deg");
+    pos_dec.unit("deg");
+
+    // Fill time bin columns
+    for (int i = 0; i < nbins; ++i) {
+        time_start(i) = time_info(0,i);
+        time_stop(i)  = time_info(1,i);
+        time_sigma(i) = max_pixel_info(i);
     }
 
-    // Call the appropriate method for writing the data
-    write_srchist_fits(time_info, max_pixel_info, src_info);
-}
+    // Fill source columns
+    pos_name(0) = "MAXSIGPIXEL";
+    pos_ra(0)   = m_max_sig_dir.ra_deg();
+    pos_dec(0)  = m_max_sig_dir.dec_deg();
 
-
-/***********************************************************************//**
- * @brief Write individual histograms in FITS format
- * 
- * @param[in] time_info     Start and stop time in MJD for each bin
- * @param[in] src_info      Significance distribution for each source
-
- * This method stores the extracted significance for each source at each time
- * interval between tstart and tstop. Each time bin contains information on
- * the start and stop time of that bin (in MJD) and the extracted variability
- * significance of the source in that time bin.
- ***************************************************************************/
-void ctfindvar::write_srchist_fits(const GNdarray& time_info,
-                                   const GNdarray& max_pixel_info,
-                                   const GNdarray& src_info)
-{
-    log_string(NORMAL, "Storing histograms in FITS format");
-
-    // Create the table
-    int           nrows = time_info.shape()[1];
-    GFitsBinTable table_signif(nrows);
-    GFitsBinTable table_dir(2);
-    table_signif.extname("SRCSIGNIF");
-    table_dir.extname("SRCPOSITION");
-
-    // Append the start/stop time and max pixel columns
-    GFitsTableDoubleCol start_mjd("TSTART", nrows);
-    GFitsTableDoubleCol stop_mjd("TSTOP", nrows);
-    GFitsTableDoubleCol max_pix("MAXSIGPIXEL", nrows);
-    for (int i=0; i<nrows; i++) {
-        start_mjd(i) = time_info(0,i);
-        stop_mjd(i)  = time_info(1,i);
-        max_pix(i)   = max_pixel_info(i);
-    }
-    table_signif.append(start_mjd);
-    table_signif.append(stop_mjd);
-    table_signif.append(max_pix);
-
-    // Store the position of the peak pixel
-    GFitsTableDoubleCol max_pix_dir("MAXSIGPIXEL",2);
-    max_pix_dir(0) = m_max_sig_dir.ra_deg();
-    max_pix_dir(1) = m_max_sig_dir.dec_deg();
-    table_dir.append(max_pix_dir);
+    // Append columns to tables
+    table_signif.append(time_start);
+    table_signif.append(time_stop);
+    table_signif.append(time_sigma);
 
     // Append the distribution for each source
-    int src_count = src_info.shape()[0];
-    for (int src=0; src<src_count; src++) {
-        
+    for (int k = 0; k < nsrc; ++k) {
+
+        // Initialise source name and direction
         std::string src_name("SOURCE");
         GSkyDir     src_dir;
 
         // Get the name from the input model file
-        if (m_inmodel.size() > 0) {
-            src_name = m_inmodel[src]->name();
+        if (m_inmodel.size() > k) {
 
-            // Get source position
-            GModelSky*     model         = dynamic_cast<GModelSky*>(m_inmodel[src]);
-            GModelSpatial* model_spatial = model->spatial();
-            GSkyRegion*    model_region  = model_spatial->region();
-            src_dir = dynamic_cast<GSkyRegionCircle*>(model_region)->centre();
-        } 
-        // ... otherwise set the position from xsrc,ysrc
+            // Extract the model
+            GModelSky* model = dynamic_cast<GModelSky*>(m_inmodel[k]);
+
+            // If model is a sky model then extract the model centre. Note
+            // that this only works for a model that results a GSkyRegionCircle
+            // object as region.
+            if (model != NULL) {
+
+                // Get the source position
+                GModelSpatial*    spatial = model->spatial();
+                GSkyRegion*       region  = spatial->region();
+                GSkyRegionCircle* circle  = dynamic_cast<GSkyRegionCircle*>(region);
+
+                // If region circle is valid then extract source name and
+                // sky direction
+                if (circle != NULL) {
+                    src_name = m_inmodel[k]->name();
+                    src_dir  = circle->centre();
+                }
+
+            } // endif: model was a sky model
+
+        } // endif: there were enough models in the input model
+
+        // ... otherwise set the position from the xsrc and ysrc parameters
         else {
             if ((*this)["coordsys"].string() == "CEL") {
-                src_dir.radec_deg((*this)["xsrc"].real(), (*this)["yref"].real());
-            } else {
-                src_dir.lb_deg((*this)["xsrc"].real(), (*this)["yref"].real());
+                src_dir.radec_deg((*this)["xsrc"].real(), (*this)["ysrc"].real());
+            }
+            else {
+                src_dir.lb_deg((*this)["xsrc"].real(), (*this)["ysrc"].real());
             }
         }
-        
-        // Create and fill a new column
-        GFitsTableDoubleCol src_sig_col(src_name, nrows);
-        for (int i=0; i<nrows; i++) {
-            src_sig_col(i) = src_info(src, i);
+
+        // Create new time column for source
+        GFitsTableDoubleCol column(src_name, nbins);
+        column.unit("sigma");
+
+        // Fill column
+        for (int i = 0; i < nbins; ++i) {
+            column(i) = src_info(k, i);
         }
-        table_signif.append(src_sig_col);
 
-        // Store the positions of the source
-        GFitsTableDoubleCol src_dir_col(src_name,2);
-        src_dir_col(0) = src_dir.ra_deg();
-        src_dir_col(1) = src_dir.dec_deg();
-        table_dir.append(src_dir_col);
-    }
+        // Append column to time table
+        table_signif.append(column);
 
-    // Store information regarding the source positions
+        // Store source infirmation
+        pos_name(k+1) = src_name;
+        pos_ra(k+1)   = src_dir.ra_deg();
+        pos_dec(k+1)  = src_dir.dec_deg();
 
-    // Write the tables to a file
-    m_outfile.append(table_signif);
-    m_outfile.append(table_dir);
+    } // endfor: looped over sources
+
+    // Append columns to tables
+    table_pos.append(pos_name);
+    table_pos.append(pos_ra);
+    table_pos.append(pos_dec);
+
+    // Append tables to FITS file
+    fits.append(table_signif);
+    fits.append(table_pos);
+
+    // Return
+    return;
 }
