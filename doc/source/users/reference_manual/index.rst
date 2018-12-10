@@ -17,7 +17,6 @@ ctools
 .. toctree::
    :maxdepth: 1
 
-   ctfindvar --- ToDo: Describe what tool is doing <ctfindvar>
    ctbin --- Generates counts cube <ctbin>
    ctbkgcube --- Generates background cube <ctbkgcube>
    ctbutterfly --- Compute butterfly <ctbutterfly>
@@ -25,6 +24,7 @@ ctools
    ctedispcube --- Generates energy dispersion cube <ctedispcube>
    cterror --- Calculates likelihood profile errors <cterror>
    ctexpcube --- Generates exposure cube <ctexpcube>
+   ctfindvar --- Search for source variability <ctfindvar>
    ctlike --- Performs maximum likelihood fitting <ctlike>
    ctmapcube --- Generates a map cube <ctmapcube>
    ctmodel --- Computes model counts cube <ctmodel>

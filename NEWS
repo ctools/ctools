@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-23 November 2018
+11 December 2018
 
 
 Introduction
@@ -124,6 +124,12 @@ Add hidden "nthreads" parameter to control parallel computations (#2421).
 ctexpcube - CTA exposure cube generation
 ----------------------------------------
 None
+
+
+ctfindvar - Variability search
+------------------------------
+New: the ctfindvar tool searches for source variability using an On/Off method
+in the time domain (#2713).
 
 
 ctlike - Maximum likelihood fitting

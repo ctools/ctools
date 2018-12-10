@@ -1,50 +1,50 @@
 .. _ctfindvar:
 
 ctfindvar
-==============================
+=========
 
-ToDo: Describe in a one liner what the tool is doing.
+Search for source variability.
 
 
 Synopsis
 --------
-This tool is used to search for source variability. 
-The variability is computed by binning the arrival time of the photons 
-and applying the on-off method to each bin, integrating the background
-over all the other bins. 
-A Limit is set to include a bin in the background sample, i.e., its 
-significance with respect to all the others bins has to be lower than 4.5
-The significance of each bin is computed using Li&Ma eq. 17.
-A limit on the background sample can also be included, taking only into 
-account bins that have a number of counts which is higher than a threshold
-defined by the user via the "minoff" parameter.
 
-Variability is calculated for each pixel of the sky given in the input files. 
-The results of the variability is further stored in the srcsig.fits file, 
-where the GTIs and the significance of each bin are stored.
-Only the sources with a significance > 4.5 sigmas are stored.
+This tool searches for source variability by applying the On/Off method in the
+time domain. The variability of sky map pixels is computed by binning the events
+as function of the photon arrival time and applying the On/Off method to each
+time bin, integrating the background over all the other time bins. Only bins
+with a variabilty significance below a given threshold, defined by the hidden
+``threshold`` parameter, are included in the background estimate. Furthermore,
+only time bins that exceed a minimum number of events, specified by the hidden
+``minoff`` parameter, are considered for the background estimate. The significance
+of each time bin is computed using Li & Ma formula.
 
-:ref:`ctfindvar` takes in input some observation files.
-It calculates a cube with several maps, each one with a count number integrated
-over a time period defined by the tinterval parameter, for each pixel. 
-The tinterval parameter is the time scale over which the variability
-will be searched.
+:ref:`ctfindvar` will search a grid of sky map pixels for source variability. Using
+the hidden ``smooth_kernel`` and ``smooth_rad`` parameters, the sky map may be
+smoothed before the variability search. The tool will compute sky maps for a
+number of time bins. The duration of each time bin is specified by the ``tinterval``
+parameter, the start and stop time are defined by the ``tmin`` and ``tmax``
+parameters. If the start and stop time are ``NONE``, the start and stop times will
+be extracted from the input event list(s). Note that ``tinterval`` specifies the
+time scale over which the variability will be searched.
 
-Inputs files:
-- observation file xml, or event list .fits
+The tool will determine the sky map pixel with the maximum variability and store
+the variability histogram and pixel position as ``MAXSIGPIXEL`` in the output file,
+specified using the ``outmap`` parameter. In addition, the tool will determine the
+variability for a number of source positions. If an input model is specified
+using the ``inmodel`` parameter, the source positions will be defined by the centre
+positions of all gamma-ray source components in the input model. If no input
+model is specified, the tool will use the ``xsrc`` and ``ysrc`` parameters to allow
+the specification of a source position. The results will be stored in the output
+file using either the source names found in the model definition file, or the
+name ``SOURCE`` if the source position was specified by the ``xsrc`` and ``ysrc``
+parameters.
 
-Output files: 
-- countscube.fits
-    provides all the count-skymaps contained in the cube.
-- peaksigmap.fits
-    a skymap of the highest significance for each pixel
-- srcsig.fits
-    a table containing the GTIs together with the significance
-    for all the sources with a significant variability detected.
+All sky map pixels with a variability above the value specified by the ``threshold``
+will also added be as a point source model to the ``outmodel`` file. Each source will
+have a power law as the spectral component with a total flux that corresponds to
+1% of the Crab nebula flux.
 
-
-The significance of a source can be displayed using the 
-``show_variability_evolution.py`` script in the example forlder
 
 General parameters
 ------------------
@@ -56,7 +56,17 @@ General parameters
     Input model definition file for extracting source positions.
 
 ``(outcube = NONE) [file]``
-    Filename for saving counts cube, NONE will result in no cube being saved.
+    Filename for saving counts cube, ``NONE`` will result in no cube being saved.
+
+``outmap [file]``
+    Filename for output sky map containing the maximum significance for each
+    spatial pixel. The file also contains the variability significance as function
+    of time for each source of interest, and the pixel with the maximum
+    significance. Furthermore, it contains the Right Ascension and Declination
+    of each source of interest and the pixel with the maximum significance.
+
+``outmodel [file]``
+    Output model definition file containing sources for significant pixels.
 
 ``caldb [string]``
     Calibration database (only required for IRF background subtraction if no
@@ -66,40 +76,45 @@ General parameters
     Instrument response function (only required for IRF background subtraction
     if no response information is provided by ``inobs``).
 
-``prefix [string]``
-    Output file prefix. The method will save two files:
-    - Skymap containing the maximum significance for each spatial pixel
-    - File containing the significance as a function of time interval for each 
-      source
 
-``(minoff = 0) [real]``
-    Minimum number of off counts to compute the significance
+Variability search parameters
+-----------------------------
+
+``coordsys <CEL|GAL> [string]``
+    Coordinate system (CEL - celestial, GAL - galactic).
+
+``xsrc [real]``
+    Right Ascension / Galactic longitude of source of interest (J2000, in degrees)
+
+``ysrc [real]``
+    Declination / Galactic latitude of source of interest (J2000, in degrees)
 
 ``emin [real]``
-    Minimum energy (TeV) for extracting events. A value of 0 results in no cut
-    being applied.
+    Minimum energy (TeV) for extracting events.
 
 ``emax [real]``
-    Maximum energy (TeV) for extracting events. A value of 0 results in no cut
-    being applied.
+    Maximum energy (TeV) for extracting events.
 
-``(sig_thr = 4.5) [real]``
+``(threshold = 4.5) [real]``
     Significance threshold for variability detection.
 
-``(smoothkrnl = NONE) <GAUSSIAN|DISK|NONE> [string]``
+``(minoff = 0) [real]``
+    Minimum number of off counts to compute the significance.
+
+``(smooth_kernel = NONE) <GAUSSIAN|DISK|NONE> [string]``
     Kernel to be used in smoothing the counts maps before computing 
     significances.
 
-``(smoothpar = 0.05) [real]``
-    Parameter for the smoothing kernel. This is either the sigma of the GAUSSIAN
-    or the radius of the DISK.
+``(smooth_rad = 0.05) [real]``
+    Radius of smoothing kernel in degrees. This is either the sigma of the
+    ``GAUSSIAN`` or the radius of the ``DISK``.
 
 
 Time binning parameters
 -----------------------
 
 ``tinterval [real]``
-    interval in seconds for each time step.
+    Interval in seconds for each time step.
 
 ``tmin [time]``
     Start time for interval determination (UTC string, JD, MJD or MET in seconds).
@@ -120,7 +135,7 @@ Spatial binning parameters
 --------------------------
 
 ``(usepnt = no) [boolean]``
-    Use CTA pointing direction for cube centre instead of xref/yref parameters?
+    Use CTA pointing direction for sky map centre instead of xref/yref parameters?
 
 ``nxpix [integer]``
     Number of cube bins in Right Ascension or Galactic longitude.
@@ -129,25 +144,16 @@ Spatial binning parameters
     Number of cube bins in Declination or Galactic latitude.
 
 ``binsz [real]``
-    Cube bin size (in degrees/pixel).
-
-``coordsys <CEL|GAL> [string]``
-    Coordinate system (CEL - celestial, GAL - galactic).
+    Sky map pixel size (in degrees/pixel).
 
 ``proj <AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN> [string]``
     Projection method.
 
 ``xref [real]``
-    Right Ascension / Galactic longitude of cube centre (J2000, in degrees).
+    Right Ascension / Galactic longitude of sky map centre (J2000, in degrees).
 
 ``yref [real]``
-    Declination / Galactic latitude of cube centre (J2000, in degrees).
-
-``xsrc [real]``
-    Right Ascension / Galactic longitude of source of interest (J2000, in degrees)
-
-``ysrc [real]``
-    Declination / Galactic latitude of source of interest (J2000, in degrees)
+    Declination / Galactic latitude of sky map centre (J2000, in degrees).
 
 
 Standard parameters

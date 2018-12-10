@@ -1,4 +1,4 @@
-2018-11-23
+2018-12-11
 
         * Version 1.6.0 released
         ========================
@@ -7,6 +7,7 @@
         CTA background rates are now per ontime (#2758)
         Apply event bin weighting in ctmodel for stacked computation (#2721)
         Enable ctbin to produce counts cubes for a joint binned analysis (#2714)
+        Add ctfindvar tool (#2713)
         Add Jupyter notebooks for H.E.S.S. DR1 (#2712)
         csphagen now creates appropriate model for likelihood fitting (#2711)
         csphagen now supports any kind of background model (#2710)
