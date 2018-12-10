@@ -57,6 +57,7 @@ pyext/ctools/tools.py
 pyext/ctools/tools_wrap.cpp
 cscripts/__init__.py
 src/ctbin/ctbin
+src/ctfindvar/ctfindvar
 src/ctlike/ctlike
 src/cttsmap/cttsmap
 src/ctmodel/ctmodel

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   ctfindvar - search time variability tool                              *
+ *                ctfindvar - Time variability search tool                 *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2018 by Simon Bonnefoy                                   *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctfindvar.hpp
- * @brief search time variability tool definition
+ * @brief Time variability search tool definition
  * @author Simon Bonnefoy
  */
 
@@ -40,7 +40,7 @@
 /***********************************************************************//**
  * @class ctfindvar
  *
- * @brief search time variability tool
+ * @brief Time variability search tool
  *
  * @todo Add tool description.
  ***************************************************************************/
@@ -68,17 +68,17 @@ public:
 
 protected:
     // Protected methods
-    void   init_cube(void);
-    void   fill_model_sig_pos(const GSkyDir& dir_pix);
-    void   init_gtis(void);
     void   init_members(void);
     void   copy_members(const ctfindvar& app);
     void   free_members(void);
+    void   get_parameters(void);
+    void   init_cube(void);
+    void   init_gtis(void);
     void   fill_cube(GCTAObservation* obs);
+    void   fill_model_sig_pos(const GSkyDir& dir_pix);
     void   fill_alpha_vector(const int&           pix_number,
                              std::vector<double>& alpha_vector);
-    void   get_parameters(void);
-    void   get_variability_sig(const int& pix_number, 
+    void   get_variability_sig(const int& pix_number,
                                const int& nbins, 
                                GNdarray&  sig_histogram);
     double gti_overlap(const GGti& gti1, 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *ctfindvar - search time variability tool main code                            *
+ *            ctfindvar - Time variability search tool main code           *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2018 by Simon Bonnefoy                                   *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctfindvar/main.cpp
- * @brief search time variability tool main code
+ * @brief Time variability search tool main code
  * @author Simon Bonnefoy
  */
 
