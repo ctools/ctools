@@ -79,7 +79,7 @@ class cslightcrv(ctools.csobservation):
         self._stacked      = False
         self._fits         = gammalib.GFits()
         self._nthreads     = 0
-        self._excl_reg_map = None              # Exclusion region map for on/off analysis
+        self._excl_reg_map = None # Exclusion region map for on/off analysis
 
         # Return
         return
@@ -736,26 +736,30 @@ class cslightcrv(ctools.csobservation):
         # Return
         return
 
-    def exclregmap(self, regmapobj=None):
+    def exclusion_map(self, object):
         """
-        Access exclusion region map object
+        Set exclusion regions map
 
         Parameters
         ----------
-        regmapobj : `~gammalib.GSkyRegionMap`
-            Excluded regions region map instance
+        object : `~gammalib.GSkyRegion` or `~gammalib.GSkyMap` or `~gammalib.GFilename`
+            Exclusion regions object
+        """
+        # Set exclusion region map
+        self._excl_reg_map = gammalib.GSkyRegionMap(object)
+
+        # Return
+        return
+
+    def exclusion_map(self):
+        """
+        Get exclusion regions map
 
         Returns
         -------
-        reg : `~gammalib.GSkyRegionMap`
-            Excluded regions region map instance
+        region : `~gammalib.GSkyRegionMap`
+            Exclusion regions map
         """
-        # Check if exclusion map object was provided
-        if regmapobj is not None:
-
-            # Set exclusion region map
-            self._excl_reg_map = gammalib.GSkyRegionMap(regmapobj)
-
         # Return
         return self._excl_reg_map
 

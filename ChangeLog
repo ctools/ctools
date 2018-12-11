@@ -5,6 +5,8 @@
 
         ctbkgcube now requires an input counts cube (#2763)
         CTA background rates are now per ontime (#2758)
+        Add exclusion_map() methods to ctskymap, csphagen, cslightcrv and
+          csphasecrv (#2725)
         Apply event bin weighting in ctmodel for stacked computation (#2721)
         Enable ctbin to produce counts cubes for a joint binned analysis (#2714)
         Add ctfindvar tool (#2713)
