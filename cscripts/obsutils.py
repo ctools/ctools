@@ -815,11 +815,11 @@ def get_onoff_obs(cls, obs, nthreads=0):
     phagen['debug']         = cls['debug'].boolean()
     phagen['nthreads']      = nthreads
 
-    # Pipe exclusion region map
-    if hasattr(cls, 'exclregmap'):
-        excl_reg_map = cls.exclregmap()
-        if excl_reg_map is not None:
-            phagen.exclregmap(excl_reg_map)
+    # Pipe exclusion map
+    if hasattr(cls, 'exclusion_map'):
+        exclusion_map = cls.exclusion_map()
+        if exclusion_map is not None:
+            phagen.exclusion_map(exclusion_map)
 
 	# Run csphagen
     phagen.run()

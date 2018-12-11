@@ -60,10 +60,9 @@ public:
     void           run(void);
     void           save(void);
     void           publish(const std::string& name = "");
-
-    void           exclmap(const GSkyMap& exclusionmap);
-    const GSkyMap& exclmap(void) const;
     const GSkyMap& skymap(void) const;
+    void           exclusion_map(const GSkyRegionMap& exclusion_map);
+    GSkyRegionMap  exclusion_map(void) const;
 
 protected:
     // Protected methods
@@ -135,18 +134,6 @@ protected:
 
 
 /***********************************************************************//**
- * @brief Return exclusion map
- *
- * @return Reference to exclusion map
- ***************************************************************************/
-inline
-const GSkyMap& ctskymap::exclmap(void) const
-{
-    return m_exclmap;
-}
-
-
-/***********************************************************************//**
  * @brief Return observation container
  *
  * @return Reference to observation container
@@ -155,6 +142,35 @@ inline
 const GSkyMap& ctskymap::skymap(void) const
 {
     return m_skymap;
+}
+
+
+/***********************************************************************//**
+ * @brief Set exclusion region map
+ *
+ * @param[in] exclusion_map Exclusion region map.
+ ***************************************************************************/
+inline
+void ctskymap::exclusion_map(const GSkyRegionMap& exclusion_map)
+{
+    // Assign exclusion map
+    m_exclmap = exclusion_map.map();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Return exclusion region map
+ *
+ * @return Exclusion region map
+ ***************************************************************************/
+inline
+GSkyRegionMap ctskymap::exclusion_map(void) const
+{
+    GSkyRegionMap exclusion_map(m_exclmap);
+    return exclusion_map;
 }
 
 #endif /* CTSKYMAP_HPP */

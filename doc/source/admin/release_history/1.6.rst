@@ -46,6 +46,9 @@ Improvements
 
 * [`2763 <https://cta-redmine.irap.omp.eu/issues/2763>`_] -
   :ref:`ctbkgcube` now requires an input counts cube
+* [`2725 <https://cta-redmine.irap.omp.eu/issues/2725>`_] -
+  Add exclusion_map() methods to :ref:`ctskymap`, :ref:`csphagen`,
+  :ref:`cslightcrv` and :ref:`csphasecrv`
 * [`2714 <https://cta-redmine.irap.omp.eu/issues/2714>`_] -
   Enable :ref:`ctbin` to produce counts cubes for a joint binned analysis.
   Rename ``outcube`` to ``outobs`` parameter.

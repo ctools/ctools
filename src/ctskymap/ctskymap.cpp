@@ -337,21 +337,6 @@ void ctskymap::publish(const std::string& name)
 }
 
 
-/***********************************************************************//**
- * @brief Set the exclusion map
- *
- * @param[in] exclmap Exclusion map object.
- ***************************************************************************/
-void ctskymap::exclmap(const GSkyMap& exclusionmap)
-{
-    // Assign exclusion map
-    m_exclmap = exclusionmap;
-
-    // Return
-    return;
-}
-
-
 /*==========================================================================
  =                                                                         =
  =                             Private methods                             =
