@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-11 December 2018
+12 December 2018
 
 
 Introduction
@@ -500,6 +500,8 @@ Add "mjdref" parameter to set_obs() function (#2054).
 
 Examples
 --------
+Add show_significance_distribution.py example script (#2723)
+
 Handle zero model values for SUBVID method in show_response.py script (#2456).
 
 Added show_rmf.py script.
