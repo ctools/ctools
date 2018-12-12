@@ -232,7 +232,8 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/onoff_rmf.fits.gz \
            $(top_srcdir)/test/data/onoff_rmf1.fits.gz \
            $(top_srcdir)/test/data/onoff_rmf2.fits.gz \
-           $(top_srcdir)/test/data/model_crab_radialacceptance.xml
+           $(top_srcdir)/test/data/model_crab_radialacceptance.xml \
+           $(top_srcdir)/test/data/sigdist_map.fits.gz
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data/iactdata
 testiactdata = $(top_srcdir)/test/data/iactdata/hdu-index.fits.gz \

@@ -2,7 +2,7 @@
 # ==========================================================================
 # Shows the distribution of significances in a given significance map.
 #
-# Copyright (C) 2011-2017 Andreas Specovius
+# Copyright (C) 2018 Andreas Specovius
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,8 +17,35 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+# --------------------------------------------------------------------------
+# What do I need for plotting:
+#
+# - significance map itself [mappath]
+#   Provided as a file path guiding to a GSkyMap in FITS format
+#   No default
+#
+# - included regions (for shrinking data space i.e. for cutting certain edges
+#   or at a certain radius) [includedreg]
+#   Provided as a file path to a FITS WCS map or DS9 regions file
+#   Default should be None, which means all is allowed
+#  
+# - excluded regions [excludedreg]
+#   Provided as a file path to a FITS WCS map or DS9 regions file
+#   Default should be None, which means there are no excluded regions. In this
+#   case no bkg will be plotted and fitted
+#
+# - binning parameters for the histogram: [nbins], [sign_min], [sign_max]
+#   Provided as floats
+#   Default should be -5 to 8 with 130 bins (131 edges)
+#
+# - title of the histogram [title]
+#   Provided as string
+#   Default should be an empty string
+#
+# - Path to plotted file [plotfile]
 # ==========================================================================
 import sys
+import math
 import gammalib
 import cscripts
 try:
@@ -35,56 +62,99 @@ except ImportError:
     print('This script needs the "numpy" module')
     sys.exit()
 
-try:
-    import scipy.optimize as optimize
-except ImportError:
-    print('This script needs the "scipy" module')
-    sys.exit()
 
+# ======================= #
+# Gaussian function class #
+# ======================= #
+class gaussian(gammalib.GPythonOptimizerFunction):
 
-#
-#
-#
-# What do I need for plotting:
-#
-#- significance map itself [mappath]
-# Provided as a file path guiding to a GSkyMap in FITS format
-# No default
-#
-#- included regions (for shrinking data space i.e. for cutting certain edges or at a certain radius) [includedreg]
-# Provided as a file path to a FITS WCS map or DS9 regions file
-# Default should be None, which means all is allowed
-#  
-#- excluded regions [excludedreg]
-# Provided as a file path to a FITS WCS map or DS9 regions file
-# Default should be None, which means there are no excluded regions. In this case no bkg will be plotted and fitted
-#
-#- binning parameters for the histogram: [nbins], [sign_min], [sign_max]
-# Provided as floats
-# Default should be -5 to 8 with 130 bins (131 edges)
-#
-#- title of the histogram [title]
-# Provided as string
-# Default should be an empty string
-#
-#- Path to plotted file [plotfile]
-#
-#
+    # Constructor
+    def __init__(self, x_vals, y_vals):
+    
+        # Call base class constructor
+        gammalib.GPythonOptimizerFunction.__init__(self)
+        
+        # Set eval method
+        self._set_eval(self.eval)
+
+        # Set data
+        self._x_vals = x_vals
+        self._y_vals = y_vals
+
+    # Methods
+    def eval(self):
+        """
+        Evaluate function
+        """
+        # Recover parameters
+        pars  = self._pars()
+        norm  = pars[0].value()
+        mean  = pars[1].value()
+        sigma = pars[2].value()
+
+        # Evaluate function values
+        y = [norm * math.exp(-0.5*(x-mean)**2/(sigma**2)) for x in self._x_vals]
+
+        # Compute weights (1/sqrt(y))
+        weight = [1.0/val if val > 0.0 else 0.0 for val in self._y_vals]
+
+        # Compute Chi Square
+        value = 0.0
+        for i in range(len(self._x_vals)):
+            arg    = self._y_vals[i] - y[i]
+            value += arg * arg * weight[i]
+        
+        # Evaluate gradient and curvature
+        sigma2 = sigma  * sigma
+        sigma3 = sigma2 * sigma
+        for i in range(len(self._x_vals)):
+
+            # Evaluate function gradients
+            dx     = self._x_vals[i] - mean
+            dnorm  = y[i]         / norm   * pars[0].scale()
+            dmean  = y[i] * dx    / sigma2 * pars[1].scale()
+            dsigma = y[i] * dx**2 / sigma3 * pars[2].scale()
+
+            # Setup gradient vector
+            arg                 = (self._y_vals[i] - y[i]) * weight[i]
+            self.gradient()[0] -= arg * dnorm
+            self.gradient()[1] -= arg * dmean
+            self.gradient()[2] -= arg * dsigma
+
+            # Setup curvature matrix
+            self.curvature()[0,0] +=  dnorm  * dnorm   * weight[i]
+            self.curvature()[0,1] +=  dnorm  * dmean   * weight[i]
+            self.curvature()[0,2] +=  dnorm  * dsigma  * weight[i]
+            self.curvature()[1,0] +=  dmean  * dnorm   * weight[i]
+            self.curvature()[1,1] +=  dmean  * dmean   * weight[i]
+            self.curvature()[1,2] +=  dmean  * dsigma  * weight[i]
+            self.curvature()[2,0] +=  dsigma * dnorm   * weight[i]
+            self.curvature()[2,1] +=  dsigma * dmean   * weight[i]
+            self.curvature()[2,2] +=  dsigma * dsigma  * weight[i]
+
+        # Set value
+        self._set_value(value)
+        
+        # Return
+        return
 
 
 # ================ #
 # Helper functions #
 # ================ #
-def gaussian(x, norm, xmean, sigma):
-    """
-    Compute function values for gaussian function.
-    """
-    return norm*np.exp(-(x-xmean)**2/float(2*sigma**2))
-
-
 def skymap_to_numpy_ndarray(skymap):
     """
     Return numpy.ndarray of pixel values of a skymap.
+
+    Parameters
+    ----------
+    skymap : `~gammalib.GSkyMap`
+        Sky map.
+
+    Returns
+    -------
+    array : `~numpy.array`
+        Numpy array
     """
     # Get map size
     npix  = skymap.npix()
@@ -108,14 +178,19 @@ def read_regions(fpath, init_map):
     ----------
     fpath : str
         Path to regions file
-    init_map : GSkyMap
+    init_map : `~gammalib.GSkyMap`
         Sky map representing fov of interest. Used for initialisation of
         regions map.
+
+    Returns
+    -------
+    map : `~gammalib.GSkyMap`
+        Sky map.
     """
 
     # Create starter map for user fov filled with zeros
-    regions_map = init_map.copy()
-    regions_map *= 0
+    regions_map  = init_map.copy()
+    regions_map *= 0.0
 
     # Take care about ds9 region files
     if fpath.lower().endswith('.reg'):
@@ -132,8 +207,8 @@ def read_regions(fpath, init_map):
             # Add ds9 region map to global map
             regions_map += ds9_map.map()
 
-    # Take care about fits wcs files
-    elif fpath.lower().endswith('.fits'):
+    # Take care about fits WCS files
+    elif gammalib.GFilename(fpath).is_fits():
 
         # Read wcs regions map
         wcs_regions = gammalib.GSkyMap(fpath)
@@ -142,18 +217,47 @@ def read_regions(fpath, init_map):
         regions_map += wcs_regions
 
     else:
-        raise RuntimeError("Invalid regions file detected. Please provide " +
-                           "a valid ds9 or FITS WCS regions file.")
+        raise RuntimeError('Invalid regions file detected. Please provide ' +
+                           'a valid ds9 or FITS WCS regions file.')
 
     # Return
     return regions_map
+
+
+def linspace(minval, maxval, nbins):
+    """
+    Return a linearly spaced array
+    
+    Parameters
+    ----------
+    minval : float
+        Minimum value
+    maxval : float
+        Maximum value
+    nbins : int
+        Number of bins
+
+    Returns
+    -------
+    bins : list of float
+        Linearly spaced array
+    """
+    # Compute bin width
+    binwidth = (maxval - minval) / float(nbins-1)
+
+    # Compute bins
+    bins = [minval + binwidth*i for i in range(nbins)]
+
+    # Return bins
+    return bins
 
 
 # ============================== #
 # Plot significance distribution #
 # ============================== #
 def plot_significance_distribution(mappath, nbins, sigma_min, sigma_max,
-                                   includedreg, excludedreg, title):
+                                   includedreg, excludedreg, title,
+                                   plotfile):
     """
     Plot the significance distribution and return instance of pyplot
     figure and axis.
@@ -174,57 +278,29 @@ def plot_significance_distribution(mappath, nbins, sigma_min, sigma_max,
         Path to global excluded region file
     title : str
         Title of the plot
-
-    Figure and axis objects are returned.
+    plotfile : str
+        Name of file for plotting
     """
 
     # Read significance map
-    # =====================
-
-    # Read map
     significance_map = gammalib.GSkyMap(mappath+'[SIGNIFICANCE]')
 
 
     # Read included regions
-    # =====================
-
-    # Set availability to false
     inclusion_available = False
-
-    # Read in case provided
     if len(includedreg) > 0:
-        # Read regions map
-        regions_map = read_regions(includedreg, init_map=significance_map)
-
-        # Make numpy boolean mask
-        mask_include = skymap_to_numpy_ndarray(regions_map).astype(bool)
-
-        # Enable masked map
+        regions_map         = read_regions(includedreg, init_map=significance_map)
+        mask_include        = skymap_to_numpy_ndarray(regions_map).astype(bool)
         inclusion_available = True
 
-
     # Read excluded regions
-    # =====================
-
-    # Set availability to false
     src_exclusion_available = False
-
-    # Read in case provided
     if len(excludedreg) > 0:
-        # Read regions file
-        regions_map = read_regions(excludedreg, init_map=significance_map)
-
-        # Make numpy boolean mask
-        mask_exclude = skymap_to_numpy_ndarray(regions_map).astype(bool)
-
-        # Enable masked map
+        regions_map             = read_regions(excludedreg, init_map=significance_map)
+        mask_exclude            = skymap_to_numpy_ndarray(regions_map).astype(bool)
         src_exclusion_available = True
 
-
-    # Convet maps to flat arrays and apply spatial cuts
-    # =================================================
-
-    # significance data to flat array
+    # Convert significance map to flat array
     data = skymap_to_numpy_ndarray(significance_map)
 
     # Initialise dummy mask allowing all pixels
@@ -241,70 +317,93 @@ def plot_significance_distribution(mappath, nbins, sigma_min, sigma_max,
         mask &= ~mask_exclude
         data_without_sources = data_without_sources[mask]
 
-
-    # Compute bin edges to user parameters
-    # ====================================
-
     # Compute bin edges, hence use nbins+1
-    bin_edges = np.linspace(sigma_min, sigma_max, nbins+1)
-
-
-    # Begin with plotting
-    # ===================
+    bin_edges = linspace(sigma_min, sigma_max, nbins+1)
 
     # Create figure
     fig = plt.figure()
     ax  = fig.gca()
 
-    # Draw significance histogram for full fov
-    y, _, _ = ax.hist(data, bins=bin_edges, histtype='step', color='k', label="significance")
+    # Draw significance histogram for full FOV
+    y, _, _ = ax.hist(data, bins=bin_edges, histtype='step', color='k',
+                      label='significance')
 
     # Draw the default normal distribution. Scale to fit maximum of histogram
-    ax.plot(bin_edges, gaussian(bin_edges, y.max(),0,1), 'b-')
+    yvals = [y.max() * math.exp(-0.5*(x-0.0)**2/(1.0**2)) for x in bin_edges]
+    ax.plot(bin_edges, yvals, 'b-')
     msg = 'mean: $0$\nwidth: $1$'
-    ax.text(0.98, 0.80, msg, ha='right', va='top', bbox=dict(edgecolor='blue', facecolor='white'), transform=ax.transAxes)
+    ax.text(0.98, 0.80, msg, ha='right', va='top',
+            bbox=dict(edgecolor='blue', facecolor='white'),
+            transform=ax.transAxes)
 
-    # If exclusion was provided also handle significanes with excluded src data
+    # If exclusion was provided then also plot significances with excluded
+    # source data
     if src_exclusion_available:
 
-        # Draw histogram of significances for data without excluded sources
+        # Draw histogram of significances for data with excluded sources
         y, _, _ = ax.hist(data_without_sources, bins=bin_edges, histtype='step',
-                          color='k', alpha=0.5, label="significance without exclusions")
+                          color='k', alpha=0.5,
+                          label='significance without exclusions')
 
-        # Fit a normal distribution to the binned masked significance data
-        pars        = [1.0, 0.0, 1.0]
-        bin_centers = 0.5*(bin_edges[:-1] + bin_edges[1:])
+        # Set initial Gaussian parameters
+        par1 = gammalib.GOptimizerPar('Norm',  y.max())
+        par2 = gammalib.GOptimizerPar('Mean',  0.0)
+        par3 = gammalib.GOptimizerPar('Sigma', 1.0)
+        pars = gammalib.GOptimizerPars()
+        pars.append(par1)
+        pars.append(par2)
+        pars.append(par3)
 
-        pars_opt, pars_cov = optimize.curve_fit(gaussian, xdata=bin_centers,
-                                                ydata=y, p0=pars)
+        # Set fit function
+        x = [0.5*(bin_edges[i]+bin_edges[i+1]) for i in range(nbins)]
+        fct = gaussian(x, y)
 
-        # Compute parameters fit errors
-        pars_err = np.sqrt(np.diag(pars_cov))
+        # Optimize function and compute errors
+        opt = gammalib.GOptimizerLM()
+        opt.optimize(fct, pars)
+        opt.errors(fct, pars)
+
+        # Recover parameters and errors
+        norm    = pars[0].value()
+        e_norm  = pars[0].error()
+        mean    = pars[1].value()
+        e_mean  = pars[1].error()
+        sigma   = pars[2].value()
+        e_sigma = pars[2].error()
 
         # Log fit result
-        print('Fit of normal distribution to excluded source significance data ' +\
+        print('Fit of normal distribution to excluded source significance data '+
               'results in:  norm=%f+=%f  xmean=%f+-%f sigma=%f+-%f' %
-              (pars_opt[0], pars_err[0], pars_opt[1], pars_err[1], pars_opt[2], pars_err[2])
-             )
+              (norm, e_norm, mean, e_mean, sigma, e_sigma))
 
         # Draw text box
-        msg = 'mean: $%.3f\pm%.3f$\nwidth: $%.3f\pm%.3f$' % (pars_opt[1], pars_err[1], pars_opt[2], pars_err[2])
-        ax.text(0.98, 0.95, msg, ha='right', va='top', bbox=dict(edgecolor='red', facecolor='white'), transform=ax.transAxes)
+        msg = 'mean: $%.3f\pm%.3f$\nwidth: $%.3f\pm%.3f$' % \
+              (mean, e_mean, sigma, e_sigma)
+        ax.text(0.98, 0.95, msg, ha='right', va='top',
+                bbox=dict(edgecolor='red', facecolor='white'),
+                transform=ax.transAxes)
 
-        # Plot the normal (2)
-        ax.plot(bin_edges, gaussian(bin_edges, *(pars_opt)), 'r-')
+        # Plot the normal
+        yvals = [norm * math.exp(-0.5*(x-mean)**2/(sigma**2)) for x in bin_edges]
+        ax.plot(bin_edges, yvals, 'r-')
 
     # Configure the plot
     ax.set_ylim(0.5, ax.get_ylim()[1]*2.0)
     ax.set_xlim(sigma_min, sigma_max)
     ax.set_title(title)
-    ax.set_xlabel("Significance")
-    ax.set_ylabel("Entries")
+    ax.set_xlabel('Significance')
+    ax.set_ylabel('Entries')
     ax.grid()
     ax.set_yscale('log')
 
+    # Show or save the plot
+    if len(plotfile) > 0:
+        plt.savefig(plotfile)
+    else:
+        plt.show()
+
     # Return
-    return fig, ax
+    return
 
 
 # ============================== #
@@ -346,14 +445,9 @@ def show_significance_distribution():
     plotfile    = options[6]['value']
 
     # Plot significance distribution histogram
-    fig, ax = plot_significance_distribution(args[0], nbins, sigma_min, sigma_max,
-                                             includedreg, excludedreg, title)
-
-    # Show or save the plot
-    if len(plotfile) > 0:
-        plt.savefig(plotfile)
-    else:
-        plt.show()
+    plot_significance_distribution(args[0], nbins, sigma_min, sigma_max,
+                                   includedreg, excludedreg, title,
+                                   plotfile)
 
     # Return
     return
