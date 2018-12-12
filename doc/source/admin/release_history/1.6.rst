@@ -106,6 +106,8 @@ Improvements
 New features
 ------------
 
+* [`2723 <https://cta-redmine.irap.omp.eu/issues/2723>`_] -
+  Add ``show_significance_distribution.py`` example script
 * [`2713 <https://cta-redmine.irap.omp.eu/issues/2713>`_] -
   Add :ref:`ctfindvar` tool
 * [`2709 <https://cta-redmine.irap.omp.eu/issues/2709>`_] -
