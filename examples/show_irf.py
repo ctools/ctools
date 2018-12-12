@@ -316,7 +316,7 @@ def plot_edisp(edisp, emin=None, emax=None, tmin=None, tmax=None,
             num  = 0.0
             for migra in migras:
                 if migra > 0.0:
-                    etrue.log10TeV(math.log10(migra) + logenergy)
+                    ereco.log10TeV(math.log10(migra) + logenergy)
                     value  = edisp(ereco, etrue, theta*gammalib.deg2rad)
                     mean  += migra * value
                     std   += migra * migra * value
