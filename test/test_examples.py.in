@@ -123,6 +123,8 @@ class Test(gammalib.GPythonTestSuite):
                     'Test show_obs.py')
         self.append(self.test_show_pointings,
                     'Test show_pointings.py')
+        self.append(self.test_show_significance_distribution,
+                    'Test show_significance_distribution.py')
 
         # Return
         return
@@ -522,6 +524,22 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute script
         self._execute_python('show_pointings', args=args)
+
+        # Return
+        return
+
+    # Test show_significance_distribution
+    def test_show_significance_distribution(self):
+        """
+        Test show_significance_distribution
+        """
+        # Set arguments
+        args = '-p example_show_significance_distribution.eps '+ \
+               '%s/sigdist_map.fits --exclude %s/sigdist_map.fits[EXCLUSION]' % \
+               (self._datadir, self._datadir)
+
+        # Execute script
+        self._execute_python('show_significance_distribution', args=args)
 
         # Return
         return
