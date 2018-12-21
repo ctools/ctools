@@ -24,20 +24,21 @@ scripts = README.md \
           make_pointings.py \
           show_butterfly.py \
           show_irf.py \
+          show_lightcurve.py \
           show_model.py \
+          show_obs.py \
           show_pha.py \
-          show_rmf.py \
+          show_phases.py \
+          show_pointings.py \
           show_pull_evolution.py \
           show_pull_histogram.py \
           show_residuals.py \
           show_response.py \
+          show_rmf.py \
           show_sensitivity.py \
+          show_significance_distribution.py \
           show_spectrum.py \
-          show_lightcurve.py \
-          show_phases.py \
           show_ts_distribution.py \
-          show_obs.py \
-          show_pointings.py \
           show_variability_evolution.py
 
 # Set install directories
