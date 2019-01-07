@@ -96,7 +96,13 @@ class gaussian(gammalib.GPythonOptimizerFunction):
         y = [norm * math.exp(-0.5*(x-mean)**2/(sigma**2)) for x in self._x_vals]
 
         # Compute weights (1/sqrt(y))
-        weight = [1.0/val if val > 0.0 else 0.0 for val in self._y_vals]
+        weight = []
+        for val in self._y_vals:
+            if val > 0.0:
+                weight.append(1.0/val)
+            else:
+                weight.append(0.0)
+        #weight = [1.0/val if val > 0.0 else 0.0 for val in self._y_vals]
 
         # Compute Chi Square
         value = 0.0
@@ -346,16 +352,17 @@ def plot_significance_distribution(mappath, nbins, sigma_min, sigma_max,
                           label='significance without exclusions')
 
         # Set initial Gaussian parameters
-        par1 = gammalib.GOptimizerPar('Norm',  y.max())
-        par2 = gammalib.GOptimizerPar('Mean',  0.0)
-        par3 = gammalib.GOptimizerPar('Sigma', 1.0)
-        pars = gammalib.GOptimizerPars()
+        y_max = float(y.max())
+        par1  = gammalib.GOptimizerPar('Norm',  y_max)
+        par2  = gammalib.GOptimizerPar('Mean',  0.0)
+        par3  = gammalib.GOptimizerPar('Sigma', 1.0)
+        pars  = gammalib.GOptimizerPars()
         pars.append(par1)
         pars.append(par2)
         pars.append(par3)
 
         # Set fit function
-        x = [0.5*(bin_edges[i]+bin_edges[i+1]) for i in range(nbins)]
+        x   = [0.5*(bin_edges[i]+bin_edges[i+1]) for i in range(nbins)]
         fct = gaussian(x, y)
 
         # Optimize function and compute errors
