@@ -100,6 +100,9 @@ General parameters
     log likelihood value. Converserly, decreasing the value will result in less
     iterations at the expense of a less accurate maximum likelihood value.
 
+``(max_iter = 50) [integer]``
+    Maximum number of fit iterations.
+
 ``(matrix = "NONE") [file]``
     Input covariance matrix file (not used)
 

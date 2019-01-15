@@ -44,6 +44,9 @@ Bug fixes
 Improvements
 ------------
 
+* Add ``max_iter`` parameter to :ref:`ctbutterfly`, :ref:`cterror`,
+  :ref:`ctlike`, :ref:`cttsmap`, :ref:`ctulimit`, and :ref:`cstsmapsplit`
+  to allow controlling the maximum number of fit iterations.
 * [`2763 <https://cta-redmine.irap.omp.eu/issues/2763>`_] -
   :ref:`ctbkgcube` now requires an input counts cube
 * [`2725 <https://cta-redmine.irap.omp.eu/issues/2725>`_] -

@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-12 December 2018
+15 January 2019
 
 
 Introduction
@@ -99,6 +99,9 @@ normalisation is correct (#2685).
 
 ctbutterfly - Generate butterfly diagrams
 -----------------------------------------
+Add hidden "max_iter" parameter to allow control of the number of fit
+iterations.
+
 Add hidden "like_accuracy" parameter to allow control of the accuracy of
 the maximum log-likelikelihood value (#2662).
 
@@ -115,6 +118,9 @@ None
 
 cterror - Likelihood profile error computation
 ----------------------------------------------
+Add hidden "max_iter" parameter to allow control of the number of fit
+iterations.
+
 Add hidden "like_accuracy" parameter to allow control of the accuracy of
 the maximum log-likelikelihood value (#2662).
 
@@ -134,6 +140,9 @@ in the time domain (#2713).
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
+Add hidden "max_iter" parameter to allow control of the number of fit
+iterations.
+
 Add hidden "like_accuracy" parameter to allow control of the accuracy of
 the maximum log-likelikelihood value (#2662).
 
@@ -225,12 +234,18 @@ accurately computes the distances between sky map pixels (#2309).
 
 cttsmap - Generation of Test Statistic map
 ------------------------------------------
+Add hidden "max_iter" parameter to allow control of the number of fit
+iterations.
+
 Add hidden "like_accuracy" parameter to allow control of the accuracy of
 the maximum log-likelikelihood value (#2662).
 
 
 ctulimit - Compute upper limit
 ------------------------------
+Add hidden "max_iter" parameter to allow control of the number of fit
+iterations.
+
 Add hidden "like_accuracy" parameter to allow control of the accuracy of
 the maximum log-likelikelihood value (#2662).
 
@@ -458,6 +473,9 @@ None
 
 cstsmapsplit - Prepare split Test Statistic computation
 -------------------------------------------------------
+Add hidden "max_iter" parameter to allow control of the number of fit
+iterations.
+
 Add hidden "like_accuracy" parameter to allow control of the accuracy of
 the maximum log-likelikelihood value (#2662).
 

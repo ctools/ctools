@@ -1,8 +1,10 @@
-2018-12-12
+2018-01-15
 
         * Version 1.6.0 released
         ========================
 
+        Add max_iter parameter to ctbutterfly, cterror, ctlike, cttsmap,
+          ctulimit and cstsmapsplit
         ctbkgcube now requires an input counts cube (#2763)
         CTA background rates are now per ontime (#2758)
         Add exclusion_map() methods to ctskymap, csphagen, cslightcrv and
