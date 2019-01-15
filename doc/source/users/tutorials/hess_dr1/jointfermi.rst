@@ -17,14 +17,14 @@ Prepare Fermi-LAT data
 For this tutorial you need to gather data for a source available in
 the H.E.S.S. public data release, the Crab nebula.
 The preparation of Fermi-LAT data can be adapted from
-`this section <..howto/howto_fermi_prepare>`_. Get LAT data from the
+`this section <..howto/howto_fermi_prepare>`_. Get Source Class LAT data from the
 Crab in the energy range 50-800 GeV. Apply a zenith angle cut at 105
 deg. Then bin them on a 60x60 pixel
 grid with 0.05 deg step, and on a logarithmic energy grid with 15 bins
 from 50 GeV to 800 GeV, and calculate livetime cube, exposure map, and
-diffuse model source maps. The results shown here correspond to LAT
+diffuse model source maps. The results shown here correspond to P8R3 LAT
 data covering the Fermi Mission Elapsed Time (MET) between 239557417 s
-and 563886920 s. To run the tutorial faster you can select a shorter dataset. 
+and 565315205 s, analysed using the fermitools 1.0.3. To run the tutorial faster you can select a shorter dataset. 
 
 Prepare H.E.S.S. data
 ^^^^^^^^^^^^^^^^
