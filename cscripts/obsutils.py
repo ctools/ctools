@@ -771,7 +771,7 @@ def get_onoff_obs(cls, obs, nthreads=0):
     use_model_bkg = True
 
     # Set inmodel, srcname, inexclusion and use_model_bkg if they are available
-    if cls.has_par('inmodel'):
+    if cls.has_par('inmodel') and obs.models().size() == 0:
         if cls['inmodel'].is_valid():
             inmodel = cls['inmodel'].value()
     if cls.has_par('srcname'):
