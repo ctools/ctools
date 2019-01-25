@@ -21,6 +21,7 @@
 import sys
 import gammalib
 import ctools
+import cscripts
 from cscripts import obsutils
 from cscripts import ioutils
 from cscripts import mputils
@@ -454,57 +455,79 @@ class cslightcrv(ctools.csobservation):
                   'values': {}}
 
         # Log information
-        self._log_header3(gammalib.EXPLICIT, 'Selecting events')
+        self._log_header3(gammalib.EXPLICIT, 'Selecting observations')
 
-        # Select events
-        select = ctools.ctselect(self.obs())
-        select['emin'] = self['emin'].real()
-        select['emax'] = self['emax'].real()
-        select['tmin'] = tmin
-        select['tmax'] = tmax
-        select['rad']  = 'UNDEFINED'
-        select['ra']   = 'UNDEFINED'
-        select['dec']  = 'UNDEFINED'
+        # Select observations
+        select = cscripts.csobsselect(self.obs())
+        select['pntselect'] = 'CIRCLE'
+        select['coordsys']  = 'GAL'
+        select['glon']      =   0.0
+        select['glat']      =   0.0
+        select['rad']       = 180.0
+        select['tmin']      = tmin
+        select['tmax']      = tmax
         select.run()
 
-        # Retrieve observation
+        # Retrieve observations
         obs = select.obs()
 
-        # Deal with stacked and On/Off Observations
-        if self._stacked or self._onoff:
-
-            # If a stacked analysis is requested bin the events
-            # and compute the stacked response functions and setup
-            # an observation container with a single stacked observation.
-            if self._stacked:
-                new_obs = obsutils.get_stacked_obs(self, obs)
-
-            # ... otherwise if On/Off analysis is requested generate
-            # the On/Off observations and response
-            elif self._onoff:
-                new_obs = obsutils.get_onoff_obs(self, obs, nthreads=1)
-
-            # Extract models
-            models = new_obs.models()
-
-            # Fix background models if required
-            if self['fix_bkg'].boolean():
-                for model in models:
-                    if model.classname() != 'GModelSky':
-                        for par in model:
-                            par.fix()
-
-            # Put back models
-            new_obs.models(models)
-
-            # Continue with new oberservation container
-            obs = new_obs
-
-        # Header
-        self._log_header3(gammalib.EXPLICIT, 'Fitting the data')
-
-        # Do maximum likelihood model fitting
+        # If there are observations then select now events from them
         if obs.size() > 0:
+
+            # Log information
+            self._log_header3(gammalib.EXPLICIT, 'Selecting events')
+
+            # Select events
+            select = ctools.ctselect(obs)
+            select['emin']  = self['emin'].real()
+            select['emax']  = self['emax'].real()
+            select['tmin']  = tmin
+            select['tmax']  = tmax
+            select['rad']   = 'UNDEFINED'
+            select['ra']    = 'UNDEFINED'
+            select['dec']   = 'UNDEFINED'
+            select.run()
+
+            # Retrieve observations
+            obs = select.obs()
+
+        # Continue only if there are observations
+        if obs.size() > 0:
+
+            # Deal with stacked and On/Off Observations
+            if self._stacked or self._onoff:
+
+                # If a stacked analysis is requested bin the events
+                # and compute the stacked response functions and setup
+                # an observation container with a single stacked observation.
+                if self._stacked:
+                    new_obs = obsutils.get_stacked_obs(self, obs)
+
+                # ... otherwise if On/Off analysis is requested generate
+                # the On/Off observations and response
+                elif self._onoff:
+                    new_obs = obsutils.get_onoff_obs(self, obs, nthreads=1)
+
+                # Extract models
+                models = new_obs.models()
+
+                # Fix background models if required
+                if self['fix_bkg'].boolean():
+                    for model in models:
+                        if model.classname() != 'GModelSky':
+                            for par in model:
+                                par.fix()
+
+                # Put back models
+                new_obs.models(models)
+
+                # Continue with new oberservation container
+                obs = new_obs
+
+            # Header
+            self._log_header3(gammalib.EXPLICIT, 'Fitting the data')
+
+            # Do maximum likelihood model fitting
             like = ctools.ctlike(obs)
             like['edisp']    = self['edisp'].boolean()
             like['nthreads'] = 1  # Avoids OpenMP conflict
@@ -533,7 +556,6 @@ class cslightcrv(ctools.csobservation):
                     result['values']['e_'+par] = source[par].error()
 
                 # Calculate upper limit (-1 if not computed)
-                #ul_diff, ul_flux, ul_eflux = self._compute_ulimit(like.obs())
                 ul_diff, ul_flux, ul_eflux = self._compute_ulimit(obs)
                 if ul_diff > 0.0:
                     result['ul_diff']  = ul_diff

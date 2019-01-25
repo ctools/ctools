@@ -137,16 +137,18 @@ class csobsselect(ctools.csobservation):
 
             # Get observation start and stop time
             obs_gti = obs.gti()
-            tstart  = obs_gti.tstart()
-            tstop   = obs_gti.tstop()
 
             # Get User start and stop time in the time reference of the CTA
             # observations
-            gti = self._get_gti(obs_gti.reference())
+            gti    = self._get_gti(obs_gti.reference())
+            tstart = gti.tstart()
+            tstop  = gti.tstop()
 
-            # If the observation is not within the time selection then skip it
-            if gti.size() > 0 and not gti.contains(tstart) and \
-                                  not gti.contains(tstop):
+            # If there is a valid User start and stop time and if that start
+            # or stop time is not within the observation GTI, then skip the
+            # observation
+            if gti.size() > 0 and not obs_gti.contains(tstart) and \
+                                  not obs_gti.contains(tstop):
                 self._log_selection(obs, 'outside time interval')
 
             # ... otherwise select spatially
@@ -300,6 +302,9 @@ class csobsselect(ctools.csobservation):
 
         # Initialise empty observation container for selected observations
         selected_obs = gammalib.GObservations()
+
+        # Set models
+        selected_obs.models(self.obs().models())
 
         # Write input observation container into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
