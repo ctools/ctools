@@ -207,19 +207,20 @@ class cslightcrv(ctools.csobservation):
 
             # If the file a FITS file then load GTIs directly
             if filename.is_fits():
-                gti.load(filename)
+                gti = gammalib.GGti(filename)
 
             # ... otherwise load file the ASCII file as CSV file and construct
             # the GTIs from the rows of the CSV file. It is expected that the
             # CSV file has two columns containing the "START" and "STOP"
             # values of the time bins. No header row is expected.
-            csv = gammalib.GCsv(filename)
-            for i in range(csv.nrows()):
-                tmin = gammalib.GTime()
-                tmax = gammalib.GTime()
-                tmin.mjd(csv.real(i,0))
-                tmax.mjd(csv.real(i,1))
-                gti.append(tmin,tmax)
+            else:
+                csv = gammalib.GCsv(filename)
+                for i in range(csv.nrows()):
+                    tmin = gammalib.GTime()
+                    tmax = gammalib.GTime()
+                    tmin.mjd(csv.real(i,0))
+                    tmax.mjd(csv.real(i,1))
+                    gti.append(tmin,tmax)
 
         # If the algorithm is "LIN" then use a linear time binning, defined by
         # the "tmin", "tmax" and "tbins" user parameters
