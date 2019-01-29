@@ -291,8 +291,16 @@ void ctbin::run(void)
         m_cubes.clear();
     }
 
+    // Set mean pointing usage
+    std::string use;
+    if (m_stack && nobs > 0) {
+        use = (*this)["usepnt"].boolean() ? "yes" : "no";
+    }
+    else {
+        use = "no";
+    }
+
     // Log observation selection results
-    std::string use = (*this)["usepnt"].boolean() ? "yes" : "no";
     log_header3(NORMAL, "Summary");
     log_value(NORMAL, "Number of observations", nobs);
     log_value(NORMAL, "Mean pointing", m_mean_pnt.print());
@@ -767,20 +775,47 @@ GSkyMap ctbin::create_cube(const GCTAObservation* obs)
     std::string coordsys = (*this)["coordsys"].string();
     std::string proj     = (*this)["proj"].string();
 
-    // Read sky map reference
-    double xref   = 0.0;
-    double yref   = 0.0;
-    bool   usepnt = (*this)["usepnt"].boolean();
-    if (usepnt) {
-        if (gammalib::toupper(coordsys) == "GAL") {
-            xref = m_mean_pnt.l_deg();
-            yref = m_mean_pnt.b_deg();
+    // Initialise sky map reference
+    double xref = 0.0;
+    double yref = 0.0;
+
+    // If pointing direction should be used then extract sky map reference
+    // from observation(s)
+    if ((*this)["usepnt"].boolean()) {
+
+        // If stacking is requested then use the mean pointing direction
+        if (m_stack) {
+            if (gammalib::toupper(coordsys) == "GAL") {
+                xref = m_mean_pnt.l_deg();
+                yref = m_mean_pnt.b_deg();
+            }
+            else {
+                xref = m_mean_pnt.ra_deg();
+                yref = m_mean_pnt.dec_deg();
+            }
         }
+    
+        // ... otherwise use the pointing direction of the observation
         else {
-            xref = m_mean_pnt.ra_deg();
-            yref = m_mean_pnt.dec_deg();
-        }
-    }
+
+            // Get pointing
+            const GCTAPointing& pnt = obs->pointing();
+
+            // Extract coordinates
+            if (gammalib::toupper(coordsys) == "GAL") {
+                xref = pnt.dir().l_deg();
+                yref = pnt.dir().b_deg();
+            }
+            else {
+                xref = pnt.dir().ra_deg();
+                yref = pnt.dir().dec_deg();
+            }
+            
+        } // endelse: use pointing direction of observation
+
+    } // endif: use pointing direction
+
+    // ... otherwise use User defined sky map reference
     else {
         xref = (*this)["xref"].real();
         yref = (*this)["yref"].real();
