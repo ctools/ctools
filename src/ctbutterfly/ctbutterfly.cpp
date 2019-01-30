@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctbutterfly - butterfly calculation tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2018 by Michael Mayer                               *
+ *  copyright (C) 2014-2019 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -467,6 +467,10 @@ void ctbutterfly::get_parameters(void)
         throw GException::feature_not_implemented(G_GET_PARAMETERS, msg);
         // m_covariance.load(matrixfilename);
     }
+
+    // Set optimizer characteristics from user parameters
+    m_opt.eps((*this)["like_accuracy"].real());
+    m_opt.max_iter((*this)["max_iter"].integer());
 
     // Get remaining parameters
     m_apply_edisp = (*this)["edisp"].boolean();

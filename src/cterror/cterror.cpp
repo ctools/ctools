@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 cterror - Parameter error calculation tool              *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2018 by Florent Forest                              *
+ *  copyright (C) 2015-2019 by Florent Forest                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -467,6 +467,10 @@ void cterror::get_parameters(void)
     m_confidence = (*this)["confidence"].real();
     double sigma = gammalib::erfinv(m_confidence) * gammalib::sqrt_two;
     m_dlogL      = (sigma*sigma) / 2.0;
+
+    // Set optimizer characteristics from user parameters
+    m_opt.eps((*this)["like_accuracy"].real());
+    m_opt.max_iter((*this)["max_iter"].integer());
 
     // Read other parameters
     m_tol      = (*this)["tol"].real();

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2019 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -406,6 +406,10 @@ void ctlike::get_parameters(void)
         m_obs.models(GModels(filename));
 
     } // endif: no models were associated with observations
+
+    // Set optimizer characteristics from user parameters
+    m_opt.eps((*this)["like_accuracy"].real());
+    m_opt.max_iter((*this)["max_iter"].integer());
 
     // Get other parameters
     m_refit           = (*this)["refit"].boolean();

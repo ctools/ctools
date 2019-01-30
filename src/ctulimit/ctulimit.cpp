@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2018 by Michael Mayer                               *
+ *  copyright (C) 2015-2019 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -462,6 +462,10 @@ void ctulimit::get_parameters(void)
     m_eref = (*this)["eref"].real();
     m_emin = (*this)["emin"].real();
     m_emax = (*this)["emax"].real();
+
+    // Set optimizer characteristics from user parameters
+    m_opt.eps((*this)["like_accuracy"].real());
+    m_opt.max_iter((*this)["max_iter"].integer());
 
     // Read precision
     m_tol      = (*this)["tol"].real();
