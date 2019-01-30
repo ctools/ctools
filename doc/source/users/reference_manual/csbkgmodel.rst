@@ -9,9 +9,24 @@ Generates background model for 3D analysis.
 Synopsis
 --------
 
-This script generates a background model for a 3D analysis.
+This script generates a background model for a 3D analysis. The background
+model is composed of spatial and spectral components, controlled through the
+parameters ``spatial`` and ``spectral``. The spatial component can be either
+an effective area model (``AEFF``), a template extracted from the instrument
+response function (``IRF``) or an analytical 2D Gaussian function (``GAUSS``).
+For the analytical 2D Gaussian function, a bilinear multiplicative background
+gradient can be added using ``gradient=yes``. The spectral component can be
+either a power law (``PLAW``) or a nodes function (``NODES``). The number of
+nodes for the node function is controlled through the ``enumbins`` parameter.
+Specific node energies can be specified through the ``ebinalg`` parameter.
 
-:ref:`csbkgmodel` writes an model definition XML file.
+If ``runwise=yes``, a background model component will be added for each observation
+in the input observation definition XML file. The script fits the background
+model to the input observation(s) to preset the background model parameters
+with resonable values.
+
+On output, :ref:`csbkgmodel` writes an model definition XML file that can be
+used for model fitting. Source model components have to be added as needed.
 
 
 General parameters
@@ -107,3 +122,4 @@ Related tools or scripts
 ------------------------
 
 :doc:`ctlike`
+:doc:`csmodelmerge`
