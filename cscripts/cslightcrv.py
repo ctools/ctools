@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a lightcurve.
 #
-# Copyright (C) 2014-2018 Michael Mayer
+# Copyright (C) 2014-2019 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -502,7 +502,7 @@ class cslightcrv(ctools.csobservation):
                 # and compute the stacked response functions and setup
                 # an observation container with a single stacked observation.
                 if self._stacked:
-                    new_obs = obsutils.get_stacked_obs(self, obs)
+                    new_obs = obsutils.get_stacked_obs(self, obs, nthreads=1)
 
                 # ... otherwise if On/Off analysis is requested generate
                 # the On/Off observations and response

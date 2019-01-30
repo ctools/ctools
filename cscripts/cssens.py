@@ -83,7 +83,7 @@ class cssens(ctools.csobservation):
                  'dec'          : self._dec,
                  'log_clients'  : self._log_clients,
                  'models'       : self._models,
-                 'nthreads' : self._nthreads}
+                 'nthreads'     : self._nthreads}
 
         # Return pickled dictionary
         return state

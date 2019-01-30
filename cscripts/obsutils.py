@@ -1,7 +1,7 @@
 # ==========================================================================
 # Utility functions for observation handling
 #
-# Copyright (C) 2011-2018 Juergen Knoedlseder
+# Copyright (C) 2011-2019 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -670,7 +670,7 @@ def get_stacked_response(obs, cntcube, edisp=False, addbounds=False,
 # ================================= #
 # Get stacked observation container #
 # ================================= #
-def get_stacked_obs(cls, obs):
+def get_stacked_obs(cls, obs, nthreads=0):
     """
     Bin an observation and return an observation container with a single
     binned observation
@@ -681,6 +681,8 @@ def get_stacked_obs(cls, obs):
         cscript class
     obs : `~gammalib.GObservations`
         Observation container
+    nthreads : str, optional
+        Number of parallel processes for On/Off spectra computation (0=all available CPUs)
 
     Returns
     -------
@@ -705,6 +707,7 @@ def get_stacked_obs(cls, obs):
     cntcube['emax']     = cls['emax'].real()
     cntcube['coordsys'] = cls['coordsys'].string()
     cntcube['proj']     = cls['proj'].string()
+    cntcube['nthreads'] = nthreads
     cntcube.run()
 
     # Store counts cube so that we can use it to build the background
