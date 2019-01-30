@@ -47,6 +47,40 @@ class csbkgmodel(ctools.csobservation):
         # Return
         return
 
+    # State methods por pickling
+    def __getstate__(self):
+        """
+        Extend ctools.csobservation getstate method to include some members
+
+        Returns
+        -------
+        state : dict
+            Pickled instance
+        """
+        # Set pickled dictionary
+        state = {'base'       : ctools.csobservation.__getstate__(self),
+                 'models'     : self._models,
+                 'instrument' : self._instrument}
+
+        # Return pickled dictionary
+        return state
+
+    def __setstate__(self, state):
+        """
+        Extend ctools.csobservation setstate method to include some members
+
+        Parameters
+        ----------
+        state : dict
+            Pickled instance
+        """
+        ctools.csobservation.__setstate__(self, state['base'])
+        self._models     = state['models']
+        self._instrument = state['instrument']
+
+        # Return
+        return
+
 
     # Private methods
     def _get_parameters(self):
