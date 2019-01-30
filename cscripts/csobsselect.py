@@ -136,7 +136,9 @@ class csobsselect(ctools.csobservation):
         if obs.classname() == 'GCTAObservation':
 
             # Get observation start and stop time
-            obs_gti = obs.gti()
+            obs_gti    = obs.gti()
+            obs_tstart = obs_gti.tstart()
+            obs_tstop  = obs_gti.tstop()
 
             # Get User start and stop time in the time reference of the CTA
             # observations
@@ -144,11 +146,10 @@ class csobsselect(ctools.csobservation):
             tstart = gti.tstart()
             tstop  = gti.tstop()
 
-            # If there is a valid User start and stop time and if that start
-            # or stop time is not within the observation GTI, then skip the
-            # observation
-            if gti.size() > 0 and not obs_gti.contains(tstart) and \
-                                  not obs_gti.contains(tstop):
+            # If there is a valid User start and stop time and the observation
+            # stop is before the start time or the observation start after the
+            # stop time, then skip the observation
+            if gti.size() > 0 and (obs_tstop < tstart or obs_tstart > tstop):
                 self._log_selection(obs, 'outside time interval')
 
             # ... otherwise select spatially
