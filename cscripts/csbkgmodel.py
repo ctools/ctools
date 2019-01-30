@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates background model
 #
-# Copyright (C) 2018 Juergen Knoedlseder
+# Copyright (C) 2018-2019 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -53,9 +53,9 @@ class csbkgmodel(ctools.csobservation):
         """
         Get parameters from parfile
         """
-        # Setup observations (do not require response, allow event list and
-        # counts cube)
-        self._setup_observations(self.obs(), False, True, True)
+        # Setup observations (require response, allow event list and counts
+        # cube)
+        self._setup_observations(self.obs(), True, True, True)
 
         # Set instrument name
         self._instrument = self._get_instrument()
@@ -135,11 +135,15 @@ class csbkgmodel(ctools.csobservation):
             if self['gradient'].boolean():
                 spatial = gammalib.GCTAModelSpatialMultiplicative()
                 factor1 = gammalib.GCTAModelRadialGauss(3.0)
+                factor1['Sigma'].min(1.5)
+                factor1['Sigma'].max(10.0)
                 factor2 = gammalib.GCTAModelSpatialGradient()
                 spatial.append(factor1)
                 spatial.append(factor2)
             else:
                 spatial = gammalib.GCTAModelRadialGauss(3.0)
+                spatial['Sigma'].min(1.5)
+                spatial['Sigma'].max(10.0)
             epivot   = gammalib.GEnergy(1.0, 'TeV')
             spectral = gammalib.GModelSpectralPlaw(3.0e-4, -1.5, epivot)
             spectral['Prefactor'].min(1.0e-8)
@@ -303,15 +307,6 @@ class csbkgmodel(ctools.csobservation):
     def _generate_runwise_bkg(self):
         """
         Generate background models
-
-        Parameters
-        ----------
-        responses : list of dict
-            List of response dictionaries
-        energy : float
-            Energy to insert (TeV)
-        comment : str
-            Reason for energy insertion
         """
         # Loop over observations
         for run in self.obs():

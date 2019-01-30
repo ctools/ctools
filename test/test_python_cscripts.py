@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for cscripts
 #
-# Copyright (C) 2016-2018 Juergen Knoedlseder
+# Copyright (C) 2016-2019 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import cscripts
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import test_cscript
 import test_cscaldb
+import test_csbkgmodel
 import test_csebins
 import test_csfindobs
 import test_csinfo
@@ -119,6 +120,7 @@ def test(installed=False, debug=False):
 
     # Define list of test suites
     tests = [test_cscript.Test(),
+             test_csbkgmodel.Test(),
              test_cscaldb.Test(),
              test_csebins.Test(),
              test_csinfo.Test(),

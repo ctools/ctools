@@ -20,6 +20,12 @@ General parameters
 ``inobs [file]``
     Event list, counts cube or input observation definition XML file.
 
+``caldb [string]``
+    Calibration database.
+
+``irf [string]``
+    Instrument response function.
+
 ``outmodel [file]``
     Output model XML file.
 
