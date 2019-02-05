@@ -286,7 +286,8 @@ class csphagen(ctools.csobservation):
         # If we have no model then create now a dummy model
         if self._models.is_empty():
             spatial  = gammalib.GModelSpatialPointSource(self._src_dir)
-            spectral = gammalib.GModelSpectralPlaw()
+            spectral = gammalib.GModelSpectralPlaw(1.0e-18, -2.0,
+                       gammalib.GEnergy(1.0, 'TeV'))
             model    = gammalib.GModelSky(spatial, spectral)
             model.name('Dummy')
             self._models.append(model)

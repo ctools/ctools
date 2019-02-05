@@ -95,3 +95,44 @@ on how to install ctools.
    pyext folder. However, you do not need `swig <http://www.swig.org/>`_
    when fetching a release as the Python wrappers are bundled with the
    release tarballs.
+
+
+Making a conda package
+----------------------
+
+To create a conda package for the development version, clone the gammalib and
+ctools source codes using
+
+.. code-block:: bash
+
+   $ git clone https://cta-gitlab.irap.omp.eu/gammalib/gammalib.git
+   $ git clone https://cta-gitlab.irap.omp.eu/ctools/ctools.git
+
+and type the following to create the conda packages (make sure that anaconda is
+included in your ``$PATH`` environment):
+
+.. code-block:: bash
+
+   $ cd gammalib
+   $ git checkout devel
+   $ ./autogen.sh
+   $ ./configure
+   $ conda-build dev/conda.recipe
+   $ cd ../ctools
+   $ git checkout devel
+   $ ./autogen.sh
+   $ ./configure
+   $ conda-build dev/conda.recipe
+
+Once this is done, you can create a conda environment using the development
+version as follows:
+
+.. code-block:: bash
+
+   $ conda create -n ctools-devel python=3.6
+   $ source activate ctools-devel
+   $ conda install --use-local ctools=1.6.0.dev1
+
+Note that you can chose between Python 2.7, 3.5, 3.6 and 3.7 for your
+conda environment.
+

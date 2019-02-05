@@ -12,3 +12,4 @@ Analysing public H.E.S.S. data
    bkgmodel
    unbinned
    classical
+   jointfermi
