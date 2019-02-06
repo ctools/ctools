@@ -1,7 +1,7 @@
 /***************************************************************************
  *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2019 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -33,8 +33,9 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                          "ctskymap::get_parameter()"
-#define G_MAP_EVENTS                 "ctskymap::map_events(GCTAObservation*)"
-#define G_MAP_BACKGROUND_IRF "ctskymap::map_background_irf(GCTAObservation*)"
+#define G_FILL_MAPS_COUNTS     "ctskymap::fill_maps_counts(GCTAObservation*)"
+#define G_FILL_MAPS_ACCEPTANCE              "ctskymap::fill_maps_acceptance("\
+                                                          "GCTAObservation*)"
 #define G_RING_BOUNDING_BOX  "ctskymap::ring_bounding_box(int&, int&, int&, "\
                                                                 "int&, int&)"
 #define G_RING_KERNEL               "ctskymap::ring_kernel(double&, double&)"
@@ -813,7 +814,7 @@ void ctskymap::fill_maps_counts(GCTAObservation* obs)
     // Make sure that the observation holds a CTA event list. If this
     // is not the case then throw an exception.
     if (events == NULL) {
-        throw GException::no_list(G_MAP_EVENTS);
+        throw GException::no_list(G_FILL_MAPS_COUNTS);
     }
 
     // Setup energy range covered by data
@@ -863,14 +864,14 @@ void ctskymap::fill_maps_counts(GCTAObservation* obs)
         }
 
         // Fill event in skymap
-        #pragma omp critical(ctskymap_map_events)
+        #pragma omp critical(ctskymap_fill_maps_counts_1)
         m_counts(pixel) += 1.0;
         num_in_map++;
 
     } // endfor: looped over all events
 
     // Log binning results
-    #pragma omp critical(ctskymap_map_events)
+    #pragma omp critical(ctskymap_fill_maps_counts_2)
     {
         log_header3(TERSE, get_obs_header(obs));
         log_value(NORMAL, "Events in list", obs->events()->size());
@@ -898,35 +899,52 @@ void ctskymap::fill_maps_counts(GCTAObservation* obs)
  *            No response information available for observation.
  *            No background template available in instrument response function.
  *
- * Computes a background acceptance sky map using the IRF template for a
- * given observation and adds the estimate to the acceptance sky map.
+ * Computes a background acceptance sky map for a given observation and adds
+ * the estimate to the acceptance sky map.
+ *
+ * If the response contains a background template, that template is used to
+ * compute the background acceptance map.
+ *
+ * If no background template is available, the outcome depends on the
+ * background subtraction method. If ``IRF`` background subtraction is
+ * requested, an exception is thrown. For ``RING`` background subtraction,
+ * a constant background rate is assumed.
  ***************************************************************************/
 void ctskymap::fill_maps_acceptance(GCTAObservation* obs)
 {
+    // Initialise IRF background template pointer
+    const GCTABackground* bkg = NULL;
+
     // Get IRF response
     const GCTAResponseIrf* rsp = dynamic_cast<const GCTAResponseIrf*>
                                  (obs->response());
 
     // Throw an exception if observation has no instrument response function
-    if (rsp == NULL) {
+    if ((rsp == NULL) && (m_bkgsubtract != "RING")) {
         std::string msg = "No response information available for "+
                           get_obs_header(obs)+" to compute IRF background. "
                           "Please specify response information or use "
                           "another background subtraction method.";
-        throw GException::invalid_value(G_MAP_BACKGROUND_IRF, msg);
+        throw GException::invalid_value(G_FILL_MAPS_ACCEPTANCE, msg);
     }
 
-    // Get IRF background template
-    const GCTABackground* bkg = rsp->background();
+    // ... otherwise get IRF background template
+    else {
 
-    // Throw an exception if observation has no IRF background template
-    if (bkg == NULL) {
-        std::string msg = "No IRF background template found in instrument "
-                          "response function for "+
-                          get_obs_header(obs)+". Please specify an instrument "
-                          "response function containing a background template.";
-        throw GException::invalid_value(G_MAP_BACKGROUND_IRF, msg);
-    }
+        // Get IRF background template
+        bkg = rsp->background();
+
+        // Throw an exception if observation has no IRF background template
+        if ((bkg == NULL) && (m_bkgsubtract != "RING")) {
+            std::string msg = "No IRF background template found in instrument "
+                              "response function for "+
+                              get_obs_header(obs)+". Please specify an "
+                              "instrument response function containing a "
+                              "background template.";
+            throw GException::invalid_value(G_FILL_MAPS_ACCEPTANCE, msg);
+        }
+
+    } // endelse: got IRF background template
 
     // Set minimum and maximum energy as GEnergy instances
     GEnergy emin(m_emin, "TeV");
@@ -961,13 +979,13 @@ void ctskymap::fill_maps_acceptance(GCTAObservation* obs)
         GCTAInstDir instdir = obs->pointing().instdir(skydir);
 
         // Compute background value
-        double value = bkg->rate_ebin(instdir, emin, emax);
+        double value = (bkg != NULL) ? bkg->rate_ebin(instdir, emin, emax) : 1.0;
 
         // Multiply background rate with livetime and solid angle
         value *= exposure * m_solidangle[i];
 
         // Add number of background events to acceptance map
-        #pragma omp critical(ctskymap_map_acceptance)
+        #pragma omp critical(ctskymap_fill_maps_acceptance_1)
         m_acceptance(i) += value;
 
         // Update total number of background events
@@ -976,8 +994,14 @@ void ctskymap::fill_maps_acceptance(GCTAObservation* obs)
     } // endfor: looped over acceptance map pixels
 
     // Log acceptance results
-    #pragma omp critical(ctskymap_map_events)
+    #pragma omp critical(ctskymap_fill_maps_acceptance_2)
     {
+        // Set message string
+        std::string msg = (bkg != NULL) ? "Use IRF background template"
+                                        : "Use constant background rate";
+
+        // Log information
+        log_value(NORMAL, "Background estimate", msg);
         log_value(NORMAL, "Events in background", int(total+0.5));
     }
 

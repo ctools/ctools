@@ -19,6 +19,11 @@ background subtraction method can be selected using the ``bkgsubtract``
 parameter. By default, no background model is subtracted (method ``NONE``).
 If ``IRF`` is selected, the background template that are shipped with the
 Instrument Response Functions will be used for background subtraction.
+If ``RING`` is selected, the background is estimated from a ring with the
+inner radius specified by the ``inradius`` parameter and the other radius
+specified by the ``outradius`` parameter. If a background template is available,
+that template will be used for weighting the counts in the ring. Otherwise, a
+constant background rate will be assumed.
 
 :ref:`ctskymap` generates a FITS file comprising a sky map as primary extension.
 If a background subtraction method was selected, the FITS file will contain
