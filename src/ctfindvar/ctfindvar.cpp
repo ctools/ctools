@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctfindvar - Time variability search tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2018 by Simon Bonnefoy                                   *
+ *  copyright (C) 2018-2019 by Simon Bonnefoy                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -229,7 +229,7 @@ void ctfindvar::run(void)
     if (logDebug()) {
         log.cout(true);
     }
-    
+
     // Get task parameters
     get_parameters();
 
@@ -544,7 +544,7 @@ void ctfindvar::init_gtis(void)
     // Set up Good Time Intervals by appending all intervals that overlap
     // with at least one of the observations
     for (int i = 0; i < bins; ++i) {
-        
+
         // Get time interval
         GTime tstart(m_tstart + i*tinterval);
         GTime tstop(m_tstart + (i+1.0)*tinterval);
@@ -810,7 +810,7 @@ void ctfindvar::analyse_cube(void)
                 m_model_above_thr.append(sky_model(dir_pix));
             }
         }
-    
+
     } // endfor: looped over pixels
 
     // Log results
@@ -872,7 +872,7 @@ std::vector<int> ctfindvar::get_pixels(void)
         } // endfor: looped over all models
 
     } // endif: there were input models
-    
+
     // ... otherwise query the source position
     else {
 
@@ -917,7 +917,7 @@ GModelSky ctfindvar::sky_model(const GSkyDir& dir) const
 
     // Create a sky model
     GModelSky model(spatial, spectral);
-    
+
     // Build model name from celestial coordinates
     double      ra   = dir.ra_deg();
     double      dec  = dir.dec_deg();
@@ -960,6 +960,14 @@ GNdarray ctfindvar::get_variability_sig(const int& ipix)
     // Get alpha values for specified pixel
     std::vector<double> alphas = get_alphas(ipix);
 
+    // Exclude all bins from the background estimate for which the
+    // number of events is below "minoff" or for which alpha is zero
+    for (int i = 0; i < m_gti.size(); ++i) {
+        if (m_counts(ipix, i) < m_minoff || alphas[i] == 0.0) {
+            accepted_bin_bckg_vector[i] = false;
+        }
+    }
+
     // Loop over pixels until all background pixels are removed
     bool background_validated = false;
     while (background_validated == false) {
@@ -970,26 +978,18 @@ GNdarray ctfindvar::get_variability_sig(const int& ipix)
         // Loop over all the GTIs of the pixel
         for (int i = 0; i < m_gti.size(); ++i) {
 
-            // The GTI is discared from background calculation and not
+            // The GTI is discarded from background calculation and not
             // checked again
             if (!accepted_bin_bckg_vector[i]) {
                 continue;
             }
 
-            // ... otherwise check if bin fails minoff check or no observations
-            // overlap it
-            else if (m_counts(ipix, i) < m_minoff || alphas[i] == 0) {
-                accepted_bin_bckg_vector[i] = false;
-                continue;
-            }
-
-            // ... otherwise
+            // ... otherwise GTI is selected, and we loop over all the
+            // others
             double noff  = 0.0;
             double alpha = 0.0;
-
-            // Got one GTI selected (i), looping over all the others (j).
             for (int j = 0; j < m_gti.size(); ++j) {
-                if (j != i && accepted_bin_bckg_vector[j] == 1) {
+                if (j != i && accepted_bin_bckg_vector[j]) {
                     noff  += m_counts(ipix, j);
                     alpha += alphas[j];
                 }
@@ -1019,7 +1019,7 @@ GNdarray ctfindvar::get_variability_sig(const int& ipix)
                 }
                 sig *= (non < alpha*noff) ? -1.0 : 1.0;
             }
-           
+
             // Update the significance
             sig_histogram(i) = sig;
 
@@ -1071,7 +1071,7 @@ std::vector<double> ctfindvar::get_alphas(const int& ipix) const
         if (roi_centre.dist_deg(pix_dir) > roi.radius()) {
             continue;
         }
-        
+
         // Convert sky direction to instrument direction
         GCTAInstDir instdir = obs->pointing().instdir(pix_dir);
 
@@ -1113,6 +1113,7 @@ std::vector<double> ctfindvar::get_alphas(const int& ipix) const
                 }
 
                 // Add up background rate
+                #pragma omp critical(ctfindvar_get_alphas) 
                 alphas[j] += exposure * bkg->rate_ebin(instdir, m_emin, m_emax);
 
             } // endif: exposure was positive
@@ -1186,7 +1187,7 @@ GTime ctfindvar::get_tstart(void)
 
             // Get CTA observation
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[k]);
-            
+
             // Continue only if observation is valid
             if (obs != NULL) {
 
@@ -1239,7 +1240,7 @@ GTime ctfindvar::get_tstop(void)
 
             // Get CTA observation
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[k]);
-            
+
             // Continue only if observation is valid
             if (obs != NULL) {
 
