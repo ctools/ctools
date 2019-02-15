@@ -3,7 +3,7 @@
 # Computes the PHA spectra for source/background and ARF/RMF files using the
 # reflected region method
 #
-# Copyright (C) 2017-2018 Luigi Tibaldo
+# Copyright (C) 2017-2019 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -181,8 +181,10 @@ class csphagen(ctools.csobservation):
             # Query source direction
             self._query_src_direction()
 
-            # Query minimum number of background regions
+            # Query minimum number of background regions and number of
+            # background regions to skip next to On region
             self['bkgregmin'].integer()
+            self['bkgregskip'].integer()
 
             # Set circular source region
             self._rad = self['rad'].real()
@@ -212,11 +214,12 @@ class csphagen(ctools.csobservation):
             raise RuntimeError('Only one On region is allowed')
 
         # Set up source direction. Query parameters if neccessary.
-        #if isinstance(self._src_reg[0], gammalib.GSkyRegionCircle):
-        #    self._src_dir = self._src_reg[0].centre()
-        #    self._rad     = self._src_reg[0].radius()
-        #else:
-        #    self._query_src_direction()
+        if self._models.is_empty():
+            if isinstance(self._src_reg[0], gammalib.GSkyRegionCircle):
+                self._src_dir = self._src_reg[0].centre()
+                self._rad     = self._src_reg[0].radius()
+            else:
+                self._query_src_direction()
 
         # Make sure that all CTA observations have an Off region by loading the
         # Off region region the parameter 'bkgregfile' for all CTA observations
@@ -365,6 +368,11 @@ class csphagen(ctools.csobservation):
             posang = pnt_dir.posang_deg(self._src_dir)
             if self._srcshape == 'CIRCLE':
 
+                # Determine number of background regions to skip
+                N_skip  = self['bkgregskip'].integer()
+                N_start = 1 + N_skip
+                N_lim   = 1 + 2*N_skip
+
                 # Compute the angular separation of reflected regions wrt
                 # camera center. The factor 1.05 ensures background regions
                 # do not overlap due to numerical precision issues
@@ -376,10 +384,10 @@ class csphagen(ctools.csobservation):
 
                 # If there are not enough reflected regions then skip the
                 # observation ...
-                if N < self['bkgregmin'].integer() + 3:
+                if N < self['bkgregmin'].integer() + N_lim:
                     msg = ' Skip because the number %d of reflected regions '\
                           'for background estimation is smaller than '\
-                          '"bkgregmin"=%d.' % (N-3, self['bkgregmin'].integer())
+                          '"bkgregmin"=%d.' % (N-N_lim, self['bkgregmin'].integer())
                     self._log_string(gammalib.NORMAL, msg)
 
                 # ... otherwise loop over position angle to create reflected
@@ -387,12 +395,12 @@ class csphagen(ctools.csobservation):
                 else:
 
                     # Log appending of reflected regions
-                    msg = ' Use %d reflected regions.' % (N-3)
+                    msg = ' Use %d reflected regions.' % (N-N_lim)
                     self._log_string(gammalib.NORMAL, msg)
 
                     # Append reflected regions
                     alpha = 360.0 / N
-                    for s in range(2, N - 1):
+                    for s in range(N_start, N - N_skip):
                         dphi    = s * alpha
                         ctr_dir = pnt_dir.clone()
                         ctr_dir.rotate_deg(posang + dphi, offset)
