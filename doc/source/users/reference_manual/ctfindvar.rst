@@ -3,7 +3,7 @@
 ctfindvar
 =========
 
-Search for source variability.
+Searches for source variability.
 
 
 Synopsis
@@ -13,7 +13,7 @@ This tool searches for source variability by applying the On/Off method in the
 time domain. The variability of sky map pixels is computed by binning the events
 as function of the photon arrival time and applying the On/Off method to each
 time bin, integrating the background over all the other time bins. Only bins
-with a variabilty significance below a given threshold, defined by the hidden
+with a variability significance below a given threshold, defined by the hidden
 ``threshold`` parameter, are included in the background estimate. Furthermore,
 only time bins that exceed a minimum number of events, specified by the hidden
 ``minoff`` parameter, are considered for the background estimate. The significance

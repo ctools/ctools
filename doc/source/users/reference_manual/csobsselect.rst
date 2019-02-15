@@ -9,10 +9,10 @@ Selects observations from an observation definition XML file.
 Synopsis
 --------
 
-This script selects all observations from an observation definiton XML file that
+This script selects all observations from an observation definition XML file that
 have pointings within a specified selection region and time interval and writes
 these observations into a new observation definition XML file. Possible selection
-regions are a circle and a box, either in Galactic or Celestial coordinates.
+regions are a circle and a box, given either in Galactic or Celestial coordinates.
 
 
 General parameters

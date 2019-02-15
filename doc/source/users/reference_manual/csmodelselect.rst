@@ -9,7 +9,7 @@ Selects models from a model definition XML file.
 Synopsis
 --------
 
-This script selects all models from a model definiton XML file that spatially
+This script selects all models from a model definition XML file that spatially
 overlap with the Region of Interests (RoIs) of a list of observations and writes
 these models into a new model definition XML file. In addition to the spatial
 selection, the tool allows selecting only models with a photon flux and/or a

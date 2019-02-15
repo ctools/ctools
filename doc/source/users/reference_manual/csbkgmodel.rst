@@ -18,12 +18,12 @@ For the analytical 2D Gaussian function, a bilinear multiplicative background
 gradient can be added using ``gradient=yes``. The spectral component can be
 either a power law (``PLAW``) or a nodes function (``NODES``). The number of
 nodes for the node function is controlled through the ``enumbins`` parameter.
-Specific node energies can be specified through the ``ebinalg`` parameter.
+Specific node energies can be specified through the ``ebinfile`` parameter.
 
 If ``runwise=yes``, a background model component will be added for each observation
 in the input observation definition XML file. The script fits the background
 model to the input observation(s) to preset the background model parameters
-with resonable values.
+with reasonable values.
 
 On output, :ref:`csbkgmodel` writes an model definition XML file that can be
 used for model fitting. Source model components have to be added as needed.

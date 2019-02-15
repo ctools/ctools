@@ -9,7 +9,7 @@ Generates energy boundaries for stacked analysis.
 Synopsis
 --------
 
-This script generates the energy bounaries for a stacked analysis by inspecting
+This script generates the energy boundaries for a stacked analysis by inspecting
 the variation in the effective area and the background template of the response
 functions. The script takes either an observation definition XML file or a
 specific instrument response function on input.
