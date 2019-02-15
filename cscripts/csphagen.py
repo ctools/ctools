@@ -140,6 +140,34 @@ class csphagen(ctools.csobservation):
         # Return
         return
 
+    def _get_regions(self, filename):
+        """
+        Get regions from DS9 file or FITS file
+
+        Parameters
+        ----------
+        filename : `~gammalib.GFilename`
+            Filename
+
+        Returns
+        -------
+        regs : `~gammalib.GSkyRegions`
+            Region container
+        """
+        # If filename is a FITS file then load region map and append to
+        # list of regions
+        if filename.is_fits():
+            map  = gammalib.GSkyRegionMap(filename)
+            regs = gammalib.GSkyRegions()
+            regs.append(map)
+
+        # ... otherwise load DS9 file
+        else:
+            regs = gammalib.GSkyRegions(filename)
+
+        # Return region container
+        return regs
+
     def _get_parameters_bkgmethod_reflected(self):
         """
         Get parameters for REFLECTED background method
@@ -177,18 +205,18 @@ class csphagen(ctools.csobservation):
         """
         # Set up source region
         filename      = self['srcregfile'].filename()
-        self._src_reg = gammalib.GSkyRegions(filename)
+        self._src_reg = self._get_regions(filename)
 
         # Raise an exception if there is more than one source region
         if len(self._src_reg) != 1:
             raise RuntimeError('Only one On region is allowed')
 
         # Set up source direction. Query parameters if neccessary.
-        if isinstance(self._src_reg[0], gammalib.GSkyRegionCircle):
-            self._src_dir = self._src_reg[0].centre()
-            self._rad     = self._src_reg[0].radius()
-        else:
-            self._query_src_direction()
+        #if isinstance(self._src_reg[0], gammalib.GSkyRegionCircle):
+        #    self._src_dir = self._src_reg[0].centre()
+        #    self._rad     = self._src_reg[0].radius()
+        #else:
+        #    self._query_src_direction()
 
         # Make sure that all CTA observations have an Off region by loading the
         # Off region region the parameter 'bkgregfile' for all CTA observations
@@ -197,7 +225,7 @@ class csphagen(ctools.csobservation):
             if obs.classname() == 'GCTAObservation':
                 if obs.off_regions().is_empty():
                     filename = self['bkgregfile'].filename()
-                    regions  = gammalib.GSkyRegions(filename)
+                    regions  = self._get_regions(filename)
                     obs.off_regions(regions)
 
         # Return
