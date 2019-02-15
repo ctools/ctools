@@ -449,10 +449,13 @@ class csphagen(ctools.csobservation):
         # names
         for model in self._models:
 
+            # Initialise model usage
+            use_model = False
+
             # If model is a background model then append "OnOff"
             if 'GCTA' in model.classname():
 
-                # Skip model is background model should not be used
+                # Skip model if background model should not be used
                 if not self['use_model_bkg'].boolean():
                     self._log_string(gammalib.NORMAL, ' Skip "%s" model "%s" (%s)' % \
                          (model.instruments(), model.name(), model.ids()))
@@ -460,10 +463,10 @@ class csphagen(ctools.csobservation):
 
                 # Check if model corresponds to one of the relevant
                 # observations
-                is_onoff = False
                 for result in results:
                     if model.is_valid(result['instrument'], result['id']):
-                        is_onoff = True
+                        if result['bkg_reg'].size() >= self['bkgregmin'].integer():
+                            use_model = True
                         break
 
                 # If stacked analysis is requested then just use for model
@@ -482,17 +485,27 @@ class csphagen(ctools.csobservation):
                     # ... otherwise use model for stacked analysis
                     else:
                         has_stacked_model = True
+                        use_model         = True
                         model.ids('')
 
                 # Set instrument name
                 model.instruments(model.instruments()+'OnOff')
 
-            # Log model usage
-            self._log_string(gammalib.NORMAL, ' Use "%s" model "%s" (%s)' % \
-                 (model.instruments(), model.name(), model.ids()))
+            # If model is relevant then append it now to the model
+            # container
+            if use_model:
 
-            # Append model to container
-            models.append(model)
+                # Log model usage
+                self._log_string(gammalib.NORMAL, ' Use "%s" model "%s" (%s)' % \
+                     (model.instruments(), model.name(), model.ids()))
+
+                # Append model to container
+                models.append(model)
+
+            # ... otherwise signal that model is skipped
+            else:
+                self._log_string(gammalib.NORMAL, ' Skip "%s" model "%s" (%s)' % \
+                     (model.instruments(), model.name(), model.ids()))
 
         # Return model container
         return models
