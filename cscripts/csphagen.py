@@ -452,7 +452,8 @@ class csphagen(ctools.csobservation):
             # Initialise model usage
             use_model = False
 
-            # If model is a background model then append "OnOff"
+            # If model is a background model then check if it will be
+            # used
             if 'GCTA' in model.classname():
 
                 # Skip model if background model should not be used
@@ -488,8 +489,12 @@ class csphagen(ctools.csobservation):
                         use_model         = True
                         model.ids('')
 
-                # Set instrument name
+                # Append "OnOff" to instrument name
                 model.instruments(model.instruments()+'OnOff')
+
+            # ... otherwise, if model is not a background model then use it
+            else:
+                use_model = True
 
             # If model is relevant then append it now to the model
             # container
