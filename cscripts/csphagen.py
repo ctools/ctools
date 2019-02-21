@@ -3,7 +3,7 @@
 # Computes the PHA spectra for source/background and ARF/RMF files using the
 # reflected region method
 #
-# Copyright (C) 2017-2018 Luigi Tibaldo
+# Copyright (C) 2017-2019 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -140,6 +140,34 @@ class csphagen(ctools.csobservation):
         # Return
         return
 
+    def _get_regions(self, filename):
+        """
+        Get regions from DS9 file or FITS file
+
+        Parameters
+        ----------
+        filename : `~gammalib.GFilename`
+            Filename
+
+        Returns
+        -------
+        regs : `~gammalib.GSkyRegions`
+            Region container
+        """
+        # If filename is a FITS file then load region map and append to
+        # list of regions
+        if filename.is_fits():
+            map  = gammalib.GSkyRegionMap(filename)
+            regs = gammalib.GSkyRegions()
+            regs.append(map)
+
+        # ... otherwise load DS9 file
+        else:
+            regs = gammalib.GSkyRegions(filename)
+
+        # Return region container
+        return regs
+
     def _get_parameters_bkgmethod_reflected(self):
         """
         Get parameters for REFLECTED background method
@@ -153,8 +181,10 @@ class csphagen(ctools.csobservation):
             # Query source direction
             self._query_src_direction()
 
-            # Query minimum number of background regions
+            # Query minimum number of background regions and number of
+            # background regions to skip next to On region
             self['bkgregmin'].integer()
+            self['bkgregskip'].integer()
 
             # Set circular source region
             self._rad = self['rad'].real()
@@ -177,18 +207,19 @@ class csphagen(ctools.csobservation):
         """
         # Set up source region
         filename      = self['srcregfile'].filename()
-        self._src_reg = gammalib.GSkyRegions(filename)
+        self._src_reg = self._get_regions(filename)
 
         # Raise an exception if there is more than one source region
         if len(self._src_reg) != 1:
             raise RuntimeError('Only one On region is allowed')
 
         # Set up source direction. Query parameters if neccessary.
-        if isinstance(self._src_reg[0], gammalib.GSkyRegionCircle):
-            self._src_dir = self._src_reg[0].centre()
-            self._rad     = self._src_reg[0].radius()
-        else:
-            self._query_src_direction()
+        if self._models.is_empty():
+            if isinstance(self._src_reg[0], gammalib.GSkyRegionCircle):
+                self._src_dir = self._src_reg[0].centre()
+                self._rad     = self._src_reg[0].radius()
+            else:
+                self._query_src_direction()
 
         # Make sure that all CTA observations have an Off region by loading the
         # Off region region the parameter 'bkgregfile' for all CTA observations
@@ -197,7 +228,7 @@ class csphagen(ctools.csobservation):
             if obs.classname() == 'GCTAObservation':
                 if obs.off_regions().is_empty():
                     filename = self['bkgregfile'].filename()
-                    regions  = gammalib.GSkyRegions(filename)
+                    regions  = self._get_regions(filename)
                     obs.off_regions(regions)
 
         # Return
@@ -337,6 +368,11 @@ class csphagen(ctools.csobservation):
             posang = pnt_dir.posang_deg(self._src_dir)
             if self._srcshape == 'CIRCLE':
 
+                # Determine number of background regions to skip
+                N_skip  = self['bkgregskip'].integer()
+                N_start = 1 + N_skip
+                N_lim   = 1 + 2*N_skip
+
                 # Compute the angular separation of reflected regions wrt
                 # camera center. The factor 1.05 ensures background regions
                 # do not overlap due to numerical precision issues
@@ -348,10 +384,10 @@ class csphagen(ctools.csobservation):
 
                 # If there are not enough reflected regions then skip the
                 # observation ...
-                if N < self['bkgregmin'].integer() + 3:
+                if N < self['bkgregmin'].integer() + N_lim:
                     msg = ' Skip because the number %d of reflected regions '\
                           'for background estimation is smaller than '\
-                          '"bkgregmin"=%d.' % (N-3, self['bkgregmin'].integer())
+                          '"bkgregmin"=%d.' % (N-N_lim, self['bkgregmin'].integer())
                     self._log_string(gammalib.NORMAL, msg)
 
                 # ... otherwise loop over position angle to create reflected
@@ -359,12 +395,12 @@ class csphagen(ctools.csobservation):
                 else:
 
                     # Log appending of reflected regions
-                    msg = ' Use %d reflected regions.' % (N-3)
+                    msg = ' Use %d reflected regions.' % (N-N_lim)
                     self._log_string(gammalib.NORMAL, msg)
 
                     # Append reflected regions
                     alpha = 360.0 / N
-                    for s in range(2, N - 1):
+                    for s in range(N_start, N - N_skip):
                         dphi    = s * alpha
                         ctr_dir = pnt_dir.clone()
                         ctr_dir.rotate_deg(posang + dphi, offset)
@@ -413,10 +449,14 @@ class csphagen(ctools.csobservation):
         # names
         for model in self._models:
 
-            # If model is a background model then append "OnOff"
+            # Initialise model usage
+            use_model = False
+
+            # If model is a background model then check if it will be
+            # used
             if 'GCTA' in model.classname():
 
-                # Skip model is background model should not be used
+                # Skip model if background model should not be used
                 if not self['use_model_bkg'].boolean():
                     self._log_string(gammalib.NORMAL, ' Skip "%s" model "%s" (%s)' % \
                          (model.instruments(), model.name(), model.ids()))
@@ -424,10 +464,10 @@ class csphagen(ctools.csobservation):
 
                 # Check if model corresponds to one of the relevant
                 # observations
-                is_onoff = False
                 for result in results:
                     if model.is_valid(result['instrument'], result['id']):
-                        is_onoff = True
+                        if result['bkg_reg'].size() >= self['bkgregmin'].integer():
+                            use_model = True
                         break
 
                 # If stacked analysis is requested then just use for model
@@ -446,17 +486,31 @@ class csphagen(ctools.csobservation):
                     # ... otherwise use model for stacked analysis
                     else:
                         has_stacked_model = True
+                        use_model         = True
                         model.ids('')
 
-                # Set instrument name
+                # Append "OnOff" to instrument name
                 model.instruments(model.instruments()+'OnOff')
 
-            # Log model usage
-            self._log_string(gammalib.NORMAL, ' Use "%s" model "%s" (%s)' % \
-                 (model.instruments(), model.name(), model.ids()))
+            # ... otherwise, if model is not a background model then use it
+            else:
+                use_model = True
 
-            # Append model to container
-            models.append(model)
+            # If model is relevant then append it now to the model
+            # container
+            if use_model:
+
+                # Log model usage
+                self._log_string(gammalib.NORMAL, ' Use "%s" model "%s" (%s)' % \
+                     (model.instruments(), model.name(), model.ids()))
+
+                # Append model to container
+                models.append(model)
+
+            # ... otherwise signal that model is skipped
+            else:
+                self._log_string(gammalib.NORMAL, ' Skip "%s" model "%s" (%s)' % \
+                     (model.instruments(), model.name(), model.ids()))
 
         # Return model container
         return models

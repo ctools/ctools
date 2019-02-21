@@ -12,7 +12,7 @@ Synopsis
 This tool computes for each event the probability that the event originates
 from a one of the components of a model.
 
-The tool takes on input an event list or an observation definiton XML file and
+The tool takes on input an event list or an observation definition XML file and
 appends on output to each event file columns that provide the probabilities.
 The column names are formed from the model name that is prefixed with ``PROB_``.
 

@@ -166,6 +166,12 @@ General parameters
     If this number of background regions is not available the observation is
     skipped.
 
+``(bkgregskip = 1) [integer]``
+    Number of background regions that should be skipped next to the On regions.
+    Typically, one region is skipped so that the Off regions are taken sufficiently
+    distant from the On region, but in some cases it may be useful to keep the
+    background regions next to the On region.
+
 ``(use_model_bkg = yes) [boolean]``
     Specifies whether the background model should be used for the computation
     of the ``alpha`` parameter and the predicted background rate in the Off
