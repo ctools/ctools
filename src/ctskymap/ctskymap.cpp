@@ -1631,6 +1631,11 @@ double ctskymap::sigma_li_ma(const double& n_on,
         sigma = -2.0 * n_off * std::log(1.0+alpha);
     }
 
+    // Handle special case of no Off-counts
+    else if (n_off == 0.0) {
+        sigma = 2.0 * n_on * std::log((1.0+alpha)/alpha);
+    }
+
     // ... otherwise handle general case
     else {
         sigma = (n_on < (alpha*n_off) ? -2.0 : 2.0) *
