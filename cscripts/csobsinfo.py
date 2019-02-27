@@ -136,7 +136,12 @@ class csobsinfo(ctools.csobservation):
 
             # Logging
             if self._logExplicit():
-                self._log.header2(obs_name)
+                obs_id   = obs.id()
+                if obs_id != '':
+                    log_name = obs_name + ' (ID='+obs_id+')'
+                else:
+                    log_name = obs_name
+                self._log.header2(log_name)
 
             # Retrieve observation name
             obs_names.append(obs_name)
