@@ -22,6 +22,8 @@ In particular, this release provides:
 Bug fixes
 ---------
 
+* [`2839 <https://cta-redmine.irap.omp.eu/issues/2839>`_] -
+  Fix ring background computation in :ref:`ctskymap` for small roiradius
 * [`2721 <https://cta-redmine.irap.omp.eu/issues/2721>`_] -
   Apply event bin weighting in :ref:`ctmodel` for stacked computation
 * [`2694 <https://cta-redmine.irap.omp.eu/issues/2694>`_] -

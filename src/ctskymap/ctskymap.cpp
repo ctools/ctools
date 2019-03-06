@@ -1371,7 +1371,8 @@ void ctskymap::compute_ring_values(const int&     ipixel,
                 }
 
                 // ... otherwise check if pixel is inside source region
-                else if (position.cos_dist(skydir) >= m_cos_roiradius) {
+                else if ((position.cos_dist(skydir) >= m_cos_roiradius) ||
+                         (ipixel == i)) {
 
                     // Update n_on
                     non += counts(i);

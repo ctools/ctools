@@ -216,7 +216,9 @@ of the input observations (#2054).
 
 ctskymap - CTA sky mapping
 --------------------------
-Add exclusion_map() methods (#2725)
+Fix an issue with artefacts for small roiradius values (#2839).
+
+Add exclusion_map() methods (#2725).
 
 Add the "inmap", "iterations" and "threshold" parameters. The hidden
 "inmap" parameter allows specifying a sky map file containing a "COUNTS"

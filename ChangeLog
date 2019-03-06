@@ -4,6 +4,7 @@
         ========================
 
         Log warning if edisp=no (#2842)
+        Fix ring background computation in ctskymap for small roiradius (#2839)
         Add max_iter parameter to ctbutterfly, cterror, ctlike, cttsmap,
           ctulimit and cstsmapsplit
         ctbkgcube now requires an input counts cube (#2763)
