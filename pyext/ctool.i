@@ -225,6 +225,9 @@ public:
  * @brief ctool base class Python extensions
  ***************************************************************************/
 %extend ctool {
+    void _log_parameters(const int& chatter) {
+        self->log_parameters(GChatter(chatter));
+    }
     void _log_observations(const int&           chatter,
                            const GObservations& obs,
                            const std::string&   what = "Observation") {

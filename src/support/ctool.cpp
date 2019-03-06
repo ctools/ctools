@@ -1085,6 +1085,49 @@ void ctool::require_inobs_nocube(const std::string& method)
 
 
 /***********************************************************************//**
+ * @brief Log application parameters
+ *
+ * @param[in] chatter Minimum required chattiness
+ *
+ * Log all application parameters. If the ctools has an edisp parameter and
+ * the edisp parameter is false then log a warning that energy dispersion
+ * is not used.
+ ***************************************************************************/
+void ctool::log_parameters(const GChatter& chatter)
+{
+    // Use base class logger
+    this->GApplication::log_parameters(chatter);
+
+    // If application has an edisp parameter but edisp is set to now then
+    // log a warning that indicates that energy dispersion is not used
+    if (has_par("edisp") && !(*this)["edisp"].boolean()) {
+
+        // Get chattiness of application
+        GChatter chattiness = static_cast<GChatter>((&m_pars["chatter"])->integer());
+
+        // Only write parameters if the chattiness is at least equal to the
+        // minimum required chattiness
+        if (chattiness >= chatter) {
+
+            // Log warning
+            log << std::endl;
+            log << "WARNING: Energy dispersion will *NOT* be considered for the "
+                   "computation. To consider" << std::endl;
+            log << "         energy dispersion, please set the \"edisp\" "
+                   "parameter to \"yes\". Be aware that" << std::endl;
+            log << "         using energy dispersion will considerably slow "
+                   "down the computations." << std::endl;
+
+        } // endif: chatter level was sufficient
+
+    } // endif: application has edisp parameter and edisp=no
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
  * @brief Log observation container
  *
  * @param[in] chatter Minimum required chattiness

@@ -116,6 +116,7 @@ protected:
     bool              is_onoff(void);
 
     // Protected methods for logging
+    void              log_parameters(const GChatter& chatter);
     void              log_observations(const GChatter&      chatter,
                                        const GObservations& obs,
                                        const std::string&   what = "Observation");

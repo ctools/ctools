@@ -44,6 +44,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`2842 <https://cta-redmine.irap.omp.eu/issues/2842>`_] -
+  Log warning if ``edisp=no``
 * Add ``max_iter`` parameter to :ref:`ctbutterfly`, :ref:`cterror`,
   :ref:`ctlike`, :ref:`cttsmap`, :ref:`ctulimit`, and :ref:`cstsmapsplit`
   to allow controlling the maximum number of fit iterations.
