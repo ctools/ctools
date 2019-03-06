@@ -605,13 +605,7 @@ void ctulimit::get_parameter_brackets(double& parmin, double& parmax)
     double error = m_model_par->factor_error();
 
     // If parameter error is zero then take parameter value as error
-    if (error == 0) {
-        error = value;
-    }
-
-    // If parameter error is larger than parameter value then take parameter
-    // value as error
-    else if (std::abs(error) > std::abs(value)) {
+    if (error == 0.0) {
         error = value;
     }
 
