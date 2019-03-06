@@ -1,15 +1,16 @@
 .. _hess_dr1_data:
 
 Joint analysis of H.E.S.S. and Fermi data
-=========================
+=========================================
 
 
   .. admonition:: What you will learn
 
      You will learn how to **jointly analyse data from H.E.S.S. and Fermi**.
 
-In this tutorial you will learn how to jointly analyse data observed with H.E.S.S. and the
-Fermi-LAT. This follows the same procedure illustrated in `this section <../howto/howto_combine_instruments>`_.
+In this tutorial you will learn how to jointly analyse data observed with
+H.E.S.S. and the Fermi-LAT. This follows the same procedure illustrated in
+`this section <../howto/howto_combine_instruments>`_.
 
 Prepare Fermi-LAT data
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -24,10 +25,11 @@ grid with 0.05 deg step, and on a logarithmic energy grid with 15 bins
 from 50 GeV to 800 GeV, and calculate livetime cube, exposure map, and
 diffuse model source maps. The results shown here correspond to P8R3 LAT
 data covering the Fermi Mission Elapsed Time (MET) between 239557417 s
-and 565315205 s, analysed using the fermitools 1.0.3. To run the tutorial faster you can select a shorter dataset. 
+and 565315205 s, analysed using the fermitools 1.0.3. To run the tutorial
+faster you can select a shorter dataset. 
 
 Prepare H.E.S.S. data
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 We will use the On/Off observations generated in `this section <classical>`_.
 
@@ -66,7 +68,7 @@ H.E.S.S. data, such as binned or unbinned. For H.E.S.S. you may choose
 another analysis method, such as unbinned or binned.
 
 Fit a spectral model to the data
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You have to define a
 :ref:`model definition file <glossary_moddef>`
@@ -132,7 +134,7 @@ the Crab pulsar. The Fermi analysis can be extended to lower energies
 for example by selecting photons based on the pulsar phase.
 
 Butterfly and SED
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 We can now generate the butterfly
 
