@@ -10,6 +10,7 @@ list of
 **Installation issues**
 
 - :ref:`Certificate problem when cloning from Git <issue_ssl>`
+- :ref:`ctools does not compile against conda Python <conda_python>`
 - :ref:`Python module does not work <issue_python>`
 - :ref:`Installing on Solaris <issue_solaris>`
 - :ref:`Installing on OpenSolaris <issue_opensolaris>`
@@ -43,7 +44,21 @@ Installation issues
    .. code-block:: bash
 
       export GIT_SSL_NO_VERIFY=true
- 
+
+ .. _conda_python:
+
+.. topic:: ctools does not compile against conda Python
+
+   Trying to compile ctools against conda Python may fail due to
+   incompatibility issues. If you'd like to compile ctools against conda
+   Python, make sure that gcc, swig, and cfitsio are all installed via
+   anaconda
+
+   .. code-block:: bash
+
+      $ conda install gcc swig
+      $ conda install -c conda-forge cfitsio
+
 .. _issue_python:
 
 .. topic:: Python module does not work
