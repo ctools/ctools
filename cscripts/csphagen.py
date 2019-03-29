@@ -271,9 +271,9 @@ class csphagen(ctools.csobservation):
             self._models  = self.obs().models().clone()
             self._srcname = self['srcname'].string()
         elif self['inmodel'].is_valid():
-            inmodel         = self['inmodel'].filename()
-            self._models    = gammalib.GModels(inmodel)
-            self._srcname   = self['srcname'].string()
+            inmodel       = self['inmodel'].filename()
+            self._models  = gammalib.GModels(inmodel)
+            self._srcname = self['srcname'].string()
 
         # Set energy bounds
         self._ebounds = self._create_ebounds()
