@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates spectra as a function of phase
 #
-# Copyright (C) 2017-2018 Rolf Buehler
+# Copyright (C) 2017-2019 Rolf Buehler
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -548,30 +548,24 @@ class csphasecrv(ctools.csobservation):
         # Return
         return self._fitmodels
 
-    def exclusion_map(self, object):
+    def exclusion_map(self, object=None):
         """
-        Set exclusion regions map
+        Return and optionally set the exclusion regions map
 
         Parameters
         ----------
         object : `~gammalib.GSkyRegion` or `~gammalib.GSkyMap` or `~gammalib.GFilename`
             Exclusion regions object
-        """
-        # Set exclusion region map
-        self._excl_reg_map = gammalib.GSkyRegionMap(object)
-
-        # Return
-        return
-
-    def exclusion_map(self):
-        """
-        Get exclusion regions map
 
         Returns
         -------
         region : `~gammalib.GSkyRegionMap`
             Exclusion regions map
         """
+        # If a regions object is provided then set the regions ...
+        if object is not None:
+            self._excl_reg_map = gammalib.GSkyRegionMap(object)
+
         # Return
         return self._excl_reg_map
 
