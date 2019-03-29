@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the cscript base classes.
 #
-# Copyright (C) 2016-2018 Juergen Knoedlseder
+# Copyright (C) 2016-2019 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -56,12 +56,14 @@ class cscript_test(ctools.cscript):
 
     # Check create_ebounds() method
     def check_create_ebounds(self, filename):
-        self.pars()['ebinfile'].value(filename)
+        if filename is not '':
+            self.pars()['ebinfile'].value(filename)
         return self._create_ebounds()
 
     # Check create_energies() method
     def check_create_energies(self, filename):
-        self.pars()['ebinfile'].value(filename)
+        if filename is not '':
+            self.pars()['ebinfile'].value(filename)
         return self._create_energies()
 
     # Check require_inobs() method
@@ -468,6 +470,23 @@ class Test(test):
         except ValueError:
             self.test_try_success()
 
+        # Test create_ebounds() method for "LIN" and "LOG" methods
+        cls, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('ebinalg','s','h','LIN','','',''))
+        pars.append(gammalib.GApplicationPar('ebinfile','f','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('enumbins','i','h','1','','',''))
+        pars.append(gammalib.GApplicationPar('emin','r','h','1.0','','',''))
+        pars.append(gammalib.GApplicationPar('emax','r','h','10.0','','',''))
+        ebounds = cls.check_create_ebounds('')
+        self.test_value(ebounds.size(), 1, 'Check number of energy boundaries')
+        self.test_value(ebounds.emin().TeV(), 1.0, 'Check minimum energy')
+        self.test_value(ebounds.emax().TeV(), 10.0, 'Check maximum energy')
+        ebounds = cls.check_create_ebounds('')
+        self.test_value(ebounds.size(), 1, 'Check number of energy boundaries')
+        self.test_value(ebounds.emin().TeV(), 1.0, 'Check minimum energy')
+        self.test_value(ebounds.emax().TeV(), 10.0, 'Check maximum energy')
+        cls.pars(cpy_pars)
+
         # Test create_energies() method for "EBOUNDS" extension
         energies = empty.check_create_energies('test_ebinfile_ebounds.fits')
         self.test_value(energies.size(), 2, 'Check number of energies')
@@ -513,6 +532,23 @@ class Test(test):
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
+
+        # Test create_energies() method for "LIN" and "LOG" methods
+        cls, pars, cpy_pars = self._setup_cscript()
+        pars.append(gammalib.GApplicationPar('ebinalg','s','h','LIN','','',''))
+        pars.append(gammalib.GApplicationPar('ebinfile','f','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('enumbins','i','h','2','','',''))
+        pars.append(gammalib.GApplicationPar('emin','r','h','1.0','','',''))
+        pars.append(gammalib.GApplicationPar('emax','r','h','10.0','','',''))
+        energies = cls.check_create_energies('')
+        self.test_value(energies.size(), 2, 'Check number of energies')
+        self.test_value(energies[0].TeV(), 1.0, 'Check first energy')
+        self.test_value(energies[1].TeV(), 10.0, 'Check second energy')
+        energies = cls.check_create_energies('')
+        self.test_value(energies.size(), 2, 'Check number of energies')
+        self.test_value(energies[0].TeV(), 1.0, 'Check first energy')
+        self.test_value(energies[1].TeV(), 10.0, 'Check second energy')
+        cls.pars(cpy_pars)
 
         # Test create_map() method
         # TODO: implement
