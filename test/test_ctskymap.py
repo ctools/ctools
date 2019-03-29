@@ -62,7 +62,9 @@ class Test(test):
                     'Test ctskymap from Python for IRF background')
         self.append(self._test_python_ring,
                     'Test ctskymap from Python for RING background')
-        
+        self.append(self._test_python_exclusion_map,
+                    'Test ctskymap exclusion map methods from Python')
+
         # Return
         return
 
@@ -418,6 +420,50 @@ class Test(test):
         # Return
         return
 
+    # Test exclusion_map methods
+    def _test_python_exclusion_map(self):
+        """
+        Test exclusion_map methods
+        """
+        # Setup ctskymap
+        skymap = ctools.ctskymap()
+
+        # Set exclusion map
+        map = gammalib.GSkyRegionMap(self._exclusion_map)
+
+        # Test iterative RING background subtraction with an exclusion map
+        # set via the ctskymap::exclusion_map() method
+        skymap = ctools.ctskymap()
+        skymap['inmap']       = self._skymap_ring
+        skymap['bkgsubtract'] = 'RING'
+        skymap['roiradius']   = 0.1
+        skymap['inradius']    = 0.6
+        skymap['outradius']   = 0.8
+        skymap['iterations']  = 2
+        skymap['threshold']   = 5.0
+        skymap['outmap']      = 'ctskymap_ring_py7.fits'
+        skymap['logfile']     = 'ctskymap_ring_py7.log'
+        skymap['chatter']     = 2
+        skymap.exclusion_map(map)
+
+        # Execute tool
+        skymap.logFileOpen()  # Needed to get a new log file
+        skymap.execute()
+
+        # Check result file
+        self._check_result_file('ctskymap_ring_py7.fits', 10, 10)
+        self._check_result_file('ctskymap_ring_py7.fits[BACKGROUND]', 10, 10)
+        self._check_result_file('ctskymap_ring_py7.fits[SIGNIFICANCE]', 10, 10)
+
+        # Recover exclusion map
+        map2 = skymap.exclusion_map()
+
+        # Check exclusion map
+        self._check_map(map2.map(), nx=10, ny=10)
+
+        # Return
+        return
+
     # Check result file
     def _check_result_file(self, filename, nx=20, ny=20):
         """
@@ -460,7 +506,7 @@ class Test(test):
             nmaps = 1
         else:
             nmaps = 0
-        
+
         # Check dimensions
         self.test_value(skymap.nmaps(), nmaps, 'Check number of maps')
         self.test_value(skymap.nx(), nx, 'Check for number of X pixels')
