@@ -768,10 +768,10 @@ void ctfindvar::analyse_cube(void)
     for (int ipix = 0; ipix < m_counts.npix(); ++ipix) {
 
         // Compute total counts for pixel
-        double total_counts = 0.0;
-        for (int k = 0; k < nbins; ++k) {
-            total_counts += m_counts(ipix, k);
-        }
+        //double total_counts = 0.0;
+        //for (int k = 0; k < nbins; ++k) {
+        //    total_counts += m_counts(ipix, k);
+        //}
 
         // Getting the variability significance for the current pixel
         GNdarray pixSig = get_variability_sig(ipix);

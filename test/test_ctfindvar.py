@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctfindvar tool.
 #
-# Copyright (C) 2018 Simon Bonnefoy
+# Copyright (C) 2018-2019 Simon Bonnefoy
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import ctools
 from testing import test

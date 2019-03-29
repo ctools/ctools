@@ -2,7 +2,7 @@
 # ==========================================================================
 # Shows the distribution of significances in a given significance map.
 #
-# Copyright (C) 2018 Andreas Specovius
+# Copyright (C) 2018-2019 Andreas Specovius
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -50,7 +50,6 @@ import gammalib
 import cscripts
 try:
     import matplotlib.pyplot as plt
-    import matplotlib.mlab as mlab
     plt.figure()
     plt.close()
 except (ImportError, RuntimeError):

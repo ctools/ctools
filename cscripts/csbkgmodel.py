@@ -19,7 +19,6 @@
 #
 # ==========================================================================
 import sys
-import math
 import gammalib
 import ctools
 
@@ -96,10 +95,10 @@ class csbkgmodel(ctools.csobservation):
 
         # Query input parameters
         spatial = self['spatial'].string()
-        if self['spatial'].string() == 'GAUSS':
+        if spatial == 'GAUSS':
             self['gradient'].boolean()
         self['spectral'].string()
-        if self['spatial'].string() == 'NODES':
+        if spatial == 'NODES':
             self._create_energies()
         self['runwise'].boolean()
         self['emin'].real()
@@ -330,7 +329,6 @@ class csbkgmodel(ctools.csobservation):
             spectral = model.spectral()
             nodes    = spectral.nodes()
             for i in range(nodes):
-                ieng = 2*(nodes - i) - 2
                 iint = 2*(nodes - i) - 1
                 if spectral[iint].error() == 0.0:
                     spectral.remove(nodes - i - 1)
