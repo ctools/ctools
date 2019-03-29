@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctfindvar - Time variability search tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2018 by Simon Bonnefoy                                   *
+ *  copyright (C) 2018-2019 by Simon Bonnefoy                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -61,11 +61,6 @@ public:
     void run(void);
     void save(void);
 
-    // Get the information on the time interval from 
-    int            time2inx(const GTime& time);
-    GGti           inx2gti(const int& indx);
-    const GSkyMap& counts(void);
-
 protected:
     // Protected methods
     void                init_members(void);
@@ -84,6 +79,7 @@ protected:
     GTime               get_tstop(void);
     GModelSky           sky_model(const GSkyDir& dir) const;
     void                write_source_histograms(GFits& fits);
+    int                 time2inx(const GTime& time) const;
 
     // Protected members
     GSkyMap           m_counts;          //!< Counts for each time interval
@@ -102,18 +98,5 @@ protected:
     GModels           m_model_above_thr; //!< Model storing position with significance above thr
 
 };
-
-
-/***********************************************************************//**
- * @brief Return reference to significance cube object
- * 
- * @return Reference to counts cube
- ***************************************************************************/
-inline
-const GSkyMap& ctfindvar::counts(void)
-{
-    return m_counts;
-}
-
 
 #endif /* CTFINDVAR_HPP */

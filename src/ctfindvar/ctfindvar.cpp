@@ -312,51 +312,6 @@ void ctfindvar::save(void)
 }
 
 
-/***********************************************************************//**
- * @brief Get the map index associated with a given time
- *
- * @param[in] time Time
- * @return Index of map in counts cube
- ***************************************************************************/
-int ctfindvar::time2inx(const GTime& time)
-{
-    // Set default return value
-    int map_index = -1;
-
-    // Loop over all GTIs
-    for (int i = 0; i < m_gti.size(); ++i) {
-
-        // If interval contains the time then break
-        if (m_gti[i].contains(time)) {
-            map_index = i;
-            break;
-        }
-
-    }
-
-    // Return map index
-    return map_index;
-}
-
-
-/***********************************************************************//**
- * @brief Return Good Time Interval for index
- *
- * @param[in] index Index
- * @return Good Time Interval
- ***************************************************************************/
-GGti ctfindvar::inx2gti(const int& index)
-{
-    // Throw an exception if index is invalid
-    if ((index < 0) || (index >= m_gti.size())) {
-        throw GException::out_of_range(G_INX2GTI, "Time index", index, m_gti.size());
-    }
-
-    // Return Good Time Interval
-    return m_gti[index];
-}
-
-
 /*==========================================================================
  =                                                                         =
  =                             Private methods                             =
@@ -1427,4 +1382,31 @@ void ctfindvar::write_source_histograms(GFits& fits)
 
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Get the map index associated with a given time
+ *
+ * @param[in] time Time
+ * @return Index of map in counts cube
+ ***************************************************************************/
+int ctfindvar::time2inx(const GTime& time) const
+{
+    // Set default return value
+    int map_index = -1;
+
+    // Loop over all GTIs
+    for (int i = 0; i < m_gti.size(); ++i) {
+
+        // If interval contains the time then break
+        if (m_gti[i].contains(time)) {
+            map_index = i;
+            break;
+        }
+
+    }
+
+    // Return map index
+    return map_index;
 }
