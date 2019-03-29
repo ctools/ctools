@@ -155,16 +155,16 @@ class Test(test):
         self._check_result_file('ctfindvar_py1.fits')
 
         # Copy ctfindvar tool
-        cpy_tool = ctfindvar
+        cpy_tool = ctfindvar.copy()
 
-        # Run copy of ctfindvar tool again
-        cpy_tool['outmap']   = 'ctfindvar_py2.fits'
-        cpy_tool['outmodel'] = 'ctfindvar_py2.xml'
-        cpy_tool['logfile']  = 'ctfindvar_py2.log'
-        cpy_tool['chatter']  = 3
+        # Run copy of ctfindvar tool again with lower threshold
+        cpy_tool['threshold'] = 1.0
+        cpy_tool['outmap']    = 'ctfindvar_py2.fits'
+        cpy_tool['outmodel']  = 'ctfindvar_py2.xml'
+        cpy_tool['logfile']   = 'ctfindvar_py2.log'
+        cpy_tool['chatter']   = 3
         cpy_tool.logFileOpen()
-        cpy_tool.run()
-        cpy_tool.save()
+        cpy_tool.execute()
 
         # Check result
         self._check_result_file('ctfindvar_py2.fits')

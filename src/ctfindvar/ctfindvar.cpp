@@ -293,19 +293,14 @@ void ctfindvar::save(void)
     // Log saving
     log_value(TERSE, "Saving output map", outmap);
 
-    // Save the model definition file
-    if (m_model_above_thr.size() > 2) {
+    // Get output model definition file filename
+    GFilename outmodel = (*this)["outmodel"].filename();
 
-        // Get model output filename
-        GFilename outmodel = (*this)["outmodel"].filename();
+    // Save model
+    m_model_above_thr.save(outmodel);
 
-        // Save model
-        m_model_above_thr.save(outmodel);
-
-        // Log saving
-        log_value(TERSE, "Saving output model", outmodel);
-
-    }
+    // Log saving
+    log_value(TERSE, "Saving output model", outmodel);
 
     // Return
     return;
