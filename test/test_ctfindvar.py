@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 from testing import test
@@ -85,6 +86,9 @@ class Test(test):
         self.test_value(self._execute(cmd), 0,
              'Check successful execution from command line')
 
+        # Check result
+        self._check_result_files('ctfindvar_cmd1.fits', 'ctfindvar_cmd1.xml', 0)
+
         # Setup ctfindvar command
         cmd = ctfindvar+' inobs="event_file_that_does_not_exist.fits"'+ \
                         ' outmap="ctfindvar_cmd2.fits"'+ \
@@ -113,11 +117,24 @@ class Test(test):
         """
         Test ctfindvar from Python
         """
-
         # Allocate ctfindvar
         ctfindvar = ctools.ctfindvar()
 
-        # Setup ctfindvar
+        # Check that saving does not nothing
+        ctfindvar['logfile']  = 'ctfindvar_py0.log'
+        ctfindvar['outmap']   = 'ctfindvar_py0.fits'
+        ctfindvar['outmodel'] = 'ctfindvar_py0.xml'
+        ctfindvar.logFileOpen()
+        ctfindvar.save()
+        self.test_assert(not os.path.isfile('ctfindvar_py0.fits'),
+             'Check that no output map has been created')
+        self.test_assert(not os.path.isfile('ctfindvar_py0.xml'),
+             'Check that no output model definition XML file has been created')
+
+        # Check that clearing does not lead to an exception or segfault
+        ctfindvar.clear()
+
+        # Now set ctfindvar parameters
         ctfindvar['inobs']     = self._events
         ctfindvar['tmin']      = 'NONE'
         ctfindvar['tmax']      = 'NONE' 
@@ -135,30 +152,25 @@ class Test(test):
         ctfindvar['ysrc']      = 22.51
         ctfindvar['caldb']     = 'prod2'
         ctfindvar['irf']       = 'South_0.5h' 
-        ctfindvar['outmap']    = 'ctfindvar_py0.fits'
-        ctfindvar['outmodel']  = 'ctfindvar_py0.xml'
-        ctfindvar['logfile']   = 'ctfindvar_py0.log'
-        ctfindvar['chatter']   =  1
+        ctfindvar['outmap']    = 'ctfindvar_py1.fits'
+        ctfindvar['outmodel']  = 'ctfindvar_py1.xml'
+        ctfindvar['logfile']   = 'ctfindvar_py1.log'
+        ctfindvar['chatter']   =  2
 
-        # Run ctfindvar tool
+        # Execute ctfindvar tool
         ctfindvar.logFileOpen()
-        ctfindvar.run()
+        ctfindvar.execute()
 
-        # Check that saving does not nothing
-        ctfindvar['outmap']   = 'ctfindvar_py1.fits'
-        ctfindvar['outmodel'] = 'ctfindvar_py1.xml'
-        ctfindvar['logfile']  = 'ctfindvar_py1.log'
-        ctfindvar.logFileOpen()
-        ctfindvar.save()
- 
         # Check result
-        self._check_result_file('ctfindvar_py1.fits')
+        self._check_result_files('ctfindvar_py1.fits', 'ctfindvar_py1.xml', 0)
 
         # Copy ctfindvar tool
         cpy_tool = ctfindvar.copy()
 
-        # Run copy of ctfindvar tool again with lower threshold
+        # Execute copy of ctfindvar tool again with lower threshold and now
+        # with output cube file
         cpy_tool['threshold'] = 1.0
+        cpy_tool['outcube']   = 'ctfindvar_py2_cube.fits'
         cpy_tool['outmap']    = 'ctfindvar_py2.fits'
         cpy_tool['outmodel']  = 'ctfindvar_py2.xml'
         cpy_tool['logfile']   = 'ctfindvar_py2.log'
@@ -167,27 +179,70 @@ class Test(test):
         cpy_tool.execute()
 
         # Check result
-        self._check_result_file('ctfindvar_py2.fits')
+        self._check_result_files('NONE', 'ctfindvar_py2.xml', 1)
+        fits = gammalib.GFits('ctfindvar_py2_cube.fits')
+        self.test_value(fits.size(), 1, 'Check for 1 extension in cube file')
 
-        # Check that clearing does not lead to an exception or segfault
+        # Now run with an input model and time window, a smoothing kernel
+        # and set the number of threads
         ctfindvar.clear()
+        ctfindvar['inobs']         = self._events
+        ctfindvar['inmodel']       = self._model
+        ctfindvar['tmin']          = '2020-01-01T00:01:10'
+        ctfindvar['tmax']          = '2020-01-01T00:03:40'
+        ctfindvar['tinterval']     = 10
+        ctfindvar['smooth_kernel'] = 'DISK'
+        ctfindvar['smooth_rad']    = 0.05
+        ctfindvar['emin']          = 0.2
+        ctfindvar['emax']          = 1.1
+        ctfindvar['nxpix']         = 200
+        ctfindvar['nypix']         = 200
+        ctfindvar['binsz']         = 0.05
+        ctfindvar['coordsys']      = 'CEL'
+        ctfindvar['proj']          = 'CAR'
+        ctfindvar['xref']          = 83.63
+        ctfindvar['yref']          = 22.51
+        ctfindvar['caldb']         = 'prod2'
+        ctfindvar['irf']           = 'South_0.5h'
+        ctfindvar['outmap']        = 'ctfindvar_py3.fits'
+        ctfindvar['outmodel']      = 'ctfindvar_py3.xml'
+        ctfindvar['logfile']       = 'ctfindvar_py3.log'
+        ctfindvar['chatter']       =  4
+        ctfindvar['nthreads']      =  2
+
+        # Execute ctfindvar tool
+        ctfindvar.logFileOpen()
+        ctfindvar.execute()
+
+        # Check result
+        self._check_result_files('ctfindvar_py3.fits', 'ctfindvar_py3.xml', 0)
 
         # Return
         return
 
     # Check ctfindvar result
-    def _check_result_file(self, filename):
+    def _check_result_files(self, fitsfile, xmlfile, nmodels):
         """
         Check ctfindvar result
 
         Parameters
         ----------
-        filename : str
-            Output file
+        fitsfile : str
+            FITS file name
+        xmlfile : str
+            Model definition XML file name
+        nmodels : int
+            Expected number of models
         """
-        # Read variability file
-        fits = gammalib.GFits(filename)
-        self.test_value(fits.size(), 3, 'Check for 3 extensions in output file')
+        # Read variability FITS file
+        if fitsfile is not 'NONE':
+            fits = gammalib.GFits(fitsfile)
+            self.test_value(fits.size(), 3, 'Check for 3 extensions in output file')
+
+        # Read model definition XML file
+        models = gammalib.GModels(xmlfile)
+        self.test_value(models.size(), nmodels,
+             'Check for %d models in model definition XML file' % nmodels)
 
         # Return
         return
