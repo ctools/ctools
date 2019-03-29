@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a residual spectrum.
 #
-# Copyright (C) 2017-2018 Luigi Tibaldo
+# Copyright (C) 2017-2019 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -447,7 +447,7 @@ class csresspec(ctools.csobservation):
         # Return modified table
         return table
 
-    def _residuals_3D(self, obs, obs_id, ccube='NONE'):
+    def _residuals_3D(self, obs, obs_id, ccube=None):
         """
         Calculate residuals for 3D observation
 
@@ -457,7 +457,7 @@ class csresspec(ctools.csobservation):
             Observation container with a single observations of type GCTAObservation
         obs_id : str
             Observation ID
-        ccube : `~gammalib.GCTAEventCube'
+        ccube : `~gammalib.GCTAEventCube', optional
             Count cube with stacked events lists
 
         Returns
@@ -468,7 +468,7 @@ class csresspec(ctools.csobservation):
 
         # If binned data already exist set the evlist_info dictionary to have
         # attribute was_list False
-        if obs[0].eventtype() == 'CountsCube' or ccube!='NONE':
+        if obs[0].eventtype() == 'CountsCube' or ccube is not None:
             evlist_info = {'was_list': False}
 
         # ... otherwise bin now
@@ -489,14 +489,14 @@ class csresspec(ctools.csobservation):
             msg = 'Computing model cube'
             self._log_string(gammalib.NORMAL, msg)
             modelcube = ctools.ctmodel(obs)
-            if ccube != 'NONE':
+            if ccube is not None:
                 modelcube.cube(ccube)
             modelcube['edisp'] = self['edisp'].boolean()
             modelcube.run()
             modcube = modelcube.cube().copy()
 
         # Extract cntcube for residual computation
-        if ccube != 'NONE':
+        if ccube is not None:
             cntcube = ccube
         else:
             cntcube = obs[0].events().copy()
@@ -533,7 +533,7 @@ class csresspec(ctools.csobservation):
                 modelcube.obs().models(model_cont)
 
                 # Reset base cube that was modified internally by ctmodel
-                if ccube != 'NONE':
+                if ccube is not None:
                     modelcube.cube(ccube)
 
                 # Run model cube
