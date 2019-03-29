@@ -83,10 +83,10 @@ def plot_variability_evolution(filename, plotfile, srcname):
     axarr[1].set_ylabel('Counts')
     
     # Optionally save result in file
-    if plotfile != "":
-        f.savefig(plotfile+".png") 
-
-    plt.show()
+    if len(plotfile) > 0:
+        plt.savefig(plotfile)
+    else:
+        plt.show()
 
     # Return
     return

@@ -95,12 +95,18 @@ class Test(gammalib.GPythonTestSuite):
                     'Test show_butterfly.py')
         self.append(self.test_show_irf,
                     'Test show_irf.py')
+        self.append(self.test_show_lightcurve,
+                    'Test show_lightcurve.py')
         self.append(self.test_show_model,
                     'Test show_model.py')
+        self.append(self.test_show_obs,
+                    'Test show_obs.py')
         self.append(self.test_show_pha,
                     'Test show_pha.py')
         self.append(self.test_show_phases,
                     'Test show_phases.py')
+        self.append(self.test_show_pointings,
+                    'Test show_pointings.py')
         self.append(self.test_show_pull_evolution,
                     'Test show_pull_evolution.py')
         self.append(self.test_show_pull_histogram,
@@ -113,18 +119,14 @@ class Test(gammalib.GPythonTestSuite):
                     'Test show_rmf.py')
         self.append(self.test_show_sensitivity,
                     'Test show_sensitivity.py')
-        self.append(self.test_show_spectrum,
-                    'Test show_spectrum.py')
-        self.append(self.test_show_lightcurve,
-                    'Test show_lightcurve.py')
-        self.append(self.test_show_ts_distribution,
-                    'Test ts_distribution.py')
-        self.append(self.test_show_obs,
-                    'Test show_obs.py')
-        self.append(self.test_show_pointings,
-                    'Test show_pointings.py')
         self.append(self.test_show_significance_distribution,
                     'Test show_significance_distribution.py')
+        self.append(self.test_show_spectrum,
+                    'Test show_spectrum.py')
+        self.append(self.test_show_ts_distribution,
+                    'Test show_ts_distribution.py')
+        self.append(self.test_show_variability_evolution,
+                    'Test show_variability_evolution.py')
 
         # Return
         return
@@ -144,111 +146,6 @@ class Test(gammalib.GPythonTestSuite):
         self._execute_python(script, args='extgal', log='make_pointings_extgal')
         self._execute_python(script, args='gc', log='make_pointings_gc')
         self._execute_python(script, args='lmc', log='make_pointings_lmc')
-
-        # Return
-        return
-
-    # Test generate_prod3_irfs
-    def test_generate_prod3_irfs(self):
-        """
-        Test generate_prod3_irfs
-        """
-        # Execute script
-        self._execute_python('generate_prod3_irfs', args=self._datadir)
-
-        # Return
-        return
-
-    # Test make_spectrum
-    def test_make_spectrum(self):
-        """
-        Test make_spectrum
-        """
-        # Set arguments
-        args = '-d %s -p example_spectrum.eps' % self._datadir
-
-        # Execute script
-        self._execute_python('make_spectrum', args=args)
-
-        # Return
-        return
-
-    # Test make_ts_distributions
-    def test_make_ts_distributions(self):
-        """
-        Test make_ts_distributions
-        """
-        # Set arguments
-        args = '-n 1 -e 0 -t 100 -d %s' % self._datadir
-
-        # Execute script
-        self._execute_python('make_ts_distributions', args=args)
-
-        # Return
-        return
-
-    # Test pipeline_binned_disk
-    def test_pipeline_binned_disk(self):
-        """
-        Test pipeline_binned_disk
-        """
-        # Execute script
-        self._execute_python('pipeline_binned_disk', args='-d '+self._datadir)
-
-        # Return
-        return
-
-    # Test pipeline_binned_mem
-    def test_pipeline_binned_mem(self):
-        """
-        Test pipeline_binned_mem
-        """
-        # Execute script
-        self._execute_python('pipeline_binned_mem', args='-d '+self._datadir)
-
-        # Return
-        return
-
-    # Test pipeline_stacked_disk
-    def test_pipeline_stacked_disk(self):
-        """
-        Test pipeline_stacked_disk
-        """
-        # Execute script
-        self._execute_python('pipeline_stacked_disk', args='-d '+self._datadir)
-
-        # Return
-        return
-
-    # Test pipeline_stacked_mem
-    def test_pipeline_stacked_mem(self):
-        """
-        Test pipeline_stacked_mem
-        """
-        # Execute script
-        self._execute_python('pipeline_stacked_mem', args='-d '+self._datadir)
-
-        # Return
-        return
-
-    # Test pipeline_unbinned_disk
-    def test_pipeline_unbinned_disk(self):
-        """
-        Test pipeline_unbinned_disk
-        """
-        # Execute script
-        self._execute_python('pipeline_unbinned_disk', args='-d '+self._datadir)
-
-        # Return
-        return
-
-    # Test pipeline_unbinned_mem
-    def test_pipeline_unbinned_mem(self):
-        """
-        Test pipeline_unbinned_mem
-        """
-        # Execute script
-        self._execute_python('pipeline_unbinned_mem', args='-d '+self._datadir)
 
         # Return
         return
@@ -281,6 +178,20 @@ class Test(gammalib.GPythonTestSuite):
         # Return
         return
 
+    # Test show_lightcurve
+    def test_show_lightcurve(self):
+        """
+        Test show_lightcurve
+        """
+        # Set arguments
+        args = '-p example_show_lightcurve.eps %s/lightcurve.fits' % self._datadir
+
+        # Execute script
+        self._execute_python('show_lightcurve', args=args)
+
+        # Return
+        return
+
     # Test show_model
     def test_show_model(self):
         """
@@ -297,6 +208,27 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute script
         self._execute_python('show_model', args=args)
+
+        # Return
+        return
+
+    # Test show_obs
+    def test_show_obs(self):
+        """
+        Test show_obs
+        """
+        # Set arguments
+        args = '-p example_show_obs1.eps %s/obs_unbinned.xml' % self._datadir
+
+        # Execute script
+        self._execute_python('show_obs', args=args)
+
+        # Set arguments
+        args = ('-ra 83.63 -dec 22.01 -p example_show_obs2.eps '
+                '%s/obs_unbinned.xml' % self._datadir)
+
+        # Execute script
+        self._execute_python('show_obs', args=args)
 
         # Return
         return
@@ -331,6 +263,20 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute script
         self._execute_python('show_phases', args=args)
+
+        # Return
+        return
+
+    # Test show_pointings
+    def test_show_pointings(self):
+        """
+        Test show_pointings
+        """
+        # Set arguments
+        args = '-p example_show_pointings.eps %s/obs_unbinned.xml' % self._datadir
+
+        # Execute script
+        self._execute_python('show_pointings', args=args)
 
         # Return
         return
@@ -443,6 +389,22 @@ class Test(gammalib.GPythonTestSuite):
         # Return
         return
 
+    # Test show_significance_distribution
+    def test_show_significance_distribution(self):
+        """
+        Test show_significance_distribution
+        """
+        # Set arguments
+        args = '-p example_show_significance_distribution.eps '+ \
+               '%s/sigdist_map.fits --exclude %s/sigdist_map.fits[EXCLUSION]' % \
+               (self._datadir, self._datadir)
+
+        # Execute script
+        self._execute_python('show_significance_distribution', args=args)
+
+        # Return
+        return
+
     # Test show_spectrum
     def test_show_spectrum(self):
         """
@@ -453,20 +415,6 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute script
         self._execute_python('show_spectrum', args=args)
-
-        # Return
-        return
-
-    # Test show_lightcurve
-    def test_show_lightcurve(self):
-        """
-        Test show_lightcurve
-        """
-        # Set arguments
-        args = '-p example_show_lightcurve.eps %s/lightcurve.fits' % self._datadir
-
-        # Execute script
-        self._execute_python('show_lightcurve', args=args)
 
         # Return
         return
@@ -493,53 +441,17 @@ class Test(gammalib.GPythonTestSuite):
         # Return
         return
 
-    # Test show_obs
-    def test_show_obs(self):
+    # Test show_variability_evolution
+    def test_show_variability_evolution(self):
         """
-        Test show_obs
-        """
-        # Set arguments
-        args = '-p example_show_obs1.eps %s/obs_unbinned.xml' % self._datadir
-
-        # Execute script
-        self._execute_python('show_obs', args=args)
-
-        # Set arguments
-        args = ('-ra 83.63 -dec 22.01 -p example_show_obs2.eps '
-                '%s/obs_unbinned.xml' % self._datadir)
-
-        # Execute script
-        self._execute_python('show_obs', args=args)
-
-        # Return
-        return
-
-    # Test show_pointings
-    def test_show_pointings(self):
-        """
-        Test show_pointings
+        Test show_variability_evolution
         """
         # Set arguments
-        args = '-p example_show_pointings.eps %s/obs_unbinned.xml' % self._datadir
+        args = ('-p example_show_variability_evolution.eps %s/variability.fits' %
+                self._datadir)
 
         # Execute script
-        self._execute_python('show_pointings', args=args)
-
-        # Return
-        return
-
-    # Test show_significance_distribution
-    def test_show_significance_distribution(self):
-        """
-        Test show_significance_distribution
-        """
-        # Set arguments
-        args = '-p example_show_significance_distribution.eps '+ \
-               '%s/sigdist_map.fits --exclude %s/sigdist_map.fits[EXCLUSION]' % \
-               (self._datadir, self._datadir)
-
-        # Execute script
-        self._execute_python('show_significance_distribution', args=args)
+        self._execute_python('show_variability_evolution', args=args)
 
         # Return
         return
