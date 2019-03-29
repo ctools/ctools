@@ -91,9 +91,9 @@ class csphasecrv(ctools.csobservation):
                  'stacked'      : self._stacked,
                  'onoff'        : self._onoff,
                  'fits'         : self._fits,
-                 'fitmodels'    : self._fitmodels,
                  'nthreads'     : self._nthreads,
-                 'excl_reg_map' : self._excl_reg_map}
+                 'excl_reg_map' : self._excl_reg_map,
+                 'fitmodels'    : self._fitmodels}
 
         # Return pickled dictionary
         return state
@@ -110,12 +110,12 @@ class csphasecrv(ctools.csobservation):
         ctools.csobservation.__setstate__(self, state['base'])
         self._srcname      = state['srcname']
         self._phbins       = state['phbins']
-        self._onoff        = state['onoff']
         self._stacked      = state['stacked']
+        self._onoff        = state['onoff']
         self._fits         = state['fits']
-        self._fitmodels    = state['fitmodels']
         self._nthreads     = state['nthreads']
         self._excl_reg_map = state['excl_reg_map']
+        self._fitmodels    = state['fitmodels']
 
         # Return
         return
@@ -136,14 +136,14 @@ class csphasecrv(ctools.csobservation):
         if self.obs().models().size() == 0:
             self.obs().models(self['inmodel'].filename())
 
-        # Get source name
-        self._srcname = self['srcname'].string()
-
         # Get phase boundaries
         self._phbins = self._create_tbounds()
 
         # Set On/Off analysis flag and query relevant user parameters
         self._onoff = self._is_onoff()
+
+        # Get source name
+        self._srcname = self['srcname'].string()
 
         # If cube analysis is selected
         # Set stacked analysis flag and query relevant user parameters

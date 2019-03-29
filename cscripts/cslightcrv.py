@@ -120,8 +120,8 @@ class cslightcrv(ctools.csobservation):
         ctools.csobservation.__setstate__(self, state['base'])
         self._srcname      = state['srcname']
         self._tbins        = state['tbins']
-        self._onoff        = state['onoff']
         self._stacked      = state['stacked']
+        self._onoff        = state['onoff']
         self._fits         = state['fits']
         self._nthreads     = state['nthreads']
         self._excl_reg_map = state['excl_reg_map']
@@ -145,14 +145,14 @@ class cslightcrv(ctools.csobservation):
         if self.obs().models().size() == 0:
             self.obs().models(self['inmodel'].filename())
 
-        # Get source name
-        self._srcname = self['srcname'].string()
-
         # Get time boundaries
         self._tbins = self._create_tbounds()
 
         # Set On/Off analysis flag and query relevant user parameters
         self._onoff = self._is_onoff()
+
+        # Get source name
+        self._srcname = self['srcname'].string()
 
         # Set stacked analysis flag and query relevant user parameters
         if not self._onoff:
