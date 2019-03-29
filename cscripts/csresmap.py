@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a residual map.
 #
-# Copyright (C) 2014-2018 Michael Mayer
+# Copyright (C) 2014-2019 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -165,29 +165,8 @@ class csresmap(ctools.csobservation):
                 # Write header
                 self._log_header1(gammalib.TERSE, 'Generate binned map (ctbin)')
 
-                # Create countsmap
-                binning = ctools.ctbin(self.obs())
-                binning['xref']     = self['xref'].real()
-                binning['yref']     = self['yref'].real()
-                binning['proj']     = self['proj'].string()
-                binning['coordsys'] = self['coordsys'].string()
-                binning['ebinalg']  = self['ebinalg'].string()
-                binning['nxpix']    = self['nxpix'].integer()
-                binning['nypix']    = self['nypix'].integer()
-                binning['binsz']    = self['binsz'].real()
-                if self['ebinalg'].string() == 'FILE':
-                    binning['ebinfile'] = self['ebinfile'].filename().file()
-                else:
-                    binning['enumbins'] = self['enumbins'].integer()
-                    binning['emin']     = self['emin'].real()
-                    binning['emax']     = self['emax'].real()
-                binning['chatter']  = self['chatter'].integer()
-                binning['clobber']  = self['clobber'].boolean()
-                binning['debug']    = self['debug'].boolean()
-                binning.run()
-
-                # Retrieve counts cube
-                cta_counts_cube = binning.cube()
+                # Create counts cube
+                cta_counts_cube = obsutils.create_counts_cube(self, self.obs())
 
             # Assign GCTAEventCube to skymap
             countmap = cta_counts_cube.counts()

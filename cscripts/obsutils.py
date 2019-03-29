@@ -937,3 +937,54 @@ def residuals(cls, counts, model):
 
     # Return
     return residuals
+
+
+# ================= #
+# Create counts map #
+# ================= #
+def create_counts_cube(cls, obs):
+    """
+    Create counts cube from observations
+
+    Parameters
+    ----------
+    cls : `~ctools.cscript`
+        cscript class
+    obs : `~gammalib.GObservations`
+        Observation container
+
+    Returns
+    -------
+    cntcube : `~gammalib.GCTAEventCube`
+        Counts cube
+    """
+    # Initialise ctbin
+    ctbin = ctools.ctbin(obs)
+    
+    # Set parameters
+    ctbin['xref']     = cls['xref'].real()
+    ctbin['yref']     = cls['yref'].real()
+    ctbin['proj']     = cls['proj'].string()
+    ctbin['coordsys'] = cls['coordsys'].string()
+    ctbin['ebinalg']  = cls['ebinalg'].string()
+    ctbin['nxpix']    = cls['nxpix'].integer()
+    ctbin['nypix']    = cls['nypix'].integer()
+    ctbin['binsz']    = cls['binsz'].real()
+    if cls['ebinalg'].string() == 'FILE':
+        ctbin['ebinfile'] = cls['ebinfile'].filename().file()
+    else:
+        ctbin['enumbins'] = cls['enumbins'].integer()
+        ctbin['emin']     = cls['emin'].real()
+        ctbin['emax']     = cls['emax'].real()
+    ctbin['chatter']  = cls['chatter'].integer()
+    ctbin['clobber']  = cls['clobber'].boolean()
+    ctbin['debug']    = cls['debug'].boolean()
+
+    # Run ctbin
+    ctbin.run()
+
+    # Retrieve counts cube
+    cntcube = ctbin.cube().copy()
+
+    # Return counts cube
+    return cntcube

@@ -18,10 +18,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import sys
 import gammalib
 import ctools
 from cscripts import obsutils
-import sys
 
 
 # =============== #
@@ -672,35 +672,18 @@ class csresspec(ctools.csobservation):
         # Log processing header
         self._log_header1(gammalib.TERSE, 'Processing Observations')
 
-        #If observations are unbinned and we stack
+        # If observations are unbinned and we stack
         if self._stack and self.obs()[0].classname() == 'GCTAObservation':
 
+            # Log counts cube computation
             msg = 'Computing count cube from multiple unbinned observations'
             self._log_string(gammalib.NORMAL, msg)
 
-            # Build count cube
-            binning = ctools.ctbin(self.obs())
-            binning['xref']     = self['xref'].real()
-            binning['yref']     = self['yref'].real()
-            binning['proj']     = self['proj'].string()
-            binning['coordsys'] = self['coordsys'].string()
-            binning['ebinalg']  = self['ebinalg'].string()
-            binning['nxpix']    = self['nxpix'].integer()
-            binning['nypix']    = self['nypix'].integer()
-            binning['binsz']    = self['binsz'].real()
-            if self['ebinalg'].string() == 'FILE':
-                binning['ebinfile'] = self['ebinfile'].filename().file()
-            else:
-                binning['enumbins'] = self['enumbins'].integer()
-                binning['emin']     = self['emin'].real()
-                binning['emax']     = self['emax'].real()
-            binning['chatter'] = self['chatter'].integer()
-            binning['clobber'] = self['clobber'].boolean()
-            binning['debug']   = self['debug'].boolean()
-            binning.run()
+            # Create counts cube
+            cta_counts_cube = obsutils.create_counts_cube(self, self.obs())
 
-            #compute residuals using cube
-            table = self._residuals_3D(self.obs(),'',binning.cube())
+            # Compute residuals using cube
+            table = self._residuals_3D(self.obs(), '', cta_counts_cube)
 
             # Append results table to output file
             self._fits.append(table)
