@@ -262,45 +262,70 @@ void ctfindvar::save(void)
     // Write header
     log_header1(TERSE, "Saving results");
 
-    // Write counts cube
+    // Save counts cube if a valid filename is given and the counts cube is
+    // not empty
     if ((*this)["outcube"].is_valid()) {
 
         // Get counts cube output filename
         GFilename outcube = (*this)["outcube"].filename();
 
-        // Save counts cube
-        m_counts.save(outcube, (*this)["clobber"].boolean());
+        // Save counts cube if it is not empty. Otherwise signal that no
+        // counts cube was saved.
+        if (!m_counts.is_empty()) {
+            m_counts.save(outcube, (*this)["clobber"].boolean());
+            log_value(TERSE, "Counts cube file", outcube.url());
+        }
+        else {
+            log_value(TERSE, "Counts cube file",
+                      outcube.url()+" (cube is empty, no file created)");
+        }
 
-        // Log saving
-        log_value(TERSE, "Saving counts cube", outcube);
     }
 
-    // Create a FITS file for storing the output
-    GFits fits;
-
-    // Write the most significant values for each pixel
-    m_peaksigmap.write(fits, "PEAKSIGMAP");
-
-    // Write source histograms
-    write_source_histograms(fits);
-
-    // Get output map filename
-    GFilename outmap = (*this)["outmap"].filename();
-
-    // Save output map
-    fits.saveto(outmap, (*this)["clobber"].boolean());
-
-    // Log saving
-    log_value(TERSE, "Saving output map", outmap);
-
-    // Get output model definition file filename
+    // Get output map and model filenames
+    GFilename outmap   = (*this)["outmap"].filename();
     GFilename outmodel = (*this)["outmodel"].filename();
 
-    // Save model
-    m_model_above_thr.save(outmodel);
+    // Save output map if the significance map is not empty
+    if (!m_peaksigmap.is_empty()) {
 
-    // Log saving
-    log_value(TERSE, "Saving output model", outmodel);
+        // Create a FITS file for storing the output
+        GFits fits;
+
+        // Write the most significant values for each pixel
+        m_peaksigmap.write(fits, "PEAKSIGMAP");
+
+        // Write source histograms
+        write_source_histograms(fits);
+
+        // Save significance map
+        fits.saveto(outmap, (*this)["clobber"].boolean());
+
+        // Log saving
+        log_value(TERSE, "Output map file", outmap.url());
+
+    }
+    else {
+        log_value(TERSE, "Output map file",
+                  outmap.url()+" (map is empty, no file created)");
+    }
+
+    // Save model definiton XML file if the significance map is not empty.
+    // This may store an empty model in case that none of the pixels is
+    // above threshold.
+    if (!m_peaksigmap.is_empty()) {
+
+        // Save model
+        m_model_above_thr.save(outmodel);
+
+        // Log saving
+        log_value(TERSE, "Model definition file", outmodel.url());
+
+    }
+    else {
+        log_value(TERSE, "Model definition file",
+                  outmodel.url()+" (map is empty, no file created)");
+    }
 
     // Return
     return;
@@ -415,11 +440,9 @@ void ctfindvar::get_parameters(void)
     // Get minimum significance to set a source as variable
     m_sig_threshold = (*this)["threshold"].real();
 
-    // Query smoothing parameters
-    if ((*this)["smooth_kernel"].is_valid()) {
-        (*this)["smooth_kernel"].string();
-        (*this)["smooth_rad"].real();
-    }
+    // Query (hidden) smoothing parameters
+    (*this)["smooth_kernel"].string();
+    (*this)["smooth_rad"].real();
 
     // If needed later, query output filenames now
     if (read_ahead()) {
@@ -561,8 +584,7 @@ void ctfindvar::create_cube(void)
     } // endfor: looped over observations
 
     // Smooth the maps if requested
-    if ((*this)["smooth_kernel"].is_valid() &&
-        (*this)["smooth_kernel"].string() != "NONE") {
+    if ((*this)["smooth_kernel"].string() != "NONE") {
         m_counts.smooth((*this)["smooth_kernel"].string(),
                         (*this)["smooth_rad"].real());
     }
@@ -716,12 +738,6 @@ void ctfindvar::analyse_cube(void)
     // looping over all the pixels in the cube
     #pragma omp parallel for
     for (int ipix = 0; ipix < m_counts.npix(); ++ipix) {
-
-        // Compute total counts for pixel
-        //double total_counts = 0.0;
-        //for (int k = 0; k < nbins; ++k) {
-        //    total_counts += m_counts(ipix, k);
-        //}
 
         // Getting the variability significance for the current pixel
         GNdarray pixSig = get_variability_sig(ipix);
