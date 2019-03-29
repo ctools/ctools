@@ -59,6 +59,11 @@ class cscript_test(ctools.cscript):
         self.pars()['ebinfile'].value(filename)
         return self._create_ebounds()
 
+    # Check create_energies() method
+    def check_create_energies(self, filename):
+        self.pars()['ebinfile'].value(filename)
+        return self._create_energies()
+
     # Check require_inobs() method
     def check_require_inobs(self, filename):
         self.pars()['inobs'].value(filename)
@@ -459,6 +464,52 @@ class Test(test):
         self.test_try('Check create_ebounds() method for invalid extension name')
         try:
             empty.check_create_ebounds('test_ebinfile_bins.fits')
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
+
+        # Test create_energies() method for "EBOUNDS" extension
+        energies = empty.check_create_energies('test_ebinfile_ebounds.fits')
+        self.test_value(energies.size(), 2, 'Check number of energies')
+        self.test_value(energies[0].TeV(), 1.0, 'Check first energy')
+        self.test_value(energies[1].TeV(), 10.0, 'Check second energy')
+
+        # Test create_energies() method for "ENERGYBINS" extension
+        energies = empty.check_create_energies('test_ebinfile_energybins.fits')
+        self.test_value(energies.size(), 2, 'Check number of energies')
+        self.test_value(energies[0].TeV(), 1.0, 'Check first energy')
+        self.test_value(energies[1].TeV(), 10.0, 'Check second energy')
+
+        # Test create_energies() method for "ENERGIES" extension
+        energies = empty.check_create_energies('test_ebinfile_energies.fits')
+        self.test_value(energies.size(), 2, 'Check number of energies')
+        self.test_value(energies[0].TeV(), 1.0, 'Check first energy')
+        self.test_value(energies[1].TeV(), 10.0, 'Check second energy')
+
+        # Test create_energies() method for invalid extension
+        self.test_try('Check create_energies() method for invalid extension')
+        try:
+            empty.check_create_energies('test_ebinfile_energies.fits[INVALID]')
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
+
+        # Test create_energies() method for "BINS" extension
+        energies = empty.check_create_energies('test_ebinfile_bins.fits[BINS]')
+        self.test_value(energies.size(), 2, 'Check number of energies')
+        self.test_value(energies[0].TeV(), 1.0, 'Check first energy')
+        self.test_value(energies[1].TeV(), 10.0, 'Check second energy')
+
+        # Test create_energies() method for "ENGS" extension
+        energies = empty.check_create_energies('test_ebinfile_engs.fits[ENGS]')
+        self.test_value(energies.size(), 2, 'Check number of energies')
+        self.test_value(energies[0].TeV(), 1.0, 'Check first energy')
+        self.test_value(energies[1].TeV(), 10.0, 'Check second energy')
+
+        # Test create_energies() method for invalid extension name
+        self.test_try('Check create_energies() method for invalid extension name')
+        try:
+            empty.check_create_energies('test_ebinfile_bins.fits')
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
