@@ -899,10 +899,10 @@ class csphagen(ctools.csobservation):
         """
         # If a regions object is provided then set the regions ...
         if object is not None:
-            self._excl_reg_map = gammalib.GSkyRegionMap(object)
+            self._excl_reg = gammalib.GSkyRegionMap(object)
 
         # Return
-        return self._excl_reg_map
+        return self._excl_reg
 
 
 # ======================== #
