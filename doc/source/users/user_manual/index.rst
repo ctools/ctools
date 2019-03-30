@@ -1,4 +1,4 @@
-.. _sec_user_manual:
+.. _user_manual:
 
 User Manual
 ===========
@@ -7,6 +7,7 @@ User Manual
    :maxdepth: 1
 
    introduction
-   response
+   data
    models
+   response
 

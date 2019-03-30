@@ -174,7 +174,7 @@ Alternatively, you can merged models using the :ref:`csmodelmerge` script:
 A list of available sky models can be found
 `here <http://gammalib.sourceforge.net/user_manual/modules/model.html>`_.
 If you are not familiar with creating sky models you should read the section
-about :ref:`modelling CTA data <sec_models>`.
+about :ref:`modelling CTA data <um_models>`.
 
 
 Example XML files

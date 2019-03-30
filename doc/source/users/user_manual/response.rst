@@ -1,7 +1,7 @@
-.. _sec_response:
+.. _um_response:
 
-CTA Instrument Response Functions
----------------------------------
+Instrument Response Functions
+-----------------------------
 
 What are instrument response functions?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -132,8 +132,8 @@ calibration database and the ``South_0.5h`` response function:
    RA of pointing (degrees) (0-360) [83.63]
    Dec of pointing (degrees) (-90-90) [22.51]
    Radius of FOV (degrees) (0-180) [5.0]
-   Start time (MET in s) [0.0]
-   End time (MET in s) [1800.0]
+   Start time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:00:00]
+   Stop time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:30:00]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
    Calibration database [prod2]

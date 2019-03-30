@@ -1,6 +1,6 @@
-.. _sec_models:
+.. _um_models:
 
-Modelling CTA data
+Modelling the data
 ------------------
 
 .. toctree::

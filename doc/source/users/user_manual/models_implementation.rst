@@ -19,7 +19,7 @@ a point source at the location of the Crab nebula with a power law spectral
 shape that is constant in time.
 The background component ``Background`` is modelled using the template that is
 provided with the
-:ref:`Instrument Response Functions (IRFs) <sec_response>`
+:ref:`Instrument Response Functions (IRFs) <um_response>`
 and that is multiplied by a spectral power law function.
 
 .. code-block:: xml

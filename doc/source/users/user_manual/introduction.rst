@@ -15,33 +15,43 @@ contribute to the ctools developments.
 Running ctools
 --------------
 
-ctools comprises a set of ftools-like binary executables, 
-written in C++, with a command-line interface allowing for interactive
-step-wise data analysis. To start a ctool from the command line, simply 
-type the name of the ctool:
+ctools comprises a set of ftools-like binary executables written in C++
+and scripts written in Python. Binary executables start with ``ct`` (for
+example :ref:`ctobssim` for the simulation of data), Python scripts start
+with ``cs`` (for example :ref:`cslightcrv` for the generation of a light
+curve). While a binary executable is called a *ctool*, a Python script is
+called a *cscript*. From a user perspective, ctools and cscripts behave
+identically. Both have a command-line interface allowing for interactive
+step-wise analysis of the data. From now on we will simply say *tool* when
+considering either a ctool or a cscript.
+
+To use a tool from the command line, simply type the name of the tool. For
+example, to simulate CTA data you can type:
 
 .. code-block:: bash
 
    $ ctobssim
    RA of pointing (degrees) (0-360) [83.63]
 
-The ctool will query all user parameters and execute. User parameters can
-also be specified as arguments separated by a whitespace to the ctool:
+The tool will query all user parameters and execute. User parameters can
+also be specified as arguments separated by a whitespace to the tool:
 
 .. code-block:: bash
 
    $ ctobssim ra=83.63 dec=22.01 rad=5.0 tmin=0 tmax=1800 emin=0.1 emax=100.0 caldb=prod2 irf=South_0.5h \
               inmodel=$CTOOLS/share/models/crab.xml outevents=events.fits
 
-If you need help about the usage of a ctool or a cscript, type the name of 
-the ctool or cscript followed by the ``--help`` option:
+If you need help about the usage of a tool, type the name of the tool followed
+by the ``--help`` option:
 
 .. code-block:: bash
 
    $ ctobssim --help
 
-ctools includes also a Python module that declares every ctool as a
-Python class. The following example illustrates the usage:
+ctools includes also Python modules that declare every tool as a Python class.
+ctools are available through the ``ctools`` module, cscripts through the
+``cscripts`` module. The following example illustrates how data can be simulated
+from Python:
 
 .. code-block:: bash
 
@@ -53,21 +63,22 @@ Python class. The following example illustrates the usage:
    >>> sim.execute()
    Radius of FOV (degrees) (0-180) [5.0]
 
-ctools comprise also cscripts, which are Python scripts that have the same 
-user interface as the ctools binaries. cscripts can be started from the 
-command line or used as Python classes, as illustrated below:
+And here an example for generating a light curve from Python:
 
 .. code-block:: bash
 
    $ python
-   >>> import cscripts
-   >>> pull = cscripts.cspull()
+   >>> import cslightcrv
+   >>> lightcrv = cscripts.cslightcrv()
+   >>> lightcrv.execute()
+
 
 User parameters and parameter files
 -----------------------------------
 
 Each ctool and cscript has a defined list of user parameters. You can
-find a complete description `here <../reference_manual/reference.html>`_.
+find a complete description of the parameters of all tools
+`here <../reference_manual/index.html>`_.
 
 User parameters are stored in par files. A ctools installation comprises a set
 of default par files stored at ``$CTOOLS/syspfiles``. When you run a tool/script
@@ -78,15 +89,9 @@ When a tool/script is executed again, it will look for a par file first in
 ``$HOME/pfiles``, and propose you to use the latest values stored there. If no
 par file is found there, it will use the default in ``$CTOOLS/syspfiles``.
 
-If you update your ctools installation you may get an error such as
+If you delete files in ``$HOME/pfiles`` the latest values will be lost, and upon
+execution of a tool a new copy of the par file will be stored in the folder. If
+for some reason a parameter file got corrupt, simply delete it from ``$HOME/pfiles``
+and start again.
 
-.. code-block:: bash
-		
-   *** ERROR encounterted in the execution of ctlike. Run aborted ...
-   *** ERROR in GApplicationPars::load(GFilename&,
-   std::vector<std::string>&): Invalid command line parameter
-   encountered (invalid parameter name "XX"): XX=2
-
-Remove the stale file ``ctlike.par`` from ``$HOME/pfiles`` and run again to
-solve the issue.
 
