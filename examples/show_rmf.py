@@ -2,7 +2,7 @@
 # ==========================================================================
 # Display Redistribution Matrix File
 #
-# Copyright (C) 2018 Juergen Knoedlseder
+# Copyright (C) 2018-2019 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -66,12 +66,12 @@ def plot_rmf(rmf, plotfile):
         image.append(row)
 
     # Create figure
-    fig = plt.figure()
+    plt.figure()
 
     # Plot image
     c    = plt.imshow(image, extent=[etrue_min,etrue_max,ereco_min,ereco_max],
                       interpolation='nearest', aspect=aspect)
-    cbar = plt.colorbar(c, orientation='vertical', shrink=0.8)
+    plt.colorbar(c, orientation='vertical', shrink=0.8)
 
     # Plot title and axis
     plt.title('Redistribution Matrix File')
