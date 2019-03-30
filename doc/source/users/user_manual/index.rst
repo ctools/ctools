@@ -8,6 +8,7 @@ User Manual
 
    introduction
    data
+   likelihood
    models
    response
 
