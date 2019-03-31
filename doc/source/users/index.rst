@@ -9,8 +9,8 @@ This documentation will guide you in the process of using ctools.
    :maxdepth: 1
 
    user_manual/index
+   tutorials/index
    reference_manual/index
    tips/index
-   tutorials/index
    user_contributed/index
    glossary

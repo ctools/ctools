@@ -34,7 +34,7 @@ density over the trigger time, measured energy and instrument direction:
 
 .. math::
    E(M) = \int_{GTI} \int_{Ebounds} \int_{ROI} P(p',E',t' | M) \,
-   d\vec{p}' \, dE' \, dt'
+   dp' \, dE' \, dt'
 
 The temporal integration boundaries are defined by the Good Time Intervals
 (GTIs) that define contiguous periods in time during which data were taken.
@@ -164,3 +164,99 @@ estimator. Therefore, ``wstat`` is known to be inaccurate if there are energy
 bins with zero Off counts.
 
 
+Levenberg-Marquardt algorithm
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ctools uses an iterative Levenberg-Marquardt algorithm for maximum likelihood
+estimation. The Levenberg-Marquardt algorithm starts with an inital guess of
+the :ref:`model <um_models>` parameters :math:`a_k` and iteratively
+replaces this estimate by a new estimate :math:`a_k + \Delta a_k`. The
+:math:`\Delta a_k` are determined by solving
+
+.. math::
+   \sum_l \alpha_{kl} (1 + \delta_{kl} \lambda) \Delta a_l = \beta_k
+
+where
+
+.. math::
+   \alpha_{kl} = \frac{\partial^2 (-\ln L(M))}{\partial a_k \partial a_l}
+
+is the curvature matrix
+
+.. math::
+   \beta_k = \frac{\partial (-\ln L(M))}{\partial a_k}
+
+is the gradient and
+:math:`\delta_{kl}` is the Kronecker delta that is :math:`1` for
+:math:`k=l` and :math:`0` otherwise. The matrix equation is solved using
+a sparse matrix Cholesky decomposition. Parameters are constrained within their
+parameter limits in case they exist.
+
+Model fitting using the Levenberg-Marquardt algorithm is implemented by
+:ref:`ctlike`.
+
+
+Statistical Parameter errors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Statistical errors on the model parameters :math:`\delta a_k` are determined
+by computing the square root of the diagonal elements of the inverse of the
+curvature matrix which is the covariance matrix ``C``:
+
+.. math::
+   \delta a_k = \sqrt{diag(C)_k}
+
+with
+
+.. math::
+   C = [\alpha]^{-1}
+
+Inversion of :math:`[\alpha]` is again performed using a sparse matrix Cholesky
+decomposition.
+
+
+Detection significance
+~~~~~~~~~~~~~~~~~~~~~~
+
+The detection significance of the source model is estimated using the so
+called Test Statistic (TS) which is defined as
+
+.. math::
+   \mathrm{TS} = 2 \ln L(M_s+M_b) - 2 \ln L(M_b)
+
+where :math:`\ln L(M_s+M_b)` is the log-likelihood value obtained when
+fitting the source and the background together to the data, and
+:math:`\ln L(M_b)` is the log-likelihood value obtained when fitting only
+the background model to the data.
+Under the hypothesis that the model :math:`M_b` provides a satisfactory fit
+of the data, :math:`TS` follows a :math:`\chi^2_n` distribution with
+:math:`n` degrees of freedom, where :math:`n` is the number of free parameters
+in the source model component. Therefore
+
+.. math::
+   p = \int_\mathrm{TS}^{+\infty} \chi^2_n(x) \:\: \mathrm{d}x
+
+gives the chance probability (p-value) that the log-likelihood improves by
+:math:`TS/2` when adding the source model :math:`M_s` due to statistical
+fluctuations only. For :math:`n=1` the significance in Gaussian sigma
+is given by :math:`\sqrt{TS}`.
+
+
+Upper limits
+~~~~~~~~~~~~
+
+If gamma-ray emission from a source is not detected, an upper flux limit can
+be derived by determining the flux :math:`F_\mathrm{up}` that leads to a
+log-likelihood decrease of :math:`\Delta ln L` with respect to the maximum
+log-likelihood estimate :math:`F_\mathrm{0}`:
+
+.. math::
+   \ln L(F_\mathrm{up}) = \ln L(F_\mathrm{0}) + \Delta ln L
+
+The log-likelihood decrease :math:`\Delta ln L` is computed from the
+chance probability (p-value) using
+
+.. math::
+   \Delta ln L = (\mathrm{erf}^{-1}(p))^2
+
+Upper limit computation is implemented by :ref:`ctulimit`.
