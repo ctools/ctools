@@ -1,4 +1,4 @@
-.. _sec_models_spectral:
+.. _um_models_spectral:
 
 Spectral model components
 -------------------------

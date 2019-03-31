@@ -1,4 +1,4 @@
-.. _sec_models_spatial_src:
+.. _um_models_spatial_src:
 
 Spatial source model components
 -------------------------------

@@ -1,32 +1,54 @@
-.. _sec_models_spatial_bgd:
+.. _um_models_spatial_bgd:
 
 Spatial background model components
 -----------------------------------
 
 The following sections present the spatial model components that are available 
-in ctools for instrumental background modelling for CTA.
+in ctools for instrumental background modelling for Imaging Air Cherenkov
+Telescopes (IACTs) such as H.E.S.S., VERITAS, MAGIC and CTA.
 
-CTA radial background
-^^^^^^^^^^^^^^^^^^^^^
 
-  There exist a number of radial CTA background models that factorise into a
-  spatial and spectral component, and that model the spatial component as a
-  function that only dependends on the offset angle :math:`\theta` from the
-  pointing direction. These models have the type ``RadialAcceptance`` and
-  require a ``<radialModel>`` tag as the spatial component.
+General IACT background
+^^^^^^^^^^^^^^^^^^^^^^^
 
-  The first radial model is of type ``Gaussian``
+  The general IACT background model is factorised in a spatial and spectral
+  component and has the type ``CTABackground``. It has the following XML
+  structure:
 
   .. code-block:: xml
 
-     <source name="Background" type="RadialAcceptance" instrument="CTA">
-       <radialModel type="Gaussian">
+     <source name="Background" type="CTABackground" instrument="CTA">
+       <spatialModel type="...">
+       ...
+       </spatialModel>
+       <spectrum type="...">
+         ...
+       </spectrum>
+     </source>
+
+  .. note::
+     Please speficy the ``instrument`` label in the XML file that corresponds
+     to the ``instrument`` label of the data. Otherwise the model will not be used
+     for your data. Valid ``instrument`` labels are ``HESS``, ``VERITAS``,
+     ``MAGIC`` and ``CTA``.
+
+  The following sections describe the spatial model components that are
+  available.
+
+
+Gaussian
+~~~~~~~~
+
+  The ``Gaussian`` model describes a 2D Gaussian shape in offset angle squared
+
+  .. code-block:: xml
+
+     <source name="Background" type="CTABackground" instrument="CTA">
+       <spatialModel type="Gaussian">
          <parameter name="Sigma" scale="1.0" value="3.0" min="0.01" max="10.0" free="1"/>
-       </radialModel>
-       <spectrum type="PowerLaw">
-         <parameter name="Prefactor"   scale="1e-6" value="61.8" min="0.0"  max="1000.0" free="1"/>
-         <parameter name="Index"       scale="-1"   value="1.85" min="0.0"  max="+5.0"   free="1"/>
-         <parameter name="PivotEnergy" scale="1e6"  value="1.0"  min="0.01" max="1000.0" free="0"/>
+       </spatialModel>
+       <spectrum type="...">
+         ...
        </spectrum>
      </source>
 
@@ -40,21 +62,31 @@ CTA radial background
 
   * :math:`\sigma` = ``Sigma`` (degrees)
 
-  The second radial model is of type ``Profile``
+  and
+
+  .. math::
+     \theta = \sqrt{\mathrm{DETX} \times \mathrm{DETX} + \mathrm{DETY} \times\mathrm{DETY}}
+
+  with :math:`\mathrm{DETX}` and :math:`\mathrm{DETY}` being the detector
+  coordinates in the nominal system.
+
+
+Profile
+~~~~~~~
+
+  The ``Profile`` model describes a radial profile
 
   .. code-block:: xml
 
-     <source name="Background" type="RadialAcceptance" instrument="CTA">
-       <radialModel type="Profile">
+     <source name="Background" type="CTABackground" instrument="CTA">
+       <spatialModel type="Profile">
          <parameter name="Width" scale="1.0" value="1.5" min="0.1" max="1000.0" free="1"/>
          <parameter name="Core"  scale="1.0" value="3.0" min="0.1" max="1000.0" free="1"/>
          <parameter name="Tail"  scale="1.0" value="5.0" min="0.1" max="1000.0" free="1"/>
-       </radialModel>
-        <spectrum type="PowerLaw">
-          <parameter name="Prefactor"   scale="1e-6" value="61.8" min="0.0"  max="1000.0" free="1"/>
-          <parameter name="Index"       scale="-1"   value="1.85" min="0.0"  max="+5.0"   free="1"/>
-          <parameter name="PivotEnergy" scale="1e6"  value="1.0"  min="0.01" max="1000.0" free="0"/>
-        </spectrum>
+       </spatialModel>
+       <spectrum type="...">
+         ...
+       </spectrum>
      </source>
 
   and implements
@@ -68,26 +100,25 @@ CTA radial background
   * :math:`c_1` = ``Core``
   * :math:`c_2` = ``Tail``
 
-  The third radial model is of type ``Polynom``
+
+Polynom
+~~~~~~~
+
+  The ``Polynom`` model describes a polynomial with an arbitrary number of
+  coefficients
 
   .. code-block:: xml
 
-     <source name="Background" type="RadialAcceptance" instrument="CTA">
-       <radialModel type="Polynom">
+     <source name="Background" type="CTABackground" instrument="CTA">
+       <spatialModel type="Polynom">
          <parameter name="Coeff0" scale="1.0" value="+1.00000"   min="-10.0" max="10.0" free="0"/>
          <parameter name="Coeff1" scale="1.0" value="-0.1239176" min="-10.0" max="10.0" free="1"/>
          <parameter name="Coeff2" scale="1.0" value="+0.9751791" min="-10.0" max="10.0" free="1"/>
          <parameter name="Coeff3" scale="1.0" value="-3.0584577" min="-10.0" max="10.0" free="1"/>
-         <parameter name="Coeff4" scale="1.0" value="+2.9089535" min="-10.0" max="10.0" free="1"/>
-         <parameter name="Coeff5" scale="1.0" value="-1.3535372" min="-10.0" max="10.0" free="1"/>
-         <parameter name="Coeff6" scale="1.0" value="+0.3413752" min="-10.0" max="10.0" free="1"/>
-         <parameter name="Coeff7" scale="1.0" value="-0.0449642" min="-10.0" max="10.0" free="1"/>
-         <parameter name="Coeff8" scale="1.0" value="+0.0024321" min="-10.0" max="10.0" free="1"/>
-       </radialModel>
-       <spectrum type="PowerLaw">
-         <parameter name="Prefactor"   scale="1e-6" value="61.8" min="0.0"  max="1000.0" free="1"/>
-         <parameter name="Index"       scale="-1"   value="1.85" min="0.0"  max="+5.0"   free="1"/>
-         <parameter name="PivotEnergy" scale="1e6"  value="1.0"  min="0.01" max="1000.0" free="0"/>
+         ...
+       </spatialModel>
+       <spectrum type="...">
+         ...
        </spectrum>
      </source>
 
@@ -100,9 +131,116 @@ CTA radial background
 
   * :math:`c_0` = ``Coeff0``
   * :math:`c_1` = ``Coeff1``
+  * :math:`c_2` = ``Coeff2``
+  * :math:`c_3` = ``Coeff3``
   * ...
 
-  (the number of polynomial coefficients is arbitrary).
+
+Gradient
+~~~~~~~~
+
+  The ``Gradient`` model describes a bilinear gradient over the field of
+  view
+
+  .. code-block:: xml
+
+     <source name="Background" type="CTABackground" instrument="CTA">
+       <spatialModel type="Gradient">
+         <parameter name="Grad_DETX" scale="1.0" value="0.0" min="-10.0" max="10.0" free="1"/>
+         <parameter name="Grad_DETY" scale="1.0" value="0.0" min="-10.0" max="10.0" free="1"/>
+       </spatialModel>
+       <spectrum type="...">
+         ...
+       </spectrum>
+     </source>
+
+  and implements
+
+  .. math::
+     M_{\rm spatial}(\mathrm{DETX},\mathrm{DETY}) =
+     1 + \nabla_\mathrm{x} \mathrm{DETX} + \nabla_\mathrm{y} \mathrm{DETY}
+
+  where
+
+  * :math:`\nabla_\mathrm{x}` = ``Grad_DETX`` (per degree)
+  * :math:`\nabla_\mathrm{y}` = ``Grad_DETY`` (per degree)
+
+
+
+Multiplicative
+~~~~~~~~~~~~~~
+
+  The ``Multiplicative`` model describes a multiplication of spatial models
+
+  .. code-block:: xml
+
+     <source name="Background" type="CTABackground" instrument="CTA">
+       <spatialModel type="Multiplicative">
+         <spatialModel type="...">
+           ...
+         </spatialModel>
+         <spatialModel type="...">
+           ...
+         </spatialModel>
+         ...
+       </spatialModel>
+       <spectrum type="...">
+         ...
+       </spectrum>
+     </source>
+
+  and implements
+
+  .. math::
+     M_{\rm spatial}(\mathrm{DETX},\mathrm{DETY}) =
+     \prod_{i=0}^{N-1} M^{(i)}_{\rm spatial}(\mathrm{DETX},\mathrm{DETY})
+
+  where :math:`M^{(i)}_{\rm spatial}(\mathrm{DETX},\mathrm{DETY})` is any
+  spatial model component, including another multiplicative model, and
+  :math:`N` is the number of model components that are multiplied.
+  For example, the default model for a H.E.S.S. data analysis is specified
+  by
+
+  .. code-block:: xml
+
+     <source name="Background" type="CTABackground" instrument="CTA">
+       <spatialModel type="Multiplicative">
+         <spatialModel type="Gaussian">
+           <parameter name="Sigma" scale="1.0" value="3.0" min="0.01" max="10.0" free="1"/>
+         </spatialModel>
+         <spatialModel type="Gradient">
+           <parameter name="Grad_DETX" scale="1.0" value="0.0" min="-10.0" max="10.0" free="1"/>
+           <parameter name="Grad_DETY" scale="1.0" value="0.0" min="-10.0" max="10.0" free="1"/>
+         </spatialModel>
+       </spatialModel>
+       <spectrum type="...">
+         ...
+       </spectrum>
+     </source>
+
+
+Radial acceptance background
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  For legacy reasons, there exists a class of radially symmetric background
+  models of the type ``RadialAcceptance`` with the following XML structure:
+
+  .. code-block:: xml
+
+     <source name="Background" type="RadialAcceptance" instrument="CTA">
+       <radialModel type="Gaussian">
+         ...
+       </radialModel>
+       <spectrum type="...">
+         ...
+       </spectrum>
+     </source>
+
+  These models require a ``<radialModel>`` tag as the spatial component and
+  accept all spatial model types that take the offset angle :math:`\theta`
+  as variable, such as ``Gaussian``, ``Profile`` and ``Polynom``. The use
+  of the radial acceptance model is deprecated, and the ``CTABackground``
+  model should be used instead.
 
 
 CTA IRF background
@@ -115,17 +253,12 @@ CTA IRF background
   can be used by specifying a model of type ``CTAIrfBackground``. No spatial component
   will be specified explicitly since the spatial (and spectral) information is
   already contained in the template. The model will be multiplied by a spectral law.
-  In the example below, the template is multiplied by a power law with normalization
-  of 1 and slope 0 (i.e. the template is taken as is, but a fit can adjust the model
-  to compensate for inaccuracies):
 
   .. code-block:: xml
 
      <source name="Background" type="CTAIrfBackground" instrument="CTA">
-       <spectrum type="PowerLaw">
-         <parameter name="Prefactor"   scale="1.0" value="1.0" min="1e-3" max="1e3"    free="1"/>
-         <parameter name="Index"       scale="1.0" value="0.0" min="-5.0" max="+5.0"   free="1"/>
-         <parameter name="PivotEnergy" scale="1e6" value="1.0" min="0.01" max="1000.0" free="0"/>
+       <spectrum type="...">
+         ...
        </spectrum>
      </source>
 
@@ -135,10 +268,8 @@ CTA IRF background
   .. code-block:: xml
 
      <source name="Background" type="CTAIrfBackground" instrument="CTAOnOff">
-       <spectrum type="PowerLaw">
-         <parameter name="Prefactor"   scale="1.0" value="1.0" min="1e-3" max="1e3"    free="1"/>
-         <parameter name="Index"       scale="1.0" value="0.0" min="-5.0" max="+5.0"   free="1"/>
-         <parameter name="PivotEnergy" scale="1e6" value="1.0" min="0.01" max="1000.0" free="0"/>
+       <spectrum type="...">
+         ...
        </spectrum>
      </source>
 
@@ -148,16 +279,13 @@ CTA effective area background
 
   Instead of using the background template the effective area for gamma rays can
   also be used to model the instrumental background. Note that in this case the
-  effective area has to be scaled to a reasonable background rate. An example is
-  given below:
+  effective area has to be scaled to a reasonable background rate.
 
   .. code-block:: xml
 
      <source name="Background" type="CTAAeffBackground" instrument="CTA">
-       <spectrum type="PowerLaw">
-         <parameter name="Prefactor"   scale="1e-14" value="1.0"  min="1e-3" max="1e3"    free="1"/>
-         <parameter name="Index"       scale="1.0"   value="-2.4" min="-5.0" max="+5.0"   free="1"/>
-         <parameter name="PivotEnergy" scale="1e6"   value="1.0"  min="0.01" max="1000.0" free="0"/>
+       <spectrum type="...">
+         ...
        </spectrum>
      </source>
 
@@ -165,17 +293,15 @@ CTA effective area background
 CTA cube background
 ^^^^^^^^^^^^^^^^^^^
 
-  For a stacked analysis, the background rate is predicted by a so called background
-  cube. The background cube is used by specifying a model of type ``CTACubeBackground``.
-  Similar to the ``CTAIrfBackground`` model, the background cube is multplied by
-  a spectral model.
+  For a stacked analysis, the background rate is predicted by a so called
+  background cube. The background cube is used by specifying a model of type
+  ``CTACubeBackground``. Similar to the ``CTAIrfBackground`` model, the
+  background cube is multplied by a spectral model.
 
   .. code-block:: xml
 
      <source name="Background" type="CTACubeBackground" instrument="CTA">
-       <spectrum type="PowerLaw">
-         <parameter name="Prefactor"   scale="1.0" value="1.0" min="1e-3" max="1e3"    free="1"/>
-         <parameter name="Index"       scale="1.0" value="0.0" min="-5.0" max="+5.0"   free="1"/>
-         <parameter name="PivotEnergy" scale="1e6" value="1.0" min="0.01" max="1000.0" free="0"/>
+       <spectrum type="...">
+         ...
        </spectrum>
      </source>

@@ -1,4 +1,4 @@
-.. _sec_models_implementation:
+.. _um_models_implementation:
 
 Implementation
 --------------
@@ -8,7 +8,7 @@ Below is a simple example of such a file comprising one source and one
 background model.
 Each model is factorised into
 a spectral (tag ``<spectrum>``),
-a spatial (tags ``<spatialModel>`` and ``<radialModel>``), and
+a spatial (tags ``<spatialModel>`` or ``<radialModel>``), and
 a temporal component (tag ``<temporal>``).
 
 .. math::

@@ -1,4 +1,4 @@
-.. _sec_models_temporal:
+.. _um_models_temporal:
 
 Temporal model components
 -------------------------
