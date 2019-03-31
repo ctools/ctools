@@ -120,6 +120,23 @@ Phase Curve
 
      *Structure of phase curve FITS file*
 
+  By default, the ``NORM`` values are recomputed internally so that the
+  phase-averaged normalisation is one, i.e.
+
+  .. math::
+     \int_0^1 r(\Phi) d\Phi = 1
+
+  In that case, the spectral component corresponds to the phase-averaged
+  spectrum. If the internal normalisation should be disabled the
+  ``normalize="0"`` attribute needs to be added to the temporal tag, i.e.
+
+  .. code-block:: xml
+
+     <temporal type="PhaseCurve" file="model_temporal_phasecurve.fits" normalize="0">
+
+  In that case the ``NORM`` values are directly multiplied with the spectral
+  component.
+
   .. warning::
      Fitting of phase curves only makes sense for an unbinned maximum likelihood
      analysis, since in a binned or stacked analysis the times of individual
