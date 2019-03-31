@@ -124,27 +124,33 @@ the background rate per solid angle is the same in the On and the Off region.
 The Poisson formula is then
 
 .. math::
-   -\ln L(M_s) = \sum_i s_i(M_s) + \alpha_i b_i(M_s) -
-                 n^\mathrm{on}_i \ln  [s_i(M_s)+ \alpha_i \, b_i(M_s)] + b_i(M_s) -
+   -\ln L(M_s) = \sum_i s_i(M_s) + \alpha b_i(M_s) -
+                 n^\mathrm{on}_i \ln  [s_i(M_s)+ \alpha \, b_i(M_s)] + b_i(M_s) -
                  n^\mathrm{off}_i \ln b_i(M_s) -\\
                  n^\mathrm{on}_i (1-\ln n^\mathrm{on}_i) -
                  n^\mathrm{off}_i (1-\ln n^\mathrm{off}_i)
 
-Some special cases need to be handled separately in ``wstat``.
+where
 
+.. math::
+   \alpha = \frac{\int_\mathrm{on} d\Omega}{\int_\mathrm{off} d\Omega}
+
+is the ratio between the solid angles of the On region and the Off region.
+
+Some special cases need to be handled separately in ``wstat``.
 If :math:`n^\mathrm{on}_i = 0` but :math:`n^\mathrm{off}_i > 0` the
 contribution to the log-likelihood from the energy bin :math:`i` is
 
 .. math::
-   -\ln L_i(M_s) = s_i(M_s) + n^\mathrm{off}_i \ln(\alpha_i+1).
+   -\ln L_i(M_s) = s_i(M_s) + n^\mathrm{off}_i \ln(\alpha+1).
 
 If :math:`n^\mathrm{off}_i = 0` and
-:math:`n^\mathrm{on}_i > s_i(M_s) \frac{\alpha_i + 1}{\alpha_i}`
+:math:`n^\mathrm{on}_i > s_i(M_s) \frac{\alpha + 1}{\alpha}`
 the contribution to the log-likelihood from the energy bin :math:`i` is
 
 .. math::
-   -\ln L_i(M_s) = -\frac{s_i(M_s)}{\alpha_i} - n^\mathrm{on}_i
-                   \ln\left(\frac{\alpha_i}{\alpha_i+1}\right)
+   -\ln L_i(M_s) = -\frac{s_i(M_s)}{\alpha} - n^\mathrm{on}_i
+                   \ln\left(\frac{\alpha}{\alpha+1}\right)
 
 However, for smaller :math:`n^\mathrm{on}_i` the value of :math:`b_i(M_s)` is
 null or negative. Since a negative number of background counts is unphysical,
@@ -188,9 +194,17 @@ is the curvature matrix
 
 is the gradient and
 :math:`\delta_{kl}` is the Kronecker delta that is :math:`1` for
-:math:`k=l` and :math:`0` otherwise. The matrix equation is solved using
-a sparse matrix Cholesky decomposition. Parameters are constrained within their
-parameter limits in case they exist.
+:math:`k=l` and :math:`0` otherwise. :math:`\lambda` is a damping parameter
+that initially is set to 0.001. If a Levenberg-Marquardt iteration leads to
+an increase of the log-likelihood function, :math:`\lambda` is decreased by a
+factor of 10. If the log-likelihood function does not improve, :math:`\lambda`
+is increased by a factor of 10 and the iteration is repeated. The iterations
+stop when the log-likelihood increase is less than a small value, typically
+0.005; the optimiser status is then set to ``converged``. The iterations are
+also stopped if the log-likelihood function does not improve for (typically)
+ten iterations; the optimiser status is then set to ``stalled``. The matrix
+equation is solved using a sparse matrix Cholesky decomposition. Parameters
+are constrained within their parameter limits in case they exist.
 
 Model fitting using the Levenberg-Marquardt algorithm is implemented by
 :ref:`ctlike`.
@@ -200,11 +214,11 @@ Statistical Parameter errors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Statistical errors on the model parameters :math:`\delta a_k` are determined
-by computing the square root of the diagonal elements of the inverse of the
-curvature matrix which is the covariance matrix ``C``:
+by computing the square root of the diagonal elements of the covariance matrix
+:math:`C` which is the inverse of the curvature matrix:
 
 .. math::
-   \delta a_k = \sqrt{diag(C)_k}
+   \delta a_k = \sqrt{C_{kk}}
 
 with
 
@@ -222,11 +236,11 @@ The detection significance of the source model is estimated using the so
 called Test Statistic (TS) which is defined as
 
 .. math::
-   \mathrm{TS} = 2 \ln L(M_s+M_b) - 2 \ln L(M_b)
+   \mathrm{TS} = 2 \, (\ln L(M_b) - \ln L(M_s+M_b))
 
-where :math:`\ln L(M_s+M_b)` is the log-likelihood value obtained when
+where :math:`-\ln L(M_s+M_b)` is the log-likelihood value obtained when
 fitting the source and the background together to the data, and
-:math:`\ln L(M_b)` is the log-likelihood value obtained when fitting only
+:math:`-\ln L(M_b)` is the log-likelihood value obtained when fitting only
 the background model to the data.
 Under the hypothesis that the model :math:`M_b` provides a satisfactory fit
 of the data, :math:`TS` follows a :math:`\chi^2_n` distribution with
@@ -251,12 +265,12 @@ log-likelihood decrease of :math:`\Delta ln L` with respect to the maximum
 log-likelihood estimate :math:`F_\mathrm{0}`:
 
 .. math::
-   \ln L(F_\mathrm{up}) = \ln L(F_\mathrm{0}) + \Delta ln L
+   -\ln L(F_\mathrm{up}) = -\ln L(F_\mathrm{0}) + \Delta \ln L
 
 The log-likelihood decrease :math:`\Delta ln L` is computed from the
 chance probability (p-value) using
 
 .. math::
-   \Delta ln L = (\mathrm{erf}^{-1}(p))^2
+   \Delta \ln L = (\mathrm{erf}^{-1}(p))^2
 
 Upper limit computation is implemented by :ref:`ctulimit`.
