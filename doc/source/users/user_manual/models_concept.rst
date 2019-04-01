@@ -9,7 +9,7 @@ Generally, the measured events can be separated into two distinct classes:
 events being attributed to gamma rays of celestial origin (the "source" 
 events) or events being attributed to any other kind of trigger (the 
 "background" events).
-In the first case, the :ref:`Instrument Response Functions (IRFs) <um_response>`
+In the first case, the :ref:`Instrument Response Functions (IRFs) <um_irf>`
 describe how an incident gamma-ray converts into a measured event.
 In the second case there is often no general prescription, and the 
 distribution of background events is commonly modeled directly in the data 
@@ -28,7 +28,7 @@ Model components are generally parametric, and model parameters can be
 adjusted through a maximum likelihood procedure to find the set of 
 parameters that represent best the measured data.
 Model components representing celestial sources are convolved with the 
-:ref:`IRFs <um_response>` to predict the expected number of source events in
+:ref:`IRFs <um_irf>` to predict the expected number of source events in
 the data.
 Background model components will be directly expressed as expected number 
-of background events without any :ref:`IRF <um_response>` convolution.
+of background events without any :ref:`IRF <um_irf>` convolution.

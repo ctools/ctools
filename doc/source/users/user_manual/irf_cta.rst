@@ -1,31 +1,10 @@
-.. _um_response:
-
-Instrument Response Functions
------------------------------
-
-What are instrument response functions?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The instrument response functions provide a mathematical description that
-links the reconstructed photon arrival direction :math:`p'`, energy :math:`E'`
-and trigger time :math:`t'` of an event to the true incident direction
-:math:`p`, energy :math:`E` and time :math:`t` of a photon. The following
-figure illustrates this relationship:
-
-.. figure:: irfs.jpg
-   :width: 70%
-
-:math:`I(p,E,t)` is the gamma-ray intensity arriving at Earth as a function of
-direction :math:`p`, energy :math:`E` and time :math:`t`. :math:`e(p',E',t')`
-is the expected event rate as function of the reconstructed direction
-:math:`p'`, energy :math:`E'` and trigger time :math:`t'`. The expected event
-rate is obtained by integrating the product of the instrumental response
-function :math:`R(p',E',t'|p,E,t)` and the emitted intensity :math:`I(p,E,t)`
-over the direction, energy and time.
-
+.. _um_irf_cta:
 
 CTA response functions
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
+
+Factorisation
+~~~~~~~~~~~~~
 
 The instrument response functions for CTA (as well as the other IACTs such as
 H.E.S.S., VERITAS and MAGIC) are factorised into
@@ -49,6 +28,36 @@ and
 
 .. math::
    \int E_{\rm disp}(E' | p, E, t) dE' = 1
+
+
+Format
+~~~~~~
+
+Each response is stored in a single FITS file, and each component of the
+response factorisation is stored in a binary table of that FITS file.
+In addition, the response files contain an additional table that describes the
+background rate as function of energy and position in the field of view.
+An example of a CTA response file is shown below:
+
+.. figure:: irf_cta_file.png
+   :width: 100%
+
+Each table in the response file is in a standardised format that is the one
+that is also used for the Fermi/LAT telescope. As an example, the effective
+area component of the response file is shown below. Response information is
+stored in a n-dimensional cube, and each axis of this cube is described by the
+lower and upper edges of the axis bins. In this example the effective area is
+stored as a 2D matrix with the first axis being energy and the second axis
+being offaxis angle. Effective area information is stored for true
+(``EFFAREA``) and reconstructed (``EFFAREA_RECO``) energy. Vector columns are
+used to store all information.
+
+.. figure:: irf_cta_aeff.png
+   :width: 100%
+
+
+Getting CTA IRFs
+~~~~~~~~~~~~~~~~
 
 ctools are shipped with the CTA ``prod2`` response functions for the northern
 and southern arrays, and variants are available that have been optimised for
@@ -81,32 +90,6 @@ In total, the following six instrument response functions are available:
    if you need root priviledges to install in your ``$CTOOLS`` directory.
    To use the prod3b-v1 response functions, specify ``prod3b-v1`` if a tool
    or script queries for the calibration database.
-
-Each response is stored in a single FITS file, and each component of
-the response factorisation is stored in a binary table of that FITS
-file.
-In addition, the response files contain an additional table that
-describes the background rate as function of energy and position in
-the field of view.
-An example of a CTA response file is shown below:
-
-.. figure:: irf-file.png
-   :width: 100%
-
-Each table in the response file is in a standardised format that is
-the one that is also used for the Fermi/LAT telescope.
-As an example, the effective area component of the response file
-is shown below.
-Response information is stored in a n-dimensional cube, and each axis
-of this cube is described by the lower and upper edges of the axis bins.
-In this example the effective area is stored as a 2D matrix with the
-first axis being energy and the second axis being offaxis angle.
-Effective area information is stored for true (``EFFAREA``) and
-reconstructed (``EFFAREA_RECO``) energy.
-Vector columns are used to store all information.
-
-.. figure:: irf-aeff.png
-   :width: 100%
 
 
 Specifying CTA response functions

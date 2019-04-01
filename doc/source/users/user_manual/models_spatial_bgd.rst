@@ -246,7 +246,7 @@ Radial acceptance background
 CTA IRF background
 ^^^^^^^^^^^^^^^^^^
 
-  The :ref:`Instrument Response Functions (IRFs) <um_response>` contain a template
+  The :ref:`Instrument Response Functions (IRFs) <um_irf>` contain a template
   that predicts the background rate as function of position in the field of view
   and measured energy in units of
   :math:`{\rm events} \, {\rm s}^{-1} {\rm MeV}^{-1} {\rm sr}^{-1}`. This template

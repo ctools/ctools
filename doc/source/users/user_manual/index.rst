@@ -10,6 +10,6 @@ User Manual
    data
    likelihood
    models
-   response
+   irf
    classical
    observations
