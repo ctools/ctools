@@ -7,40 +7,32 @@ What are instrument response functions?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The instrument response functions provide a mathematical description that
-links the measured quantities :math:`\vec{d}` of an event to the physical
-quantities :math:`\vec{p}` of the incident photon. The following figure 
-illustrates this relationship:
+links the reconstructed photon arrival direction :math:`p'`, energy :math:`E'`
+and trigger time :math:`t'` of an event to the true incident direction
+:math:`p`, energy :math:`E` and time :math:`t` of a photon. The following
+figure illustrates this relationship:
 
 .. figure:: irfs.jpg
    :width: 70%
 
-:math:`I(\vec{p})` is the gamma-ray intensity arriving at Earth as a
-function of photon properties :math:`\vec{p}` 
-(which usually are true photon energy, true photon incident direction, 
-and true photon arrival time),
-while :math:`e(\vec{d})` is the expected event rate as function of event 
-properties :math:`\vec{d}` (which usually are the measured photon energy,
-measured or reconstructued photon incident direction, and measured photon 
-arrival time). The expected event rate is obtained by integrating the
-product of 
-the instrumental response function :math:`R(\vec{d}|\vec{p},\vec{a}`)
-and the emitted intensity :math:`I(\vec{p})` over the photon properties
-:math:`\vec{p}`.
-The argument :math:`\vec{a}` in the response function comprises any 
-auxiliary parameter on which the response function may depend on (e.g. 
-pointing direction, triggered telescopes, optical efficiencies, 
-atmospheric conditions, etc.). All these quantities and hence the 
-instrument response function may depend on time.
+:math:`I(p,E,t)` is the gamma-ray intensity arriving at Earth as a function of
+direction :math:`p`, energy :math:`E` and time :math:`t`. :math:`e(p',E',t')`
+is the expected event rate as function of the reconstructed direction
+:math:`p'`, energy :math:`E'` and trigger time :math:`t'`. The expected event
+rate is obtained by integrating the product of the instrumental response
+function :math:`R(p',E',t'|p,E,t)` and the emitted intensity :math:`I(p,E,t)`
+over the direction, energy and time.
 
 
 CTA response functions
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The instrument response functions for CTA are factorised into 
+The instrument response functions for CTA (as well as the other IACTs such as
+H.E.S.S., VERITAS and MAGIC) are factorised into
 the effective area :math:`A_{\rm eff}(p, E, t)` (units :math:`cm^2`),
 the point spread function :math:`PSF(p' | p, E, t)`,
 and the energy dispersion :math:`E_{\rm disp}(E' | p, E, t)`
-following:
+following
 
 .. math::
     R(p', E', t' | p, E, t) =
@@ -48,7 +40,17 @@ following:
     PSF(p' | p, E, t) \times
     E_{\rm disp}(E' | p, E, t)
 
-ctools are shipped with so called ``prod2`` response functions for the northern
+where
+
+.. math::
+   \int PSF(p' | p, E, t) dp' = 1
+
+and
+
+.. math::
+   \int E_{\rm disp}(E' | p, E, t) dE' = 1
+
+ctools are shipped with the CTA ``prod2`` response functions for the northern
 and southern arrays, and variants are available that have been optimised for
 exposure times of 0.5 hours, 5 hours and 50 hours.
 In total, the following six instrument response functions are available:
@@ -56,9 +58,9 @@ In total, the following six instrument response functions are available:
 ``South_5h``, and ``South_50h``.
 
 .. note::
-   In cases for which the CTA instrument response functions are used in a
-   research project, we ask to add the following acknowledgement in any
-   resulting publication:
+   If you use the CTA instrument response functions for a research project
+   and specifically for a presentation or publication, we ask to add the
+   following acknowledgement to the presentation or publication:
 
    *This research has made use of the CTA instrument response functions
    provided by the CTA Consortium and Observatory.*

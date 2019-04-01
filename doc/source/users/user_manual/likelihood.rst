@@ -210,7 +210,7 @@ Model fitting using the Levenberg-Marquardt algorithm is implemented by
 :ref:`ctlike`.
 
 
-Statistical Parameter errors
+Statistical parameter errors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Statistical errors on the model parameters :math:`\delta a_k` are determined
@@ -256,8 +256,8 @@ fluctuations only. For :math:`n=1` the significance in Gaussian sigma
 is given by :math:`\sqrt{TS}`.
 
 
-Upper limits
-~~~~~~~~~~~~
+Upper flux limits
+~~~~~~~~~~~~~~~~~
 
 If gamma-ray emission from a source is not detected, an upper flux limit can
 be derived by determining the flux :math:`F_\mathrm{up}` that leads to a
