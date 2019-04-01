@@ -11,4 +11,5 @@ User Manual
    likelihood
    models
    response
-
+   classical
+   observations
