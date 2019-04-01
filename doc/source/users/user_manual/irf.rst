@@ -8,3 +8,5 @@ Instrument Response Functions
 
    irf_intro
    irf_cta
+   irf_lat
+   irf_comptel

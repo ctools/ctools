@@ -3,31 +3,45 @@
 CTA response functions
 ----------------------
 
-Factorisation
-~~~~~~~~~~~~~
+Formulation
+~~~~~~~~~~~
 
 The instrument response functions for CTA (as well as the other IACTs such as
 H.E.S.S., VERITAS and MAGIC) are factorised into
-the effective area :math:`A_{\rm eff}(p, E, t)` (units :math:`cm^2`),
-the point spread function :math:`PSF(p' | p, E, t)`,
-and the energy dispersion :math:`E_{\rm disp}(E' | p, E, t)`
+the effective area :math:`A_{\rm eff}(p,E,t)` (units :math:`cm^2`),
+the point spread function :math:`PSF(p'|p,E,t)`,
+and the energy dispersion :math:`E_{\rm disp}(E'|p,E,t)`
 following
 
 .. math::
-    R(p', E', t' | p, E, t) =
-    A_{\rm eff}(p, E, t) \times
-    PSF(p' | p, E, t) \times
-    E_{\rm disp}(E' | p, E, t)
+    R(p',E',t'|p,E,t) = A_{\rm eff}(p,E,t) \times PSF(p'|p,E,t) \times
+                        E_{\rm disp}(E'|p,E,t)
 
 where
 
 .. math::
-   \int PSF(p' | p, E, t) dp' = 1
+   \int PSF(p'|p,E,t) \, dp' = 1
 
 and
 
 .. math::
-   \int E_{\rm disp}(E' | p, E, t) dE' = 1
+   \int E_{\rm disp}(E'|p,E,t) \, dE' = 1
+
+For the point spread function, two variants exist that both depend on energy
+and off-axis angle, but differ in the functional form that is used to describe
+the PSF. The first variant implements a superposition of three 2D Gaussian
+functions that are each characterised by a width and a relative amplitude.
+Alternatively, a King profile defined by
+
+.. math::
+   \mathrm{\it PSF}(p'|p,E,t) = \frac{1}{2 \pi \sigma^2}
+   \left( 1 - \frac{1}{\gamma} \right)
+   \left( 1 + \frac{1}{2 \gamma} \frac{\delta^2}{\sigma^2} \right)^{-\gamma}
+
+can be used, where :math:`\delta` is the angular separation between the true
+and measured photon directions :math:`p` and :math:`p'`, respectively,
+:math:`\sigma` describes the width and :math:`\gamma` the tail of the
+distribution.
 
 
 Format
