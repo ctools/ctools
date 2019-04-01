@@ -56,7 +56,7 @@ Light Curve
 
   .. _fig_model_lightcurve:
 
-  .. figure:: model_lightcurve.png
+  .. figure:: models_lightcurve.png
      :align: center
      :width: 100%
 
@@ -112,9 +112,9 @@ Phase Curve
   values in the ``NORM`` column specify :math:`r(\Phi(t))` at phases
   :math:`\Phi(t)`, and should be comprised between 0 and 1.
 
-  .. _fig_model_phasecurve:
+  .. _fig_models_phasecurve:
 
-  .. figure:: model_phasecurve.png
+  .. figure:: models_phasecurve.png
      :align: center
      :width: 40%
 
