@@ -61,3 +61,68 @@ The parameters :math:`n_\mathrm{c}`, :math:`n_\mathrm{t}`, :math:`s_\mathrm{c}`,
 :math:`\gamma_\mathrm{t}` depend on energy :math:`E` and off-axis angle
 :math:`\theta`.
 Energy dispersion is so far not implemented.
+
+
+Event types
+~~~~~~~~~~~
+
+The LAT events are partitioned into exclusive event types that for Pass 6 and
+Pass 7 data correspond to pair conversions located in either the front or the
+back section of the tracker. For Pass 8 the event partitioning has been
+generalised to other event types. For each event type, a specific response
+function exists that will be designated in the following with the superscript
+:math:`\alpha`.
+
+
+Livetime cube
+~~~~~~~~~~~~~
+
+The livetime cube is a means to speed up the exposure calculations in a
+Fermi/LAT analysis and contains the integrated livetime as a function of sky
+position and inclination angle with respect to the LAT z-axis.
+This livetime, denoted by :math:`\tau(p,\theta)`, is the time that the LAT
+observed a given position on the sky at a given inclination angle, and includes
+the history of the LAT's orientation during the entire observation period.
+A Fermi/LAT livetime cube includes also a version of the livetime information
+that is weighted by the livetime fraction (i.e. the ratio between livetime and
+ontime) and that allows correction of inefficiencies introduced by so-called
+ghost events, and that we denote here by :math:`\tau_\mathrm{wgt}(p,\theta)`.
+
+
+Mean point-source PSF
+~~~~~~~~~~~~~~~~~~~~~
+
+GammaLib, the library that is underlying ctools, natively implements the
+computation of the mean PSF for point sources.
+The exposure for a given sky direction :math:`p`, photon energy :math:`E` and
+event type :math:`\alpha` is computed using
+
+.. math::
+   X^\alpha(p, E) = f_1^\alpha(E) \int_{\theta} \tau(p,\theta) \,
+                    A_\mathrm{eff}^\alpha(E,\theta) \, d\theta
+                  + f_2^\alpha(E) \int_{\theta} \tau_\mathrm{wgt}(p,\theta)
+                    \, A_\mathrm{eff}^\alpha(E,\theta) \, d\theta
+
+The exposure weighted point spread function is computed using
+
+.. math::
+   \mathrm{\it PSF}^\alpha(\delta|p,E) =
+          f_1^\alpha(E) \int_{\theta} \tau(p,\theta) \,
+          A_\mathrm{eff}^\alpha(E, \theta) \,
+          \mathrm{\it PSF}^\alpha(\delta|E,\theta) \, d\theta
+        + f_2^\alpha(E) \int_{\theta} \tau_\mathrm{wgt}(p,\theta) \,
+          A_\mathrm{eff}^\alpha(E,\theta) \, \mathrm{\it PSF}^\alpha(\delta|E,\theta) \,
+          d\theta,
+
+where :math:`f_1^\alpha(E)` and :math:`f_2^\alpha(E)` are energy and event
+type dependent efficiency factors.
+
+The mean point spread function for a point source is computed using
+
+.. math::
+   \overline{\mathrm{\it PSF}}(\delta|p,E) =
+             \frac{\sum_\alpha \mathrm{\it PSF}^\alpha(\delta|p,E)}
+                  {\sum_\alpha X^\alpha(p,E)}
+
+where the sum is taken over all event types :math:`\alpha`.
+
