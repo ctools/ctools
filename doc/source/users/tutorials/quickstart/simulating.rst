@@ -207,33 +207,33 @@ from this file are shown here:
 
 .. code-block:: none
 
-   2018-01-24T14:01:30: === CTA observation ===
-   2018-01-24T14:01:30:  Simulation cone ...........: RA=83.63 deg, Dec=22.51 deg, radius=5.5 deg
-   2018-01-24T14:01:30:  Time interval .............: 6.31109e+08 - 6.31112e+08 s
-   2018-01-24T14:01:30:  Photon energy range .......: 30 GeV - 70.310187347763 GeV
-   2018-01-24T14:01:30:  Event energy range ........: 30 GeV - 70.310187347763 GeV
-   2018-01-24T14:01:30:   Simulation area ..........: 1.90195e+09 cm2
-   2018-01-24T14:01:30:   Use model ................: Crab
-   2018-01-24T14:01:30:   Normalization ............: 1 [Crab]
-   2018-01-24T14:01:30:   Flux .....................: 2.50006e-09 [Crab] photons/cm2/s
-   2018-01-24T14:01:30:   Normalized flux ..........: 2.50006e-09 [Crab] photons/cm2/s
-   2018-01-24T14:01:30:   Photon rate ..............: 4.75499 photons/s [Crab]
-   2018-01-24T14:01:30:   MC source photons ........: 17169 [Crab]
-   2018-01-24T14:01:30:   MC source events .........: 3870 [Crab]
-   2018-01-24T14:01:30:   MC source events .........: 3870 (all source models)
-   2018-01-24T14:01:30:  Photon energy range .......: 70.310187347763 GeV - 164.784081495918 GeV
+   2019-04-02T12:47:42: === CTA observation ===
+   2019-04-02T12:47:42:  Simulation cone ...........: RA=83.63 deg, Dec=22.51 deg, radius=5.5 deg
+   2019-04-02T12:47:42:  Time interval .............: 6.31109e+08 - 6.31112e+08 s
+   2019-04-02T12:47:42:  Photon energy range .......: 30 GeV - 70.310187347763 GeV
+   2019-04-02T12:47:42:  Event energy range ........: 30 GeV - 70.310187347763 GeV
+   2019-04-02T12:47:42:   Simulation area ..........: 1.90195e+09 cm2
+   2019-04-02T12:47:42:   Use model ................: Crab
+   2019-04-02T12:47:42:   Normalization ............: 1 [Crab]
+   2019-04-02T12:47:42:   Flux .....................: 2.50006e-09 [Crab] photons/cm2/s
+   2019-04-02T12:47:42:   Normalized flux ..........: 2.50006e-09 [Crab] photons/cm2/s
+   2019-04-02T12:47:42:   Photon rate ..............: 4.75499 photons/s [Crab]
+   2019-04-02T12:47:42:   MC source photons ........: 17169 [Crab]
+   2019-04-02T12:47:42:   MC source events .........: 3870 [Crab]
+   2019-04-02T12:47:42:   MC source events .........: 3870 (all source models)
+   2019-04-02T12:47:42:  Photon energy range .......: 70.310187347763 GeV - 164.784081495918 GeV
    ...
-   2018-01-24T14:01:30:  MC source photons .........: 46368 [Crab]
-   2018-01-24T14:01:30:  MC source events ..........: 12749 [Crab]
-   2018-01-24T14:01:38:  MC events outside ROI .....: 0
-   2018-01-24T14:01:38:  MC background events ......: 189461
-   2018-01-24T14:01:38:  MC identifier 1 ...........: Crab
-   2018-01-24T14:01:38:  MC identifier 2 ...........: CTABackgroundModel
-   2018-01-24T14:01:38:  MC events .................: 202210 (all models)
+   2019-04-02T12:47:42:  MC source photons .........: 46368 [Crab]
+   2019-04-02T12:47:42:  MC source events ..........: 12749 [Crab]
+   2019-04-02T12:47:50:  MC events outside ROI .....: 0
+   2019-04-02T12:47:50:  MC background events ......: 193299
+   2019-04-02T12:47:50:  MC identifier 1 ...........: Crab
+   2019-04-02T12:47:50:  MC identifier 2 ...........: CTABackgroundModel
+   2019-04-02T12:47:50:  MC events .................: 206048 (all models)
 
 Each line starts with the UTC time at which the line has been written. In
 this run, 46368 Crab photons have been thrown. 12749 of these photons have been
-registered by CTA as events. In the same time interval, 189461 background
+registered by CTA as events. In the same time interval, 193299 background
 events have been registred by CTA.
 
 .. note::

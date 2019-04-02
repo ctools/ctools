@@ -49,12 +49,15 @@ To derive On/Off observations from the ``events_edisp.fits`` event list, type:
    Input event list or observation definition XML file [obs.xml] events_edisp.fits
    Calibration database [prod2]
    Instrument response function [South_0.5h]
+   Input model definition XML file (if NONE, use point source) [NONE] $CTOOLS/share/models/crab.xml
+   Source name [Crab]
    Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
    Start value for first energy bin in TeV [0.1]
    Stop value for last energy bin in TeV [100.0]
    Number of energy bins [120] 30
    Stack multiple observations into single PHA, ARF and RMF files? [no]
    Output observation definition XML file [onoff_obs.xml]
+   Output model definition XML file [onoff_model.xml]
    Method for background estimation (REFLECTED|CUSTOM) [REFLECTED]
    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Right Ascension of source region centre (deg) (0-360) [83.63]
@@ -121,6 +124,34 @@ into the spectral response computation.
    location) can be set using the hidden ``prefix`` parameter of
    :ref:`csphagen`.
 
+:ref:`csphagen` also produced the
+:ref:`model definition XML file <glossary_moddef>`
+``onoff_model.xml`` that can be directly used for model fitting:
+
+.. code-block:: xml
+
+   <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+   <source_library title="source library">
+     <source name="Crab" type="PointSource">
+       <spectrum type="PowerLaw">
+         <parameter name="Prefactor" value="5.7" error="0" scale="1e-16" min="1e-07" max="1000" free="1" />
+         <parameter name="Index" value="2.48" error="0" scale="-1" min="0" max="5" free="1" />
+         <parameter name="PivotEnergy" value="0.3" scale="1000000" min="0.01" max="1000" free="0" />
+       </spectrum>
+       <spatialModel type="PointSource">
+         <parameter name="RA" value="83.6331" scale="1" min="-360" max="360" free="0" />
+         <parameter name="DEC" value="22.0145" scale="1" min="-90" max="90" free="0" />
+       </spatialModel>
+     </source>
+     <source name="CTABackgroundModel" type="CTAIrfBackground" instrument="CTAOnOff">
+       <spectrum type="PowerLaw">
+         <parameter name="Prefactor" value="1" error="0" scale="1" min="0.001" max="1000" free="1" />
+         <parameter name="Index" value="0" error="0" scale="1" min="-5" max="5" free="1" />
+         <parameter name="PivotEnergy" value="1" scale="1000000" min="0.01" max="1000" free="0" />
+       </spectrum>
+     </source>
+   </source_library>
+
 There are also come ancillary `ds9 <http://ds9.si.edu>`_ region files, that show
 the On region and the Off regions, ``onoff_on.reg`` and
 ``onoff_off.reg``, respectively. Below there is
@@ -135,43 +166,8 @@ the On and Off regions.
    the green circles the Off regions, and the white circle the On
    region.*
 
-Now you are ready to fit a model to the On/Off data. As usual, you need to
-create for this purpose a
-:ref:`model definition file <glossary_moddef>`.
-So far, only fitting of point sources is supported, hence you need a single
-point source as celestial component of the
-:ref:`model definition file <glossary_moddef>`.
-As background component you need to add a ``CTAIrfBackground`` model for
-the ``CTAOnOff`` instrument, which is the instrument code that defines an
-On/Off analysis. Your
-:ref:`model definition XML file <glossary_moddef>`
-should look as follows:
-
-.. code-block:: bash
-
-   <?xml version="1.0" standalone="no"?>
-   <source_library title="source library">
-      <source name="Crab" type="PointSource">
-         <spectrum type="PowerLaw">
-            <parameter name="Prefactor"   scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
-            <parameter name="Index"       scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
-            <parameter name="PivotEnergy" scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
-         </spectrum>
-         <spatialModel type="PointSource">
-            <parameter name="RA"  scale="1.0" value="83.6331" min="-360" max="360" free="0"/>
-            <parameter name="DEC" scale="1.0" value="22.0145" min="-90"  max="90"  free="0"/>
-         </spatialModel>
-      </source>
-      <source name="CTABackgroundModel" type="CTAIrfBackground" instrument="CTAOnOff">
-         <spectrum type="PowerLaw">
-            <parameter name="Prefactor"   scale="1.0"  value="1.0"  min="1e-3" max="1e+3"   free="1"/>
-            <parameter name="Index"       scale="1.0"  value="0.0"  min="-5.0" max="+5.0"   free="1"/>
-            <parameter name="PivotEnergy" scale="1e6"  value="1.0"  min="0.01" max="1000.0" free="0"/>
-         </spectrum>
-      </source>
-   </source_library>
-
-You can now fit this model using an On/Off analysis by specifying the
+You can now fit the model ``onoff_model.xml`` using an On/Off analysis by
+specifying the
 :ref:`output observation definition file <glossary_obsdef>`
 and the
 :ref:`model definition file <glossary_moddef>`
@@ -180,9 +176,9 @@ to :ref:`ctlike`:
 .. code-block:: bash
 
    $ ctlike
-   Input event list, counts cube or observation definition XML file [selected_events.fits] onoff_obs.xml
-   Input model definition XML file [$CTOOLS/share/models/crab.xml] crab_onoff.xml
-   Output model definition XML file [crab_results.xml]
+   Input event list, counts cube or observation definition XML file [selected_events_edisp.fits] onoff_obs.xml
+   Input model definition XML file [$CTOOLS/share/models/crab.xml] onoff_model.xml
+   Output model definition XML file [crab_results_edisp.xml] crab_results.xml
 
 Below you see the corresponding output from the ``ctlike.log`` file. The fitted
 parameters are still the same within statistical uncertainties as the ones
@@ -191,61 +187,62 @@ the background is not well known a priori.
 
 .. code-block:: none
 
-   2018-01-24T15:03:20: +=================================+
-   2018-01-24T15:03:20: | Maximum likelihood optimisation |
-   2018-01-24T15:03:20: +=================================+
-   2018-01-24T15:03:20:  >Iteration   0: -logL=-44981.922, Lambda=1.0e-03
-   2018-01-24T15:03:20:  >Iteration   1: -logL=-44983.914, Lambda=1.0e-03, delta=1.992, step=1.0e+00, max(|grad|)=2.056476 [Index:7]
-   2018-01-24T15:03:20:  >Iteration   2: -logL=-44983.915, Lambda=1.0e-04, delta=0.001, step=1.0e+00, max(|grad|)=0.001765 [Index:3]
-   2018-01-24T15:03:20:
-   2018-01-24T15:03:20: +=========================================+
-   2018-01-24T15:03:20: | Maximum likelihood optimisation results |
-   2018-01-24T15:03:20: +=========================================+
-   2018-01-24T15:03:20: === GOptimizerLM ===
-   2018-01-24T15:03:20:  Optimized function value ..: -44983.915
-   2018-01-24T15:03:20:  Absolute precision ........: 0.005
-   2018-01-24T15:03:20:  Acceptable value decrease .: 2
-   2018-01-24T15:03:20:  Optimization status .......: converged
-   2018-01-24T15:03:20:  Number of parameters ......: 10
-   2018-01-24T15:03:20:  Number of free parameters .: 4
-   2018-01-24T15:03:20:  Number of iterations ......: 2
-   2018-01-24T15:03:20:  Lambda ....................: 1e-05
-   2018-01-24T15:03:20:  Maximum log likelihood ....: 44983.915
-   2018-01-24T15:03:20:  Observed events  (Nobs) ...: 7309.000
-   2018-01-24T15:03:20:  Predicted events (Npred) ..: 7306.626 (Nobs - Npred = 2.37371839911157)
-   2018-01-24T15:03:20: === GModels ===
-   2018-01-24T15:03:20:  Number of models ..........: 2
-   2018-01-24T15:03:20:  Number of parameters ......: 10
-   2018-01-24T15:03:20: === GModelSky ===
-   2018-01-24T15:03:20:  Name ......................: Crab
-   2018-01-24T15:03:20:  Instruments ...............: all
-   2018-01-24T15:03:20:  Instrument scale factors ..: unity
-   2018-01-24T15:03:20:  Observation identifiers ...: all
-   2018-01-24T15:03:20:  Model type ................: PointSource
-   2018-01-24T15:03:20:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
-   2018-01-24T15:03:20:  Number of parameters ......: 6
-   2018-01-24T15:03:20:  Number of spatial par's ...: 2
-   2018-01-24T15:03:20:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
-   2018-01-24T15:03:20:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
-   2018-01-24T15:03:20:  Number of spectral par's ..: 3
-   2018-01-24T15:03:20:   Prefactor ................: 5.59354639816441e-16 +/- 7.3028712529757e-18 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
-   2018-01-24T15:03:20:   Index ....................: -2.47773254234859 +/- 0.0110401748178683 [-0,-5]  (free,scale=-1,gradient)
-   2018-01-24T15:03:20:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
-   2018-01-24T15:03:20:  Number of temporal par's ..: 1
-   2018-01-24T15:03:20:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-   2018-01-24T15:03:20: === GCTAModelIrfBackground ===
-   2018-01-24T15:03:20:  Name ......................: BackgroundModel
-   2018-01-24T15:03:20:  Instruments ...............: CTAOnOff
-   2018-01-24T15:03:20:  Instrument scale factors ..: unity
-   2018-01-24T15:03:20:  Observation identifiers ...: all
-   2018-01-24T15:03:20:  Model type ................: "PowerLaw" * "Constant"
-   2018-01-24T15:03:20:  Number of parameters ......: 4
-   2018-01-24T15:03:20:  Number of spectral par's ..: 3
-   2018-01-24T15:03:20:   Prefactor ................: 0.977042261939201 +/- 0.0498175569832557 [0.01,100] ph/cm2/s/MeV (free,scale=1,gradient)
-   2018-01-24T15:03:20:   Index ....................: 0.00289056644049351 +/- 0.0299910588265984 [-5,5]  (free,scale=1,gradient)
-   2018-01-24T15:03:20:   PivotEnergy ..............: 1000000 MeV (fixed,scale=1000000,gradient)
-   2018-01-24T15:03:20:  Number of temporal par's ..: 1
-   2018-01-24T15:03:20:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+  2019-04-02T14:55:29: +=================================+
+  2019-04-02T14:55:29: | Maximum likelihood optimisation |
+  2019-04-02T14:55:29: +=================================+
+  2019-04-02T14:55:29:  >Iteration   0: -logL=-47436.484, Lambda=1.0e-03
+  2019-04-02T14:55:29:  >Iteration   1: -logL=-47439.247, Lambda=1.0e-03, delta=2.762, step=1.0e+00, max(|grad|)=14.136296 [Index:7]
+  2019-04-02T14:55:29:  >Iteration   2: -logL=-47439.266, Lambda=1.0e-04, delta=0.020, step=1.0e+00, max(|grad|)=0.089563 [Index:7]
+  2019-04-02T14:55:29:  >Iteration   3: -logL=-47439.266, Lambda=1.0e-05, delta=0.000, step=1.0e+00, max(|grad|)=0.001727 [Index:7]
+  2019-04-02T14:55:29:
+  2019-04-02T14:55:29: +=========================================+
+  2019-04-02T14:55:29: | Maximum likelihood optimisation results |
+  2019-04-02T14:55:29: +=========================================+
+  2019-04-02T14:55:29: === GOptimizerLM ===
+  2019-04-02T14:55:29:  Optimized function value ..: -47439.266
+  2019-04-02T14:55:29:  Absolute precision ........: 0.005
+  2019-04-02T14:55:29:  Acceptable value decrease .: 2
+  2019-04-02T14:55:29:  Optimization status .......: converged
+  2019-04-02T14:55:29:  Number of parameters ......: 10
+  2019-04-02T14:55:29:  Number of free parameters .: 4
+  2019-04-02T14:55:29:  Number of iterations ......: 3
+  2019-04-02T14:55:29:  Lambda ....................: 1e-06
+  2019-04-02T14:55:29:  Maximum log likelihood ....: 47439.266
+  2019-04-02T14:55:29:  Observed events  (Nobs) ...: 7607.000
+  2019-04-02T14:55:29:  Predicted events (Npred) ..: 7606.425 (Nobs - Npred = 0.575097306655152)
+  2019-04-02T14:55:29: === GModels ===
+  2019-04-02T14:55:29:  Number of models ..........: 2
+  2019-04-02T14:55:29:  Number of parameters ......: 10
+  2019-04-02T14:55:29: === GModelSky ===
+  2019-04-02T14:55:29:  Name ......................: Crab
+  2019-04-02T14:55:29:  Instruments ...............: all
+  2019-04-02T14:55:29:  Instrument scale factors ..: unity
+  2019-04-02T14:55:29:  Observation identifiers ...: all
+  2019-04-02T14:55:29:  Model type ................: PointSource
+  2019-04-02T14:55:29:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
+  2019-04-02T14:55:29:  Number of parameters ......: 6
+  2019-04-02T14:55:29:  Number of spatial par's ...: 2
+  2019-04-02T14:55:29:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
+  2019-04-02T14:55:29:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
+  2019-04-02T14:55:29:  Number of spectral par's ..: 3
+  2019-04-02T14:55:29:   Prefactor ................: 5.71422768206296e-16 +/- 7.28119011001326e-18 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+  2019-04-02T14:55:29:   Index ....................: -2.47772427704665 +/- 0.0108450088768338 [-0,-5]  (free,scale=-1,gradient)
+  2019-04-02T14:55:29:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
+  2019-04-02T14:55:29:  Number of temporal par's ..: 1
+  2019-04-02T14:55:29:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+  2019-04-02T14:55:29: === GCTAModelIrfBackground ===
+  2019-04-02T14:55:29:  Name ......................: CTABackgroundModel
+  2019-04-02T14:55:29:  Instruments ...............: CTAOnOff
+  2019-04-02T14:55:29:  Instrument scale factors ..: unity
+  2019-04-02T14:55:29:  Observation identifiers ...: all
+  2019-04-02T14:55:29:  Model type ................: "PowerLaw" * "Constant"
+  2019-04-02T14:55:29:  Number of parameters ......: 4
+  2019-04-02T14:55:29:  Number of spectral par's ..: 3
+  2019-04-02T14:55:29:   Prefactor ................: 0.925471278485926 +/- 0.0482291417226665 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
+  2019-04-02T14:55:29:   Index ....................: -0.0649030558071282 +/- 0.0301870339200633 [-5,5]  (free,scale=1,gradient)
+  2019-04-02T14:55:29:   PivotEnergy ..............: 1000000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
+  2019-04-02T14:55:29:  Number of temporal par's ..: 1
+  2019-04-02T14:55:29:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 :ref:`ctlike` has a hidden parameter called ``statistic`` that sets the
 statistic used for the fit. By default, :ref:`ctlike` will use ``CSTAT``
@@ -257,7 +254,70 @@ Alternatively, you can use ``WSTAT`` for an On/Off analysis, which treats the
 number of background counts in each energy bin as a nuisance parameter that is
 derived from the On and Off counts by profiling the likelihood function. In
 this case, the only assumption is that the background rate spectrum is the same
-in the On and Off regions.
+in the On and Off regions. Below the results for a :ref:`ctlike` run with
+the ``statistic=wstat`` option.
+
+.. code-block:: none
+
+   2019-04-02T15:56:29: +=================================+
+   2019-04-02T15:56:29: | Maximum likelihood optimisation |
+   2019-04-02T15:56:29: +=================================+
+   2019-04-02T15:56:29:    Parameter "Prefactor" has zero curvature. Fix parameter.
+   2019-04-02T15:56:29:    Parameter "Index" has zero curvature. Fix parameter.
+   2019-04-02T15:56:29:  >Iteration   0: -logL=13.699, Lambda=1.0e-03
+   2019-04-02T15:56:29:  >Iteration   1: -logL=13.645, Lambda=1.0e-03, delta=0.054, step=1.0e+00, max(|grad|)=0.226348 [Index:3]
+   2019-04-02T15:56:29:  >Iteration   2: -logL=13.645, Lambda=1.0e-04, delta=0.000, step=1.0e+00, max(|grad|)=0.001120 [Index:3]
+   2019-04-02T15:56:29:    Free parameter "Prefactor" after convergence was reached with frozen parameter.
+   2019-04-02T15:56:29:    Free parameter "Index" after convergence was reached with frozen parameter.
+   2019-04-02T15:56:29:
+   2019-04-02T15:56:29: +=========================================+
+   2019-04-02T15:56:29: | Maximum likelihood optimisation results |
+   2019-04-02T15:56:29: +=========================================+
+   2019-04-02T15:56:29: === GOptimizerLM ===
+   2019-04-02T15:56:29:  Optimized function value ..: 13.645
+   2019-04-02T15:56:29:  Absolute precision ........: 0.005
+   2019-04-02T15:56:29:  Acceptable value decrease .: 2
+   2019-04-02T15:56:29:  Optimization status .......: converged
+   2019-04-02T15:56:29:  Number of parameters ......: 10
+   2019-04-02T15:56:29:  Number of free parameters .: 4
+   2019-04-02T15:56:29:  Number of iterations ......: 2
+   2019-04-02T15:56:29:  Lambda ....................: 1e-05
+   2019-04-02T15:56:29:  Maximum log likelihood ....: -13.645
+   2019-04-02T15:56:29:  Observed events  (Nobs) ...: 7607.000
+   2019-04-02T15:56:29:  Predicted events (Npred) ..: 7606.133 (Nobs - Npred = 0.866926153597888)
+   2019-04-02T15:56:29: === GModels ===
+   2019-04-02T15:56:29:  Number of models ..........: 2
+   2019-04-02T15:56:29:  Number of parameters ......: 10
+   2019-04-02T15:56:29: === GModelSky ===
+   2019-04-02T15:56:29:  Name ......................: Crab
+   2019-04-02T15:56:29:  Instruments ...............: all
+   2019-04-02T15:56:29:  Instrument scale factors ..: unity
+   2019-04-02T15:56:29:  Observation identifiers ...: all
+   2019-04-02T15:56:29:  Model type ................: PointSource
+   2019-04-02T15:56:29:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
+   2019-04-02T15:56:29:  Number of parameters ......: 6
+   2019-04-02T15:56:29:  Number of spatial par's ...: 2
+   2019-04-02T15:56:29:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
+   2019-04-02T15:56:29:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
+   2019-04-02T15:56:29:  Number of spectral par's ..: 3
+   2019-04-02T15:56:29:   Prefactor ................: 5.71398803734648e-16 +/- 7.28140878478654e-18 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+   2019-04-02T15:56:29:   Index ....................: -2.47775827196727 +/- 0.0108569325078945 [-0,-5]  (free,scale=-1,gradient)
+   2019-04-02T15:56:29:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
+   2019-04-02T15:56:29:  Number of temporal par's ..: 1
+   2019-04-02T15:56:29:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-02T15:56:29: === GCTAModelIrfBackground ===
+   2019-04-02T15:56:29:  Name ......................: CTABackgroundModel
+   2019-04-02T15:56:29:  Instruments ...............: CTAOnOff
+   2019-04-02T15:56:29:  Instrument scale factors ..: unity
+   2019-04-02T15:56:29:  Observation identifiers ...: all
+   2019-04-02T15:56:29:  Model type ................: "PowerLaw" * "Constant"
+   2019-04-02T15:56:29:  Number of parameters ......: 4
+   2019-04-02T15:56:29:  Number of spectral par's ..: 3
+   2019-04-02T15:56:29:   Prefactor ................: 1 +/- 0 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
+   2019-04-02T15:56:29:   Index ....................: 0 +/- 0 [-5,5]  (free,scale=1,gradient)
+   2019-04-02T15:56:29:   PivotEnergy ..............: 1000000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
+   2019-04-02T15:56:29:  Number of temporal par's ..: 1
+   2019-04-02T15:56:29:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 .. warning::
    Beware that the profiling may yield unphysical results (negative background
@@ -269,11 +329,6 @@ in the On and Off regions.
    good enough). See the
    `XSPEC manual Appendix B <https://heasarc.gsfc.nasa.gov/xanadu/xspec/manual/XSappendixStatistics.html>`_
    for more information.
-
-Finally, you can also use ``CHI2`` as fit statistic which is a classical chi
-square, i.e., a Gaussian signal and Gaussian background. As for ``CSTAT``, a
-spectral model for the signal and a spectral model for the background are
-jointly fit to the On and Off spectra.
 
 .. note::
    Many scripts can also be used in On/Off mode, including

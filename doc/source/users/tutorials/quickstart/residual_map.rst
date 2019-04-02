@@ -34,11 +34,11 @@ subtracted. You run the :ref:`csresmap` script as follows:
 
 The :ref:`csresmap` script produces the FITS file ``resmap.fits`` that contains
 the residual counts map. The image is displayed below using
-`ds9 <http://ds9.si.edu>`_ with a linear color scale and with a small Gaussian
+`ds9 <http://ds9.si.edu>`_ with a linear color scale and with a 3 pixel Gaussian
 kernel smoothing applied. Obviously, there are no significant residuals, which
 indicates that the model fit was satisfactory.
 
-.. figure:: residual_map.jpg
+.. figure:: residual_map.png
    :width: 400px
    :align: center
 

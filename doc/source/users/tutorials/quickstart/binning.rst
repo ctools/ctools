@@ -20,10 +20,10 @@ using the :ref:`ctbin` tool as follows:
 
    $ ctbin
    Input event list or observation definition XML file [events.fits] selected_events.fits
+   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63]
    Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.51]
-   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
-   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Image scale (in degrees/pixel) [0.02]
    Size of the X axis in pixels [200]
    Size of the Y axis in pixels [200]
@@ -31,7 +31,7 @@ using the :ref:`ctbin` tool as follows:
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
    Number of energy bins (1-200) [20]
-   Output counts cube file [cntcube.fits]
+   Output counts cube file or observation definition XML file [cntcube.fits]
 
 In this example the events from file ``selected_events.fits`` will be binned
 into a counts cube stored into the file ``cntcube.fits``. The counts cube
@@ -59,7 +59,7 @@ above. The ``EBOUNDS`` table has 20 rows, one for each energy bin, while the
 ``GTI`` table has just a single row, indicating the start and stop time of the
 simulated data.
 
-.. figure:: cntmap-fits.jpg
+.. figure:: cntmap_fits.png
    :width: 600px
    :align: center
 
@@ -69,7 +69,7 @@ simulated data.
 An image of the first bin, covering the energy range 100 - 141 GeV, is 
 shown below:
 
-.. figure:: cntmap-map.jpg
+.. figure:: cntmap_map.png
    :height: 400px
    :align: center
 
@@ -80,17 +80,17 @@ reproduced below:
 
 .. code-block:: none
 
-   2018-01-24T14:23:03: +=================+
-   2018-01-24T14:23:03: | Bin observation |
-   2018-01-24T14:23:03: +=================+
-   2018-01-24T14:23:03: === CTA observation (id=000001) ===
-   2018-01-24T14:23:03:  Events in list ............: 21974
-   2018-01-24T14:23:03:  Events in cube ............: 18799
-   2018-01-24T14:23:03:  Events outside RoI ........: 0
-   2018-01-24T14:23:03:  Events with invalid WCS ...: 0
-   2018-01-24T14:23:03:  Events outside cube area ..: 3175
-   2018-01-24T14:23:03:  Events outside energy bins : 0
+   2019-04-02T13:46:34: +=================+
+   2019-04-02T13:46:34: | Bin observation |
+   2019-04-02T13:46:34: +=================+
+   2019-04-02T13:46:34: === CTA observation (id=000001) ===
+   2019-04-02T13:46:34:  Events in list ............: 22708
+   2019-04-02T13:46:34:  Events in cube ............: 19452
+   2019-04-02T13:46:34:  Events outside RoI ........: 0
+   2019-04-02T13:46:34:  Events with invalid WCS ...: 0
+   2019-04-02T13:46:34:  Events outside cube area ..: 3256
+   2019-04-02T13:46:34:  Events outside energy bins : 0
 
-From the 21974 events that were simulated and stored in the
-``selected_events.fits`` file, 18799 lie within the cube boundaries and are thus
+From the 22708 events that were simulated and stored in the
+``selected_events.fits`` file, 19452 lie within the cube boundaries and are thus
 put into the resulting counts cube.

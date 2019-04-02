@@ -56,54 +56,61 @@ the same events for both analyses.
 
 .. code-block:: none
 
-   2018-01-24T14:42:49: +=========================================+
-   2018-01-24T14:42:49: | Maximum likelihood optimisation results |
-   2018-01-24T14:42:49: +=========================================+
-   2018-01-24T14:42:49: === GOptimizerLM ===
-   2018-01-24T14:42:49:  Optimized function value ..: 139993.152
-   2018-01-24T14:42:49:  Absolute precision ........: 0.005
-   2018-01-24T14:42:49:  Acceptable value decrease .: 2
-   2018-01-24T14:42:49:  Optimization status .......: converged
-   2018-01-24T14:42:49:  Number of parameters ......: 10
-   2018-01-24T14:42:49:  Number of free parameters .: 4
-   2018-01-24T14:42:49:  Number of iterations ......: 2
-   2018-01-24T14:42:49:  Lambda ....................: 1e-05
-   2018-01-24T14:42:49:  Maximum log likelihood ....: -139993.152
-   2018-01-24T14:42:49:  Observed events  (Nobs) ...: 21974.000
-   2018-01-24T14:42:49:  Predicted events (Npred) ..: 21973.998 (Nobs - Npred = 0.00192004605924012)
-   2018-01-24T14:42:49: === GModels ===
-   2018-01-24T14:42:49:  Number of models ..........: 2
-   2018-01-24T14:42:49:  Number of parameters ......: 10
-   2018-01-24T14:42:49: === GModelSky ===
-   2018-01-24T14:42:49:  Name ......................: Crab
-   2018-01-24T14:42:49:  Instruments ...............: all
-   2018-01-24T14:42:49:  Instrument scale factors ..: unity
-   2018-01-24T14:42:49:  Observation identifiers ...: all
-   2018-01-24T14:42:49:  Model type ................: PointSource
-   2018-01-24T14:42:49:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
-   2018-01-24T14:42:49:  Number of parameters ......: 6
-   2018-01-24T14:42:49:  Number of spatial par's ...: 2
-   2018-01-24T14:42:49:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
-   2018-01-24T14:42:49:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
-   2018-01-24T14:42:49:  Number of spectral par's ..: 3
-   2018-01-24T14:42:49:   Prefactor ................: 5.84749807744844e-16 +/- 1.02060247557839e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
-   2018-01-24T14:42:49:   Index ....................: -2.48831941472059 +/- 0.0150002799717933 [-0,-5]  (free,scale=-1,gradient)
-   2018-01-24T14:42:49:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
-   2018-01-24T14:42:49:  Number of temporal par's ..: 1
-   2018-01-24T14:42:49:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-   2018-01-24T14:42:49: === GCTAModelIrfBackground ===
-   2018-01-24T14:42:49:  Name ......................: CTABackgroundModel
-   2018-01-24T14:42:49:  Instruments ...............: CTA
-   2018-01-24T14:42:49:  Instrument scale factors ..: unity
-   2018-01-24T14:42:49:  Observation identifiers ...: all
-   2018-01-24T14:42:49:  Model type ................: "PowerLaw" * "Constant"
-   2018-01-24T14:42:49:  Number of parameters ......: 4
-   2018-01-24T14:42:49:  Number of spectral par's ..: 3
-   2018-01-24T14:42:49:   Prefactor ................: 1.00311308345777 +/- 0.0134769768119516 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
-   2018-01-24T14:42:49:   Index ....................: 0.00710999567642649 +/- 0.00818686036300859 [-5,5]  (free,scale=1,gradient)
-   2018-01-24T14:42:49:   PivotEnergy ..............: 1000000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
-   2018-01-24T14:42:49:  Number of temporal par's ..: 1
-   2018-01-24T14:42:49:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-02T14:15:10: +=================================+
+   2019-04-02T14:15:10: | Maximum likelihood optimisation |
+   2019-04-02T14:15:10: +=================================+
+   2019-04-02T14:15:10:  >Iteration   0: -logL=143782.837, Lambda=1.0e-03
+   2019-04-02T14:15:10:  >Iteration   1: -logL=143779.346, Lambda=1.0e-03, delta=3.491, step=1.0e+00, max(|grad|)=5.346881 [Index:7]
+   2019-04-02T14:15:10:  >Iteration   2: -logL=143779.343, Lambda=1.0e-04, delta=0.003, step=1.0e+00, max(|grad|)=-0.055672 [Index:3]
+   2019-04-02T14:15:10:
+   2019-04-02T14:15:10: +=========================================+
+   2019-04-02T14:15:10: | Maximum likelihood optimisation results |
+   2019-04-02T14:15:10: +=========================================+
+   2019-04-02T14:15:10: === GOptimizerLM ===
+   2019-04-02T14:15:10:  Optimized function value ..: 143779.343
+   2019-04-02T14:15:10:  Absolute precision ........: 0.005
+   2019-04-02T14:15:10:  Acceptable value decrease .: 2
+   2019-04-02T14:15:10:  Optimization status .......: converged
+   2019-04-02T14:15:10:  Number of parameters ......: 10
+   2019-04-02T14:15:10:  Number of free parameters .: 4
+   2019-04-02T14:15:10:  Number of iterations ......: 2
+   2019-04-02T14:15:10:  Lambda ....................: 1e-05
+   2019-04-02T14:15:10:  Maximum log likelihood ....: -143779.343
+   2019-04-02T14:15:10:  Observed events  (Nobs) ...: 22708.000
+   2019-04-02T14:15:10:  Predicted events (Npred) ..: 22707.995 (Nobs - Npred = 0.00519125738355797)
+   2019-04-02T14:15:10: === GModels ===
+   2019-04-02T14:15:10:  Number of models ..........: 2
+   2019-04-02T14:15:10:  Number of parameters ......: 10
+   2019-04-02T14:15:10: === GModelSky ===
+   2019-04-02T14:15:10:  Name ......................: Crab
+   2019-04-02T14:15:10:  Instruments ...............: all
+   2019-04-02T14:15:10:  Instrument scale factors ..: unity
+   2019-04-02T14:15:10:  Observation identifiers ...: all
+   2019-04-02T14:15:10:  Model type ................: PointSource
+   2019-04-02T14:15:10:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
+   2019-04-02T14:15:10:  Number of parameters ......: 6
+   2019-04-02T14:15:10:  Number of spatial par's ...: 2
+   2019-04-02T14:15:10:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
+   2019-04-02T14:15:10:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
+   2019-04-02T14:15:10:  Number of spectral par's ..: 3
+   2019-04-02T14:15:10:   Prefactor ................: 5.88338676901458e-16 +/- 1.02452856089807e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+   2019-04-02T14:15:10:   Index ....................: -2.49375950219757 +/- 0.0149889370322137 [-0,-5]  (free,scale=-1,gradient)
+   2019-04-02T14:15:10:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
+   2019-04-02T14:15:10:  Number of temporal par's ..: 1
+   2019-04-02T14:15:10:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-02T14:15:10: === GCTAModelIrfBackground ===
+   2019-04-02T14:15:10:  Name ......................: CTABackgroundModel
+   2019-04-02T14:15:10:  Instruments ...............: CTA
+   2019-04-02T14:15:10:  Instrument scale factors ..: unity
+   2019-04-02T14:15:10:  Observation identifiers ...: all
+   2019-04-02T14:15:10:  Model type ................: "PowerLaw" * "Constant"
+   2019-04-02T14:15:10:  Number of parameters ......: 4
+   2019-04-02T14:15:10:  Number of spectral par's ..: 3
+   2019-04-02T14:15:10:   Prefactor ................: 1.0018169793538 +/- 0.0133053833141539 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
+   2019-04-02T14:15:10:   Index ....................: -0.00708154249642314 +/- 0.00805278228449961 [-5,5]  (free,scale=1,gradient)
+   2019-04-02T14:15:10:   PivotEnergy ..............: 1000000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
+   2019-04-02T14:15:10:  Number of temporal par's ..: 1
+   2019-04-02T14:15:10:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 .. note::
    Many tools or scripts can also be used in unbinned mode, including

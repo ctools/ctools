@@ -53,7 +53,7 @@ The :ref:`csspec` script creates the FITS file ``spectrum.fits`` that contains
 the results of the SED fitting. A graphical display of the fit results is
 shown below.
 
-.. figure:: spectrum.jpg
+.. figure:: spectrum.png
    :width: 600px
    :align: center
 

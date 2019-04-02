@@ -52,18 +52,18 @@ You run :ref:`ctpsfcube` as follows:
    Calibration database [prod2]
    Instrument response function [South_0.5h]
    Input counts cube file to extract PSF cube definition [NONE]
+   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63]
    Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.51]
-   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
-   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Image scale (in degrees/pixel) [1.0]
    Size of the X axis in pixels [10]
    Size of the Y axis in pixels [10]
    Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
-   Number of energy bins (1-200) [20]
-   Output PSF cube file [psfcube.fits]
+   Number of energy bins (1-1000) [20]
+   Output PSF cube file [psfcube.fits] 
 
 This produces the FITS file ``psfcube.fits`` that contains the point spread
 function as function of sky position and energy. You may have noted in the
