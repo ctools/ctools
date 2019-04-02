@@ -6,8 +6,8 @@ CTA response functions
 Formulation
 ~~~~~~~~~~~
 
-The instrument response functions for CTA (as well as the other IACTs such as
-H.E.S.S., VERITAS and MAGIC) are factorised into
+The :ref:`instrument response functions <glossary_irf>` for CTA (as well as the
+other IACTs such as H.E.S.S., VERITAS and MAGIC) are factorised into
 the effective area :math:`A_{\rm eff}(p,E,t)` (units :math:`cm^2`),
 the point spread function :math:`PSF(p'|p,E,t)`,
 and the energy dispersion :math:`E_{\rm disp}(E'|p,E,t)`
@@ -109,9 +109,9 @@ In total, the following six instrument response functions are available:
 Specifying CTA response functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The specification of the CTA Instrument Response Functions depends on the 
-way how ctools are used. Common to all methods is that the IRFs are 
-defined by a response name and a calibration database name.
+The specification of the CTA :ref:`Instrument Response Functions <glossary_irf>`
+depends on the way how ctools are used. Common to all methods is that the IRFs
+are defined by a response name and a calibration database name.
 ctools makes use of HEASARC's CALDB format to index and store
 IRFs, and specification of the database and response names is
 sufficient to access the response.
@@ -120,8 +120,9 @@ sufficient to access the response.
 Specifying the response function as input parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-ctools that require instrument response functions have two parameters
-to specify the calibration database name and the response function name.
+ctools that require :ref:`instrument response functions <glossary_irf>` have
+two parameters to specify the calibration database name and the response
+function name.
 The following example shows a ``ctobssim`` run using the ``prod2``
 calibration database and the ``South_0.5h`` response function:
 

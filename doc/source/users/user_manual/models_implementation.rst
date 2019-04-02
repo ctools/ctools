@@ -3,7 +3,8 @@
 Implementation
 --------------
 
-The general model is describe in ctools using a model definition XML file. 
+The general model is describe in ctools using a
+:ref:`model definition XML file <glossary_moddef>`.
 Below is a simple example of such a file comprising one source and one 
 background model.
 Each model is factorised into
@@ -87,9 +88,9 @@ term will be appended to each ``<parameter>`` tag.
 
 .. note::
 
-   The syntax of the model definition XML file has been inspired from the
-   syntax used by the Fermi/LAT ScienceTools, but for reasons of clarity and
-   homogenity of the various model and parameter names we have made some
-   modifications.
+   The syntax of the :ref:`model definition XML file <glossary_moddef>` has been
+   inspired from the syntax used by the Fermi/LAT ScienceTools, but for reasons
+   of clarity and homogenity of the various model and parameter names we have
+   made some modifications.
    Nevertheless, the format used by the Fermi/LAT ScienceTools is also
    supported.

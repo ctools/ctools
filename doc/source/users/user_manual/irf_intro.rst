@@ -3,11 +3,11 @@
 What are instrument response functions?
 ---------------------------------------
 
-The instrument response functions provide a mathematical description that
-links the reconstructed photon arrival direction :math:`p'`, energy :math:`E'`
-and trigger time :math:`t'` of an event to the true incident direction
-:math:`p`, energy :math:`E` and time :math:`t` of a photon. The following
-figure illustrates this relationship:
+The :ref:`instrument response functions <glossary_irf>` provide a mathematical
+description that links the reconstructed photon arrival direction :math:`p'`,
+energy :math:`E'` and trigger time :math:`t'` of an event to the true incident
+direction :math:`p`, energy :math:`E` and time :math:`t` of a photon. The
+following figure illustrates this relationship:
 
 .. figure:: irfs.jpg
    :width: 70%

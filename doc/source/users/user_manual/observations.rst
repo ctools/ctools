@@ -23,8 +23,9 @@ log-likelihood
 
 for the maximum likelihood estimations, where the sum is taken over the
 individual observations :math:`k`. Below you will see the first lines of an
-observation definition XML file that describe the first three observations of
-the Galactic Plane survey for the first CTA Data Challenge:
+:ref:`observation definition XML file <glossary_obsdef>` that describe the
+first three observations of the Galactic Plane survey for the first CTA Data
+Challenge:
 
 .. code-block:: xml
 
@@ -198,7 +199,7 @@ where :math:`B_k(p',E',t')` is the background model of observation :math:`k`.
 The sum is taken over all observations :math:`k`.
 
 The files for a stacked binned observation are specified as follows in an
-observation definition XML file:
+:ref:`observation definition XML file <glossary_obsdef>`:
 
 .. code-block:: xml
 
@@ -255,8 +256,8 @@ and the effective background response vectors using
 
 where :math:`\tau_k` is the live time (or exposure) of observation :math:`k`.
 
-The XML file for a stacked On/Off observation has the same format as for
-a single On/Off observation:
+The :ref:`observation definition XML file <glossary_obsdef>` for a stacked
+On/Off observation has the same format as for a single On/Off observation:
 
 .. code-block:: xml
 

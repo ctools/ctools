@@ -12,6 +12,7 @@ is shown below.
 
 .. figure:: eventlist.png
    :width: 70%
+   :align: center
 
 Metadata, such as the telescope pointing direction, the live time, or any other
 information that may be relevant for data processing, is stored in the FITS
@@ -21,15 +22,17 @@ below.
 
 .. figure:: eventheader.png
    :width: 70%
+   :align: center
 
-Every event list needs to be accompanied by a table with so-called Good Time
-Intervals (GTIs) where each row corresponds to a time interval of continuous
-data taking, and the two columns correspond to the start and stop times of these
-time intervals. An exemple for the GTIs of the H.E.S.S. event lists comprising
-a single GTI is shown below.
+Every event list needs to be accompanied by a table with so-called
+:ref:`Good Time Intervals (GTIs) <glossary_gti>` where each row corresponds
+to a time interval of continuous data taking, and the two columns correspond
+to the start and stop times of these time intervals. An exemple for the GTIs
+of the H.E.S.S. event lists comprising a single GTI is shown below.
 
 .. figure:: gti.png
    :width: 40%
+   :align: center
 
 Note that times are given in so-called Mission-Elapsed Time (MET) in seconds,
 and that the zero-point of the MET is specified by the ``MJDREFI`` and
