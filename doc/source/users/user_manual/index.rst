@@ -7,6 +7,7 @@ User Manual
    :maxdepth: 1
 
    introduction
+   overview
    data
    likelihood
    models
