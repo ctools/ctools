@@ -20,14 +20,15 @@ package, you can use that package to fit CTA data that were prepared for an
 On/Off analysis.
 
 To illustrate how you can do this, let's simulate an observation of the Crab
-nebula with a pointing direction that is offset by 1 deg:
+nebula with a pointing direction that is offset by 1 deg. We also use energy
+dispersion in the simulation as an On/Off analysis always
 
 .. code-block:: bash
 
-   $ ctobssim
+   $ ctobssim edisp=yes
    RA of pointing (degrees) (0-360) [83.63]
-   Dec of pointing (degrees) (-90-90) [22.01] 21.01
-   Radius of FOV (degrees) (0-180) [5]
+   Dec of pointing (degrees) (-90-90) [22.51] 21.01
+   Radius of FOV (degrees) (0-180) [5.0]
    Start time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:00:00]
    Stop time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:30:00]
    Lower energy limit (TeV) [0.1]
@@ -47,18 +48,19 @@ Off counts spectrum:
    Input event list or observation definition XML file [obs.xml] events.fits
    Calibration database [prod2]
    Instrument response function [South_0.5h]
-   Start value for first energy bin in TeV [0.1]
-   Stop value for last energy bin in TeV [100]
-   Radius of source region circle (deg) (0-180) [0.2]
    Input model definition XML file (if NONE, use point source) [NONE]
    Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
-   Number of energy bins [20]
+   Start value for first energy bin in TeV [0.1]
+   Stop value for last energy bin in TeV [100.0]
+   Number of energy bins [120] 20
    Stack multiple observations into single PHA, ARF and RMF files? [no]
    Output observation definition XML file [onoff_obs.xml]
+   Output model definition XML file [onoff_model.xml]
    Method for background estimation (REFLECTED|CUSTOM) [REFLECTED]
    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Right Ascension of source region centre (deg) (0-360) [83.63]
    Declination of source region centre (deg) (-90-90) [22.01]
+   Radius of source region circle (deg) (0-180) [0.2]
 
 Now you can start
 `Xspec <https://heasarc.nasa.gov/xanadu/xspec/>`_
@@ -67,10 +69,9 @@ for model fitting.
 .. code-block:: bash
 
    $ xspec
-   Creating a $HOME/.xspec directory for you
 
-   		   XSPEC version: 12.10.0c
- 	   Build Date/Time: Tue Jun 12 12:46:58 2018
+                  XSPEC version: 12.10.1
+        Build Date/Time: Mon Jan  7 12:38:07 2019
 
    XSPEC12>
 
@@ -87,10 +88,10 @@ First load the On file ``onoff_pha_on.fits`` using the ``data`` command:
    1 spectrum  in use
  
    Spectral Data File: onoff_pha_on.fits  Spectrum 1
-   Net count rate (cts/s) for Spectrum:1  1.585e+00 +/- 3.099e-02 (94.0 % total)
+   Net count rate (cts/s) for Spectrum:1  1.619e+00 +/- 3.135e-02 (93.9 % total)
     Assigned to Data Group 1 and Plot Group 1
      Noticed Channels:  1-20
-     Telescope: unknown Instrument: unknown  Channel Type: PI
+     Telescope: CTA Instrument: PROD2  Channel Type: PI
      Exposure Time: 1764 sec
     Using fit statistic: chi
     Using test statistic: chi
@@ -135,11 +136,11 @@ model using
    ________________________________________________________________________
 
 
-   Fit statistic : C-Statistic =         712.82 using 20 PHA bins and 18 degrees of freedom.
+   Fit statistic : C-Statistic =         727.46 using 20 PHA bins and 18 degrees of freedom.
 
-   Test statistic : Chi-Squared =         605.26 using 20 PHA bins.
-    Reduced chi-squared =         33.625 for     18 degrees of freedom
-    Null hypothesis probability =  6.662146e-117
+   Test statistic : Chi-Squared =         548.66 using 20 PHA bins.
+    Reduced chi-squared =         30.481 for     18 degrees of freedom
+    Null hypothesis probability =  5.939476e-105
 
    ***Warning: Chi-square may not be valid due to bins with zero variance
                in spectrum number(s): 1
@@ -159,39 +160,39 @@ command:
    XSPEC12>fit
                                    Parameters
    C-Statistic  |beta|/N    Lvl    1:PhoIndex        2:norm
-   85.7044      11239.1      -3       2.49284       654.424
-   25.1265      3951.81      -4       2.48007       578.148
-   23.0302      769.247      -5       2.47567       541.654
-   22.9323      165.457      -6       2.47509       538.451
-   22.9315      13.9094      -7       2.47503       538.072
+   96.8692      11494.2      -3       2.49807       711.693
+   12.0065      4626.2       -4       2.49140       735.585
+   10.9389      553.368      -5       2.48822       701.803
+   10.8978      108.533      -6       2.48774       697.592
+   10.8974      11.7189      -7       2.48768       697.003
    ==============================
     Variances and Principal Axes
                     1        2
-    8.8843E-07| -1.0000   0.0001
-    2.8990E+04| -0.0001  -1.0000
+    8.7349E-07| -1.0000   0.0001
+    4.6499E+04| -0.0001  -1.0000
    ------------------------------
 
    ========================
      Covariance Matrix
            1           2
-      2.326e-04   2.592e+00
-      2.592e+00   2.899e+04
+      2.228e-04   3.212e+00
+      3.212e+00   4.650e+04
    ------------------------
 
    ========================================================================
    Model powerlaw<1> Source No.: 1   Active/On
    Model Model Component  Parameter  Unit     Value
     par  comp
-      1    1   powerlaw   PhoIndex            2.47503      +/-  1.52504E-02
-      2    1   powerlaw   norm                538.072      +/-  170.265
+      1    1   powerlaw   PhoIndex            2.48768      +/-  1.49258E-02
+      2    1   powerlaw   norm                697.003      +/-  215.637
    ________________________________________________________________________
 
 
-   Fit statistic : C-Statistic =          22.93 using 20 PHA bins and 18 degrees of freedom.
+   Fit statistic : C-Statistic =          10.90 using 20 PHA bins and 18 degrees of freedom.
 
-   Test statistic : Chi-Squared =         437.54 using 20 PHA bins.
-    Reduced chi-squared =         24.308 for     18 degrees of freedom
-    Null hypothesis probability =   1.317221e-81
+   Test statistic : Chi-Squared =         126.30 using 20 PHA bins.
+    Reduced chi-squared =         7.0169 for     18 degrees of freedom
+    Null hypothesis probability =   2.683238e-18
 
    ***Warning: Chi-square may not be valid due to bins with zero variance
                in spectrum number(s): 1
@@ -208,7 +209,7 @@ obtained using :ref:`ctlike`.
  +-----------+-------+-----------------+-----------------+
  | Parameter | Truth |      Xspec      |     ctlike      |
  +===========+=======+=================+=================+
- | Prefactor | 601.4 | 538.0 +/- 170.3 | 536.4 +/- 184.2 |
+ | Prefactor | 601.4 | 697.0 +/- 215.6 | 697.5 +/- 234.5 |
  +-----------+-------+-----------------+-----------------+
- | Index     | 2.48  | 2.475 +/- 0.015 | 2.475 +/- 0.017 |
+ | Index     | 2.48  | 2.488 +/- 0.015 | 2.488 +/- 0.017 |
  +-----------+-------+-----------------+-----------------+
