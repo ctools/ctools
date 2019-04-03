@@ -147,10 +147,13 @@ Running the other tools is equivalent.
 Specifying the response function in an observation definition file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In the above example, only a single global response function can be
-used for all CTA observations. If you need to specify response functions
-per observation you can add the information directly in the XML observation 
-definition file:
+In the above example, only a single global response function can be used for all
+CTA observations. If you need to specify response functions per observation you
+can add the information directly in the
+:ref:`observation definition XML file <glossary_obsdef>`. You will learn more
+about :ref:`observation definition XML files <glossary_obsdef>` in the
+section :ref:`um_observations`. Here an example of specifying the response
+information in the :ref:`observation definition XML file <glossary_obsdef>`:
 
 .. code-block:: xml
 
@@ -181,7 +184,8 @@ Specifying individual instrument response files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you need even more control over individual response files, you can
-specify them individually in the XML observation file as follows:
+specify them individually in the
+:ref:`observation definition XML file <glossary_obsdef>` as follows:
 
 .. code-block:: xml
 

@@ -19,7 +19,7 @@ so-called observation definition XML file. ctools will then compute the joint
 log-likelihood
 
 .. math::
-   -\ln L(M) = -\sum_k \ln L_k(M)
+   \ln L(M) = \sum_k \ln L_k(M)
 
 for the maximum likelihood estimations, where the sum is taken over the
 individual observations :math:`k`. Below you will see the first lines of an

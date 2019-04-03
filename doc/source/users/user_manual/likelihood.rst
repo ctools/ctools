@@ -22,7 +22,8 @@ For unbinned data the Poisson formula
 .. math::
    -\ln L(M) = E(M) - \sum_i \ln P(p'_i, E'_i ,t'_i | M)
 
-is used, where the sum is taken over all events :math:`i`, characterised by the
+is used, where :math:`\ln L(M)` is the so-called log-likelihood function and
+the sum is taken over all events :math:`i`, characterised by the
 instrument direction :math:`p'_i`, the measured energy :math:`E'_i`
 and the trigger time :math:`t'_i`. :math:`P(p', E' ,t' | M)` is
 the probability density that given the :ref:`model <um_models>` :math:`M`, an
@@ -136,7 +137,7 @@ where
    \alpha = \frac{\int_\mathrm{on} d\Omega}{\int_\mathrm{off} d\Omega}
 
 is the ratio between the solid angles of the On region and the Off region.
-The terms in the last row are added so that :math:`-2 \ln L(M_s)` follows a
+The terms in the last row are added so that :math:`2 \ln L(M_s)` follows a
 :math:`\chi^2` distribution.
 
 Some special cases need to be handled separately in ``wstat``.
@@ -176,10 +177,16 @@ Levenberg-Marquardt algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ctools uses an iterative Levenberg-Marquardt algorithm for maximum likelihood
-estimation. The Levenberg-Marquardt algorithm starts with an inital guess of
-the :ref:`model <um_models>` parameters :math:`a_k` and iteratively
-replaces this estimate by a new estimate :math:`a_k + \Delta a_k`. The
-:math:`\Delta a_k` are determined by solving
+estimation. Since the Levenberg-Marquardt algorithm minimizes a function, we
+use
+
+.. math::
+   f(M) = -\ln L(M)
+
+as the function to minimize by the algorithm. The Levenberg-Marquardt algorithm
+starts with an inital guess of the :ref:`model <um_models>` parameters
+:math:`a_k` and iteratively replaces this estimate by a new estimate
+:math:`a_k + \Delta a_k`. The :math:`\Delta a_k` are determined by solving
 
 .. math::
    \sum_l \alpha_{kl} (1 + \delta_{kl} \lambda) \Delta a_l = \beta_k
@@ -198,15 +205,16 @@ is the gradient and
 :math:`\delta_{kl}` is the Kronecker delta that is :math:`1` for
 :math:`k=l` and :math:`0` otherwise. :math:`\lambda` is a damping parameter
 that initially is set to 0.001. If a Levenberg-Marquardt iteration leads to
-an increase of the log-likelihood function, :math:`\lambda` is decreased by a
-factor of 10. If the log-likelihood function does not improve, :math:`\lambda`
-is increased by a factor of 10 and the iteration is repeated. The iterations
-stop when the log-likelihood increase is less than a small value, typically
-0.005; the optimiser status is then set to ``converged``. The iterations are
-also stopped if the log-likelihood function does not improve for (typically)
-ten iterations; the optimiser status is then set to ``stalled``. The matrix
-equation is solved using a sparse matrix Cholesky decomposition. Parameters
-are constrained within their parameter limits in case they exist.
+an increase of the log-likelihood function :math:`\ln L(M)`, :math:`\lambda`
+is decreased by a factor of 10. If the log-likelihood function :math:`\ln L(M)`
+does not improve, :math:`\lambda` is increased by a factor of 10 and the
+iteration is repeated. The iterations stop when the log-likelihood increase is
+less than a small value, typically 0.005; the optimiser status is then set to
+``converged``. The iterations are also stopped if the log-likelihood function
+does not increase for (typically) ten iterations; the optimiser status is then
+set to ``stalled``. The matrix equation is solved using a sparse matrix Cholesky
+decomposition. Parameters are constrained within their parameter limits in case
+they exist.
 
 Model fitting using the Levenberg-Marquardt algorithm is implemented by
 :ref:`ctlike`.
@@ -238,11 +246,11 @@ The detection significance of the source model is estimated using the so
 called Test Statistic (TS) which is defined as
 
 .. math::
-   \mathrm{TS} = 2 \, (\ln L(M_b) - \ln L(M_s+M_b))
+   \mathrm{TS} = 2 \, ( \ln L(M_s+M_b) - \ln L(M_b) )
 
-where :math:`-\ln L(M_s+M_b)` is the log-likelihood value obtained when
+where :math:`\ln L(M_s+M_b)` is the log-likelihood value obtained when
 fitting the source and the background together to the data, and
-:math:`-\ln L(M_b)` is the log-likelihood value obtained when fitting only
+:math:`\ln L(M_b)` is the log-likelihood value obtained when fitting only
 the background model to the data.
 Under the hypothesis that the model :math:`M_b` provides a satisfactory fit
 of the data, :math:`TS` follows a :math:`\chi^2_n` distribution with
@@ -263,13 +271,13 @@ Upper flux limits
 
 If gamma-ray emission from a source is not detected, an upper flux limit can
 be derived by determining the flux :math:`F_\mathrm{up}` that leads to a
-log-likelihood decrease of :math:`\Delta ln L` with respect to the maximum
+log-likelihood decrease of :math:`\Delta \ln L` with respect to the maximum
 log-likelihood estimate :math:`F_\mathrm{0}`:
 
 .. math::
-   -\ln L(F_\mathrm{up}) = -\ln L(F_\mathrm{0}) + \Delta \ln L
+   \ln L(F_\mathrm{up}) = \ln L(F_\mathrm{0}) - \Delta \ln L
 
-The log-likelihood decrease :math:`\Delta ln L` is computed from the
+The log-likelihood decrease :math:`\Delta \ln L` is computed from the
 chance probability (p-value) using
 
 .. math::
