@@ -121,91 +121,91 @@ both observations.
 
 .. code-block:: none
 
-   2018-01-24T16:13:12: +====================+
-   2018-01-24T16:13:12: | Input observations |
-   2018-01-24T16:13:12: +====================+
-   2018-01-24T16:13:12: === GObservations ===
-   2018-01-24T16:13:12:  Number of observations ....: 2
-   2018-01-24T16:13:12:  Number of models ..........: 2
-   2018-01-24T16:13:12:  Number of observed events .: 32097
-   2018-01-24T16:13:12:  Number of predicted events : 0
-   2018-01-24T16:13:12: === GCTAObservation ===
-   2018-01-24T16:13:12:  Name ......................: Crab
-   2018-01-24T16:13:12:  Identifier ................: 00001
+   2019-04-03T12:03:40: +====================+
+   2019-04-03T12:03:40: | Input observations |
+   2019-04-03T12:03:40: +====================+
+   2019-04-03T12:03:40: === GObservations ===
+   2019-04-03T12:03:40:  Number of observations ....: 2
+   2019-04-03T12:03:40:  Number of models ..........: 2
+   2019-04-03T12:03:40:  Number of observed events .: 32617
+   2019-04-03T12:03:40:  Number of predicted events : 0
+   2019-04-03T12:03:40: === GCTAObservation ===
+   2019-04-03T12:03:40:  Name ......................: Crab
+   2019-04-03T12:03:40:  Identifier ................: 00001
    ...
-   2018-01-24T16:13:12: === GCTAResponseIrf ===
-   2018-01-24T16:13:12:  Caldb mission .............: cta
-   2018-01-24T16:13:12:  Caldb instrument ..........: prod2
-   2018-01-24T16:13:12:  Response name .............: North_0.5h
-   2018-01-24T16:13:12:  Energy dispersion .........: Not used
-   2018-01-24T16:13:12:  Save energy range .........: undefined
+   2019-04-03T12:03:40: === GCTAResponseIrf ===
+   2019-04-03T12:03:40:  Caldb mission .............: cta
+   2019-04-03T12:03:40:  Caldb instrument ..........: prod2
+   2019-04-03T12:03:40:  Response name .............: North_0.5h
+   2019-04-03T12:03:40:  Energy dispersion .........: Not used
+   2019-04-03T12:03:40:  Safe energy range .........: undefined
    ...
-   2018-01-24T16:13:12: === GCTAObservation ===
-   2018-01-24T16:13:12:  Name ......................: Crab
-   2018-01-24T16:13:12:  Identifier ................: 00002
+   2019-04-03T12:03:40: === GCTAObservation ===
+   2019-04-03T12:03:40:  Name ......................: Crab
+   2019-04-03T12:03:40:  Identifier ................: 00002
    ...
-   2018-01-24T16:13:12: === GCTAResponseIrf ===
-   2018-01-24T16:13:12:  Caldb mission .............: cta
-   2018-01-24T16:13:12:  Caldb instrument ..........: prod2
-   2018-01-24T16:13:12:  Response name .............: South_0.5h
-   2018-01-24T16:13:12:  Energy dispersion .........: Not used
-   2018-01-24T16:13:12:  Save energy range .........: undefined
+   2019-04-03T12:03:40: === GCTAResponseIrf ===
+   2019-04-03T12:03:40:  Caldb mission .............: cta
+   2019-04-03T12:03:40:  Caldb instrument ..........: prod2
+   2019-04-03T12:03:40:  Response name .............: South_0.5h
+   2019-04-03T12:03:40:  Energy dispersion .........: Not used
+   2019-04-03T12:03:40:  Safe energy range .........: undefined
    ...
-   2018-01-24T16:13:12: +=================================+
-   2018-01-24T16:13:12: | Maximum likelihood optimisation |
-   2018-01-24T16:13:12: +=================================+
-   2018-01-24T16:13:12:  >Iteration   0: -logL=220368.120, Lambda=1.0e-03
-   2018-01-24T16:13:12:  >Iteration   1: -logL=220367.708, Lambda=1.0e-03, delta=0.412, step=1.0e+00, max(|grad|)=-0.544370 [Index:3]
-   2018-01-24T16:13:12:  >Iteration   2: -logL=220367.708, Lambda=1.0e-04, delta=0.000, step=1.0e+00, max(|grad|)=0.013339 [Index:3]
+   2019-04-03T12:03:40: +=================================+
+   2019-04-03T12:03:40: | Maximum likelihood optimisation |
+   2019-04-03T12:03:40: +=================================+
+   2019-04-03T12:03:40:  >Iteration   0: -logL=223322.114, Lambda=1.0e-03
+   2019-04-03T12:03:40:  >Iteration   1: -logL=223321.707, Lambda=1.0e-03, delta=0.408, step=1.0e+00, max(|grad|)=-0.286978 [Index:3]
+   2019-04-03T12:03:41:  >Iteration   2: -logL=223321.707, Lambda=1.0e-04, delta=0.000, step=1.0e+00, max(|grad|)=0.008996 [Index:3]
    ...
-   2018-01-24T16:13:12: +=========================================+
-   2018-01-24T16:13:12: | Maximum likelihood optimisation results |
-   2018-01-24T16:13:12: +=========================================+
-   2018-01-24T16:13:12: === GOptimizerLM ===
-   2018-01-24T16:13:12:  Optimized function value ..: 220367.708
-   2018-01-24T16:13:12:  Absolute precision ........: 0.005
-   2018-01-24T16:13:12:  Acceptable value decrease .: 2
-   2018-01-24T16:13:12:  Optimization status .......: converged
-   2018-01-24T16:13:12:  Number of parameters ......: 10
-   2018-01-24T16:13:12:  Number of free parameters .: 4
-   2018-01-24T16:13:12:  Number of iterations ......: 2
-   2018-01-24T16:13:12:  Lambda ....................: 1e-05
-   2018-01-24T16:13:12:  Maximum log likelihood ....: -220367.708
-   2018-01-24T16:13:12:  Observed events  (Nobs) ...: 32097.000
-   2018-01-24T16:13:12:  Predicted events (Npred) ..: 32097.000 (Nobs - Npred = 0.000298515627946472)
-   2018-01-24T16:13:12: === GModels ===
-   2018-01-24T16:13:12:  Number of models ..........: 2
-   2018-01-24T16:13:12:  Number of parameters ......: 10
-   2018-01-24T16:13:12: === GModelSky ===
-   2018-01-24T16:13:12:  Name ......................: Crab
-   2018-01-24T16:13:12:  Instruments ...............: all
-   2018-01-24T16:13:12:  Instrument scale factors ..: unity
-   2018-01-24T16:13:12:  Observation identifiers ...: all
-   2018-01-24T16:13:12:  Model type ................: PointSource
-   2018-01-24T16:13:12:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
-   2018-01-24T16:13:12:  Number of parameters ......: 6
-   2018-01-24T16:13:12:  Number of spatial par's ...: 2
-   2018-01-24T16:13:12:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
-   2018-01-24T16:13:12:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
-   2018-01-24T16:13:12:  Number of spectral par's ..: 3
-   2018-01-24T16:13:12:   Prefactor ................: 5.69752531012742e-16 +/- 8.48707814807091e-18 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
-   2018-01-24T16:13:12:   Index ....................: -2.46938547601713 +/- 0.0131947771405262 [-0,-5]  (free,scale=-1,gradient)
-   2018-01-24T16:13:12:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
-   2018-01-24T16:13:12:  Number of temporal par's ..: 1
-   2018-01-24T16:13:12:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-   2018-01-24T16:13:12: === GCTAModelIrfBackground ===
-   2018-01-24T16:13:12:  Name ......................: CTABackgroundModel
-   2018-01-24T16:13:12:  Instruments ...............: CTA
-   2018-01-24T16:13:12:  Instrument scale factors ..: unity
-   2018-01-24T16:13:12:  Observation identifiers ...: all
-   2018-01-24T16:13:12:  Model type ................: "PowerLaw" * "Constant"
-   2018-01-24T16:13:12:  Number of parameters ......: 4
-   2018-01-24T16:13:12:  Number of spectral par's ..: 3
-   2018-01-24T16:13:12:   Prefactor ................: 1.00359239305231 +/- 0.0102298598204261 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
-   2018-01-24T16:13:12:   Index ....................: 0.00205626275645075 +/- 0.0063475481805347 [-5,5]  (free,scale=1,gradient)
-   2018-01-24T16:13:12:   PivotEnergy ..............: 1000000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
-   2018-01-24T16:13:12:  Number of temporal par's ..: 1
-   2018-01-24T16:13:12:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-03T12:03:41: +=========================================+
+   2019-04-03T12:03:41: | Maximum likelihood optimisation results |
+   2019-04-03T12:03:41: +=========================================+
+   2019-04-03T12:03:41: === GOptimizerLM ===
+   2019-04-03T12:03:41:  Optimized function value ..: 223321.707
+   2019-04-03T12:03:41:  Absolute precision ........: 0.005
+   2019-04-03T12:03:41:  Acceptable value decrease .: 2
+   2019-04-03T12:03:41:  Optimization status .......: converged
+   2019-04-03T12:03:41:  Number of parameters ......: 10
+   2019-04-03T12:03:41:  Number of free parameters .: 4
+   2019-04-03T12:03:41:  Number of iterations ......: 2
+   2019-04-03T12:03:41:  Lambda ....................: 1e-05
+   2019-04-03T12:03:41:  Maximum log likelihood ....: -223321.707
+   2019-04-03T12:03:41:  Observed events  (Nobs) ...: 32617.000
+   2019-04-03T12:03:41:  Predicted events (Npred) ..: 32617.000 (Nobs - Npred = 0.000131530254293466)
+   2019-04-03T12:03:41: === GModels ===
+   2019-04-03T12:03:41:  Number of models ..........: 2
+   2019-04-03T12:03:41:  Number of parameters ......: 10
+   2019-04-03T12:03:41: === GModelSky ===
+   2019-04-03T12:03:41:  Name ......................: Crab
+   2019-04-03T12:03:41:  Instruments ...............: all
+   2019-04-03T12:03:41:  Instrument scale factors ..: unity
+   2019-04-03T12:03:41:  Observation identifiers ...: all
+   2019-04-03T12:03:41:  Model type ................: PointSource
+   2019-04-03T12:03:41:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
+   2019-04-03T12:03:41:  Number of parameters ......: 6
+   2019-04-03T12:03:41:  Number of spatial par's ...: 2
+   2019-04-03T12:03:41:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
+   2019-04-03T12:03:41:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
+   2019-04-03T12:03:41:  Number of spectral par's ..: 3
+   2019-04-03T12:03:41:   Prefactor ................: 5.72698650799973e-16 +/- 8.51055978485276e-18 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+   2019-04-03T12:03:41:   Index ....................: -2.47086950206208 +/- 0.013181464993022 [-0,-5]  (free,scale=-1,gradient)
+   2019-04-03T12:03:41:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
+   2019-04-03T12:03:41:  Number of temporal par's ..: 1
+   2019-04-03T12:03:41:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-03T12:03:41: === GCTAModelIrfBackground ===
+   2019-04-03T12:03:41:  Name ......................: CTABackgroundModel
+   2019-04-03T12:03:41:  Instruments ...............: CTA
+   2019-04-03T12:03:41:  Instrument scale factors ..: unity
+   2019-04-03T12:03:41:  Observation identifiers ...: all
+   2019-04-03T12:03:41:  Model type ................: "PowerLaw" * "Constant"
+   2019-04-03T12:03:41:  Number of parameters ......: 4
+   2019-04-03T12:03:41:  Number of spectral par's ..: 3
+   2019-04-03T12:03:41:   Prefactor ................: 1.0003690756707 +/- 0.0101399127264145 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
+   2019-04-03T12:03:41:   Index ....................: 0.0011090716373709 +/- 0.00631895300124681 [-5,5]  (free,scale=1,gradient)
+   2019-04-03T12:03:41:   PivotEnergy ..............: 1000000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
+   2019-04-03T12:03:41:  Number of temporal par's ..: 1
+   2019-04-03T12:03:41:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 You can have a more fine grained control over the response function by
 specifying individual filenames for the various response components.

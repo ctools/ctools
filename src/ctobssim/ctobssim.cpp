@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2019 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -371,7 +371,7 @@ void ctobssim::run(void)
             // Simulate source events
             simulate_source(&obs_clone, models, m_rans[i], &wrklog);
 
-            // Simulate source events
+            // Simulate background events
             simulate_background(&obs_clone, models, m_rans[i], &wrklog);
 
             // Set Monte Carlo identifier and name correspondance
@@ -633,6 +633,9 @@ void ctobssim::get_parameters(void)
     else {
         setup_observations(m_obs);
     }
+
+    // Set observation boundaries
+    set_obs_bounds();
 
     // Read model definition file if required
     if (m_obs.models().size() == 0) {

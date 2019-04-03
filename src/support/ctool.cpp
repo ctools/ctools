@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2019 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -1749,80 +1749,6 @@ void ctool::set_obs_response(GCTAObservation* obs)
 
 
 /***********************************************************************//**
- * @brief Set observation boundaries for all CTA observations
- *
- * @param[in,out] obs Observation container
- *
- * Sets the observation boundaries for all CTA observations in the container
- * that contain event lists. If the energy boundaries of an event list are
- * empty, the method gets the 
- *
- *      emin:   Minimum energy (TeV)
- *      emax:   Maximum energy (TeV)
- *
- * user parameters and sets a single energy boundary element @p [emin,emax].
- *
- * If the RoI radius of the event list is invalid, the method gets the
- *
- *      rad:    Region of Interest radius (deg)
- *
- * user parameter to set the radius of the RoI, and uses the CTA pointing
- * direction to set the centre of the RoI.
- ***************************************************************************/
-void ctool::set_obs_bounds(GObservations& obs)
-{
-    // Loop over all observations in the container
-    for (int i = 0; i < obs.size(); ++i) {
-
-        // Get pointer to CTA observation
-        GCTAObservation* cta = dynamic_cast<GCTAObservation*>(obs[i]);
-
-        // Fall through if observation is not a CTA observation or if it
-        // does not contain events
-        if ((cta == NULL) || (!cta->has_events())) {
-            continue;
-        }
-
-        // Get pointer on CTA event list
-        GCTAEventList* list = const_cast<GCTAEventList*>
-                       (dynamic_cast<const GCTAEventList*>(cta->events()));
-
-        // Fall through if CTA observation does not contain an event list
-        if (list == NULL) {
-            continue;
-        }
-
-        // If there are no energy boundaries then read the "emin" and "emax"
-        // user parameters and add them
-        if (list->ebounds().is_empty()) {
-            if (has_par("emin") && (*this)["emin"].is_valid() &&
-                has_par("emax") && (*this)["emax"].is_valid()) {
-                double emin((*this)["emin"].real());
-                double emax((*this)["emax"].real());
-                GEbounds ebounds(GEnergy(emin, "TeV"),
-                                 GEnergy(emax, "TeV"));
-                list->ebounds(ebounds);
-            }
-        }
-
-        // If there is no RoI then read the "rad" user parameters and use
-        // the pointing direction to set the RoI
-        if (list->roi().radius() == 0) {
-            if (has_par("rad")) {
-                double rad = (*this)["rad"].real();
-                GCTARoi roi(GCTAInstDir(cta->pointing().dir()), rad);
-                list->roi(roi);
-            }
-        }
-
-    } // endfor: looped over observations
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
  * @brief Get observation container
  *
  * @param[in] get_response Indicates whether response information should
@@ -1907,7 +1833,7 @@ GObservations ctool::get_observations(const bool& get_response)
 
         } // endelse: file was an XML file
 
-    }
+    } // endif: "inobs" filename was specified
 
     // Return observation container
     return obs;

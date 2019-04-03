@@ -1,7 +1,7 @@
 /***************************************************************************
  *             ctobservation - Base class for observation tools            *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2019 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -112,6 +112,7 @@ public:
     %rename(_read_ogip_keywords)         read_ogip_keywords;
     %rename(_write_ogip_keywords)        write_ogip_keywords;
     %rename(_set_obs_statistic)          set_obs_statistic;
+    %rename(_set_obs_bounds)             set_obs_bounds;
     %rename(_save_events_fits)           save_events_fits;
     %rename(_save_events_xml)            save_events_xml;
 
@@ -121,6 +122,7 @@ public:
     void             read_ogip_keywords(GFitsHDU* hdu) const;
     void             write_ogip_keywords(GFitsHDU* hdu) const;
     void             set_obs_statistic(const std::string& statistic);
+    void             set_obs_bounds();
     void             save_events_fits(void);
     void             save_events_xml(void);
 };

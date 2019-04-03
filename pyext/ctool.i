@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2019 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -118,7 +118,6 @@ public:
     %rename(_set_edisp)                set_edisp;
     %rename(_restore_edisp)            restore_edisp;
     %rename(_set_obs_response)         set_obs_response;
-    %rename(_set_obs_bounds)           set_obs_bounds;
     %rename(_get_mean_pointing)        get_mean_pointing;
     %rename(_get_current_rss)          get_current_rss;
     %rename(_get_obs_header)           get_obs_header;
@@ -167,7 +166,6 @@ public:
     void              restore_edisp(GObservations& obs,
                                     const std::vector<bool>& edisp) const;
     void              set_obs_response(GCTAObservation* obs);
-    void              set_obs_bounds(GObservations& obs);
     GObservations     get_observations(const bool& get_response = true);
     GSkyDir           get_mean_pointing(const GObservations& obs);
     size_t            get_current_rss(void);

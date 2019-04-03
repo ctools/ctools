@@ -119,16 +119,6 @@ class cscript_test(ctools.cscript):
         self._restore_edisp(obs, edisp)
         return
 
-    # Check set_obs_bounds() method
-    def check_set_obs_bounds(self):
-        obs    = gammalib.GObservations()
-        events = gammalib.GCTAEventList()
-        cta    = gammalib.GCTAObservation()
-        cta.events(events)
-        obs.append(cta)
-        self._set_obs_bounds(obs)
-        return obs.copy()
-
     # Check get_mean_pointing() method
     def check_get_mean_pointing(self, obs):
         return self._get_mean_pointing(obs)
@@ -224,6 +214,17 @@ class ctobservation_test(ctools.csobservation):
         self.obs(obs)
         self._set_obs_statistic(statistic)
         return gammalib.toupper(self.obs()[0].statistic())
+
+    # Check set_obs_bounds() method
+    def check_set_obs_bounds(self):
+        obs    = gammalib.GObservations()
+        events = gammalib.GCTAEventList()
+        cta    = gammalib.GCTAObservation()
+        cta.events(events)
+        obs.append(cta)
+        self.obs(obs)
+        self._set_obs_bounds()
+        return self.obs()
 
     # Check read_ogip_keywords() and write_ogip_keywords methods
     def check_ogip_keywords(self, hdu):
@@ -346,6 +347,26 @@ class Test(test):
         """
         # Get test class
         cls = cscript_test()
+
+        # Recover User parameters
+        pars = cls.pars()
+
+        # Create a copy of the User parameters
+        cpy_pars = pars.copy()
+
+        # Clear User parameters
+        pars.clear()
+
+        # Return
+        return (cls, pars, cpy_pars)
+
+    # Setup ctobservation test class
+    def _setup_ctobservation_test(self):
+        """
+        Setup cscript test class
+        """
+        # Get test class
+        cls = ctobservation_test()
 
         # Recover User parameters
         pars = cls.pars()
@@ -908,18 +929,6 @@ class Test(test):
                                      self._datadir+'/crab_edispcube.fits',
                                      'yes')
 
-        # Test set_obs_bounds() method
-        obs = empty.check_set_obs_bounds()
-        self.test_value(obs.size(), 1, 'Check number of observations')
-        self.test_value(obs[0].events().ebounds().size(), 1,
-                        'Check number of energy boundaries')
-        self.test_value(obs[0].events().ebounds().emin().TeV(), 1.0,
-                        'Check minimum energy')
-        self.test_value(obs[0].events().ebounds().emax().TeV(), 10.0,
-                        'Check maximum energy')
-        self.test_value(obs[0].events().roi().radius(), 1.0,
-                        'Check RoI radius')
-
         # Test get_mean_pointing() method for empty observation container
         self.test_try('Check get_mean_pointing() method for empty observation '
                       'container')
@@ -1083,6 +1092,37 @@ class Test(test):
                         'CSTAT',
                         'Check set_obs_statistic("DEFAULT") for On/Off')
 
+        # Test set_obs_bounds() method
+        cls, pars, cpy_pars = self._setup_ctobservation_test()
+        pars.append(gammalib.GApplicationPar('ra','r','h','10.0','','',''))
+        pars.append(gammalib.GApplicationPar('dec','r','h','20.0','','',''))
+        pars.append(gammalib.GApplicationPar('rad','r','h','3.0','','',''))
+        pars.append(gammalib.GApplicationPar('emin','r','h','1.0','','',''))
+        pars.append(gammalib.GApplicationPar('emax','r','h','100.0','','',''))
+        pars.append(gammalib.GApplicationPar('tmin','t','h','2005-10-08T14:30:25','','',''))
+        pars.append(gammalib.GApplicationPar('tmax','t','h','2005-10-08T14:58:26','','',''))
+        obs = cls.check_set_obs_bounds()
+        self.test_value(obs.size(), 1, 'Check number of observations')
+        self.test_value(obs[0].events().gti().size(), 1,
+                        'Check number of GTIs')
+        self.test_value(obs[0].events().gti().tstart().utc(), '2005-10-08T14:30:25',
+                        'Check start time')
+        self.test_value(obs[0].events().gti().tstop().utc(), '2005-10-08T14:58:26',
+                        'Check stop time')
+        self.test_value(obs[0].events().ebounds().size(), 1,
+                        'Check number of energy boundaries')
+        self.test_value(obs[0].events().ebounds().emin().TeV(), 1.0,
+                        'Check minimum energy')
+        self.test_value(obs[0].events().ebounds().emax().TeV(), 100.0,
+                        'Check maximum energy')
+        self.test_value(obs[0].events().roi().centre().dir().ra_deg(), 10.0,
+                        'Check RoI centre Right Ascension')
+        self.test_value(obs[0].events().roi().centre().dir().dec_deg(), 20.0,
+                        'Check RoI centre Declination')
+        self.test_value(obs[0].events().roi().radius(), 3.0,
+                        'Check RoI radius')
+        cls.pars(cpy_pars)
+
         # Test read_ogip_keywords() method for empty header
         hdu = empty.check_ogip_keywords(gammalib.GFitsBinTable())
         self.test_value(hdu.string('TELESCOP'), '', 'Check "TELESCOP" keyword')
@@ -1107,7 +1147,6 @@ class Test(test):
         table.card('ONTIME', 2345.0, 'Comment')
         table.card('LIVETIME', 2210.0, 'Comment')
         table.card('EXPOSURE', 3001.0, 'Comment')
-
         hdu = empty.check_ogip_keywords(table)
         self.test_value(hdu.string('TELESCOP'), 'CTA', 'Check "TELESCOP" keyword')
         self.test_value(hdu.string('DATE-OBS'), '2018-01-01', 'Check "DATE-OBS" keyword')
