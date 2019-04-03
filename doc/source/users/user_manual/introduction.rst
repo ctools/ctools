@@ -53,9 +53,8 @@ ctools are available through the ``ctools`` module, cscripts through the
 ``cscripts`` module. The following example illustrates how data can be simulated
 from Python:
 
-.. code-block:: bash
+.. code-block:: python
 
-   $ python
    >>> import ctools
    >>> sim = ctools.ctobssim()
    >>> sim["ra"]  = 83.63
@@ -65,9 +64,8 @@ from Python:
 
 And here an example for generating a light curve from Python:
 
-.. code-block:: bash
+.. code-block:: python
 
-   $ python
    >>> import cslightcrv
    >>> lightcrv = cscripts.cslightcrv()
    >>> lightcrv.execute()
@@ -94,4 +92,27 @@ execution of a tool a new copy of the par file will be stored in the folder. If
 for some reason a parameter file got corrupt, simply delete it from ``$HOME/pfiles``
 and start again.
 
+There are two types of user parameters: those that will be queried when starting
+a tool and those that are hidden and not queried. Hidden parameters serve to
+define default values that normally need not to be changed, but exposing the
+parameters in the interface allows to change them by the user for fine tuning
+of a tool. An example for a hidden parameter of :ref:`ctobssim` is the ``seed``
+parameter to set the initial seed value of the random number generator. To set
+a hidden parameter its value has to be specified on the command line. For
+example
 
+.. code-block:: bash
+
+  $ ctobssim seed=41
+
+will run :ref:`ctobssim` with a seed value of 41. Multiple hidden parameters
+specified on the command line need to be separated by a white space. In the
+Python interface, values of hidden parameters are specified in the same way as
+values of queried parameters, e.g.
+
+.. code-block:: python
+
+   >>> import ctools
+   >>> sim = ctools.ctobssim()
+   >>> sim["seed"] = 41
+   ...

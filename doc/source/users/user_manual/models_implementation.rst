@@ -13,7 +13,7 @@ a spatial (tags ``<spatialModel>`` or ``<radialModel>``), and
 a temporal component (tag ``<temporal>``).
 
 .. math::
-  M(x,y,E,t) = M_{\rm spatial}(x,y|E) \times M_{\rm spectral}(E) \times M_{\rm temporal}(t)
+   M(p,E,t) = M_{\rm spatial}(p|E) \times M_{\rm spectral}(E) \times M_{\rm temporal}(t)
 
 In this specific example, the source component ``Crab`` describes 
 a point source at the location of the Crab nebula with a power law spectral

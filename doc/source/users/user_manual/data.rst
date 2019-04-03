@@ -16,7 +16,7 @@ is shown below.
 
 Metadata, such as the telescope pointing direction, the live time, or any other
 information that may be relevant for data processing, is stored in the FITS
-header of the event list binary table. An exemple for the metadata that is
+header of the event list binary table. An example for the metadata that is
 included in the header of the H.E.S.S. Collaboration event lists is shown
 below.
 
@@ -27,7 +27,7 @@ below.
 Every event list needs to be accompanied by a table with so-called
 :ref:`Good Time Intervals (GTIs) <glossary_gti>` where each row corresponds
 to a time interval of continuous data taking, and the two columns correspond
-to the start and stop times of these time intervals. An exemple for the GTIs
+to the start and stop times of these time intervals. An example for the GTIs
 of the H.E.S.S. event lists comprising a single GTI is shown below.
 
 .. figure:: gti.png
@@ -39,3 +39,7 @@ and that the zero-point of the MET is specified by the ``MJDREFI`` and
 ``MJDREFF`` keywords as the integer and fraction part of a Modified Julian Date
 (MJD) in the header of the GTI. The same holds also for the trigger times in
 the event list.
+
+For further information on the data format we recommend to read the
+`Data formats for gamma-ray astronomy <https://gamma-astro-data-formats.readthedocs.io/en/latest/>`_
+document.

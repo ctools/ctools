@@ -136,6 +136,8 @@ where
    \alpha = \frac{\int_\mathrm{on} d\Omega}{\int_\mathrm{off} d\Omega}
 
 is the ratio between the solid angles of the On region and the Off region.
+The terms in the last row are added so that :math:`-2 \ln L(M_s)` follows a
+:math:`\chi^2` distribution.
 
 Some special cases need to be handled separately in ``wstat``.
 If :math:`n^\mathrm{on}_i = 0` but :math:`n^\mathrm{off}_i > 0` the

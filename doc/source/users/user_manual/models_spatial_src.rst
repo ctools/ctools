@@ -347,8 +347,8 @@ Composite model
   which implements
 
   .. math::
-     M_{\rm spatial}(x,y|E) = \frac{1}{N} \sum_{i=0}^{N-1} M_{\rm spatial}^{(i)}(x,y|E)
+     M_{\rm spatial}(p|E) = \frac{1}{N} \sum_{i=0}^{N-1} M_{\rm spatial}^{(i)}(p|E)
 
-  where :math:`M_{\rm spatial}^{(i)}(x,y|E)` is any spatial model component
+  where :math:`M_{\rm spatial}^{(i)}(p|E)` is any spatial model component
   (including another composite model), and :math:`N` is the number of
   model components that are combined.
