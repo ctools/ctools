@@ -177,14 +177,9 @@ Levenberg-Marquardt algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ctools uses an iterative Levenberg-Marquardt algorithm for maximum likelihood
-estimation. Since the Levenberg-Marquardt algorithm minimizes a function, we
-use
-
-.. math::
-   f(M) = -\ln L(M)
-
-as the function to minimize by the algorithm. The Levenberg-Marquardt algorithm
-starts with an inital guess of the :ref:`model <um_models>` parameters
+estimation. Since the Levenberg-Marquardt algorithm minimises a function, we
+use :math:`-\ln L(M)` as the function to minimse. The Levenberg-Marquardt
+algorithm starts with an inital guess of the :ref:`model <um_models>` parameters
 :math:`a_k` and iteratively replaces this estimate by a new estimate
 :math:`a_k + \Delta a_k`. The :math:`\Delta a_k` are determined by solving
 
