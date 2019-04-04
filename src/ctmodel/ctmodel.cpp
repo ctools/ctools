@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmodel - Model cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2019 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -768,7 +768,7 @@ void ctmodel::get_obs(void)
             set_response(m_obs);
 
             // Set observation boundary parameters (emin, emax, rad)
-            set_obs_bounds(m_obs);
+            set_obs_bounds();
 
             // Signal that XML file should be used for storage
             m_use_xml = true;

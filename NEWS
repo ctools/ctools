@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-6 March 2019
+3 April 2019
 
 
 Introduction
@@ -42,6 +42,9 @@ None
 
 Base classes
 ------------
+The set_obs_bounds() method was moved from the ctool class to the ctobservation
+class.
+
 The ctool base class now implements a log_parameters() method that overwrites
 the base class method and that logs a warning if the tool has an "edisp"
 parameter but the parameter is set to "no" (#2842).

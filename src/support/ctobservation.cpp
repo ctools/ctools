@@ -1,7 +1,7 @@
 /***************************************************************************
  *             ctobservation - Base class for observation tools            *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2019 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -482,6 +482,127 @@ void ctobservation::set_obs_statistic(const std::string& statistic)
         }
 
     } // endfor: looped over all observations
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Set observation boundaries for CTA observations
+ *
+ * Sets the observation boundaries for all CTA observations that contain
+ * event lists if they do not yet exist.
+ *
+ * If the event list does not contain any Good Time Intervals, they are
+ * derived from the time limits provided by the @a tmin and @a tmax user
+ * parameters if they exist and are valid. Furthermore, the reference time
+ * for the Good Time Intervals is inferred from the @p mjdref parameter
+ * if it exists. Otherwise, G_CTA_MJDREF is used as reference time.
+ *
+ * If the event list does not contain energy boundaries, they are derived
+ * from the energy limits provided by the @a emin and @a emax user
+ * parameters if they exist and are valid.
+ *
+ * If the event list does not contain a valid ROI, the ROI radius is
+ * determined by the @a rad user parameter if it exists and is valid. The
+ * center is either taken from the pointing direction, and if this is not
+ * valid, it is set from the @a ra and @a dec user parameters if they exist
+ * and are valid.
+ ***************************************************************************/
+void ctobservation::set_obs_bounds(void)
+{
+    // Loop over all observations in the container
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Get pointer to CTA observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+
+        // Fall through if observation is not a CTA observation or if it
+        // does not contain events
+        if ((obs == NULL) || (!obs->has_events())) {
+            continue;
+        }
+
+        // Get pointer on CTA event list
+        GCTAEventList* list = const_cast<GCTAEventList*>
+                       (dynamic_cast<const GCTAEventList*>(obs->events()));
+
+        // Fall through if CTA observation does not contain an event list
+        if (list == NULL) {
+            continue;
+        }
+
+        // If there are no Good Time Intervals then read the "tmin" and "tmax"
+        // user parameters and add them
+        if (list->gti().is_empty()) {
+            if (has_par("tmin") && (*this)["tmin"].is_valid() &&
+                has_par("tmax") && (*this)["tmax"].is_valid()) {
+
+                // Set time reference
+                GTimeReference ref = (has_par("mjdref"))
+                ? GTimeReference((*this)["mjdref"].real(), "s", "TT", "LOCAL")
+                : GTimeReference(G_CTA_MJDREF, "s", "TT", "LOCAL");
+
+                // Get time limits
+                GTime tmin = (*this)["tmin"].time(ref);
+                GTime tmax = (*this)["tmax"].time(ref);
+
+                // Set GTI
+                GGti gti(tmin, tmax);
+
+                // Set GTI of list
+                list->gti(gti);
+
+            } // endif: "tmin" and "tmax" parameters existed and were valid
+        } // endif: GTI was not set
+
+
+        // If there are no energy boundaries then read the "emin" and "emax"
+        // user parameters and add them
+        if (list->ebounds().is_empty()) {
+            if (has_par("emin") && (*this)["emin"].is_valid() &&
+                has_par("emax") && (*this)["emax"].is_valid()) {
+                double emin((*this)["emin"].real());
+                double emax((*this)["emax"].real());
+                GEbounds ebounds(GEnergy(emin, "TeV"),
+                                 GEnergy(emax, "TeV"));
+                list->ebounds(ebounds);
+            }
+        }
+
+        // If there is no RoI then read the "rad" user parameters and use
+        // the pointing direction to set the RoI
+        if (!list->roi().is_valid()) {
+            if (has_par("rad") && (*this)["rad"].is_valid()) {
+                if (obs->pointing().is_valid() ||
+                    (has_par("ra")  && (*this)["ra"].is_valid() &&
+                     has_par("dec") && (*this)["dec"].is_valid())) {
+
+                    // Get sky direction
+                    GSkyDir dir;
+                    if (obs->pointing().is_valid()) {
+                        dir = obs->pointing().dir();
+                    }
+                    else {
+                        dir.radec_deg((*this)["ra"].real(),
+                                      (*this)["dec"].real());
+                    }
+
+                    // Get radius
+                    double rad = (*this)["rad"].real();
+
+                    // Set ROI
+                    GCTARoi roi(GCTAInstDir(dir), rad);
+
+                    // Set ROI of list
+                    list->roi(roi);
+
+                } // endif: sky direction was accessible
+            } // endif: ROI radius was accessible
+        } // endif: list had no ROI
+
+    } // endfor: looped over observations
 
     // Return
     return;

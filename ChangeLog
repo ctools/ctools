@@ -1,8 +1,9 @@
-2019-03-06
+2019-04-03
 
         * Version 1.6.0 released
         ========================
 
+        Move ctool::set_obs_bounds() to ctobservation::set_obs_bounds()
         Log warning if edisp=no (#2842)
         Fix ring background computation in ctskymap for small roiradius (#2839)
         Add max_iter parameter to ctbutterfly, cterror, ctlike, cttsmap,
