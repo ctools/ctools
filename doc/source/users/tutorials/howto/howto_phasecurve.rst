@@ -86,7 +86,7 @@ has now an associated phase value that was computed from the trigger time of
 the event.
 
 .. figure:: howto_phasecurve_events.png
-   :width: 700px
+   :width: 800px
    :align: center
 
    *Event list file with phase information for the Vela pulsar*
@@ -98,21 +98,26 @@ the following:
 
 .. code-block:: bash
 
-   $ ctselect
+   $ ctselect usepnt=no
    Input event list or observation definition XML file [events.fits] obs_vela_phased.xml
    RA for ROI centre (degrees) (0-360) [83.63] 128.838
    Dec for ROI centre (degrees) (-90-90) [22.51] -45.178
-   Radius of ROI (degrees) (0-180) [3.0] 0.2
+   Radius of ROI around pointing or specified RA/DEC (degrees) (0-180) [3.0] 0.2
    Start time (UTC string, JD, MJD or MET in seconds) [NONE]
    Lower energy limit (TeV) [0.1] 0.03
    Upper energy limit (TeV) [100.0] 160.0
    Output event list or observation definition XML file [selected_events.fits] obs_vela_phased_selected.xml
 
+.. note::
+   By default :ref:`ctselect` selects events around the pointing direction.
+   To select the events around a different sky direction, the hidden ``usepnt=no``
+   has to be passed to the tool.
+
 The selected events as a function of phase are displayed below. There is a
 clear indication for a phase dependence of the event rate.
 
 .. figure:: howto_phasecurve_phases.png
-   :width: 600px
+   :width: 500px
    :align: center
 
    *Phase histogram for events selected within 0.2 degrees of the Vela pulsar*
@@ -184,22 +189,37 @@ probability threshold to >10% by adding the attribute
 
 .. code-block:: bash
 
-   $ ctselect expr="PROB_VelaPulsar>0.1"
+   $ ctselect expr="PROB_VelaPulsar>0.1" usepnt=no forcesel=yes
    Input event list or observation definition XML file [obs_vela_phased.xml] obs_vela_phased_prob.xml
    RA for ROI centre (degrees) (0-360) [128.838]
    Dec for ROI centre (degrees) (-90-90) [-45.178]
-   Radius of ROI (degrees) (0-180) [0.2] 5.0
+   Radius of ROI around pointing or specified RA/DEC (degrees) (0-180) [0.2] 5.0
    Start time (UTC string, JD, MJD or MET in seconds) [NONE]
    Lower energy limit (TeV) [0.03]
    Upper energy limit (TeV) [160.0]
    Output event list or observation definition XML file [obs_vela_phased_selected.xml] obs_vela_phased_prob_selected.xml
+
+.. warning::
+   The ``forcesel=yes`` option is required to accomodate for non-overlapping
+   regions of interests (ROIs). The situation is illustrated in the figure
+   below. Due to the large radius of 5 degrees, the ROI selection (red) does
+   not fully overlap with the field of view of the observations (blue), leading
+   to a non-circular selection region (grey). Such data cannot be used for an
+   unbinned maximum likelihood analysis which always requires circular selection
+   regions. However, for data display, as intended here, such a selection may
+   make sense. But you should **never** try fitting such data using :ref:`ctlike`
+   or any other maximum likelihood tool.
+
+   .. figure:: howto_roi_selection.jpg
+      :width: 30%
+      :align: center
 
 The selected events as a function of phase are displayed below. The background
 is considerably reduced with respect to the simple radius cut that was
 used before, and the pulsations of the Vela pulsar are now clearly visible.
 
 .. figure:: howto_phasecurve_probphases.png
-   :width: 600px
+   :width: 500px
    :align: center
 
    *Phase histogram of events for events having a probability of >10% in originating from the Vela pulsar*
@@ -216,11 +236,11 @@ after the :ref:`ctselect` command:
 
 .. code-block:: bash
 
-   $ ctselect expr="MC_ID==91"
+   $ ctselect expr="MC_ID==91" usepnt=no forcesel=yes
    Input event list or observation definition XML file [obs_vela_phased_prob.xml] obs_vela_phased.xml
    RA for ROI centre (degrees) (0-360) [128.838]
    Dec for ROI centre (degrees) (-90-90) [-45.178]
-   Radius of ROI (degrees) (0-180) [5.0]
+   Radius of ROI around pointing or specified RA/DEC (degrees) (0-180) [5.0]
    Start time (UTC string, JD, MJD or MET in seconds) [NONE]
    Lower energy limit (TeV) [0.03]
    Upper energy limit (TeV) [160.0]
@@ -228,12 +248,12 @@ after the :ref:`ctselect` command:
 
 The resulting phase histogram is shown below. It confirms that the peaks seen
 in the event histogram do indeed correspond to the expected peaks from the Vela
-pulsar. Note that the peak has an amplitude of about 460 events, while the peak
-in the figures above is about 250 events, indicating that almost half of the
-events have been surpressed by the radius or probability cuts.
+pulsar. Note that the peak has an amplitude of about 440 events, while the peak
+above background in the figures above is about 250 events, indicating that almost
+half of the events were surpressed by the radius or probability cuts.
 
 .. figure:: howto_phasecurve_mcid.png
-   :width: 700px
+   :width: 500px
    :align: center
 
    *Distribution of Vela pulsar events as function of event phase*

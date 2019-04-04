@@ -34,16 +34,16 @@ as argument after the tool name:
 
    $ ctskymap publish=yes
    Input event list or observation definition XML file [events.fits] obs_selected.xml
+   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] GAL
+   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 0.0
    Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 0.0
-   Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR]
-   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] GAL
    Image scale (in degrees/pixel) [0.02]
    Size of the X axis in pixels [200] 400
    Size of the Y axis in pixels [200] 400
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
-   Background subtraction method (NONE|IRF) [NONE]
+   Background subtraction method (NONE|IRF|RING) [NONE]
    Output skymap file [skymap.fits]
 
 Once :ref:`ctskymap` has terminated, the resulting sky map will automatically
@@ -88,12 +88,12 @@ argument after the tool name:
 .. code-block:: bash
 
    $ ctselect publish=yes
-   Input event list or observation definition XML file [selected_gps_baseline_120380.fits]
-   RA for ROI centre (degrees) (0-360) [UNDEFINED]
-   Start time (CTA MET in seconds) [UNDEFINED]
-   Lower energy limit (TeV) [0.2]
-   Upper energy limit (TeV) [50.0]
-   Output event list or observation definition XML file [selected_gps_baseline_120380_0.2-50TeV.fits]
+   Input event list or observation definition XML file [events.fits] selected_gps_baseline_110380.fits
+   Radius of ROI around pointing or specified RA/DEC (degrees) (0-180) [3.0] NONE
+   Start time (UTC string, JD, MJD or MET in seconds) [NONE]
+   Lower energy limit (TeV) [0.1] 0.2
+   Upper energy limit (TeV) [100.0] 50.0
+   Output event list or observation definition XML file [selected_events.fits] 
 
 Once :ref:`ctselect` has terminated, the resulting event list will automatically
 appear in the

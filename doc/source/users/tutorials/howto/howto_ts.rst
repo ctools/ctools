@@ -67,7 +67,7 @@ An excerpt of the :ref:`ctlike` log file is shown below
    2018-01-25T12:46:12: === GModelSky ===
    2018-01-25T12:46:12:  Name ......................: Src001
    2018-01-25T12:46:12:  Instruments ...............: all
-   2018-01-25T12:46:12:  Test Statistic ............: 7659.64342272468
+   2018-01-25T12:46:12:  Test Statistic ............: 7659.72844228207
 
 The Test Statistic values are also written into the
 :ref:`model definition file <glossary_moddef>`
@@ -77,7 +77,7 @@ created by :ref:`ctlike`:
 
    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
    <source_library title="source library">
-     <source name="Src001" type="PointSource" ts="7659.643" tscalc="1">
+     <source name="Src001" type="PointSource" ts="7659.728" tscalc="1">
        ...
      </source>
      ...

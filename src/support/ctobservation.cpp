@@ -551,11 +551,14 @@ void ctobservation::set_obs_bounds(void)
                                       (*this)["dec"].real());
                     }
 
+                    // Get instrument direction
+                    GCTAInstDir instdir(dir);
+
                     // Get radius
                     double rad = (*this)["rad"].real();
 
                     // Set ROI
-                    GCTARoi roi(GCTAInstDir(dir), rad);
+                    GCTARoi roi(instdir, rad);
 
                     // Set ROI of list
                     list->roi(roi);

@@ -26,10 +26,10 @@ map of size 0.5 x 0.5 degrees, centred on the Galactic Centre.
    Input background cube file [NONE] bkgcube.fits
    Test source name [Crab] Test
    Input model definition XML file [$CTOOLS/share/models/crab.xml] $CTOOLS/share/models/test_cube.xml
+   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] GAL
+   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 0.0
    Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 0.0
-   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
-   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] GAL
    Image scale (in degrees/pixel) [0.02] 0.05
    Size of the X axis in pixels [200] 10
    Size of the Y axis in pixels [200] 10
@@ -73,10 +73,10 @@ The figure below shows the resulting Test Statistic map.
       Input PSF cube file [NONE] psfcube.fits
       Input background cube file [NONE] bkgcube.fits
       Input model definition XML file [$CTOOLS/share/models/crab.xml] $CTOOLS/share/models/test_cube.xml
+      Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] GAL
+      Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
       First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 0.0
       Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 0.0
-      Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
-      Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] GAL
       Image scale (in degrees/pixel) [0.02] 0.05
       Size of the X axis in pixels [200] 10
       Size of the Y axis in pixels [200] 10
@@ -90,16 +90,16 @@ The figure below shows the resulting Test Statistic map.
 
    .. code-block:: bash
 
-      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits edisp=no errors=no statistic=DEFAULT usepnt=no nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 publish=no chatter=2 clobber=yes debug=no mode=ql logL0=-447796.4353529836 binmin=0 binmax=10 outmap=tsmap_split_0.fits logfile=tsmap_split_0.log &
-      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits edisp=no errors=no statistic=DEFAULT usepnt=no nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 publish=no chatter=2 clobber=yes debug=no mode=ql logL0=-447796.4353529836 binmin=10 binmax=20 outmap=tsmap_split_1.fits logfile=tsmap_split_1.log &
-      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits edisp=no errors=no statistic=DEFAULT usepnt=no nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 publish=no chatter=2 clobber=yes debug=no mode=ql logL0=-447796.4353529836 binmin=20 binmax=30 outmap=tsmap_split_2.fits logfile=tsmap_split_2.log &
-      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits edisp=no errors=no statistic=DEFAULT usepnt=no nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 publish=no chatter=2 clobber=yes debug=no mode=ql logL0=-447796.4353529836 binmin=30 binmax=40 outmap=tsmap_split_3.fits logfile=tsmap_split_3.log &
-      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits edisp=no errors=no statistic=DEFAULT usepnt=no nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 publish=no chatter=2 clobber=yes debug=no mode=ql logL0=-447796.4353529836 binmin=40 binmax=50 outmap=tsmap_split_4.fits logfile=tsmap_split_4.log &
-      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits edisp=no errors=no statistic=DEFAULT usepnt=no nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 publish=no chatter=2 clobber=yes debug=no mode=ql logL0=-447796.4353529836 binmin=50 binmax=60 outmap=tsmap_split_5.fits logfile=tsmap_split_5.log &
-      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits edisp=no errors=no statistic=DEFAULT usepnt=no nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 publish=no chatter=2 clobber=yes debug=no mode=ql logL0=-447796.4353529836 binmin=60 binmax=70 outmap=tsmap_split_6.fits logfile=tsmap_split_6.log &
-      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits edisp=no errors=no statistic=DEFAULT usepnt=no nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 publish=no chatter=2 clobber=yes debug=no mode=ql logL0=-447796.4353529836 binmin=70 binmax=80 outmap=tsmap_split_7.fits logfile=tsmap_split_7.log &
-      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits edisp=no errors=no statistic=DEFAULT usepnt=no nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 publish=no chatter=2 clobber=yes debug=no mode=ql logL0=-447796.4353529836 binmin=80 binmax=90 outmap=tsmap_split_8.fits logfile=tsmap_split_8.log &
-      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits edisp=no errors=no statistic=DEFAULT usepnt=no nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 publish=no chatter=2 clobber=yes debug=no mode=ql logL0=-447796.4353529836 binmin=90 binmax=100 outmap=tsmap_split_9.fits logfile=tsmap_split_9.log &
+      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 logL0=-447785.5939102234 binmin=0 binmax=10 outmap=tsmap_split_0.fits logfile=tsmap_split_0.log &
+      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 logL0=-447785.5939102234 binmin=10 binmax=20 outmap=tsmap_split_1.fits logfile=tsmap_split_1.log &
+      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 logL0=-447785.5939102234 binmin=20 binmax=30 outmap=tsmap_split_2.fits logfile=tsmap_split_2.log &
+      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 logL0=-447785.5939102234 binmin=30 binmax=40 outmap=tsmap_split_3.fits logfile=tsmap_split_3.log &
+      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 logL0=-447785.5939102234 binmin=40 binmax=50 outmap=tsmap_split_4.fits logfile=tsmap_split_4.log &
+      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 logL0=-447785.5939102234 binmin=50 binmax=60 outmap=tsmap_split_5.fits logfile=tsmap_split_5.log &
+      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 logL0=-447785.5939102234 binmin=60 binmax=70 outmap=tsmap_split_6.fits logfile=tsmap_split_6.log &
+      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 logL0=-447785.5939102234 binmin=70 binmax=80 outmap=tsmap_split_7.fits logfile=tsmap_split_7.log &
+      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 logL0=-447785.5939102234 binmin=80 binmax=90 outmap=tsmap_split_8.fits logfile=tsmap_split_8.log &
+      cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 logL0=-447785.5939102234 binmin=90 binmax=100 outmap=tsmap_split_9.fits logfile=tsmap_split_9.log &
 
    Now run the ASCII file by typing
 

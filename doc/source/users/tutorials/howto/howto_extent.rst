@@ -67,29 +67,29 @@ The results can be seen in the log file and will also be written into the
 output :ref:`model definition file <glossary_moddef>`.
 For illustration, an excerpt of the :ref:`ctlike` log file is shown below.
 The disk with of ``Src003`` has been fitted to 0.326 +/- 0.005 degrees.
-The source is detected with a TS value of 960.6.
+The source is detected with a TS value of 960.3.
 
 .. code-block:: none
 
-   2018-01-25T13:18:26: === GModelSky ===
-   2018-01-25T13:18:26:  Name ......................: Src003
-   2018-01-25T13:18:26:  Instruments ...............: all
-   2018-01-25T13:18:26:  Test Statistic ............: 960.648581179907
-   2018-01-25T13:18:26:  Instrument scale factors ..: unity
-   2018-01-25T13:18:26:  Observation identifiers ...: all
-   2018-01-25T13:18:26:  Model type ................: ExtendedSource
-   2018-01-25T13:18:26:  Model components ..........: "RadialDisk" * "PowerLaw" * "Constant"
-   2018-01-25T13:18:26:  Number of parameters ......: 7
-   2018-01-25T13:18:26:  Number of spatial par's ...: 3
-   2018-01-25T13:18:26:   RA .......................: 266.317413730996 +/- 0.00715229434136355 [-360,360] deg (free,scale=1)
-   2018-01-25T13:18:26:   DEC ......................: -30.1850885371228 +/- 0.00616374863033401 [-90,90] deg (free,scale=1)
-   2018-01-25T13:18:26:   Radius ...................: 0.325758937003301 +/- 0.00480357697494016 [0.001,10] deg (free,scale=1)
-   2018-01-25T13:18:26:  Number of spectral par's ..: 3
-   2018-01-25T13:18:26:   Prefactor ................: 5.64206343830812e-17 +/- 6.90009393020621e-18 [0,5.7e-15] ph/cm2/s/MeV (free,scale=5.7e-18,gradient)
-   2018-01-25T13:18:26:   Index ....................: -2.70498667660106 +/- 0.0560039729118815 [9.92,-9.92]  (free,scale=-2.48,gradient)
-   2018-01-25T13:18:26:   PivotEnergy ..............: 300000 MeV (fixed,scale=300000,gradient)
-   2018-01-25T13:18:26:  Number of temporal par's ..: 1
-   2018-01-25T13:18:26:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-04T10:02:58: === GModelSky ===
+   2019-04-04T10:02:58:  Name ......................: Src003
+   2019-04-04T10:02:58:  Instruments ...............: all
+   2019-04-04T10:02:58:  Test Statistic ............: 960.322220887407
+   2019-04-04T10:02:58:  Instrument scale factors ..: unity
+   2019-04-04T10:02:58:  Observation identifiers ...: all
+   2019-04-04T10:02:58:  Model type ................: ExtendedSource
+   2019-04-04T10:02:58:  Model components ..........: "RadialDisk" * "PowerLaw" * "Constant"
+   2019-04-04T10:02:58:  Number of parameters ......: 7
+   2019-04-04T10:02:58:  Number of spatial par's ...: 3
+   2019-04-04T10:02:58:   RA .......................: 266.317422676847 +/- 0.00715320609048925 [-360,360] deg (free,scale=1)
+   2019-04-04T10:02:58:   DEC ......................: -30.1850853839605 +/- 0.00616458713967605 [-90,90] deg (free,scale=1)
+   2019-04-04T10:02:58:   Radius ...................: 0.325736814893164 +/- 0.00480422517891009 [0.001,10] deg (free,scale=1)
+   2019-04-04T10:02:58:  Number of spectral par's ..: 3
+   2019-04-04T10:02:58:   Prefactor ................: 5.63906592494167e-17 +/- 6.89890876156083e-18 [0,5.7e-15] ph/cm2/s/MeV (free,scale=5.7e-18,gradient)
+   2019-04-04T10:02:58:   Index ....................: -2.7048301145616 +/- 0.0560202225832113 [9.92,-9.92]  (free,scale=-2.48,gradient)
+   2019-04-04T10:02:58:   PivotEnergy ..............: 300000 MeV (fixed,scale=300000,gradient)
+   2019-04-04T10:02:58:  Number of temporal par's ..: 1
+   2019-04-04T10:02:58:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 .. warning::
    The parameter errors returned by :ref:`ctlike` are purely statistical. In
@@ -102,7 +102,7 @@ Now generate a residual map using :ref:`csresmap` to check the fit quality
 .. code-block:: bash
 
    $ csresmap
-   Input event list, counts cube, or observation definition XML file [cntmap.fits] cntcube.fits
+   Input event list, counts cube, or observation definition XML file [events.fits] cntcube.fits
    Input model cube file (generated with ctmodel) [NONE]
    Input exposure cube file [NONE] expcube.fits
    Input PSF cube file [NONE] psfcube.fits

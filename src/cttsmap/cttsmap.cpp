@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    cttsmap - TS map calculation tool                    *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2018 by Michael Mayer                               *
+ *  copyright (C) 2014-2019 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -274,9 +274,14 @@ void cttsmap::run(void)
         log_header2(EXPLICIT, "Computing TS for bin number "+gammalib::str(i)+
                     " at "+bincentre.print());
 
+        // Sets unique test source name. This avoids caching of response
+        // values
+        std::string srcname = m_srcname + "_" + gammalib::str(i);
+
     	// Add test source at current bin position
         (*m_testsource)["RA"].value(bincentre.ra_deg());
         (*m_testsource)["DEC"].value(bincentre.dec_deg());
+        m_testsource->name(srcname);
         models.append(*m_testsource);
 
     	// Assign models to observations
@@ -310,7 +315,7 @@ void cttsmap::run(void)
 
     	// Get test source model instance
     	GModels best_fit_model = m_obs.models();
-    	GModel* testsource     = best_fit_model[m_srcname];
+    	GModel* testsource     = best_fit_model[srcname];
 
     	// Assign values to the maps
     	m_tsmap(i) = ts;
@@ -340,7 +345,7 @@ void cttsmap::run(void)
         m_statusmap(i) = status;
 
     	// Remove model from container
-    	models.remove(m_srcname);
+    	models.remove(srcname);
 
     } // endfor: looped over grid positions
 
@@ -375,7 +380,7 @@ void cttsmap::save(void)
 
         // Get TS map filename
         m_outmap = (*this)["outmap"].filename();
-    
+
         // Create fits file
         GFits fits;
 
@@ -564,7 +569,7 @@ void cttsmap::get_parameters(void)
     GSkyMap map = create_map(m_obs);
 
     // Check if errors should be computed
-    m_errors  = (*this)["errors"].boolean();
+    m_errors = (*this)["errors"].boolean();
 
     // Initialise maps from user parameters
     init_maps(map);
@@ -638,7 +643,7 @@ void cttsmap::init_maps(const GSkyMap& map)
             m_mapnames.push_back("e_" + (*m_testsource)[i].name());
 
         } // endif: error calculation was requested
-        
+
     } // endfor: looped over all model parameters
 
     // Return

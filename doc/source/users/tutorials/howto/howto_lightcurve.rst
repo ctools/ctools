@@ -32,16 +32,16 @@ The time interval is linearly divided into 5 time bins.
    $ cslightcrv
    Input event list or observation definition XML file [events.fits] obs_selected.xml
    Input model definition XML file [$CTOOLS/share/models/crab.xml] $CTOOLS/share/models/1dc_howto_unbinned.xml
-   Source name [Crab] Src002
    Algorithm for defining time bins (FILE|LIN|GTI) [GTI] LIN
    Lightcurve start time (UTC string, JD, MJD or MET in seconds) [MJD 51544.5] MJD 59235.5
    Lightcurve stop time (UTC string, JD, MJD or MET in seconds) [MJD 51544.6] MJD 59236.0
    Number of time bins (1-10000) [5]
    Analysis method (3D|ONOFF) [3D]
-   Lower energy limit of events (TeV) [0.1] 1.0
-   Upper energy limit of events (TeV) [100.0] 100.0
+   Source name [Crab] Src002
+   Lower energy limit of events (TeV) [0.1]
+   Upper energy limit of events (TeV) [100.0]
    Number of energy bins for binned (0=unbinned for 3D analysis only) (0-100) [0]
-   Output light curve file [lightcurve.fits]
+   Output light curve file [lightcurve.fits] 
 
 The resulting light curve is shown in the figure below.
 

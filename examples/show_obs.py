@@ -108,7 +108,7 @@ def plot_information(info, ra, dec, plotfile):
     if info['offset'].boolean() and ebounds.size() > 0:
         ncols += 1
     iplot = 1
-    plt.figure()
+    plt.figure(figsize=(10,6))
     plt.subplot(nrows, ncols, iplot)
 
     # Plot zenith angle histogram
@@ -167,6 +167,9 @@ def plot_information(info, ra, dec, plotfile):
     plt.xlabel('Time (MJD)')
     plt.ylabel('Zenith Angle (deg)')
     plt.title('Observation time')
+
+    # Adjust
+    plt.tight_layout()
 
     # Show plots or save it into file
     if len(plotfile) > 0:
