@@ -533,44 +533,6 @@ void ctobservation::set_obs_bounds(void)
             continue;
         }
 
-        // If there are no Good Time Intervals then read the "tmin" and "tmax"
-        // user parameters and add them
-        if (list->gti().is_empty()) {
-            if (has_par("tmin") && (*this)["tmin"].is_valid() &&
-                has_par("tmax") && (*this)["tmax"].is_valid()) {
-
-                // Set time reference
-                GTimeReference ref = (has_par("mjdref"))
-                ? GTimeReference((*this)["mjdref"].real(), "s", "TT", "LOCAL")
-                : GTimeReference(G_CTA_MJDREF, "s", "TT", "LOCAL");
-
-                // Get time limits
-                GTime tmin = (*this)["tmin"].time(ref);
-                GTime tmax = (*this)["tmax"].time(ref);
-
-                // Set GTI
-                GGti gti(tmin, tmax);
-
-                // Set GTI of list
-                list->gti(gti);
-
-            } // endif: "tmin" and "tmax" parameters existed and were valid
-        } // endif: GTI was not set
-
-
-        // If there are no energy boundaries then read the "emin" and "emax"
-        // user parameters and add them
-        if (list->ebounds().is_empty()) {
-            if (has_par("emin") && (*this)["emin"].is_valid() &&
-                has_par("emax") && (*this)["emax"].is_valid()) {
-                double emin((*this)["emin"].real());
-                double emax((*this)["emax"].real());
-                GEbounds ebounds(GEnergy(emin, "TeV"),
-                                 GEnergy(emax, "TeV"));
-                list->ebounds(ebounds);
-            }
-        }
-
         // If there is no RoI then read the "rad" user parameters and use
         // the pointing direction to set the RoI
         if (!list->roi().is_valid()) {
@@ -601,6 +563,43 @@ void ctobservation::set_obs_bounds(void)
                 } // endif: sky direction was accessible
             } // endif: ROI radius was accessible
         } // endif: list had no ROI
+
+        // If there are no energy boundaries then read the "emin" and "emax"
+        // user parameters and add them
+        if (list->ebounds().is_empty()) {
+            if (has_par("emin") && (*this)["emin"].is_valid() &&
+                has_par("emax") && (*this)["emax"].is_valid()) {
+                double emin((*this)["emin"].real());
+                double emax((*this)["emax"].real());
+                GEbounds ebounds(GEnergy(emin, "TeV"),
+                                 GEnergy(emax, "TeV"));
+                list->ebounds(ebounds);
+            }
+        }
+
+        // If there are no Good Time Intervals then read the "tmin" and "tmax"
+        // user parameters and add them
+        if (list->gti().is_empty()) {
+            if (has_par("tmin") && (*this)["tmin"].is_valid() &&
+                has_par("tmax") && (*this)["tmax"].is_valid()) {
+
+                // Set time reference
+                GTimeReference ref = (has_par("mjdref"))
+                ? GTimeReference((*this)["mjdref"].real(), "s", "TT", "LOCAL")
+                : GTimeReference(G_CTA_MJDREF, "s", "TT", "LOCAL");
+
+                // Get time limits
+                GTime tmin = (*this)["tmin"].time(ref);
+                GTime tmax = (*this)["tmax"].time(ref);
+
+                // Set GTI
+                GGti gti(tmin, tmax);
+
+                // Set GTI of list
+                list->gti(gti);
+
+            } // endif: "tmin" and "tmax" parameters existed and were valid
+        } // endif: GTI was not set
 
     } // endfor: looped over observations
 
