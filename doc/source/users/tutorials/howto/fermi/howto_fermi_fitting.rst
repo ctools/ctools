@@ -92,95 +92,95 @@ log file ``ctlike.log`` that was also created by :ref:`ctlike`:
 
 .. code-block:: none
 
-   2018-01-25T20:07:55: +=================================+
-   2018-01-25T20:07:55: | Maximum likelihood optimisation |
-   2018-01-25T20:07:55: +=================================+
-   2018-01-25T20:07:57:  >Iteration   0: -logL=-177232.327, Lambda=1.0e-03
-   2018-01-25T20:07:58:  >Iteration   1: -logL=-198931.136, Lambda=1.0e-03, delta=21698.809, step=1.0e+00, max(|grad|)=-22717.063466 [CutoffEnergy:4]
-   2018-01-25T20:07:58:  >Iteration   2: -logL=-200269.888, Lambda=1.0e-04, delta=1338.753, step=1.0e+00, max(|grad|)=-67629.683771 [CutoffEnergy:4]
-   2018-01-25T20:07:59:  >Iteration   3: -logL=-212351.965, Lambda=1.0e-05, delta=12082.076, step=1.0e+00, max(|grad|)=23026.802421 [Index2:6]
-   2018-01-25T20:07:59:  >Iteration   4: -logL=-213954.259, Lambda=1.0e-06, delta=1602.294, step=1.0e+00, max(|grad|)=-8297.380912 [CutoffEnergy:4]
-   2018-01-25T20:07:59:  >Iteration   5: -logL=-215347.973, Lambda=1.0e-07, delta=1393.714, step=1.0e+00, max(|grad|)=2746.754042 [Index2:6]
-   2018-01-25T20:08:00:  >Iteration   6: -logL=-215497.807, Lambda=1.0e-08, delta=149.834, step=1.0e+00, max(|grad|)=699.848484 [Index2:6]
-   2018-01-25T20:08:00:   Iteration   7: -logL=-215497.807, Lambda=1.0e-09, delta=-13.845, step=1.0e+00, max(|grad|)=-1201.982875 [Index1:3] (stalled)
-   2018-01-25T20:08:01:   Iteration   8: -logL=-215497.807, Lambda=1.0e-08, delta=-13.844, step=1.0e+00, max(|grad|)=-1201.959647 [Index1:3] (stalled)
-   2018-01-25T20:08:01:   Iteration   9: -logL=-215497.807, Lambda=1.0e-07, delta=-13.835, step=1.0e+00, max(|grad|)=-1201.727401 [Index1:3] (stalled)
-   2018-01-25T20:08:02:   Iteration  10: -logL=-215497.807, Lambda=1.0e-06, delta=-13.744, step=1.0e+00, max(|grad|)=-1199.408717 [Index1:3] (stalled)
-   2018-01-25T20:08:02:   Iteration  11: -logL=-215497.807, Lambda=1.0e-05, delta=-12.858, step=1.0e+00, max(|grad|)=-1176.594021 [Index1:3] (stalled)
-   2018-01-25T20:08:03:   Iteration  12: -logL=-215497.807, Lambda=1.0e-04, delta=-6.126, step=1.0e+00, max(|grad|)=-980.833963 [Index1:3] (stalled)
-   2018-01-25T20:08:04:  >Iteration  13: -logL=-215503.803, Lambda=1.0e-03, delta=5.995, step=1.0e+00, max(|grad|)=-285.964915 [Index1:3]
-   2018-01-25T20:08:04:   Iteration  14: -logL=-215503.803, Lambda=1.0e-04, delta=-8.762, step=1.0e+00, max(|grad|)=-730.461326 [Index1:3] (stalled)
-   2018-01-25T20:08:05:  >Iteration  15: -logL=-215504.976, Lambda=1.0e-03, delta=1.173, step=1.0e+00, max(|grad|)=-153.941336 [Index1:3]
-   2018-01-25T20:08:05:   Iteration  16: -logL=-215503.593, Lambda=1.0e-04, delta=-1.383, step=1.0e+00, max(|grad|)=-327.368445 [Index1:3] (stalled)
-   2018-01-25T20:08:06:  >Iteration  17: -logL=-215505.817, Lambda=1.0e-03, delta=2.225, step=1.0e+00, max(|grad|)=3.256216 [Index2:6]
-   2018-01-25T20:08:06:  >Iteration  18: -logL=-215505.824, Lambda=1.0e-04, delta=0.007, step=1.0e+00, max(|grad|)=-8.190316 [CutoffEnergy:4]
-   2018-01-25T20:08:06:  >Iteration  19: -logL=-215505.826, Lambda=1.0e-05, delta=0.002, step=1.0e+00, max(|grad|)=0.635263 [Index2:6]
-   2018-01-25T20:08:07:
-   2018-01-25T20:08:07: +=========================================+
-   2018-01-25T20:08:07: | Maximum likelihood optimisation results |
-   2018-01-25T20:08:07: +=========================================+
-   2018-01-25T20:08:07: === GOptimizerLM ===
-   2018-01-25T20:08:07:  Optimized function value ..: -215505.826
-   2018-01-25T20:08:07:  Absolute precision ........: 0.005
-   2018-01-25T20:08:07:  Acceptable value decrease .: 2
-   2018-01-25T20:08:07:  Optimization status .......: converged
-   2018-01-25T20:08:07:  Number of parameters ......: 14
-   2018-01-25T20:08:07:  Number of free parameters .: 7
-   2018-01-25T20:08:07:  Number of iterations ......: 19
-   2018-01-25T20:08:07:  Lambda ....................: 1e-06
-   2018-01-25T20:08:07:  Maximum log likelihood ....: 215505.826
-   2018-01-25T20:08:07:  Observed events  (Nobs) ...: 202330.000
-   2018-01-25T20:08:07:  Predicted events (Npred) ..: 202318.925 (Nobs - Npred = 11.0749561789562)
-   2018-01-25T20:08:07: === GModels ===
-   2018-01-25T20:08:07:  Number of models ..........: 3
-   2018-01-25T20:08:07:  Number of parameters ......: 14
-   2018-01-25T20:08:07: === GModelSky ===
-   2018-01-25T20:08:07:  Name ......................: Vela
-   2018-01-25T20:08:07:  Instruments ...............: all
-   2018-01-25T20:08:07:  Instrument scale factors ..: unity
-   2018-01-25T20:08:07:  Observation identifiers ...: all
-   2018-01-25T20:08:07:  Model type ................: PointSource
-   2018-01-25T20:08:07:  Model components ..........: "PointSource" * "SuperExponentialCutoffPowerLaw" * "Constant"
-   2018-01-25T20:08:07:  Number of parameters ......: 8
-   2018-01-25T20:08:07:  Number of spatial par's ...: 2
-   2018-01-25T20:08:07:   RA .......................: 128.835772118429 +/- 0.00162177813558897 [-360,360] deg (free,scale=1)
-   2018-01-25T20:08:07:   DEC ......................: -45.1835812138884 +/- 0.00114069728792873 [-90,90] deg (free,scale=1)
-   2018-01-25T20:08:07:  Number of spectral par's ..: 5
-   2018-01-25T20:08:07:   Prefactor ................: 4.35032346821964e-09 +/- 4.73845090178596e-10 [1e-16,1e-06] ph/cm2/s/MeV (free,scale=1e-09,gradient)
-   2018-01-25T20:08:07:   Index1 ...................: -1.34367731366247 +/- 0.031088811599731 [-0,-5]  (free,scale=-1,gradient)
-   2018-01-25T20:08:07:   CutoffEnergy .............: 990.275379109663 +/- 181.814299583364 [1,1000000] MeV (free,scale=1000,gradient)
-   2018-01-25T20:08:07:   PivotEnergy ..............: 1000 [10,1000000] MeV (fixed,scale=1000,gradient)
-   2018-01-25T20:08:07:   Index2 ...................: 0.587550117179991 +/- 0.0279192539614008 [0.1,5]  (free,scale=1,gradient)
-   2018-01-25T20:08:07:  Number of temporal par's ..: 1
-   2018-01-25T20:08:07:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-   2018-01-25T20:08:07: === GModelSky ===
-   2018-01-25T20:08:07:  Name ......................: Galactic_diffuse
-   2018-01-25T20:08:07:  Instruments ...............: all
-   2018-01-25T20:08:07:  Instrument scale factors ..: unity
-   2018-01-25T20:08:07:  Observation identifiers ...: all
-   2018-01-25T20:08:07:  Model type ................: DiffuseSource
-   2018-01-25T20:08:07:  Model components ..........: "DiffuseMapCube" * "Constant" * "Constant"
-   2018-01-25T20:08:07:  Number of parameters ......: 3
-   2018-01-25T20:08:07:  Number of spatial par's ...: 1
-   2018-01-25T20:08:07:   Normalization ............: 1 [0.1,10]  (fixed,scale=1,gradient)
-   2018-01-25T20:08:07:  Number of spectral par's ..: 1
-   2018-01-25T20:08:07:   Normalization ............: 1.10941973066973 +/- 0.00503412002598653 [0.1,1000]  (free,scale=1,gradient)
-   2018-01-25T20:08:07:  Number of temporal par's ..: 1
-   2018-01-25T20:08:07:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-   2018-01-25T20:08:07: === GModelSky ===
-   2018-01-25T20:08:07:  Name ......................: Extragalactic_diffuse
-   2018-01-25T20:08:07:  Instruments ...............: all
-   2018-01-25T20:08:07:  Instrument scale factors ..: unity
-   2018-01-25T20:08:07:  Observation identifiers ...: all
-   2018-01-25T20:08:07:  Model type ................: DiffuseSource
-   2018-01-25T20:08:07:  Model components ..........: "DiffuseIsotropic" * "FileFunction" * "Constant"
-   2018-01-25T20:08:07:  Number of parameters ......: 3
-   2018-01-25T20:08:07:  Number of spatial par's ...: 1
-   2018-01-25T20:08:07:   Value ....................: 1 [0,10]  (fixed,scale=1,gradient)
-   2018-01-25T20:08:07:  Number of spectral par's ..: 1
-   2018-01-25T20:08:07:   Normalization ............: 1 [0,1000]  (fixed,scale=1,gradient)
-   2018-01-25T20:08:07:  Number of temporal par's ..: 1
-   2018-01-25T20:08:07:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-04T14:34:18: +=================================+
+   2019-04-04T14:34:18: | Maximum likelihood optimisation |
+   2019-04-04T14:34:18: +=================================+
+   2019-04-04T14:34:20:  >Iteration   0: -logL=-177232.327, Lambda=1.0e-03
+   2019-04-04T14:34:20:  >Iteration   1: -logL=-198931.136, Lambda=1.0e-03, delta=21698.809, step=1.0e+00, max(|grad|)=-22717.063466 [CutoffEnergy:4]
+   2019-04-04T14:34:21:  >Iteration   2: -logL=-200269.888, Lambda=1.0e-04, delta=1338.753, step=1.0e+00, max(|grad|)=-67629.683813 [CutoffEnergy:4]
+   2019-04-04T14:34:21:  >Iteration   3: -logL=-212351.965, Lambda=1.0e-05, delta=12082.076, step=1.0e+00, max(|grad|)=23026.802441 [Index2:6]
+   2019-04-04T14:34:22:  >Iteration   4: -logL=-213954.259, Lambda=1.0e-06, delta=1602.294, step=1.0e+00, max(|grad|)=-8297.380921 [CutoffEnergy:4]
+   2019-04-04T14:34:22:  >Iteration   5: -logL=-215347.973, Lambda=1.0e-07, delta=1393.714, step=1.0e+00, max(|grad|)=2746.754045 [Index2:6]
+   2019-04-04T14:34:23:  >Iteration   6: -logL=-215497.807, Lambda=1.0e-08, delta=149.834, step=1.0e+00, max(|grad|)=699.848487 [Index2:6]
+   2019-04-04T14:34:23:   Iteration   7: -logL=-215497.807, Lambda=1.0e-09, delta=-13.845, step=1.0e+00, max(|grad|)=-1201.982876 [Index1:3] (stalled)
+   2019-04-04T14:34:24:   Iteration   8: -logL=-215497.807, Lambda=1.0e-08, delta=-13.844, step=1.0e+00, max(|grad|)=-1201.959648 [Index1:3] (stalled)
+   2019-04-04T14:34:24:   Iteration   9: -logL=-215497.807, Lambda=1.0e-07, delta=-13.835, step=1.0e+00, max(|grad|)=-1201.727402 [Index1:3] (stalled)
+   2019-04-04T14:34:24:   Iteration  10: -logL=-215497.807, Lambda=1.0e-06, delta=-13.744, step=1.0e+00, max(|grad|)=-1199.408718 [Index1:3] (stalled)
+   2019-04-04T14:34:25:   Iteration  11: -logL=-215497.807, Lambda=1.0e-05, delta=-12.858, step=1.0e+00, max(|grad|)=-1176.594022 [Index1:3] (stalled)
+   2019-04-04T14:34:26:   Iteration  12: -logL=-215497.807, Lambda=1.0e-04, delta=-6.126, step=1.0e+00, max(|grad|)=-980.833964 [Index1:3] (stalled)
+   2019-04-04T14:34:26:  >Iteration  13: -logL=-215503.803, Lambda=1.0e-03, delta=5.995, step=1.0e+00, max(|grad|)=-285.964915 [Index1:3]
+   2019-04-04T14:34:27:   Iteration  14: -logL=-215503.803, Lambda=1.0e-04, delta=-8.762, step=1.0e+00, max(|grad|)=-730.461327 [Index1:3] (stalled)
+   2019-04-04T14:34:27:  >Iteration  15: -logL=-215504.976, Lambda=1.0e-03, delta=1.173, step=1.0e+00, max(|grad|)=-153.941337 [Index1:3]
+   2019-04-04T14:34:28:   Iteration  16: -logL=-215503.593, Lambda=1.0e-04, delta=-1.383, step=1.0e+00, max(|grad|)=-327.368446 [Index1:3] (stalled)
+   2019-04-04T14:34:28:  >Iteration  17: -logL=-215505.817, Lambda=1.0e-03, delta=2.225, step=1.0e+00, max(|grad|)=3.256215 [Index2:6]
+   2019-04-04T14:34:29:  >Iteration  18: -logL=-215505.824, Lambda=1.0e-04, delta=0.007, step=1.0e+00, max(|grad|)=-8.190315 [CutoffEnergy:4]
+   2019-04-04T14:34:29:  >Iteration  19: -logL=-215505.826, Lambda=1.0e-05, delta=0.002, step=1.0e+00, max(|grad|)=0.635264 [Index2:6]
+   2019-04-04T14:34:30:
+   2019-04-04T14:34:30: +=========================================+
+   2019-04-04T14:34:30: | Maximum likelihood optimisation results |
+   2019-04-04T14:34:30: +=========================================+
+   2019-04-04T14:34:30: === GOptimizerLM ===
+   2019-04-04T14:34:30:  Optimized function value ..: -215505.826
+   2019-04-04T14:34:30:  Absolute precision ........: 0.005
+   2019-04-04T14:34:30:  Acceptable value decrease .: 2
+   2019-04-04T14:34:30:  Optimization status .......: converged
+   2019-04-04T14:34:30:  Number of parameters ......: 14
+   2019-04-04T14:34:30:  Number of free parameters .: 7
+   2019-04-04T14:34:30:  Number of iterations ......: 19
+   2019-04-04T14:34:30:  Lambda ....................: 1e-06
+   2019-04-04T14:34:30:  Maximum log likelihood ....: 215505.826
+   2019-04-04T14:34:30:  Observed events  (Nobs) ...: 202330.000
+   2019-04-04T14:34:30:  Predicted events (Npred) ..: 202318.925 (Nobs - Npred = 11.0749567862367)
+   2019-04-04T14:34:30: === GModels ===
+   2019-04-04T14:34:30:  Number of models ..........: 3
+   2019-04-04T14:34:30:  Number of parameters ......: 14
+   2019-04-04T14:34:30: === GModelSky ===
+   2019-04-04T14:34:30:  Name ......................: Vela
+   2019-04-04T14:34:30:  Instruments ...............: all
+   2019-04-04T14:34:30:  Instrument scale factors ..: unity
+   2019-04-04T14:34:30:  Observation identifiers ...: all
+   2019-04-04T14:34:30:  Model type ................: PointSource
+   2019-04-04T14:34:30:  Model components ..........: "PointSource" * "SuperExponentialCutoffPowerLaw" * "Constant"
+   2019-04-04T14:34:30:  Number of parameters ......: 8
+   2019-04-04T14:34:30:  Number of spatial par's ...: 2
+   2019-04-04T14:34:30:   RA .......................: 128.835772118406 +/- 0.00162177814111823 [-360,360] deg (free,scale=1)
+   2019-04-04T14:34:30:   DEC ......................: -45.1835812138759 +/- 0.00114069728372229 [-90,90] deg (free,scale=1)
+   2019-04-04T14:34:30:  Number of spectral par's ..: 5
+   2019-04-04T14:34:30:   Prefactor ................: 4.35032346843698e-09 +/- 4.73845090232622e-10 [1e-16,1e-06] ph/cm2/s/MeV (free,scale=1e-09,gradient)
+   2019-04-04T14:34:30:   Index1 ...................: -1.34367731364905 +/- 0.0310888116010815 [-0,-5]  (free,scale=-1,gradient)
+   2019-04-04T14:34:30:   CutoffEnergy .............: 990.275379021926 +/- 181.814299577731 [1,1000000] MeV (free,scale=1000,gradient)
+   2019-04-04T14:34:30:   PivotEnergy ..............: 1000 [10,1000000] MeV (fixed,scale=1000,gradient)
+   2019-04-04T14:34:30:   Index2 ...................: 0.58755011716699 +/- 0.027919253961318 [0.1,5]  (free,scale=1,gradient)
+   2019-04-04T14:34:30:  Number of temporal par's ..: 1
+   2019-04-04T14:34:30:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-04T14:34:30: === GModelSky ===
+   2019-04-04T14:34:30:  Name ......................: Galactic_diffuse
+   2019-04-04T14:34:30:  Instruments ...............: all
+   2019-04-04T14:34:30:  Instrument scale factors ..: unity
+   2019-04-04T14:34:30:  Observation identifiers ...: all
+   2019-04-04T14:34:30:  Model type ................: DiffuseSource
+   2019-04-04T14:34:30:  Model components ..........: "DiffuseMapCube" * "Constant" * "Constant"
+   2019-04-04T14:34:30:  Number of parameters ......: 3
+   2019-04-04T14:34:30:  Number of spatial par's ...: 1
+   2019-04-04T14:34:30:   Normalization ............: 1 [0.1,10]  (fixed,scale=1,gradient)
+   2019-04-04T14:34:30:  Number of spectral par's ..: 1
+   2019-04-04T14:34:30:   Normalization ............: 1.10941973066989 +/- 0.00503412002600817 [0.1,1000]  (free,scale=1,gradient)
+   2019-04-04T14:34:30:  Number of temporal par's ..: 1
+   2019-04-04T14:34:30:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-04T14:34:30: === GModelSky ===
+   2019-04-04T14:34:30:  Name ......................: Extragalactic_diffuse
+   2019-04-04T14:34:30:  Instruments ...............: all
+   2019-04-04T14:34:30:  Instrument scale factors ..: unity
+   2019-04-04T14:34:30:  Observation identifiers ...: all
+   2019-04-04T14:34:30:  Model type ................: DiffuseSource
+   2019-04-04T14:34:30:  Model components ..........: "DiffuseIsotropic" * "FileFunction" * "Constant"
+   2019-04-04T14:34:30:  Number of parameters ......: 3
+   2019-04-04T14:34:30:  Number of spatial par's ...: 1
+   2019-04-04T14:34:30:   Value ....................: 1 [0,10]  (fixed,scale=1,gradient)
+   2019-04-04T14:34:30:  Number of spectral par's ..: 1
+   2019-04-04T14:34:30:   Normalization ............: 1 [0,1000]  (fixed,scale=1,gradient)
+   2019-04-04T14:34:30:  Number of temporal par's ..: 1
+   2019-04-04T14:34:30:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 The fit converged after 19 iterations with spectral parameters that are
 reasonably close to those found in
@@ -241,9 +241,9 @@ using the Fermi-LAT Science Tools.
 
    .. code-block:: none
 
-      2018-01-25T20:05:57:  Name ......................: Vela
-      2018-01-25T20:05:57:  Instruments ...............: all
-      2018-01-25T20:05:57:  Test Statistic ............: 326341.439917148
+      2019-04-04T14:37:50:  Name ......................: Vela
+      2019-04-04T14:37:50:  Instruments ...............: all
+      2019-04-04T14:37:50:  Test Statistic ............: 326341.43991719
 
    which is also close to the value determined by gtlike.
 

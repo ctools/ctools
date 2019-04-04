@@ -20,14 +20,14 @@ source. You do this by using the :ref:`cttsmap` tool as follows:
    Input event list, counts cube or observation definition XML file [events.fits] obs.xml
    Test source name [Crab] Vela
    Input model definition XML file [$CTOOLS/share/models/crab.xml] vela_results.xml
+   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 128.84
    Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] -45.18
-   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
-   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Image scale (in degrees/pixel) [0.02] 0.3
    Size of the X axis in pixels [200] 10
    Size of the Y axis in pixels [200] 10
-   Output Test Statistic map file [tsmap.fits]
+   Output Test Statistic map file [tsmap.fits] 
 
 :ref:`cttsmap` created a 10 x 10 pixels map with a pixel size of 0.3 degrees
 around the location of the Vela pulsar and saved the result in the FITS file

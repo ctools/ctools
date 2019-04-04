@@ -20,7 +20,7 @@ for the source. To do this you first have to add an additional source to the
    <source_library title="source library">
      <source type="PointSource" name="Test">
        <spectrum type="PowerLaw">
-         <parameter name="PhotonFlux" scale="1e-12" value="1.0"      min="1e-07" max="1000.0"       free="1"/>
+         <parameter name="PhotonFlux" scale="1e-12" value="1.0"      min="1e-07" max="1e+07"     free="1"/>
          <parameter name="Index"      scale="1.0"   value="-2.0"     min="-5.0"  max="+5.0"      free="0"/>
          <parameter name="LowerLimit" scale="1.0"   value="100.0"    min="10.0"  max="1000000.0" free="0"/>
          <parameter name="UpperLimit" scale="1.0"   value="100000.0" min="10.0"  max="1000000.0" free="0"/>
@@ -53,9 +53,9 @@ The results of the upper limit computation can then be extracted from the
 
 .. code-block:: bash
 
-   2018-01-25T20:43:02: +=====================+
-   2018-01-25T20:43:02: | Upper limit results |
-   2018-01-25T20:43:02: +=====================+
-   2018-01-25T20:43:02:  Differential flux limit ...: 1.00100099727198e-13 ph/cm2/s/MeV at 0.001 TeV
-   2018-01-25T20:43:02:  Integral flux limit .......: 9.9999999627471e-10 ph/cm2/s within [0.0001-0.1] TeV
-   2018-01-25T20:43:02:  Energy flux limit .........: 1.10785216561628e-12 erg/cm2/s within [0.0001-0.1] TeV
+   2019-04-04T15:03:22: +=====================+
+   2019-04-04T15:03:22: | Upper limit results |
+   2019-04-04T15:03:22: +=====================+
+   2019-04-04T15:03:22:  Differential flux limit ...: 1.77270316013682e-13 ph/cm2/s/MeV at 0.001 TeV
+   2019-04-04T15:03:22:  Integral flux limit .......: 1.77093045697669e-09 ph/cm2/s within [0.0001-0.1] TeV
+   2019-04-04T15:03:22:  Energy flux limit .........: 1.96192914922622e-12 erg/cm2/s within [0.0001-0.1] TeV
