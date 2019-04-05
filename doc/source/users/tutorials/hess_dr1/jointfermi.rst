@@ -1,4 +1,4 @@
-.. _hess_dr1_data:
+.. _hess_dr1_fermi:
 
 Joint analysis of H.E.S.S. and Fermi data
 =========================================

@@ -22,7 +22,7 @@ infile,      f, a, runlist.lis,,, "Input runlist file"
 inmodel,     f, h, NONE,,, "Input model definition XML file (optional)"
 master_indx, s, h, master.json,,, "Input master index file"
 outobs,      f, a, obs.xml,,, "Output observation definition XML file"
-outmodel,    f, a, bgmodels.xml,,, "Output model definition XML file"
+outmodel,    f, a, bkgmodels.xml,,, "Output model definition XML file"
 
 #
 # Script parameters
@@ -31,7 +31,7 @@ bkgpars,          i, a, 1,,, "Number of free parameters per background model"
 bkg_scale,        b, h, yes,,, "Apply background scaling factor from observation index file if available?"
 ev_hiera,         s, h, events,,, "Hierarchy of event formats"
 aeff_hiera,       s, h, aeff_2d,,, "Hierarchy of effective area formats"
-psf_hiera,        s, h, psf_king|psf_3gauss,,, "Hierarchy of psf formats"
+psf_hiera,        s, h, psf_king|psf_3gauss|psf_table,,, "Hierarchy of psf formats"
 edisp_hiera,      s, h, edisp_2d,,, "Hierarchy of energy dispersion formats"
 bkg_hiera,        s, h, bkg_3d,,, "Hierarchy of background formats"
 bkg_mod_hiera,    s, h, irf|aeff|gauss,,, "Hierarchy of background models"

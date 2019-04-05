@@ -46,5 +46,5 @@ Analysis of data from other instruments
 
    How to analyse Fermi-LAT data with ctools? <fermi/index>
    How to analyse COMPTEL data with ctools? <comptel/index>
-   How to analyse H.E.S.S. data with ctools? <iact/index>
+   How to analyse data from existing IACTs (H.E.S.S., VERITAS or MAGIC) with ctools? <iact/index>
    howto_combine_instruments

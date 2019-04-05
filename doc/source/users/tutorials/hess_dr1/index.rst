@@ -1,4 +1,4 @@
-.. _1dc:
+.. _hess_dr1:
 
 Analysing public H.E.S.S. data
 ==============================
