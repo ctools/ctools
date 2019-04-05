@@ -161,8 +161,9 @@ that should look as follows:
    not ``file`` since the ``IAQ`` parameter is not necessarily a file
    but can be also a response name of the calibration database.
 
-Before doing a model fit you need a model. Create the following
-:ref:`model definition file <glossary_moddef>`:
+Before doing a model fit you need a model. We included one in the ctools package
+that you can find at ``$CTOOLS/share/models/comptel_howto_gc.xml``. Here the
+first few lines of this model:
 
 .. code-block:: xml
 
@@ -180,10 +181,6 @@ Before doing a model fit you need a model. Create the following
      <source name="Background" type="DRBFitting" instrument="COM">
        <node>
          <parameter name="Phibar"        value="9"   scale="1" min="0" max="50"   free="0" />
-         <parameter name="Normalization" value="1.0" scale="1" min="0" max="1000" free="1" />
-       </node>
-       <node>
-         <parameter name="Phibar"        value="11"  scale="1" min="0" max="50"   free="0" />
          <parameter name="Normalization" value="1.0" scale="1" min="0" max="1000" free="1" />
        </node>
        ...
@@ -212,15 +209,15 @@ map of the region around the Galactic centre as follows:
    $ cttsmap
    Input event list, counts cube or observation definition XML file [events.fits] obs_dri.xml
    Test source name [Crab] GC
-   Input model definition XML file [$CTOOLS/share/models/crab.xml] models.xml
+   Input model definition XML file [$CTOOLS/share/models/crab.xml] $CTOOLS/share/models/comptel_howto_gc.xml
+   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] GAL
+   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 0.0
    Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 0.0
-   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
-   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] GAL
    Image scale (in degrees/pixel) [0.02] 1.0
    Size of the X axis in pixels [200] 50
    Size of the Y axis in pixels [200] 30
-   Output Test Statistic map file [tsmap.fits] tsmap.fits
+   Output Test Statistic map file [tsmap.fits]
 
 Below is the resulting Test Statistic map that shows 1.8 MeV emission
 following the Galactic plane and peaking near the Galactic centre.

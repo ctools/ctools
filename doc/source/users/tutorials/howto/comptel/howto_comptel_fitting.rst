@@ -187,78 +187,78 @@ log file ``ctlike.log`` that was also created by :ref:`ctlike`:
 
 .. code-block:: none
 
-   2017-08-26T22:05:05: +=================================+
-   2017-08-26T22:05:05: | Maximum likelihood optimisation |
-   2017-08-26T22:05:05: +=================================+
-   2017-08-26T22:05:06:  >Iteration   0: -logL=988086.091, Lambda=1.0e-03
-   2017-08-26T22:05:07:  >Iteration   1: -logL=670534.792, Lambda=1.0e-03, delta=317551.299, step=1.0e+00, max(|grad|)=86219.859480 [Index:3]
-   2017-08-26T22:05:08:  >Iteration   2: -logL=387046.862, Lambda=1.0e-04, delta=283487.930, step=1.0e+00, max(|grad|)=69886.869623 [Index:3]
-   2017-08-26T22:05:08:  >Iteration   3: -logL=154426.362, Lambda=1.0e-05, delta=232620.499, step=1.0e+00, max(|grad|)=47994.333526 [Index:3]
-   2017-08-26T22:05:09:  >Iteration   4: -logL=-12393.885, Lambda=1.0e-06, delta=166820.247, step=1.0e+00, max(|grad|)=24763.811238 [Index:3]
-   2017-08-26T22:05:10:  >Iteration   5: -logL=-108271.655, Lambda=1.0e-07, delta=95877.770, step=1.0e+00, max(|grad|)=7544.090872 [Index:3]
-   2017-08-26T22:05:11:  >Iteration   6: -logL=-145906.957, Lambda=1.0e-08, delta=37635.302, step=1.0e+00, max(|grad|)=1167.483336 [Index:3]
-   2017-08-26T22:05:12:  >Iteration   7: -logL=-152898.212, Lambda=1.0e-09, delta=6991.255, step=1.0e+00, max(|grad|)=110.879761 [Index:3]
-   2017-08-26T22:05:12:  >Iteration   8: -logL=-153217.134, Lambda=1.0e-10, delta=318.921, step=1.0e+00, max(|grad|)=-2.969681 [Scale factor 2:111]
-   2017-08-26T22:05:13:  >Iteration   9: -logL=-153218.344, Lambda=1.0e-11, delta=1.210, step=1.0e+00, max(|grad|)=-0.047390 [Index:3]
-   2017-08-26T22:05:14:  >Iteration  10: -logL=-153218.344, Lambda=1.0e-12, delta=0.000, step=1.0e+00, max(|grad|)=-0.001891 [Index:3]
-   2017-08-26T22:05:15:
-   2017-08-26T22:05:15: +====================================+
-   2017-08-26T22:05:15: | Maximum likelihood re-optimisation |
-   2017-08-26T22:05:15: +====================================+
-   2017-08-26T22:05:15:  >Iteration   0: -logL=-152378.830, Lambda=1.0e-03
-   2017-08-26T22:05:16:  >Iteration   1: -logL=-152759.255, Lambda=1.0e-03, delta=380.425, step=1.0e+00, max(|grad|)=-2.480864 [Scale factor 10:21]
-   2017-08-26T22:05:16:  >Iteration   2: -logL=-152760.518, Lambda=1.0e-04, delta=1.264, step=1.0e+00, max(|grad|)=-0.019031 [Scale factor 10:21]
-   2017-08-26T22:05:16:  >Iteration   3: -logL=-152760.518, Lambda=1.0e-05, delta=0.000, step=1.0e+00, max(|grad|)=-0.000001 [Scale factor 10:21]
-   2017-08-26T22:05:16:
-   2017-08-26T22:05:16: +============================================+
-   2017-08-26T22:05:16: | Maximum likelihood re-optimisation results |
-   2017-08-26T22:05:16: +============================================+
-   2017-08-26T22:05:16: === GOptimizerLM ===
-   2017-08-26T22:05:16:  Optimized function value ..: -152760.518
-   2017-08-26T22:05:16:  Absolute precision ........: 0.005
-   2017-08-26T22:05:16:  Acceptable value decrease .: 2
-   2017-08-26T22:05:16:  Optimization status .......: converged
-   2017-08-26T22:05:16:  Number of parameters ......: 200
-   2017-08-26T22:05:16:  Number of free parameters .: 87
-   2017-08-26T22:05:16:  Number of iterations ......: 3
-   2017-08-26T22:05:16:  Lambda ....................: 1e-06
-   2017-08-26T22:05:16:
-   2017-08-26T22:05:16: +=========================================+
-   2017-08-26T22:05:16: | Maximum likelihood optimisation results |
-   2017-08-26T22:05:16: +=========================================+
-   2017-08-26T22:05:16: === GOptimizerLM ===
-   2017-08-26T22:05:16:  Optimized function value ..: -153218.344
-   2017-08-26T22:05:16:  Absolute precision ........: 0.005
-   2017-08-26T22:05:16:  Acceptable value decrease .: 2
-   2017-08-26T22:05:16:  Optimization status .......: converged
-   2017-08-26T22:05:16:  Number of parameters ......: 206
-   2017-08-26T22:05:16:  Number of free parameters .: 89
-   2017-08-26T22:05:16:  Number of iterations ......: 10
-   2017-08-26T22:05:16:  Lambda ....................: 1e-13
-   2017-08-26T22:05:16:  Maximum log likelihood ....: 153218.344
-   2017-08-26T22:05:16:  Observed events  (Nobs) ...: 527595.000
-   2017-08-26T22:05:16:  Predicted events (Npred) ..: 527594.000 (Nobs - Npred = 1.00004221417475)
-   2017-08-26T22:05:16: === GModels ===
-   2017-08-26T22:05:16:  Number of models ..........: 5
-   2017-08-26T22:05:16:  Number of parameters ......: 206
-   2017-08-26T22:05:16: === GModelSky ===
-   2017-08-26T22:05:16:  Name ......................: Crab
-   2017-08-26T22:05:16:  Instruments ...............: all
-   2017-08-26T22:05:16:  Test Statistic ............: 915.650908945536
-   2017-08-26T22:05:16:  Instrument scale factors ..: unity
-   2017-08-26T22:05:16:  Observation identifiers ...: all
-   2017-08-26T22:05:16:  Model type ................: PointSource
-   2017-08-26T22:05:16:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
-   2017-08-26T22:05:16:  Number of parameters ......: 6
-   2017-08-26T22:05:16:  Number of spatial par's ...: 2
-   2017-08-26T22:05:16:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
-   2017-08-26T22:05:16:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
-   2017-08-26T22:05:16:  Number of spectral par's ..: 3
-   2017-08-26T22:05:16:   Prefactor ................: 0.00237517119227384 +/- 0.000107673211964802 [-1,1] ph/cm2/s/MeV (free,scale=0.001,gradient)
-   2017-08-26T22:05:16:   Index ....................: -2.47153532398462 +/- 0.0500838601327289 [5,-5]  (free,scale=-1,gradient)
-   2017-08-26T22:05:16:   PivotEnergy ..............: 1 [0.01,1000] MeV (fixed,scale=1,gradient)
-   2017-08-26T22:05:16:  Number of temporal par's ..: 1
-   2017-08-26T22:05:16:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-04T15:11:31: +=================================+
+   2019-04-04T15:11:31: | Maximum likelihood optimisation |
+   2019-04-04T15:11:31: +=================================+
+   2019-04-04T15:11:32:  >Iteration   0: -logL=988079.891, Lambda=1.0e-03
+   2019-04-04T15:11:32:  >Iteration   1: -logL=670528.685, Lambda=1.0e-03, delta=317551.206, step=1.0e+00, max(|grad|)=86223.268050 [Index:3]
+   2019-04-04T15:11:33:  >Iteration   2: -logL=387041.036, Lambda=1.0e-04, delta=283487.648, step=1.0e+00, max(|grad|)=69889.358952 [Index:3]
+   2019-04-04T15:11:34:  >Iteration   3: -logL=154421.136, Lambda=1.0e-05, delta=232619.900, step=1.0e+00, max(|grad|)=47995.573198 [Index:3]
+   2019-04-04T15:11:35:  >Iteration   4: -logL=-12398.051, Lambda=1.0e-06, delta=166819.188, step=1.0e+00, max(|grad|)=24764.034734 [Index:3]
+   2019-04-04T15:11:35:  >Iteration   5: -logL=-108274.155, Lambda=1.0e-07, delta=95876.104, step=1.0e+00, max(|grad|)=7544.055951 [Index:3]
+   2019-04-04T15:11:36:  >Iteration   6: -logL=-145907.646, Lambda=1.0e-08, delta=37633.490, step=1.0e+00, max(|grad|)=1167.458562 [Index:3]
+   2019-04-04T15:11:36:  >Iteration   7: -logL=-152898.181, Lambda=1.0e-09, delta=6990.535, step=1.0e+00, max(|grad|)=110.883829 [Index:3]
+   2019-04-04T15:11:37:  >Iteration   8: -logL=-153217.048, Lambda=1.0e-10, delta=318.867, step=1.0e+00, max(|grad|)=-2.969678 [Scale factor 2:111]
+   2019-04-04T15:11:37:  >Iteration   9: -logL=-153218.258, Lambda=1.0e-11, delta=1.210, step=1.0e+00, max(|grad|)=-0.047105 [Index:3]
+   2019-04-04T15:11:38:  >Iteration  10: -logL=-153218.258, Lambda=1.0e-12, delta=0.000, step=1.0e+00, max(|grad|)=-0.001877 [Index:3]
+   2019-04-04T15:11:38:
+   2019-04-04T15:11:38: +====================================+
+   2019-04-04T15:11:38: | Maximum likelihood re-optimisation |
+   2019-04-04T15:11:38: +====================================+
+   2019-04-04T15:11:39:  >Iteration   0: -logL=-152378.895, Lambda=1.0e-03
+   2019-04-04T15:11:39:  >Iteration   1: -logL=-152759.255, Lambda=1.0e-03, delta=380.360, step=1.0e+00, max(|grad|)=-2.480233 [Scale factor 10:21]
+   2019-04-04T15:11:39:  >Iteration   2: -logL=-152760.518, Lambda=1.0e-04, delta=1.263, step=1.0e+00, max(|grad|)=-0.019021 [Scale factor 10:21]
+   2019-04-04T15:11:40:  >Iteration   3: -logL=-152760.518, Lambda=1.0e-05, delta=0.000, step=1.0e+00, max(|grad|)=-0.000001 [Scale factor 10:21]
+   2019-04-04T15:11:40:
+   2019-04-04T15:11:40: +============================================+
+   2019-04-04T15:11:40: | Maximum likelihood re-optimisation results |
+   2019-04-04T15:11:40: +============================================+
+   2019-04-04T15:11:40: === GOptimizerLM ===
+   2019-04-04T15:11:40:  Optimized function value ..: -152760.518
+   2019-04-04T15:11:40:  Absolute precision ........: 0.005
+   2019-04-04T15:11:40:  Acceptable value decrease .: 2
+   2019-04-04T15:11:40:  Optimization status .......: converged
+   2019-04-04T15:11:40:  Number of parameters ......: 200
+   2019-04-04T15:11:40:  Number of free parameters .: 87
+   2019-04-04T15:11:40:  Number of iterations ......: 3
+   2019-04-04T15:11:40:  Lambda ....................: 1e-06
+   2019-04-04T15:11:40:
+   2019-04-04T15:11:40: +=========================================+
+   2019-04-04T15:11:40: | Maximum likelihood optimisation results |
+   2019-04-04T15:11:40: +=========================================+
+   2019-04-04T15:11:40: === GOptimizerLM ===
+   2019-04-04T15:11:40:  Optimized function value ..: -153218.258
+   2019-04-04T15:11:40:  Absolute precision ........: 0.005
+   2019-04-04T15:11:40:  Acceptable value decrease .: 2
+   2019-04-04T15:11:40:  Optimization status .......: converged
+   2019-04-04T15:11:40:  Number of parameters ......: 206
+   2019-04-04T15:11:40:  Number of free parameters .: 89
+   2019-04-04T15:11:40:  Number of iterations ......: 10
+   2019-04-04T15:11:40:  Lambda ....................: 1e-13
+   2019-04-04T15:11:40:  Maximum log likelihood ....: 153218.258
+   2019-04-04T15:11:40:  Observed events  (Nobs) ...: 527595.000
+   2019-04-04T15:11:40:  Predicted events (Npred) ..: 527594.000 (Nobs - Npred = 1.00004248635378)
+   2019-04-04T15:11:40: === GModels ===
+   2019-04-04T15:11:40:  Number of models ..........: 5
+   2019-04-04T15:11:40:  Number of parameters ......: 206
+   2019-04-04T15:11:40: === GModelSky ===
+   2019-04-04T15:11:40:  Name ......................: Crab
+   2019-04-04T15:11:40:  Instruments ...............: all
+   2019-04-04T15:11:40:  Test Statistic ............: 915.478960024426
+   2019-04-04T15:11:40:  Instrument scale factors ..: unity
+   2019-04-04T15:11:40:  Observation identifiers ...: all
+   2019-04-04T15:11:40:  Model type ................: PointSource
+   2019-04-04T15:11:40:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
+   2019-04-04T15:11:40:  Number of parameters ......: 6
+   2019-04-04T15:11:40:  Number of spatial par's ...: 2
+   2019-04-04T15:11:40:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
+   2019-04-04T15:11:40:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
+   2019-04-04T15:11:40:  Number of spectral par's ..: 3
+   2019-04-04T15:11:40:   Prefactor ................: 0.00237485707890478 +/- 0.000107670251181817 [-1,1] ph/cm2/s/MeV (free,scale=0.001,gradient)
+   2019-04-04T15:11:40:   Index ....................: -2.47146337740947 +/- 0.0500850436160353 [5,-5]  (free,scale=-1,gradient)
+   2019-04-04T15:11:40:   PivotEnergy ..............: 1 [0.01,1000] MeV (fixed,scale=1,gradient)
+   2019-04-04T15:11:40:  Number of temporal par's ..: 1
+   2019-04-04T15:11:40:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 The fit converged after 10 iterations and did a second fit without the
 source component to determine the Test Statistic value of the Crab.

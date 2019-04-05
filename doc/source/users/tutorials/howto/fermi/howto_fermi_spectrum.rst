@@ -8,7 +8,7 @@ Generate a spectral energy distribution for a source
      You will learn how to use :ref:`csspec` to derive the spectral energy
      density of a source from Fermi-LAT data.
 
-To determine a spectral of the Vela pulsar you can use the :ref:`csspec`
+To determine a spectrum of the Vela pulsar you can use the :ref:`csspec`
 script. To do this, type
 
 .. code-block:: bash

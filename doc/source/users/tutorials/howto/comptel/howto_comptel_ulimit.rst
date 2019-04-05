@@ -29,28 +29,28 @@ create the following
        <parameter name="DRB" file="m35330_drg.fits"/>
        <parameter name="DRG" file="m35330_drg.fits"/>
        <parameter name="DRX" file="m32504_drx.fits"/>
-       <parameter name="IAQ" value="ENERG(0.75-1.0)MeV"/>
+       <parameter name="IAQ" value="UNH(0.75-1.0)MeV"/>
      </observation>
      <observation name="Vela" id="200001" instrument="COM">
        <parameter name="DRE" file="m50867_dre.fits"/>
        <parameter name="DRB" file="m35330_drg.fits"/>
        <parameter name="DRG" file="m35330_drg.fits"/>
        <parameter name="DRX" file="m32504_drx.fits"/>
-       <parameter name="IAQ" value="ENERG(1.0-3.0)MeV"/>
+       <parameter name="IAQ" value="UNH(1.0-3.0)MeV"/>
      </observation>
      <observation name="Vela" id="300001" instrument="COM">
        <parameter name="DRE" file="m50868_dre.fits"/>
        <parameter name="DRB" file="m35330_drg.fits"/>
        <parameter name="DRG" file="m35330_drg.fits"/>
        <parameter name="DRX" file="m32504_drx.fits"/>
-       <parameter name="IAQ" value="ENERG(3.0-10.0)MeV"/>
+       <parameter name="IAQ" value="UNH(3.0-10.0)MeV"/>
      </observation>
      <observation name="Vela" id="400001" instrument="COM">
        <parameter name="DRE" file="m50869_dre.fits"/>
        <parameter name="DRB" file="m35330_drg.fits"/>
        <parameter name="DRG" file="m35330_drg.fits"/>
        <parameter name="DRX" file="m32504_drx.fits"/>
-       <parameter name="IAQ" value="ENERG(10.0-30.0)MeV"/>
+       <parameter name="IAQ" value="UNH(10.0-30.0)MeV"/>
      </observation>
    </observation_list>
 
@@ -98,9 +98,9 @@ The results of the upper limit computation can then be extracted from the
 
 .. code-block:: bash
 
-   2017-08-27T08:13:44: +=====================+
-   2017-08-27T08:13:44: | Upper limit results |
-   2017-08-27T08:13:44: +=====================+
-   2017-08-27T08:13:44:  Differential flux limit ...: 9.26955448510129e-06 ph/cm2/s/MeV at 1e-06 TeV
-   2017-08-27T08:13:44:  Integral flux limit .......: 6.43104918005e-05 ph/cm2/s within [7.5e-08-3e-05] TeV
-   2017-08-27T08:13:44:  Energy flux limit .........: 1.54555137999306e-10 erg/cm2/s within [7.5e-08-3e-05] TeV
+   2019-04-04T15:47:22: +=====================+
+   2019-04-04T15:47:22: | Upper limit results |
+   2019-04-04T15:47:22: +=====================+
+   2019-04-04T15:47:22:  Differential flux limit ...: 9.26467937144868e-06 ph/cm2/s/MeV at 1e-06 TeV
+   2019-04-04T15:47:22:  Integral flux limit .......: 6.42766691440729e-05 ph/cm2/s within [7.5e-08-3e-05] TeV
+   2019-04-04T15:47:22:  Energy flux limit .........: 1.54473853201363e-10 erg/cm2/s within [7.5e-08-3e-05] TeV
