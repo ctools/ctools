@@ -14,28 +14,40 @@ nebula.
 Prepare Fermi-LAT data
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The preparation of Fermi-LAT data will follow the one
-`described in this section <howto_fermi_prepare>`_.
-
+The preparation of Fermi-LAT data will follow the description provided
+on
+:ref:`howto_fermi_prepare`.
 
 Prepare CTA data
 ^^^^^^^^^^^^^^^^
 
 For CTA the simulations of the Galactic Plane Scan from the first Data Challenge
-will be used, but if you do not have these data at hand you can create your own
-simulated CTA dataset by
-`following the description here <start_simulating>`_.
+will be used.
+First, select all observations from the data with pointing directions close to
+the Vela pulsar:
 
-First, bin the simulated data into a counts cube
+.. code-block:: bash
+
+   $ csobsselect
+   Input event list or observation definition XML file [obs.xml] $CTADATA/obs/obs_gps_baseline.xml
+   Pointing selection region shape (CIRCLE|BOX) [CIRCLE]
+   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+   Right Ascension of selection centre (deg) (0-360) [83.63] 128.838
+   Declination of selection centre (deg) (-90-90) [22.01] -45.178
+   Radius of selection circle (deg) (0-180) [5.0]
+   Start time (UTC string, JD, MJD or MET in seconds) [NONE]
+   Output observation definition XML file [outobs.xml] obs_vela.xml
+
+Then bin the selected observations into a counts cube
 
 .. code-block:: bash
 
    $ ctbin
-   Input event list or observation definition XML file [events.fits] obs.xml
+   Input event list or observation definition XML file [events.fits] obs_vela.xml
+   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 128.838
    Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.51] -45.178
-   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
-   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Image scale (in degrees/pixel) [0.02]
    Size of the X axis in pixels [200]
    Size of the Y axis in pixels [200]
@@ -50,19 +62,19 @@ Then compute the response cubes as follows
 .. code-block:: bash
 
    $ ctexpcube
-   Input event list or observation definition XML file [NONE] obs.xml
+   Input event list or observation definition XML file [NONE] obs_vela.xml
    Input counts cube file to extract exposure cube definition [NONE] cntcube.fits
    Output exposure cube file [expcube.fits]
 
 .. code-block:: bash
 
    $ ctpsfcube
-   Input event list or observation definition XML file [NONE] obs.xml
+   Input event list or observation definition XML file [NONE] obs_vela.xml
    Input counts cube file to extract PSF cube definition [NONE]
+   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 128.838
    Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.51] -45.178
-   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
-   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Image scale (in degrees/pixel) [1.0]
    Size of the X axis in pixels [10]
    Size of the Y axis in pixels [10]
@@ -75,7 +87,7 @@ Then compute the response cubes as follows
 .. code-block:: bash
 
    $ ctbkgcube
-   Input event list or observation definition XML file [NONE] obs.xml
+   Input event list or observation definition XML file [NONE] obs_vela.xml
    Input counts cube file to extract background cube definition [NONE] cntcube.fits
    Input model definition XML file [NONE] $CTOOLS/share/models/bkg_irf.xml
    Output background cube file [bkgcube.fits]

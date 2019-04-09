@@ -20,7 +20,7 @@ observations. You do this with the :ref:`ctselect` tool by typing:
 
    $ ctselect
    Input event list or observation definition XML file [events.fits] obs.xml
-   RA for ROI centre (degrees) (0-360) [83.63] NONE
+   Radius of ROI around pointing or specified RA/DEC (degrees) (0-180) [3.0] NONE
    Start time (UTC string, JD, MJD or MET in seconds) [NONE]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
