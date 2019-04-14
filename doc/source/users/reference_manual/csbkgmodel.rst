@@ -50,9 +50,22 @@ General parameters
     instrument, the instrument name will be extracted from the observation
     definition XML file.
 
-``spatial <IRF|AEFF|GAUSS> [string]``
-    Spatial model component. So far IRF template, effective area and radial
-    Gaussian models are supported.
+``spatial <IRF|AEFF|GAUSS|GAUSS(E)> [string]``
+    Spatial model component. So far IRF template, effective area, a radial
+    Gaussian and an energy-dependent radial Gaussian models are supported.
+
+``snumbins [integer]``
+    Number of energy nodes for GAUSS(E) spatial model.
+    This parameter is only queried if ``GAUSS(E)`` is specified as spatial
+    model.
+
+``smin [real]``
+    Lower energy limit of energy nodes for GAUSS(E) spatial model (TeV).
+    This parameter is only queried if ``snumbins`` is larger than 1.
+
+``smax [real]``
+    Upper energy limit of energy nodes for GAUSS(E) spatial model (TeV).
+    This parameter is only queried if ``snumbins`` is larger than 1.
 
 ``gradient [boolean]``
     Allow for a spatial gradient in the background event distribution?
