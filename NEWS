@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-3 April 2019
+14 April 2019
 
 
 Introduction
@@ -270,6 +270,9 @@ None
 
 csbkgmodel - Generate background model for 3D analysis
 ------------------------------------------------------
+A model named GAUSS(E) was added to implement an energy-dependent Gaussian
+spatial function (#2868).
+
 Introduced the script that generates a background for a 3D analysis. This
 script is particularly useful to generate a background model for the analysis
 of the H.E.S.S. public data release (#2694).

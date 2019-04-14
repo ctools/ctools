@@ -46,6 +46,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`2868 <https://cta-redmine.irap.omp.eu/issues/2868>`_] -
+  Add ``GAUSS(E)`` model to :ref:`csbkgmodel`
 * [`2842 <https://cta-redmine.irap.omp.eu/issues/2842>`_] -
   Log warning if ``edisp=no``
 * Add ``max_iter`` parameter to :ref:`ctbutterfly`, :ref:`cterror`,

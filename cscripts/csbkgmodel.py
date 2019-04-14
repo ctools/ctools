@@ -95,10 +95,15 @@ class csbkgmodel(ctools.csobservation):
 
         # Query input parameters
         spatial = self['spatial'].string()
-        if spatial == 'GAUSS':
+        if spatial == 'GAUSS(E)':
+            snumbins = self['snumbins'].integer()
+            if snumbins > 1:
+                self['smin'].real()
+                self['smax'].real()
+        if spatial == 'GAUSS' or spatial == 'GAUSS(E)':
             self['gradient'].boolean()
-        self['spectral'].string()
-        if spatial == 'NODES':
+        spectral = self['spectral'].string()
+        if spectral == 'NODES':
             self._create_energies()
         self['runwise'].boolean()
         self['emin'].real()
@@ -142,9 +147,16 @@ class csbkgmodel(ctools.csobservation):
         # Return instrument
         return instrument
 
-    def _generate_initial_model(self):
+    def _generate_initial_model(self, sigma_min=2.0, sigma_max=1000.0):
         """
         Generate initial background model
+
+        Parameters
+        ----------
+        sigma_min : float, optional
+            Minimum sigma
+        sigma_max : float, optional
+            Maximum sigma
 
         Returns
         -------
@@ -165,22 +177,65 @@ class csbkgmodel(ctools.csobservation):
 
         # Handle GAUSS model
         elif self['spatial'].string() == 'GAUSS':
+
+            # Set spatial model
+            factor1 = gammalib.GCTAModelRadialGauss(3.0)
+            factor1['Sigma'].min(sigma_min)
+            factor1['Sigma'].max(sigma_max)
+
+            # Optionally add gradient
             if self['gradient'].boolean():
                 spatial = gammalib.GCTAModelSpatialMultiplicative()
-                factor1 = gammalib.GCTAModelRadialGauss(3.0)
-                factor1['Sigma'].min(1.5)
-                factor1['Sigma'].max(10.0)
                 factor2 = gammalib.GCTAModelSpatialGradient()
                 spatial.append(factor1)
                 spatial.append(factor2)
             else:
-                spatial = gammalib.GCTAModelRadialGauss(3.0)
-                spatial['Sigma'].min(1.5)
-                spatial['Sigma'].max(10.0)
+                spatial = factor1
+
+            # Set spectral model
             epivot   = gammalib.GEnergy(1.0, 'TeV')
             spectral = gammalib.GModelSpectralPlaw(3.0e-4, -1.5, epivot)
             spectral['Prefactor'].min(1.0e-8)
-            model    = gammalib.GCTAModelBackground(spatial, spectral)
+
+            # Set background model
+            model = gammalib.GCTAModelBackground(spatial, spectral)
+
+        # Handle GAUSS(E) model
+        elif self['spatial'].string() == 'GAUSS(E)':
+
+            # Set spatial model
+            if self['snumbins'].integer() == 1:
+                factor1 = gammalib.GCTAModelRadialGauss(3.0)
+                factor1['Sigma'].min(sigma_min)
+                factor1['Sigma'].max(sigma_max)
+            else:
+                emin     = gammalib.GEnergy(self['smin'].real(), 'TeV')
+                emax     = gammalib.GEnergy(self['smax'].real(), 'TeV')
+                energies = gammalib.GEnergies(self['snumbins'].integer(), emin, emax)
+                spectrum = gammalib.GModelSpectralConst(3.0)
+                nodes    = gammalib.GModelSpectralNodes(spectrum, energies)
+                for i in range(nodes.nodes()):
+                    nodes[i*2+1].min(sigma_min)
+                    nodes[i*2+1].max(sigma_max)
+                nodes.autoscale()
+                factor1 = gammalib.GCTAModelSpatialGaussSpectrum(nodes)
+
+            # Optionally add gradient
+            if self['gradient'].boolean():
+                spatial = gammalib.GCTAModelSpatialMultiplicative()
+                factor2 = gammalib.GCTAModelSpatialGradient()
+                spatial.append(factor1)
+                spatial.append(factor2)
+            else:
+                spatial = factor1
+
+            # Set spectral model
+            epivot   = gammalib.GEnergy(1.0, 'TeV')
+            spectral = gammalib.GModelSpectralPlaw(3.0e-4, -1.5, epivot)
+            spectral['Prefactor'].min(1.0e-8)
+
+            # Set background model
+            model = gammalib.GCTAModelBackground(spatial, spectral)
 
         # Any other strings (should never occur)
         else:
