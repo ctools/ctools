@@ -355,6 +355,9 @@ class csbkgmodel(ctools.csobservation):
         like = ctools.ctlike(obs)
         like.run()
 
+        # Extract optimiser
+        opt = like.opt()
+
         # Extract fitted model
         model = like.obs().models()[0].copy()
 
@@ -376,6 +379,9 @@ class csbkgmodel(ctools.csobservation):
             like = ctools.ctlike(obs)
             like.run()
 
+            # Extract optimiser
+            opt = like.opt()
+
             # Extract fitted model
             model = like.obs().models()[0].copy()
 
@@ -387,6 +393,9 @@ class csbkgmodel(ctools.csobservation):
                 iint = 2*(nodes - i) - 1
                 if spectral[iint].error() == 0.0:
                     spectral.remove(nodes - i - 1)
+
+        # Write optimizer
+        self._log_string(gammalib.EXPLICIT, str(opt))
 
         # Return model
         return model
