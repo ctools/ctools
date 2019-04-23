@@ -31,11 +31,12 @@ smin,       r, a, 0.1,,, "Lower energy limit of energy nodes for GAUSS(E) spatia
 smax,       r, a, 10.0,,, "Upper energy limit of energy nodes for GAUSS(E) spatial model (TeV)"
 gradient,   b, a, yes,,, "Allow for spatial gradient?"
 spectral,   s, a, NODES,PLAW|NODES,, "Spectral model component"
-ebinalg,    s, a, LOG,FILE|LIN|LOG,, "Algorithm for defining spectral energy nodes"
+ebinalg,    s, a, LOG,FILE|LIN|LOG|POW,, "Algorithm for defining spectral energy nodes"
 emin,       r, a, 0.1,,, "Lower energy limit (TeV)"
 emax,       r, a, 100.0,,, "Upper energy limit (TeV)"
 enumbins,   i, a, 8,1,200, "Number of spectral energy nodes"
 ebinfile,   f, a, NONE,,, "Name of the file containing the energy node definition"
+ebingamma,  r, a, 1.0,,, "Exponent for POW energy node definition"
 runwise,    b, a, yes,,, "Generate runwise background model?"
 rad,        r, h, 2.0,,, "Radius for event selection (degrees)"
 

@@ -696,10 +696,11 @@ GEbounds ctool::create_ebounds(void)
  * The following parameters are read:
  *
  *      ebinalg - Energy binning algorithm
- *      ebinfile - Name of file with energy binning
+ *      ebinfile - Name of file with energy binning (if ebinalg == FILE)
  *      emin - Minimum energy (if ebinalg != FILE)
  *      emax - Maximum energy (if ebinalg != FILE)
  *      enumbins - Number of energy bins (if ebinalg != FILE)
+ *      ebingamma - Power law index (if ebinalg == POW)
  ***************************************************************************/
 GEnergies ctool::create_energies(void)
 {
@@ -782,6 +783,38 @@ GEnergies ctool::create_energies(void)
         } // endelse: loaded energy boundaries from table extension
 
     } // endif: ebinalg was "FILE"
+
+    // ... otherwise, if energy binning algorithm is of type "POW" (case
+    // sensitive), then set the energy binning according to a power-law
+    else if (ebinalg == "POW") {
+
+        // Get task parameters
+    	double emin      = (*this)["emin"].real();
+    	double emax      = (*this)["emax"].real();
+    	int    enumbins  = (*this)["enumbins"].integer();
+        double ebingamma = (*this)["ebingamma"].real();
+
+        // Precomputation
+        double a = 1.0 - ebingamma;
+        double c = (a == 0.0)
+                   ? 1.0 / (std::log(emax) - std::log(emin))
+                   : a   / (std::pow(emax,a) - std::pow(emin,a));
+        double b = double(c*(enumbins-1.0));
+
+        // Initialise first energy
+        double e = emin;
+        energies.append(GEnergy(e, "TeV"));
+
+        // Loop over energy bins
+        for (int i = 0; i < enumbins-1; ++i) {
+            double log_e_next = (a == 0.0)
+                                ? 1.0/b + std::log(e)
+                                : std::log(a/b + std::pow(e,a)) / a;
+            double e_next = std::exp(log_e_next);
+            energies.append(GEnergy(e_next, "TeV"));
+            e = e_next;
+        }
+    }
 
     // ... otherwise use a linear or a logarithmically-spaced energy binning
     else {

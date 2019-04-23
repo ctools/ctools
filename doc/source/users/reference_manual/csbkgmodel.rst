@@ -75,11 +75,17 @@ General parameters
     Spectral model component. ``PLAW`` specifies a simple power law model,
     ``NODES`` specifies a piecewise broken power-law.
 
-``ebinalg <FILE|LIN|LOG> [string]``
+``ebinalg <FILE|LIN|LOG|POW> [string]``
     Algorithm for defining energy nodes. For ``FILE``, the energy nodes are
     defined in a FITS file that is specified by the ``ebinfile`` parameter,
     for ``LIN`` and ``LOG`` there will be ``enumbins`` energy nodes spaced
     linearly or logarithmically between ``emin`` and ``emax``, respectively.
+    For ``POW`` a spacing with ``enumbins`` nodes between ``emin`` and ``emax``
+    will be defined so that the integral over a power law with a spectral index
+    defined by the parameter ``ebingamma`` will be constant. A value of
+    ``ebingamma=1`` correspond to the ``LOG`` algorithm, a smaller value provides
+    a finer binning for larger energies while a larger value provides a finer
+    binning for smaller energies.
 
 ``emin [real]``
     Lower energy limit (in TeV).
@@ -88,10 +94,14 @@ General parameters
     Upper energy limit (in TeV).
 
 ``enumbins [integer]``
-    Number of energy nodes if ``LIN`` or ``LOG`` energy algorithms are used.
+    Number of energy nodes if ``LIN``, ``LOG`` or ``POW`` energy algorithms are
+    used.
 
 ``ebinfile [file]``
     Name of the file containing the energy node definition if ``ebinalg=FILE``.
+
+``ebingamma [real]``
+    Power law index for energy node definition if ``ebinalg=POW``.
 
 ``runwise [boolean]``
     Generate runwise background model? If ``yes`` is specified a background

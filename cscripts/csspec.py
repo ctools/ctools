@@ -652,7 +652,7 @@ class csspec(ctools.csobservation):
                   'Npred':       0.0}
 
         # Write header for fitting
-        self._log_header3(gammalib.EXPLICIT, 'Performing fit')
+        self._log_header3(gammalib.EXPLICIT, 'Performing fit in energy bin')
 
         # Setup maximum likelihood fit
         like = ctools.ctlike(obs)
@@ -666,6 +666,9 @@ class csspec(ctools.csobservation):
 
         # Perform maximum likelihood fit
         like.run()
+
+        # Write model results for explicit chatter level
+        self._log_string(gammalib.EXPLICIT, str(like.obs().models()))
 
         # Continue only if log-likelihood is non-zero
         if like.obs().logL() != 0.0:
@@ -688,7 +691,8 @@ class csspec(ctools.csobservation):
             if self['calc_ulim'].boolean():
 
                 # Logging information
-                self._log_header3(gammalib.EXPLICIT, 'Computing upper limit')
+                self._log_header3(gammalib.EXPLICIT,
+                                  'Computing upper limit for energy bin')
 
                 # Create upper limit object  
                 ulimit = ctools.ctulimit(like.obs())
@@ -801,7 +805,7 @@ class csspec(ctools.csobservation):
         self._log_header1(gammalib.TERSE, 'Generate spectrum')
 
         # Write header for fitting
-        self._log_header3(gammalib.EXPLICIT, 'Performing fit')
+        self._log_header3(gammalib.EXPLICIT, 'Performing model fit')
 
         # Perform maximum likelihood fit
         like          = ctools.ctlike(self.obs())
@@ -815,6 +819,9 @@ class csspec(ctools.csobservation):
         model    = like.obs().models()[self['srcname'].string()]
         spectrum = model.spectral()
         logL0    = like.obs().logL()
+
+        # Write model results for explicit chatter level
+        self._log_string(gammalib.EXPLICIT, str(like.obs().models()))
 
         # Loop over all nodes
         for i in range(spectrum.nodes()):
@@ -844,7 +851,9 @@ class csspec(ctools.csobservation):
             if self['calc_ulim'].boolean():
 
                 # Logging information
-                self._log_header3(gammalib.EXPLICIT, 'Computing upper limit')
+                self._log_header3(gammalib.EXPLICIT,
+                                  'Computing upper limit for node energy %f TeV' %
+                                  result['energy'])
 
                 # Copy observation container
                 obs = like.obs().copy()
