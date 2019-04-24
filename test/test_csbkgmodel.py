@@ -232,10 +232,11 @@ class Test(test):
         bkgmodel['spatial']    = 'GAUSS'
         bkgmodel['gradient']   = True
         bkgmodel['spectral']   = 'NODES'
-        bkgmodel['ebinalg']    = 'LOG'
+        bkgmodel['ebinalg']    = 'POW'
         bkgmodel['emin']       = 1.0
         bkgmodel['emax']       = 100.0
         bkgmodel['enumbins']   = 8
+        bkgmodel['ebingamma']  = 1.1
         bkgmodel['runwise']    = True
         bkgmodel['rad']        = 2.0
         bkgmodel['chatter']    = 2
