@@ -460,7 +460,7 @@ class csbkgmodel(ctools.csobservation):
             self._models.append(model)
 
         # Write models
-        self._log_models(gammalib.NORMAL, self._models, 'Output models')
+        self._log_models(gammalib.NORMAL, self._models, 'Output model')
 
         # Return
         return
