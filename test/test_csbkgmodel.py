@@ -198,7 +198,7 @@ class Test(test):
         bkgmodel['caldb']      = self._caldb
         bkgmodel['irf']        = self._irf
         bkgmodel['instrument'] = 'CTA'
-        bkgmodel['spatial']    = 'AEFF'
+        bkgmodel['spatial']    = 'IRF'
         bkgmodel['gradient']   = False
         bkgmodel['spectral']   = 'PLAW'
         bkgmodel['ebinalg']    = 'LOG'

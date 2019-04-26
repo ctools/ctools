@@ -100,7 +100,10 @@ class csbkgmodel(ctools.csobservation):
             if snumbins > 1:
                 self['smin'].real()
                 self['smax'].real()
-        if spatial == 'GAUSS' or spatial == 'GAUSS(E)':
+        if spatial == 'LOOKUP':
+            self['slufile'].filename()
+        if spatial == 'LOOKUP' or spatial == 'GAUSS' or \
+           spatial == 'GAUSS(E)' or spatial == 'PROFILE':
             self['gradient'].boolean()
         spectral = self['spectral'].string()
         if spectral == 'NODES':
@@ -175,6 +178,29 @@ class csbkgmodel(ctools.csobservation):
             spectral = gammalib.GModelSpectralPlaw(1.0e-13, -2.5, epivot)
             model    = gammalib.GCTAModelAeffBackground(spectral)
 
+        # Handle LOOKUP model
+        elif self['spatial'].string() == 'LOOKUP':
+
+            # Set spatial model
+            factor1 = gammalib.GCTAModelSpatialLookup(self['slufile'].filename())
+
+            # Optionally add gradient
+            if self['gradient'].boolean():
+                spatial = gammalib.GCTAModelSpatialMultiplicative()
+                factor2 = gammalib.GCTAModelSpatialGradient()
+                spatial.append(factor1)
+                spatial.append(factor2)
+            else:
+                spatial = factor1
+
+            # Set spectral model
+            epivot   = gammalib.GEnergy(1.0, 'TeV')
+            spectral = gammalib.GModelSpectralPlaw(3.0e-4, -1.5, epivot)
+            spectral['Prefactor'].min(1.0e-8)
+
+            # Set background model
+            model = gammalib.GCTAModelBackground(spatial, spectral)
+
         # Handle GAUSS model
         elif self['spatial'].string() == 'GAUSS':
 
@@ -219,6 +245,66 @@ class csbkgmodel(ctools.csobservation):
                     nodes[i*2+1].max(sigma_max)
                 nodes.autoscale()
                 factor1 = gammalib.GCTAModelSpatialGaussSpectrum(nodes)
+
+            # Optionally add gradient
+            if self['gradient'].boolean():
+                spatial = gammalib.GCTAModelSpatialMultiplicative()
+                factor2 = gammalib.GCTAModelSpatialGradient()
+                spatial.append(factor1)
+                spatial.append(factor2)
+            else:
+                spatial = factor1
+
+            # Set spectral model
+            epivot   = gammalib.GEnergy(1.0, 'TeV')
+            spectral = gammalib.GModelSpectralPlaw(3.0e-4, -1.5, epivot)
+            spectral['Prefactor'].min(1.0e-8)
+
+            # Set background model
+            model = gammalib.GCTAModelBackground(spatial, spectral)
+
+        # Handle PROFILE model
+        elif self['spatial'].string() == 'PROFILE':
+
+            # Set spatial model
+            factor1 = gammalib.GCTAModelRadialProfile(2.0, 4.0, 5.0)
+            factor1['Width'].min(1.0)
+            factor1['Width'].max(10.0)
+            factor1['Core'].min(1.0)
+            factor1['Core'].max(10.0)
+            factor1['Tail'].min(-10.0)
+            factor1['Tail'].max(10.0)
+            factor1['Tail'].free()
+
+            # Optionally add gradient
+            if self['gradient'].boolean():
+                spatial = gammalib.GCTAModelSpatialMultiplicative()
+                factor2 = gammalib.GCTAModelSpatialGradient()
+                spatial.append(factor1)
+                spatial.append(factor2)
+            else:
+                spatial = factor1
+
+            # Set spectral model
+            epivot   = gammalib.GEnergy(1.0, 'TeV')
+            spectral = gammalib.GModelSpectralPlaw(3.0e-4, -1.5, epivot)
+            spectral['Prefactor'].min(1.0e-8)
+
+            # Set background model
+            model = gammalib.GCTAModelBackground(spatial, spectral)
+
+        # Handle POLYNOM model
+        elif self['spatial'].string() == 'POLYNOM':
+
+            # Set spatial model
+            factor1 = gammalib.GCTAModelRadialPolynom([1.0, -0.1, +0.1])
+            factor1['Coeff0'].min(0.1)
+            factor1['Coeff0'].max(10.0)
+            factor1['Coeff0'].fix()
+            factor1['Coeff1'].min(-10.0)
+            factor1['Coeff1'].max(10.0)
+            factor1['Coeff2'].min(-10.0)
+            factor1['Coeff2'].max(10.0)
 
             # Optionally add gradient
             if self['gradient'].boolean():

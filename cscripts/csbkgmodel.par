@@ -25,7 +25,8 @@ outmodel, f, a, model.xml,,, "Output model definition XML file"
 # Script parameters
 #==================
 instrument, s, a, CTA,,, "Instrument name (for multi-instrument analysis)"
-spatial,    s, a, GAUSS,IRF|AEFF|GAUSS|GAUSS(E),, "Spatial model component"
+spatial,    s, a, GAUSS,IRF|AEFF|LOOKUP|GAUSS|GAUSS(E)|PROFILE|POLYNOM,, "Spatial model component"
+slufile,    f, a, lookup.fits,,, "Name of lookup table file for LOOKUP spatial model"
 snumbins,   i, a, 3,1,200, "Number of energy nodes for GAUSS(E) spatial model"
 smin,       r, a, 0.1,,, "Lower energy limit of energy nodes for GAUSS(E) spatial model (TeV)"
 smax,       r, a, 10.0,,, "Upper energy limit of energy nodes for GAUSS(E) spatial model (TeV)"

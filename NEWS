@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-14 April 2019
+26 April 2019
 
 
 Introduction
@@ -270,6 +270,11 @@ None
 
 csbkgmodel - Generate background model for 3D analysis
 ------------------------------------------------------
+Three additional spatial models were added: LOOKUP which uses a 2D lookup table,
+PROFILE which uses an energy-independent profile, and POLYNOM which uses an
+energy-independent polynom of third order. The parameter "slufile" was added
+to allow specification of a lookup table file (#2878).
+
 A model named GAUSS(E) was added to implement an energy-dependent Gaussian
 spatial function (#2868).
 

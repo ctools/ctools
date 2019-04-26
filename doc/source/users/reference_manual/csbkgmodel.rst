@@ -50,9 +50,29 @@ General parameters
     instrument, the instrument name will be extracted from the observation
     definition XML file.
 
-``spatial <IRF|AEFF|GAUSS|GAUSS(E)> [string]``
-    Spatial model component. So far IRF template, effective area, a radial
-    Gaussian and an energy-dependent radial Gaussian models are supported.
+``spatial <IRF|AEFF|LOOKUP|GAUSS|GAUSS(E)|PROFILE|POLYNOM> [string]``
+    Spatial model component. The following options exist:
+     ``IRF``: The background template included in the Instrument Response
+     Functions will be used (energy-dependent)
+
+     ``AEFF``: The effective area will be used (energy-dependent)
+
+     ``LOOKUP``: A lookup table, specified by the ``slufile`` parameter, will
+     be used (energy-dependent).
+
+     ``GAUSS``: A radial Gaussian in offset angle squared will be used.
+
+     ``GAUSS(E)``: An energy-dependent radial Gaussian in offset angle squared
+     will be used. The ``snumbins`` parameter specifies the number of energy
+     nodes, the ``smin`` and ``smax`` parameters specify the energy range for
+     the nodes.
+
+     ``PROFILE``: A radial profile will be used.
+
+     ``POLYNOM``: A third order polynomial will be used.
+
+``slufile [file]``
+    Name of the file containing the lookup table if ``spatial=LOOKUP``.
 
 ``snumbins [integer]``
     Number of energy nodes for GAUSS(E) spatial model.
