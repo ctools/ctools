@@ -179,7 +179,7 @@ Levenberg-Marquardt algorithm
 ctools uses an iterative Levenberg-Marquardt algorithm for maximum likelihood
 estimation. Since the Levenberg-Marquardt algorithm minimises a function, we
 use :math:`-\ln L(M)` as the function to minimse. The Levenberg-Marquardt
-algorithm starts with an inital guess of the :ref:`model <um_models>` parameters
+algorithm starts with an initial guess of the :ref:`model <um_models>` parameters
 :math:`a_k` and iteratively replaces this estimate by a new estimate
 :math:`a_k + \Delta a_k`. The :math:`\Delta a_k` are determined by solving
 
@@ -191,12 +191,12 @@ where
 .. math::
    \alpha_{kl} = \frac{\partial^2 (-\ln L(M))}{\partial a_k \partial a_l}
 
-is the curvature matrix
+is the curvature matrix,
 
 .. math::
    \beta_k = \frac{\partial (-\ln L(M))}{\partial a_k}
 
-is the gradient and
+is the gradient, and
 :math:`\delta_{kl}` is the Kronecker delta that is :math:`1` for
 :math:`k=l` and :math:`0` otherwise. :math:`\lambda` is a damping parameter
 that initially is set to 0.001. If a Levenberg-Marquardt iteration leads to
@@ -247,8 +247,8 @@ where :math:`\ln L(M_s+M_b)` is the log-likelihood value obtained when
 fitting the source and the background together to the data, and
 :math:`\ln L(M_b)` is the log-likelihood value obtained when fitting only
 the background model to the data.
-Under the hypothesis that the model :math:`M_b` provides a satisfactory fit
-of the data, :math:`TS` follows a :math:`\chi^2_n` distribution with
+Under the hypothesis that the model :math:`M_s+M_b` provides a satisfactory fit
+of the data, :math:`\mathrm{TS}` follows a :math:`\chi^2_n` distribution with
 :math:`n` degrees of freedom, where :math:`n` is the number of free parameters
 in the source model component. Therefore
 
@@ -256,9 +256,9 @@ in the source model component. Therefore
    p = \int_\mathrm{TS}^{+\infty} \chi^2_n(x) \:\: \mathrm{d}x
 
 gives the chance probability (p-value) that the log-likelihood improves by
-:math:`TS/2` when adding the source model :math:`M_s` due to statistical
+:math:`\mathrm{TS}/2` when adding the source model :math:`M_s` due to statistical
 fluctuations only. For :math:`n=1` the significance in Gaussian sigma
-is given by :math:`\sqrt{TS}`.
+is given by :math:`\sqrt{\mathrm{TS}}`.
 
 
 Upper flux limits
