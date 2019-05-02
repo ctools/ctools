@@ -37,7 +37,8 @@ models = 1dc_howto.xml \
          crab_profile.xml \
          disk.xml \
          gauss.xml \
-         shell.xml
+         shell.xml \
+         hess_bkg_lookup.fits
 
 # Install models
 modelsdir   = $(datadir)/models

@@ -45,6 +45,7 @@ class Test(test):
         # Set test datasets and parameters
         self._myevents1 = self._datadir + '/crab_offaxis1.fits'
         self._myevents2 = self._datadir + '/crab_offaxis2.fits'
+        self._lookup    = self._datadir + '/hess_bkg_lookup.fits'
 
         # Return
         return
@@ -249,6 +250,114 @@ class Test(test):
 
         # Check background model
         self._check_bkg_model('csbkgmodel_py5.xml', nmodels=2)
+
+        # Test GAUSS(E) spatial model
+        bkgmodel = cscripts.csbkgmodel()
+        bkgmodel['inobs']      = self._events
+        bkgmodel['caldb']      = self._caldb
+        bkgmodel['irf']        = self._irf
+        bkgmodel['instrument'] = 'CTA'
+        bkgmodel['spatial']    = 'GAUSS(E)'
+        bkgmodel['snumbins']   = 2
+        bkgmodel['smin']       = 1.0
+        bkgmodel['smax']       = 10.0
+        bkgmodel['gradient']   = True
+        bkgmodel['spectral']   = 'NODES'
+        bkgmodel['ebinalg']    = 'LOG'
+        bkgmodel['emin']       = 1.0
+        bkgmodel['emax']       = 100.0
+        bkgmodel['enumbins']   = 8
+        bkgmodel['runwise']    = True
+        bkgmodel['rad']        = 2.0
+        bkgmodel['chatter']    = 2
+        bkgmodel['outmodel']   = 'csbkgmodel_py6.xml'
+        bkgmodel['logfile']    = 'csbkgmodel_py6.log'
+
+        # Run csbkgmodel script and save background model
+        bkgmodel.logFileOpen()   # Make sure we get a log file
+        bkgmodel.execute()
+
+        # Check background model
+        self._check_bkg_model('csbkgmodel_py6.xml')
+
+        # Test LOOKUP spatial model
+        bkgmodel = cscripts.csbkgmodel()
+        bkgmodel['inobs']      = self._events
+        bkgmodel['caldb']      = self._caldb
+        bkgmodel['irf']        = self._irf
+        bkgmodel['instrument'] = 'CTA'
+        bkgmodel['spatial']    = 'LOOKUP'
+        bkgmodel['slufile']    = self._lookup
+        bkgmodel['gradient']   = True
+        bkgmodel['spectral']   = 'NODES'
+        bkgmodel['ebinalg']    = 'LOG'
+        bkgmodel['emin']       = 1.0
+        bkgmodel['emax']       = 100.0
+        bkgmodel['enumbins']   = 8
+        bkgmodel['runwise']    = True
+        bkgmodel['rad']        = 2.0
+        bkgmodel['chatter']    = 2
+        bkgmodel['outmodel']   = 'csbkgmodel_py7.xml'
+        bkgmodel['logfile']    = 'csbkgmodel_py7.log'
+
+        # Run csbkgmodel script and save background model
+        bkgmodel.logFileOpen()   # Make sure we get a log file
+        bkgmodel.execute()
+
+        # Check background model
+        self._check_bkg_model('csbkgmodel_py7.xml')
+
+        # Test PROFILE spatial model
+        bkgmodel = cscripts.csbkgmodel()
+        bkgmodel['inobs']      = self._events
+        bkgmodel['caldb']      = self._caldb
+        bkgmodel['irf']        = self._irf
+        bkgmodel['instrument'] = 'CTA'
+        bkgmodel['spatial']    = 'PROFILE'
+        bkgmodel['gradient']   = True
+        bkgmodel['spectral']   = 'NODES'
+        bkgmodel['ebinalg']    = 'LOG'
+        bkgmodel['emin']       = 1.0
+        bkgmodel['emax']       = 100.0
+        bkgmodel['enumbins']   = 8
+        bkgmodel['runwise']    = True
+        bkgmodel['rad']        = 2.0
+        bkgmodel['chatter']    = 2
+        bkgmodel['outmodel']   = 'csbkgmodel_py8.xml'
+        bkgmodel['logfile']    = 'csbkgmodel_py8.log'
+
+        # Run csbkgmodel script and save background model
+        bkgmodel.logFileOpen()   # Make sure we get a log file
+        bkgmodel.execute()
+
+        # Check background model
+        self._check_bkg_model('csbkgmodel_py8.xml')
+
+        # Test POLYNOM spatial model
+        bkgmodel = cscripts.csbkgmodel()
+        bkgmodel['inobs']      = self._events
+        bkgmodel['caldb']      = self._caldb
+        bkgmodel['irf']        = self._irf
+        bkgmodel['instrument'] = 'CTA'
+        bkgmodel['spatial']    = 'POLYNOM'
+        bkgmodel['gradient']   = True
+        bkgmodel['spectral']   = 'NODES'
+        bkgmodel['ebinalg']    = 'LOG'
+        bkgmodel['emin']       = 1.0
+        bkgmodel['emax']       = 100.0
+        bkgmodel['enumbins']   = 8
+        bkgmodel['runwise']    = True
+        bkgmodel['rad']        = 2.0
+        bkgmodel['chatter']    = 2
+        bkgmodel['outmodel']   = 'csbkgmodel_py9.xml'
+        bkgmodel['logfile']    = 'csbkgmodel_py9.log'
+
+        # Run csbkgmodel script and save background model
+        bkgmodel.logFileOpen()   # Make sure we get a log file
+        bkgmodel.execute()
+
+        # Check background model
+        self._check_bkg_model('csbkgmodel_py9.xml')
 
         # Return
         return

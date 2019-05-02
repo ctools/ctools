@@ -30,7 +30,6 @@ class csbkgmodel(ctools.csobservation):
     """
     Generates background model
     """
-
     # Constructor
     def __init__(self, *argv):
         """
@@ -46,7 +45,7 @@ class csbkgmodel(ctools.csobservation):
         # Return
         return
 
-    # State methods por pickling
+    # __getstate__ method for pickling
     def __getstate__(self):
         """
         Extend ctools.csobservation getstate method to include some members
@@ -64,6 +63,7 @@ class csbkgmodel(ctools.csobservation):
         # Return pickled dictionary
         return state
 
+    # __setstate__ method for pickling
     def __setstate__(self, state):
         """
         Extend ctools.csobservation setstate method to include some members
@@ -102,8 +102,9 @@ class csbkgmodel(ctools.csobservation):
                 self['smax'].real()
         if spatial == 'LOOKUP':
             self['slufile'].filename()
-        if spatial == 'LOOKUP' or spatial == 'GAUSS' or \
-           spatial == 'GAUSS(E)' or spatial == 'PROFILE':
+        if spatial == 'LOOKUP'   or spatial == 'GAUSS'   or \
+           spatial == 'GAUSS(E)' or spatial == 'PROFILE' or \
+           spatial == 'POLYNOM':
             self['gradient'].boolean()
         spectral = self['spectral'].string()
         if spectral == 'NODES':
@@ -178,73 +179,74 @@ class csbkgmodel(ctools.csobservation):
             spectral = gammalib.GModelSpectralPlaw(1.0e-13, -2.5, epivot)
             model    = gammalib.GCTAModelAeffBackground(spectral)
 
-        # Handle LOOKUP model
-        elif self['spatial'].string() == 'LOOKUP':
+        # Handle other models
+        else:
 
-            # Set spatial model
-            factor1 = gammalib.GCTAModelSpatialLookup(self['slufile'].filename())
+            # Handle LOOKUP model
+            if self['spatial'].string() == 'LOOKUP':
 
-            # Optionally add gradient
-            if self['gradient'].boolean():
-                spatial = gammalib.GCTAModelSpatialMultiplicative()
-                factor2 = gammalib.GCTAModelSpatialGradient()
-                spatial.append(factor1)
-                spatial.append(factor2)
-            else:
-                spatial = factor1
+                # Set spatial model
+                factor1 = gammalib.GCTAModelSpatialLookup(self['slufile'].filename())
 
-            # Set spectral model
-            epivot   = gammalib.GEnergy(1.0, 'TeV')
-            spectral = gammalib.GModelSpectralPlaw(3.0e-4, -1.5, epivot)
-            spectral['Prefactor'].min(1.0e-8)
+            # Handle GAUSS model
+            elif self['spatial'].string() == 'GAUSS':
 
-            # Set background model
-            model = gammalib.GCTAModelBackground(spatial, spectral)
-
-        # Handle GAUSS model
-        elif self['spatial'].string() == 'GAUSS':
-
-            # Set spatial model
-            factor1 = gammalib.GCTAModelRadialGauss(3.0)
-            factor1['Sigma'].min(sigma_min)
-            factor1['Sigma'].max(sigma_max)
-
-            # Optionally add gradient
-            if self['gradient'].boolean():
-                spatial = gammalib.GCTAModelSpatialMultiplicative()
-                factor2 = gammalib.GCTAModelSpatialGradient()
-                spatial.append(factor1)
-                spatial.append(factor2)
-            else:
-                spatial = factor1
-
-            # Set spectral model
-            epivot   = gammalib.GEnergy(1.0, 'TeV')
-            spectral = gammalib.GModelSpectralPlaw(3.0e-4, -1.5, epivot)
-            spectral['Prefactor'].min(1.0e-8)
-
-            # Set background model
-            model = gammalib.GCTAModelBackground(spatial, spectral)
-
-        # Handle GAUSS(E) model
-        elif self['spatial'].string() == 'GAUSS(E)':
-
-            # Set spatial model
-            if self['snumbins'].integer() == 1:
+                # Set spatial model
                 factor1 = gammalib.GCTAModelRadialGauss(3.0)
                 factor1['Sigma'].min(sigma_min)
                 factor1['Sigma'].max(sigma_max)
+
+            # Handle GAUSS(E) model
+            elif self['spatial'].string() == 'GAUSS(E)':
+
+                # Set spatial model. If a single energy bin is specified then
+                # use the GAUSS model. Otherwise allocate a node spectrum for
+                # the energy nodes of GAUSS(E).
+                if self['snumbins'].integer() == 1:
+                    factor1 = gammalib.GCTAModelRadialGauss(3.0)
+                    factor1['Sigma'].min(sigma_min)
+                    factor1['Sigma'].max(sigma_max)
+                else:
+                    emin     = gammalib.GEnergy(self['smin'].real(), 'TeV')
+                    emax     = gammalib.GEnergy(self['smax'].real(), 'TeV')
+                    energies = gammalib.GEnergies(self['snumbins'].integer(), emin, emax)
+                    spectrum = gammalib.GModelSpectralConst(3.0)
+                    nodes    = gammalib.GModelSpectralNodes(spectrum, energies)
+                    for i in range(nodes.nodes()):
+                        nodes[i*2+1].min(sigma_min)
+                        nodes[i*2+1].max(sigma_max)
+                    nodes.autoscale()
+                    factor1 = gammalib.GCTAModelSpatialGaussSpectrum(nodes)
+
+            # Handle PROFILE model
+            elif self['spatial'].string() == 'PROFILE':
+
+                # Set spatial model
+                factor1 = gammalib.GCTAModelRadialProfile(2.0, 4.0, 5.0)
+                factor1['Width'].min(1.0)
+                factor1['Width'].max(10.0)
+                factor1['Core'].min(1.0)
+                factor1['Core'].max(10.0)
+                factor1['Tail'].min(1.0)
+                factor1['Tail'].max(10.0)
+                factor1['Tail'].free()
+
+            # Handle POLYNOM model
+            elif self['spatial'].string() == 'POLYNOM':
+
+                # Set spatial model
+                factor1 = gammalib.GCTAModelRadialPolynom([1.0, -0.1, +0.1])
+                factor1['Coeff0'].min(0.1)
+                factor1['Coeff0'].max(10.0)
+                factor1['Coeff0'].fix()
+                factor1['Coeff1'].min(-10.0)
+                factor1['Coeff1'].max(10.0)
+                factor1['Coeff2'].min(-10.0)
+                factor1['Coeff2'].max(10.0)
+
+            # Any other strings (should never occur)
             else:
-                emin     = gammalib.GEnergy(self['smin'].real(), 'TeV')
-                emax     = gammalib.GEnergy(self['smax'].real(), 'TeV')
-                energies = gammalib.GEnergies(self['snumbins'].integer(), emin, emax)
-                spectrum = gammalib.GModelSpectralConst(3.0)
-                nodes    = gammalib.GModelSpectralNodes(spectrum, energies)
-                for i in range(nodes.nodes()):
-                    nodes[i*2+1].min(sigma_min)
-                    nodes[i*2+1].max(sigma_max)
-                nodes.autoscale()
-                factor1 = gammalib.GCTAModelSpatialGaussSpectrum(nodes)
+                model = None
 
             # Optionally add gradient
             if self['gradient'].boolean():
@@ -262,70 +264,6 @@ class csbkgmodel(ctools.csobservation):
 
             # Set background model
             model = gammalib.GCTAModelBackground(spatial, spectral)
-
-        # Handle PROFILE model
-        elif self['spatial'].string() == 'PROFILE':
-
-            # Set spatial model
-            factor1 = gammalib.GCTAModelRadialProfile(2.0, 4.0, 5.0)
-            factor1['Width'].min(1.0)
-            factor1['Width'].max(10.0)
-            factor1['Core'].min(1.0)
-            factor1['Core'].max(10.0)
-            factor1['Tail'].min(-10.0)
-            factor1['Tail'].max(10.0)
-            factor1['Tail'].free()
-
-            # Optionally add gradient
-            if self['gradient'].boolean():
-                spatial = gammalib.GCTAModelSpatialMultiplicative()
-                factor2 = gammalib.GCTAModelSpatialGradient()
-                spatial.append(factor1)
-                spatial.append(factor2)
-            else:
-                spatial = factor1
-
-            # Set spectral model
-            epivot   = gammalib.GEnergy(1.0, 'TeV')
-            spectral = gammalib.GModelSpectralPlaw(3.0e-4, -1.5, epivot)
-            spectral['Prefactor'].min(1.0e-8)
-
-            # Set background model
-            model = gammalib.GCTAModelBackground(spatial, spectral)
-
-        # Handle POLYNOM model
-        elif self['spatial'].string() == 'POLYNOM':
-
-            # Set spatial model
-            factor1 = gammalib.GCTAModelRadialPolynom([1.0, -0.1, +0.1])
-            factor1['Coeff0'].min(0.1)
-            factor1['Coeff0'].max(10.0)
-            factor1['Coeff0'].fix()
-            factor1['Coeff1'].min(-10.0)
-            factor1['Coeff1'].max(10.0)
-            factor1['Coeff2'].min(-10.0)
-            factor1['Coeff2'].max(10.0)
-
-            # Optionally add gradient
-            if self['gradient'].boolean():
-                spatial = gammalib.GCTAModelSpatialMultiplicative()
-                factor2 = gammalib.GCTAModelSpatialGradient()
-                spatial.append(factor1)
-                spatial.append(factor2)
-            else:
-                spatial = factor1
-
-            # Set spectral model
-            epivot   = gammalib.GEnergy(1.0, 'TeV')
-            spectral = gammalib.GModelSpectralPlaw(3.0e-4, -1.5, epivot)
-            spectral['Prefactor'].min(1.0e-8)
-
-            # Set background model
-            model = gammalib.GCTAModelBackground(spatial, spectral)
-
-        # Any other strings (should never occur)
-        else:
-            model = None
 
         # Set background name and instrument
         if model is not None:
