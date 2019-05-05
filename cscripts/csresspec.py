@@ -550,7 +550,7 @@ class csresspec(ctools.csobservation):
 
         return table
 
-    def _residuals_OnOff(self,obs,obs_id):
+    def _residuals_OnOff(self, obs, obs_id):
         """
         Calculate residual for OnOff observation
 
@@ -614,27 +614,36 @@ class csresspec(ctools.csobservation):
         # Calculate models of individual components if requested
         if self['components'].boolean():
             for component in obs.models():
-                # If background pass
-                # We always add the background at the end so that
-                # we accommodate WSTAT for which the background is not
-                # mandatory in the model
-                if component.classname() == 'GCTAModelIrfBackground':
+
+                # If the component is a background model then pass. We always
+                # add the background at the end so that we accommodate WSTAT
+                # for which the background is not mandatory in the model
+                if component.classname() == 'GCTAModelAeffBackground' or \
+                   component.classname() == 'GCTAModelBackground'     or \
+                   component.classname() == 'GCTAModelCubeBackground' or \
+                   component.classname() == 'GCTAModelIrfBackground'  or \
+                   component.classname() == 'GCTAModelRadialAcceptance':
                     pass
-                # Otherwise calculate gamma component and append to Table
+
+                # ... otherwise calculate gamma component and append to Table
                 else:
                     self._log_value(gammalib.NORMAL,
                                     'Computing model for component',
                                     component.name())
+
                     # Create observation container for individual components
                     model_cont = gammalib.GModels()
                     model_cont.append(component)
+
                     # Calculate gamma model
                     model = onoff.model_gamma(model_cont)
                     model = model.counts_spectrum()
+
                     # Append to table
                     table = self._append_column(table, component.name(),
                                                 model)
-            # Add background already calculated
+
+            # Add now the background that is already calculated
             self._log_value(gammalib.NORMAL,
                             'Computing model for component',
                             'Background')
@@ -712,11 +721,11 @@ class csresspec(ctools.csobservation):
 
                 # If 3D observation
                 if obs[0].classname() == 'GCTAObservation':
-                    table = self._residuals_3D(obs,obs_id)
+                    table = self._residuals_3D(obs, obs_id)
 
                 # otherwise, if On/Off
                 elif obs[0].classname() == 'GCTAOnOffObservation':
-                    table = self._residuals_OnOff(obs,obs_id)
+                    table = self._residuals_OnOff(obs, obs_id)
 
                 # Append results table to output file
                 self._fits.append(table)
