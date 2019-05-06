@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.0
 
-26 April 2019
+6 May 2019
 
 
 Introduction
@@ -427,6 +427,11 @@ None
 
 csresspec - Generate residual spectrum
 --------------------------------------
+The script now also works for observation specific models. Stacking of
+residuals is now only performed after residual computation for each
+observation, so that stacking of observation specific models becomes
+possible (#2883).
+
 An exception occured when using a pre-computed model cube via the modcube
 parameter due to a bug in the code. This bug was fixed (#2448).
 

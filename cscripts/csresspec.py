@@ -31,7 +31,6 @@ class csresspec(ctools.csobservation):
     """
     Generates a residual spectrum
     """
-
     # Constructor
     def __init__(self, *argv):
         """
@@ -368,7 +367,7 @@ class csresspec(ctools.csobservation):
 
         Returns
         -------
-        table : `~gammalib.GFitsBinTable()'
+        table : `~gammalib.GFitsBinTable'
             Residual spectrum as FITS binary table
         """
         # Create FITS table columns
@@ -417,7 +416,7 @@ class csresspec(ctools.csobservation):
             FITS binary table
         name : str
             Column name
-        data : `~gammalib.GEbounds'
+        data : float
             Data to be filled into new column
 
         Returns
@@ -425,11 +424,8 @@ class csresspec(ctools.csobservation):
         table : `~gammalib.GFitsBinTable'
             FITS binary table
         """
-        # Check size compatibility
-        if table.nrows() == data.size():
-            pass
-        # Otherwise throw error
-        else:
+        # If size is incompatible then throw an error
+        if table.nrows() != data.size():
             msg = 'csresspec._append_column: FITS table and data have ' \
                   'incompatible size.'
             raise RuntimeError(msg)
@@ -447,14 +443,105 @@ class csresspec(ctools.csobservation):
         # Return modified table
         return table
 
-    def _residuals_3D(self, obs, obs_id, ccube=None):
+    def _results2table(self, result):
+        """
+        Turn results into FITS table
+
+        Parameters
+        ----------
+        result : dict
+            Result dictionary
+
+        Returns
+        -------
+        table : `~gammalib.GFitsBinTable`
+            FITS binary table
+        """
+        # Log action
+        msg = 'Filling residual table'
+        self._log_string(gammalib.NORMAL, msg)
+        
+        # Fill results table
+        table = self._residuals_table(result['obs_id'],
+                                      result['ebounds'],
+                                      result['counts_on'],
+                                      result['model'],
+                                      result['residuals_on'])
+
+        # Optionally add Off spectrum to table
+        if 'counts_off' in result:
+            table = self._append_column(table, 'Counts_Off', result['counts_off'])
+
+        # Optionally add background/Off model to table
+        if 'background' in result:
+            table = self._append_column(table, 'Model_Off', result['background'])
+
+        # Optionally add Off residuals to table
+        if 'residuals_off' in result:
+            table = self._append_column(table, 'Residuals_Off', result['residuals_off'])
+
+        # Add components
+        for component in result:
+            if 'component_' in component:
+                colname = component[10:]
+                table = self._append_column(table, colname, result[component])
+
+        # Return FITS table
+        return table
+
+    def _stack_results(self, results):
+        """
+        Stack results
+
+        Parameters
+        ----------
+        results : list of dict
+            Residual spectra results
+
+        Returns
+        -------
+        results : list of dict
+            Stacked result
+        """
+        # Loop over results
+        for i, result in enumerate(results):
+
+            # Copy results for first iteration
+            if i == 0:
+                stacked_result = result.copy()
+ 
+            # ... otherwise add results
+            else:
+                stacked_result['obs_id']         = ''
+                stacked_result['counts_on']     += result['counts_on']
+                stacked_result['model']         += result['model']
+                stacked_result['residuals_on']  += result['residuals_on']
+                if 'counts_off' in result:
+                    stacked_result['counts_off']    += result['counts_off']
+                if 'background' in result:
+                    stacked_result['background']    += result['background']
+                if 'residuals_off' in result:
+                    stacked_result['residuals_off'] += result['residuals_off']
+                for component in result:
+                    if 'component_' in component:
+                        stacked_result[component] += result[component]
+
+        # Create list of stacked results
+        results = [stacked_result]
+        
+        # Return stacked results
+        return results
+
+    def _residuals_3D(self, obs, models, obs_id, ccube=None):
         """
         Calculate residuals for 3D observation
 
         Parameters
         ----------
-        obs : `~gammalib.GObservations`
-            Observation container with a single observations of type GCTAObservation
+        obs : `~gammalib.GCTAObservation`
+            CTA observation
+        models : `~gammalib.GModels`
+            Models
         obs_id : str
             Observation ID
         ccube : `~gammalib.GCTAEventCube', optional
@@ -462,13 +549,17 @@ class csresspec(ctools.csobservation):
 
         Returns
         -------
-        table : `~gammalib.GFitsBinTable()'
-            Residual spectrum as FITS binary table
+        result : dict
+            Residual result dictionary
         """
+        # Create observation container with observation
+        obs_container = gammalib.GObservations()
+        obs_container.append(obs)
+        obs_container.models(models)
 
         # If binned data already exist set the evlist_info dictionary to have
         # attribute was_list False
-        if obs[0].eventtype() == 'CountsCube' or ccube is not None:
+        if obs.eventtype() == 'CountsCube' or ccube is not None:
             evlist_info = {'was_list': False}
 
         # ... otherwise bin now
@@ -477,7 +568,7 @@ class csresspec(ctools.csobservation):
             # mask only the ROI for residual calculation
             msg = 'Setting up binned observation'
             self._log_string(gammalib.NORMAL, msg)
-            obs, evlist_info = self._bin_evlist(obs)
+            obs_container, evlist_info = self._bin_evlist(obs_container)
 
         # Calculate Model and residuals. If model cube is provided load
         # it
@@ -488,7 +579,7 @@ class csresspec(ctools.csobservation):
         else:
             msg = 'Computing model cube'
             self._log_string(gammalib.NORMAL, msg)
-            modelcube = ctools.ctmodel(obs)
+            modelcube = ctools.ctmodel(obs_container)
             if ccube is not None:
                 modelcube.cube(ccube)
             modelcube['edisp'] = self['edisp'].boolean()
@@ -499,7 +590,7 @@ class csresspec(ctools.csobservation):
         if ccube is not None:
             cntcube = ccube
         else:
-            cntcube = obs[0].events().copy()
+            cntcube = obs_container[0].events().copy()
 
         # Derive count spectra from cubes
         msg = 'Computing counts, model, and residual spectra'
@@ -511,21 +602,24 @@ class csresspec(ctools.csobservation):
         residuals = obsutils.residuals(self, counts, model)
 
         # Extract energy bounds
-        ebounds = cntcube.ebounds()
+        ebounds = cntcube.ebounds().copy()
 
-        # Fill results table
-        msg = 'Filling residual table'
-        self._log_string(gammalib.NORMAL, msg)
-        table = self._residuals_table(obs_id, ebounds, counts, model,
-                                      residuals)
+        # Set result dictionary
+        result = {'obs_id':         obs_id,
+                  'ebounds':        ebounds,
+                  'counts_on':      counts,
+                  'model':          model,
+                  'residuals_on':   residuals}
 
         # Calculate models of individual components if requested
         if self['components'].boolean():
-            for component in obs.models():
-                # Log component
+
+            # Loop over components
+            for component in models:
+
+                # Log action
                 self._log_value(gammalib.NORMAL,
-                                'Computing model component',
-                                component.name())
+                                'Computing model component', component.name())
 
                 # Set model cube models to individual component
                 model_cont = gammalib.GModels()
@@ -542,78 +636,75 @@ class csresspec(ctools.csobservation):
 
                 # Extract spectrum of individual component
                 modcube = modelcube.cube().copy()
-                model = self._cube_to_spectrum(modcube, evlist_info)
+                model   = self._cube_to_spectrum(modcube, evlist_info)
 
-                # append component to table
-                table = self._append_column(table, component.name(),
-                                            model)
+                # Append to results
+                result['component_%s' % component.name()] = model
 
-        return table
+        # Return result
+        return result
 
-    def _residuals_OnOff(self, obs, obs_id):
+    def _residuals_OnOff(self, obs, models, obs_id):
         """
         Calculate residual for OnOff observation
 
         Parameters
         ----------
-        obs : `~gammalib.GObservations`
-            Observation container with a single observations of type GCTAOnOffObservation
+        obs : `~gammalib.GOnOffObservation`
+            OnOff observation
+        models : `~gammalib.GModels`
+            Models
         obs_id : str
             Observation ID
 
         Returns
         -------
-        table : `~gammalib.GFitsBinTable'
-            Residual spectrum as FITS binary table
+        result : dict
+            Residual result dictionary
         """
-
-        # Calculate Counts, Model and residuals
+        # Log action
         msg = 'Computing counts, model, and residual spectra'
         self._log_string(gammalib.NORMAL, msg)
 
-        onoff = obs[0]
-
         # On spectrum
-        counts = onoff.on_spec().counts_spectrum()
+        counts = obs.on_spec().counts_spectrum()
 
         # Model for On region
-        background = onoff.model_background(obs.models()).counts_spectrum()
-        alpha      = onoff.on_spec().backscal_spectrum()
+        background = obs.model_background(models).counts_spectrum()
+        alpha      = obs.on_spec().backscal_spectrum()
         model      = background.copy()
         model     *= alpha
-        model     += onoff.model_gamma(obs.models()).counts_spectrum()
+        model     += obs.model_gamma(models).counts_spectrum()
 
         # On Residuals
         residuals = obsutils.residuals(self, counts, model)
 
         # Extract energy bounds
-        ebounds = onoff.on_spec().ebounds()
-
-        # Fill results table
-        msg = 'Filling residual table'
-        self._log_string(gammalib.NORMAL, msg)
-        table = self._residuals_table(obs_id, ebounds, counts, model,
-                                      residuals)
+        ebounds = obs.on_spec().ebounds()
 
         # Get Off spectrum and add to table
         msg = 'Computing counts, model, and residual spectra for Off regions'
         self._log_string(gammalib.NORMAL, msg)
-        counts_off = onoff.off_spec().counts_spectrum()
-        table = self._append_column(table, 'Counts_Off',
-                                    counts_off)
-
-        # Add background/Off model to table
-        table = self._append_column(table, 'Model_Off',
-                                    background)
+        counts_off = obs.off_spec().counts_spectrum()
 
         # Calculate Off residuals and add to table
         residuals_off = obsutils.residuals(self, counts_off, background)
-        table = self._append_column(table, 'Residuals_Off',
-                                    residuals_off)
+
+        # Set result dictionary
+        result = {'obs_id':         obs_id,
+                  'ebounds':        ebounds,
+                  'counts_on':      counts,
+                  'model':          model,
+                  'residuals_on':   residuals,
+                  'counts_off':     counts_off,
+                  'background':     background,
+                  'residuals_off':  residuals_off}
 
         # Calculate models of individual components if requested
         if self['components'].boolean():
-            for component in obs.models():
+
+            # Loop over model components
+            for component in models:
 
                 # If the component is a background model then pass. We always
                 # add the background at the end so that we accommodate WSTAT
@@ -636,22 +727,20 @@ class csresspec(ctools.csobservation):
                     model_cont.append(component)
 
                     # Calculate gamma model
-                    model = onoff.model_gamma(model_cont)
+                    model = obs.model_gamma(model_cont)
                     model = model.counts_spectrum()
 
-                    # Append to table
-                    table = self._append_column(table, component.name(),
-                                                model)
+                    # Append to results
+                    result['component_%s' % component.name()] = model
 
             # Add now the background that is already calculated
-            self._log_value(gammalib.NORMAL,
-                            'Computing model for component',
-                            'Background')
-            background *= onoff.on_spec().backscal_spectrum()
-            table = self._append_column(table, 'Background',
-                                        background)
+            bkg      = background.copy()
+            backscal = obs.on_spec().backscal_spectrum()
+            bkg     *= backscal
+            result['component_Background'] = bkg
 
-        return table
+        # Return result
+        return result
 
     # Public methods
     def run(self):
@@ -668,67 +757,50 @@ class csresspec(ctools.csobservation):
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
 
-        # Stack On/Off observations if requested
-        if self._stack and self.obs()[0].classname() == 'GCTAOnOffObservation':
-            msg = 'Stacking %d On/Off observations.' % (self.obs().size())
-            self._log_string(gammalib.NORMAL, msg)
-            stacked = gammalib.GCTAOnOffObservation(self.obs())
-            stacked_obs = gammalib.GObservations()
-            stacked_obs.append(stacked)
-            stacked_obs.models(self.obs().models())
-            self.obs(stacked_obs)
-
         # Log processing header
         self._log_header1(gammalib.TERSE, 'Processing Observations')
 
-        # If observations are unbinned and we stack
-        if self._stack and self.obs()[0].classname() == 'GCTAObservation':
+        # Initialise list of results
+        results = []
 
-            # Log counts cube computation
-            msg = 'Computing count cube from multiple unbinned observations'
-            self._log_string(gammalib.NORMAL, msg)
+        # Loop over observations and calculate residuals
+        for i, obs in enumerate(self.obs()):
 
-            # Create counts cube
-            cta_counts_cube = obsutils.create_counts_cube(self, self.obs())
+            # Retrieve and store obs id
+            obs_id = obs.id()
 
-            # Compute residuals using cube
-            table = self._residuals_3D(self.obs(), '', cta_counts_cube)
+            # If observation id is empty and there is more than one observation
+            # replace with incremental number
+            if obs_id == '' and self.obs().size() > 1:
+                obs_id = '%6.6d' % i
 
-            # Append results table to output file
-            self._fits.append(table)
+            # Log processing of observation
+            if self.obs().size() > 1:
+                self._log_header2(gammalib.NORMAL,
+                                  'Processing observation %s' % obs_id)
 
-        # Otherwise, loop over observations and calculate residuals
-        else:
-            for s, observation in enumerate(self.obs()):
+            # If 3D observation
+            if obs.classname() == 'GCTAObservation':
+                result = self._residuals_3D(obs, self.obs().models(), obs_id)
 
-                # Retrieve and store obs id
-                obs_id = observation.id()
+            # otherwise, if On/Off
+            elif obs.classname() == 'GCTAOnOffObservation':
+                result = self._residuals_OnOff(obs, self.obs().models(), obs_id)
 
-                # If observation id is empty and there is more than one observation
-                # replace with incremental number
-                if obs_id == '' and self.obs().size() > 1:
-                    obs_id = str(s)
+            # Append result to list of results
+            results.append(result)
 
-                # Log processing of observation
-                if self.obs().size() > 1:
-                    self._log_header2(gammalib.NORMAL,
-                                      'Processing observation %s' % obs_id)
-
-                # Turn into observation container and assign models
-                obs = gammalib.GObservations()
-                obs.append(observation)
-                obs.models(self.obs().models())
-
-                # If 3D observation
-                if obs[0].classname() == 'GCTAObservation':
-                    table = self._residuals_3D(obs, obs_id)
-
-                # otherwise, if On/Off
-                elif obs[0].classname() == 'GCTAOnOffObservation':
-                    table = self._residuals_OnOff(obs, obs_id)
-
-                # Append results table to output file
+            # If no stacking is requested the append table to FITS file
+            if not self._stack:
+                table = self._results2table(results[i])
                 self._fits.append(table)
+
+        # If stacking is requested then stack results and append table to
+        # FITS file
+        if self._stack:
+            results = self._stack_results(results)
+            table   = self._results2table(results[0])
+            self._fits.append(table)
 
         # Return
         return

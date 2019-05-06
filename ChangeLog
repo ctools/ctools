@@ -1,8 +1,9 @@
-2019-04-26
+2019-05-06
 
         * Version 1.6.0 released
         ========================
 
+        csresspec now also works for observation specific models (#2883)
         Add more spatial models to csbkgmodel (#2878)
         Add GAUSS(E) model to csbkgmodel (#2868)
         Move ctool::set_obs_bounds() to ctobservation::set_obs_bounds()
