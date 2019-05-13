@@ -2,7 +2,7 @@
 # ==========================================================================
 # ctools Mac OS X package creation
 #
-# Copyright (C) 2017 Sylvie Brau-Nogué
+# Copyright (C) 2017-2019 Sylvie Brau-Nogué
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -134,7 +134,7 @@ make clean
 # =============== #
 cd $SRCDIR
 if [ ! -d "cfitsio" ]; then
-    wget http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/$CFITSIO.tar.gz
+    wget https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/$CFITSIO.tar.gz
     if [ "$?" -ne "0" ]; then
         echo "*** Unable to download $CFITSIO.tar.gz"
         exit 1
