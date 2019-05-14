@@ -47,35 +47,36 @@ converged properly, as illustrated in the example below:
 
 .. code-block:: none
 
-   2018-01-26T13:57:31: +=================================+
-   2018-01-26T13:57:31: | Maximum likelihood optimisation |
-   2018-01-26T13:57:31: +=================================+
-   2018-01-26T13:57:59:  >Iteration   0: -logL=20951221.333, Lambda=1.0e-03
-   2018-01-26T13:58:24:  >Iteration   1: -logL=20920374.352, Lambda=1.0e-03, delta=30846.981, step=1.0e+00, max(|grad|)=74106.669528 [Index:14]
-   2018-01-26T13:58:49:  >Iteration   2: -logL=20914723.637, Lambda=1.0e-04, delta=5650.715, step=1.0e+00, max(|grad|)=6059.304173 [Index:14]
-   2018-01-26T13:59:15:  >Iteration   3: -logL=20912552.166, Lambda=1.0e-05, delta=2171.471, step=1.0e+00, max(|grad|)=4361.007623 [RA:0]
-   2018-01-26T13:59:41:  >Iteration   4: -logL=20911666.571, Lambda=1.0e-06, delta=885.595, step=1.0e+00, max(|grad|)=2602.512475 [RA:0]
-   2018-01-26T14:00:07:  >Iteration   5: -logL=20911523.902, Lambda=1.0e-07, delta=142.669, step=1.0e+00, max(|grad|)=1076.703629 [RA:0]
-   2018-01-26T14:00:31:  >Iteration   6: -logL=20911508.855, Lambda=1.0e-08, delta=15.047, step=1.0e+00, max(|grad|)=333.013402 [RA:0]
-   2018-01-26T14:00:56:  >Iteration   7: -logL=20911507.544, Lambda=1.0e-09, delta=1.311, step=1.0e+00, max(|grad|)=93.512904 [RA:0]
-   2018-01-26T14:01:22:  >Iteration   8: -logL=20911507.529, Lambda=1.0e-10, delta=0.015, step=1.0e+00, max(|grad|)=24.977311 [RA:0]
-   2018-01-26T14:01:46:  >Iteration   9: -logL=20911507.529, Lambda=1.0e-11, delta=0.000, step=1.0e+00, max(|grad|)=6.442211 [RA:0]
-   2018-01-26T14:02:12:
-   2018-01-26T14:02:12: +=========================================+
-   2018-01-26T14:02:12: | Maximum likelihood optimisation results |
-   2018-01-26T14:02:12: +=========================================+
-   2018-01-26T14:02:12: === GOptimizerLM ===
-   2018-01-26T14:02:12:  Optimized function value ..: 20911507.529
-   2018-01-26T14:02:12:  Absolute precision ........: 0.005
-   2018-01-26T14:02:12:  Acceptable value decrease .: 2
-   2018-01-26T14:02:12:  Optimization status .......: converged
-   2018-01-26T14:02:12:  Number of parameters ......: 17
-   2018-01-26T14:02:12:  Number of free parameters .: 11
-   2018-01-26T14:02:12:  Number of iterations ......: 9
-   2018-01-26T14:02:12:  Lambda ....................: 1e-12
-   2018-01-26T14:02:12:  Maximum log likelihood ....: -20911507.529
-   2018-01-26T14:02:12:  Observed events  (Nobs) ...: 3084595.000
-   2018-01-26T14:02:12:  Predicted events (Npred) ..: 3084591.999 (Nobs - Npred = 3.00117048900574)
+   2019-04-08T09:07:55: +=================================+
+   2019-04-08T09:07:55: | Maximum likelihood optimisation |
+   2019-04-08T09:07:55: +=================================+
+   2019-04-08T09:08:59:  >Iteration   0: -logL=20943561.913, Lambda=1.0e-03
+   2019-04-08T09:10:00:  >Iteration   1: -logL=20918670.241, Lambda=1.0e-03, delta=24891.672, step=1.0e+00, max(|grad|)=58029.396529 [Index:26]
+   2019-04-08T09:11:01:  >Iteration   2: -logL=20913349.801, Lambda=1.0e-04, delta=5320.440, step=1.0e+00, max(|grad|)=5850.894621 [RA:0]
+   2019-04-08T09:12:04:  >Iteration   3: -logL=20911154.917, Lambda=1.0e-05, delta=2194.884, step=1.0e+00, max(|grad|)=4316.126017 [RA:0]
+   2019-04-08T09:13:05:  >Iteration   4: -logL=20910268.971, Lambda=1.0e-06, delta=885.946, step=1.0e+00, max(|grad|)=2582.430399 [RA:0]
+   2019-04-08T09:14:07:  >Iteration   5: -logL=20910125.113, Lambda=1.0e-07, delta=143.859, step=1.0e+00, max(|grad|)=1071.357032 [RA:0]
+   2019-04-08T09:15:08:  >Iteration   6: -logL=20910109.424, Lambda=1.0e-08, delta=15.689, step=1.0e+00, max(|grad|)=332.605987 [RA:0]
+   2019-04-08T09:16:10:  >Iteration   7: -logL=20910107.964, Lambda=1.0e-09, delta=1.460, step=1.0e+00, max(|grad|)=-100.227262 [RA:7]
+   2019-04-08T09:17:13:  >Iteration   8: -logL=20910107.928, Lambda=1.0e-10, delta=0.036, step=1.0e+00, max(|grad|)=-62.422960 [RA:7]
+   2019-04-08T09:18:13:  >Iteration   9: -logL=20910107.921, Lambda=1.0e-11, delta=0.007, step=1.0e+00, max(|grad|)=-38.916864 [RA:7]
+   2019-04-08T09:19:14:  >Iteration  10: -logL=20910107.919, Lambda=1.0e-12, delta=0.003, step=1.0e+00, max(|grad|)=-24.284973 [RA:7]
+   2019-04-08T09:20:15:
+   2019-04-08T09:20:15: +=========================================+
+   2019-04-08T09:20:15: | Maximum likelihood optimisation results |
+   2019-04-08T09:20:15: +=========================================+
+   2019-04-08T09:20:15: === GOptimizerLM ===
+   2019-04-08T09:20:15:  Optimized function value ..: 20910107.919
+   2019-04-08T09:20:15:  Absolute precision ........: 0.005
+   2019-04-08T09:20:15:  Acceptable value decrease .: 2
+   2019-04-08T09:20:15:  Optimization status .......: converged
+   2019-04-08T09:20:15:  Number of parameters ......: 29
+   2019-04-08T09:20:15:  Number of free parameters .: 19
+   2019-04-08T09:20:15:  Number of iterations ......: 10
+   2019-04-08T09:20:15:  Lambda ....................: 1e-13
+   2019-04-08T09:20:15:  Maximum log likelihood ....: -20910107.919
+   2019-04-08T09:20:15:  Observed events  (Nobs) ...: 3084595.000
+   2019-04-08T09:20:15:  Predicted events (Npred) ..: 3084591.995 (Nobs - Npred = 3.00508165732026)
 
 Also the :ref:`ctbutterfly` tool and the :ref:`csspec` and :ref:`csresmap`
 scripts can be run into unbinned mode by providing the

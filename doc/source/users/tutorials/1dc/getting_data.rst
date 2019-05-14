@@ -7,6 +7,7 @@ The
 :ref:`first CTA Data Challenge <glossary_1dc>`
 data are available on the
 `CTA ownCloud server <https://owncloud.cta-observatory.org>`_.
+Only CTA Consortium members are entitled to access the data.
 You need your usual CTA credentials to download the data.
 
 The release contains simulated data for the Galactic Plane Survey, the

@@ -214,6 +214,25 @@ they exist.
 Model fitting using the Levenberg-Marquardt algorithm is implemented by
 :ref:`ctlike`.
 
+.. note::
+   Computation of :math:`\alpha_{kl}` and :math:`\beta_k` implies computation
+   of derivatives of :math:`P(p',E',t' | M)` with respect to the parameters
+   of the model :math:`M`.
+   According to
+   `Numerical Recipes (section 15.5.1) <http://www.nrbook.com/a/bookcpdf.php>`_
+   second derivatives in :math:`P(p',E',t' | M)` are neglected in ctools,
+   which implies that only first derivatives
+
+   .. math::
+      \frac{\partial P(p',E',t' | M)}{\partial a_k} =
+      \frac{\partial P(p',E',t' | M)}{\partial M}
+      \frac{\partial M}{\partial a_k}
+
+   are computed.
+   If possible, derivates are computed analytically (for example for spectral
+   model parameters), otherwise numerical derivatives are used (for example for
+   spatial or temporal model parameters).
+
 
 Statistical parameter errors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

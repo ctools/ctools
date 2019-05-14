@@ -70,19 +70,20 @@ Next, create a skymap to identify the source region. You do this using the
 
    $ ctskymap
    Input event list or observation definition XML file [events.fits] obs.xml
+   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 350.85
    Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 58.815
-   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
-   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Image scale (in degrees/pixel) [0.02]
    Size of the X axis in pixels [200] 250
    Size of the Y axis in pixels [200] 250
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0] 50.0
    Background subtraction method (NONE|IRF|RING) [NONE] RING
-   Source region radius for estimating on-counts (degrees) [0.2]
-   Inner ring radius (degrees) [0.6]
-   Outer ring radius (degrees) [0.8]
+   Source region radius for estimating on-counts (degrees) [0.1] 0.05
+   Inner background ring radius (degrees) [0.6]
+   Outer background ring radius (degrees) [0.8]
+   Number of iterations for exclusion regions computation (0-100) [0]
    Output skymap file [skymap.fits]
 
 The ``RING`` background subtraction method was used that is also a classical
@@ -143,19 +144,20 @@ parameter ``inexclusion`` on the command line:
 
    $ ctskymap inexclusion=CasA_exclusion.reg
    Input event list or observation definition XML file [obs.xml]
+   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
    First coordinate of image center in degrees (RA or galactic l) (0-360) [350.85]
    Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [58.815]
-   Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
-   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Image scale (in degrees/pixel) [0.02]
    Size of the X axis in pixels [250]
    Size of the Y axis in pixels [250]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [50.0]
    Background subtraction method (NONE|IRF|RING) [RING]
-   Source region radius for estimating on-counts (degrees) [0.2]
-   Inner ring radius (degrees) [0.6]
-   Outer ring radius (degrees) [0.8]
+   Source region radius for estimating on-counts (degrees) [0.05]
+   Inner background ring radius (degrees) [0.6]
+   Outer background ring radius (degrees) [0.8]
+   Number of iterations for exclusion regions computation (0-100) [0]
    Output skymap file [skymap.fits] skymap_exclusion.fits
 
 Below you can see the new significance map with the source exclusion region.
@@ -172,6 +174,16 @@ In general you will need to iterate until you have found all the significant
 gamma-ray emission regions and added them to the exclusion regions or map,
 which will then be used for spectral extraction.
 
+.. note::
+   :ref:`ctskymap` will automatically generate exclusion maps by collecting all
+   sky map pixels with a significance above a given threshold in an exclusion
+   map. Since the pixel significance will depend on the background estimate,
+   and hence the exclusion map itself, the pixel significance needs to be
+   iteratively recomputed after update of the exclusion map. The ``iterations``
+   parameter allows to specify the number of iterations (typically 3 are
+   sufficient) and the ``threshold`` parameter specifies the significance
+   threshold for pixels to be included in the exclusion map.
+
 
 Create an On/Off observation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -187,12 +199,14 @@ follows:
 
    $ csphagen
    Input event list or observation definition XML file [obs.xml]
+   Input model definition XML file (if NONE, use point source) [NONE]
    Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
    Start value for first energy bin in TeV [0.1]
    Stop value for last energy bin in TeV [100.0] 50.0
    Number of energy bins [120] 30
    Stack multiple observations into single PHA, ARF and RMF files? [no] yes
    Output observation definition XML file [onoff_obs.xml]
+   Output model definition XML file [onoff_model.xml]
    Method for background estimation (REFLECTED|CUSTOM) [REFLECTED]
    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Right Ascension of source region centre (deg) (0-360) [83.63] 350.85
@@ -208,7 +222,7 @@ The central output file is the
 
    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
    <observation_list title="observation list">
-     <observation name="" id="" instrument="CTAOnOff" statistic="cstat">
+     <observation name="" id="" instrument="CTAOnOff" statistic="wstat">
        <parameter name="Pha_on"  file="onoff_stacked_pha_on.fits" />
        <parameter name="Pha_off" file="onoff_stacked_pha_off.fits" />
        <parameter name="Arf"     file="onoff_stacked_arf.fits" />
@@ -254,33 +268,25 @@ using the :ref:`csobsinfo` script).
 Fitting the On/Off observation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Before fitting the On/Off observation you need a model that must contain a
-component for the source, and a component for the background.
-Here is what such a
+:ref:`csphagen` also generated an output
 :ref:`model definition file <glossary_moddef>`
-looks like:
+``onoff_model.xml`` than can be readily used for model fitting. Here is the
+content of that file:
 
 .. code-block:: xml
 
    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
    <source_library title="source library">
-     <source name="Cassiopeia A" type="PointSource">
+     <source name="Dummy" type="PointSource">
        <spectrum type="PowerLaw">
-         <parameter name="Prefactor"   value="1.45" scale="1e-18" min="0"            free="1"/>
-         <parameter name="Index"       value="2.75" scale="-1"    min="-10" max="10" free="1"/>
-         <parameter name="PivotEnergy" value="1"    scale="1e6"                      free="0"/>
+         <parameter name="Prefactor" value="1" error="0" scale="1e-18" min="0" free="1" />
+         <parameter name="Index" value="1" error="-0" scale="-2" min="-5" max="5" free="1" />
+         <parameter name="PivotEnergy" value="1" scale="1000000" free="0" />
        </spectrum>
        <spatialModel type="PointSource">
-         <parameter name="RA"  value="350.8500" scale="1" free="0"/>
-         <parameter name="DEC" value="58.8150"  scale="1" free="0"/>
+         <parameter name="RA" value="350.85" scale="1" free="0" />
+         <parameter name="DEC" value="58.815" scale="1" free="0" />
        </spatialModel>
-     </source>
-     <source name="Background model" type="CTAIrfBackground" instrument="CTAOnOff">
-       <spectrum type="PowerLaw">
-         <parameter name="Prefactor" value="1" scale="1"   min="0.001" max="1000" free="1"/>
-         <parameter name="Index"     value="0" scale="1"   min="-5"    max="5"    free="1"/>
-         <parameter name="Scale"     value="1" scale="1e6" min="0.01"  max="1000" free="0"/>
-       </spectrum>
      </source>
    </source_library>
 
@@ -290,75 +296,64 @@ Fit now the model to the data using :ref:`ctlike`:
 
    $ ctlike
    Input event list, counts cube or observation definition XML file [events.fits] onoff_obs.xml
-   Input model definition XML file [$CTOOLS/share/models/crab.xml] models.xml
+   Input model definition XML file [$CTOOLS/share/models/crab.xml] onoff_model.xml
    Output model definition XML file [crab_results.xml] CasA_results.xml
 
 The fit result can be inspected by peeking the log file:
 
 .. code-block:: none
 
-   2018-01-26T15:27:12: +=================================+
-   2018-01-26T15:27:12: | Maximum likelihood optimisation |
-   2018-01-26T15:27:12: +=================================+
-   2018-01-26T15:27:12:  >Iteration   0: -logL=-1026083.619, Lambda=1.0e-03
-   2018-01-26T15:27:12:  >Iteration   1: -logL=-1026087.793, Lambda=1.0e-03, delta=4.173, step=1.0e+00, max(|grad|)=21.271945 [Index:7]
-   2018-01-26T15:27:12:  >Iteration   2: -logL=-1026087.796, Lambda=1.0e-04, delta=0.003, step=1.0e+00, max(|grad|)=0.102571 [Index:3]
-   2018-01-26T15:27:12:
-   2018-01-26T15:27:12: +=========================================+
-   2018-01-26T15:27:12: | Maximum likelihood optimisation results |
-   2018-01-26T15:27:12: +=========================================+
-   2018-01-26T15:27:12: === GOptimizerLM ===
-   2018-01-26T15:27:12:  Optimized function value ..: -1026087.796
-   2018-01-26T15:27:12:  Absolute precision ........: 0.005
-   2018-01-26T15:27:12:  Acceptable value decrease .: 2
-   2018-01-26T15:27:12:  Optimization status .......: converged
-   2018-01-26T15:27:12:  Number of parameters ......: 10
-   2018-01-26T15:27:12:  Number of free parameters .: 4
-   2018-01-26T15:27:12:  Number of iterations ......: 2
-   2018-01-26T15:27:12:  Lambda ....................: 1e-05
-   2018-01-26T15:27:12:  Maximum log likelihood ....: 1026087.796
-   2018-01-26T15:27:12:  Observed events  (Nobs) ...: 9732.000
-   2018-01-26T15:27:12:  Predicted events (Npred) ..: 9721.777 (Nobs - Npred = 10.2227809809738)
-   2018-01-26T15:27:12: === GModels ===
-   2018-01-26T15:27:12:  Number of models ..........: 2
-   2018-01-26T15:27:12:  Number of parameters ......: 10
-   2018-01-26T15:27:12: === GModelSky ===
-   2018-01-26T15:27:12:  Name ......................: Cassiopeia A
-   2018-01-26T15:27:12:  Instruments ...............: all
-   2018-01-26T15:27:12:  Instrument scale factors ..: unity
-   2018-01-26T15:27:12:  Observation identifiers ...: all
-   2018-01-26T15:27:12:  Model type ................: PointSource
-   2018-01-26T15:27:12:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
-   2018-01-26T15:27:12:  Number of parameters ......: 6
-   2018-01-26T15:27:12:  Number of spatial par's ...: 2
-   2018-01-26T15:27:12:   RA .......................: 350.85 deg (fixed,scale=1)
-   2018-01-26T15:27:12:   DEC ......................: 58.815 deg (fixed,scale=1)
-   2018-01-26T15:27:12:  Number of spectral par's ..: 3
-   2018-01-26T15:27:12:   Prefactor ................: 1.45578961370674e-18 +/- 4.9384961682402e-20 [0,infty[ ph/cm2/s/MeV (free,scale=1e-18,gradient)
-   2018-01-26T15:27:12:   Index ....................: -2.73210299568164 +/- 0.0232463328679961 [10,-10]  (free,scale=-1,gradient)
-   2018-01-26T15:27:12:   PivotEnergy ..............: 1000000 MeV (fixed,scale=1000000,gradient)
-   2018-01-26T15:27:12:  Number of temporal par's ..: 1
-   2018-01-26T15:27:12:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-   2018-01-26T15:27:12: === GCTAModelIrfBackground ===
-   2018-01-26T15:27:12:  Name ......................: Background model
-   2018-01-26T15:27:12:  Instruments ...............: CTAOnOff
-   2018-01-26T15:27:12:  Instrument scale factors ..: unity
-   2018-01-26T15:27:12:  Observation identifiers ...: all
-   2018-01-26T15:27:12:  Model type ................: "PowerLaw" * "Constant"
-   2018-01-26T15:27:12:  Number of parameters ......: 4
-   2018-01-26T15:27:12:  Number of spectral par's ..: 3
-   2018-01-26T15:27:12:   Prefactor ................: 1.01524362954018 +/- 0.00842555027426839 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
-   2018-01-26T15:27:12:   Index ....................: 0.00464866003898362 +/- 0.00484378659736699 [-5,5]  (free,scale=1,gradient)
-   2018-01-26T15:27:12:   Scale ....................: 1000000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
-   2018-01-26T15:27:12:  Number of temporal par's ..: 1
-   2018-01-26T15:27:12:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-09T13:23:01: +=================================+
+   2019-04-09T13:23:01: | Maximum likelihood optimisation |
+   2019-04-09T13:23:01: +=================================+
+   2019-04-09T13:23:01:  >Iteration   0: -logL=808.123, Lambda=1.0e-03
+   2019-04-09T13:23:01:  >Iteration   1: -logL=397.528, Lambda=1.0e-03, delta=410.596, step=1.0e+00, max(|grad|)=5592.136956 [Index:3]
+   2019-04-09T13:23:01:  >Iteration   2: -logL=30.531, Lambda=1.0e-04, delta=366.997, step=1.0e+00, max(|grad|)=44.701876 [Index:3]
+   2019-04-09T13:23:01:  >Iteration   3: -logL=28.754, Lambda=1.0e-05, delta=1.777, step=1.0e+00, max(|grad|)=8.638016 [Index:3]
+   2019-04-09T13:23:01:  >Iteration   4: -logL=28.718, Lambda=1.0e-06, delta=0.036, step=1.0e+00, max(|grad|)=2.410274 [Index:3]
+   2019-04-09T13:23:01:  >Iteration   5: -logL=28.717, Lambda=1.0e-07, delta=0.001, step=1.0e+00, max(|grad|)=0.338036 [Index:3]
+   2019-04-09T13:23:01:
+   2019-04-09T13:23:01: +=========================================+
+   2019-04-09T13:23:01: | Maximum likelihood optimisation results |
+   2019-04-09T13:23:01: +=========================================+
+   2019-04-09T13:23:01: === GOptimizerLM ===
+   2019-04-09T13:23:01:  Optimized function value ..: 28.717
+   2019-04-09T13:23:01:  Absolute precision ........: 0.005
+   2019-04-09T13:23:01:  Acceptable value decrease .: 2
+   2019-04-09T13:23:01:  Optimization status .......: converged
+   2019-04-09T13:23:01:  Number of parameters ......: 6
+   2019-04-09T13:23:01:  Number of free parameters .: 2
+   2019-04-09T13:23:01:  Number of iterations ......: 5
+   2019-04-09T13:23:01:  Lambda ....................: 1e-08
+   2019-04-09T13:23:01:  Maximum log likelihood ....: -28.717
+   2019-04-09T13:23:01:  Observed events  (Nobs) ...: 9732.000
+   2019-04-09T13:23:01:  Predicted events (Npred) ..: 9685.547 (Nobs - Npred = 46.4528551491258)
+   2019-04-09T13:23:01: === GModels ===
+   2019-04-09T13:23:01:  Number of models ..........: 1
+   2019-04-09T13:23:01:  Number of parameters ......: 6
+   2019-04-09T13:23:01: === GModelSky ===
+   2019-04-09T13:23:01:  Name ......................: Dummy
+   2019-04-09T13:23:01:  Instruments ...............: all
+   2019-04-09T13:23:01:  Instrument scale factors ..: unity
+   2019-04-09T13:23:01:  Observation identifiers ...: all
+   2019-04-09T13:23:01:  Model type ................: PointSource
+   2019-04-09T13:23:01:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
+   2019-04-09T13:23:01:  Number of parameters ......: 6
+   2019-04-09T13:23:01:  Number of spatial par's ...: 2
+   2019-04-09T13:23:01:   RA .......................: 350.85 deg (fixed,scale=1)
+   2019-04-09T13:23:01:   DEC ......................: 58.815 deg (fixed,scale=1)
+   2019-04-09T13:23:01:  Number of spectral par's ..: 3
+   2019-04-09T13:23:01:   Prefactor ................: 1.40288229704921e-18 +/- 4.79754801405267e-20 [0,infty[ ph/cm2/s/MeV (free,scale=1e-18,gradient)
+   2019-04-09T13:23:01:   Index ....................: -2.78268915221025 +/- 0.0230642440053814 [10,-10]  (free,scale=-2,gradient)
+   2019-04-09T13:23:01:   PivotEnergy ..............: 1000000 MeV (fixed,scale=1000000,gradient)
+   2019-04-09T13:23:01:  Number of temporal par's ..: 1
+   2019-04-09T13:23:01:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 .. tip::
-   By default the ``CSTAT`` statistic is used which fits the background model
-   specified in the ``models.xml`` file to the data. Alternatively you may
-   specify the ``WSTAT`` statistic using the hidden parameter ``statistic`` and
-   hence estimate the background rates directly from the data. In that case, no
-   background model is needed in the :ref:`model definition XML file <glossary_moddef>`:
+   By default the ``WSTAT`` statistic is used which does not require a
+   background model. If a background model should be used it needs to be
+   provided as input model to :ref:`csphagen`. Here an example for an
+   input model:
 
    .. code-block:: xml
 
@@ -375,40 +370,72 @@ The fit result can be inspected by peeking the log file:
             <parameter name="DEC" value="58.8150"  scale="1" free="0"/>
           </spatialModel>
         </source>
+        <source name="Background model" type="CTAIrfBackground" instrument="CTA">
+          <spectrum type="PowerLaw">
+            <parameter name="Prefactor" value="1" scale="1"   min="0.001" max="1000" free="1"/>
+            <parameter name="Index"     value="0" scale="1"   min="-5"    max="5"    free="1"/>
+            <parameter name="Scale"     value="1" scale="1e6" min="0.01"  max="1000" free="0"/>
+          </spectrum>
+        </source>
       </source_library>
 
-   Fit now this modified model to the data by specifying ``statistic=WSTAT`` as
-   argument:
+   Now rerun :ref:`csphagen` as follows:
 
    .. code-block:: bash
 
-      $ ctlike statistic=WSTAT
-      Input event list, counts cube or observation definition XML file [onoff_obs.xml]
-      Input model definition XML file [models.xml] models_wstat.xml
-      Output model definition XML file [CasA_results.xml] CasA_results_wstat.xml
+      $ csphagen
+      Input event list or observation definition XML file [obs.xml]
+      Input model definition XML file (if NONE, use point source) [NONE] CasA_model.xml
+      Source name [Crab] Cassiopeia A
+      Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
+      Start value for first energy bin in TeV [0.1]
+      Stop value for last energy bin in TeV [50.0]
+      Number of energy bins [30]
+      Stack multiple observations into single PHA, ARF and RMF files? [yes]
+      Output observation definition XML file [onoff_obs.xml] onoff_obs_cstat.xml
+      Output model definition XML file [onoff_model.xml] onoff_model_cstat.xml
+      Method for background estimation (REFLECTED|CUSTOM) [REFLECTED]
+      Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+      Right Ascension of source region centre (deg) (0-360) [350.85]
+      Declination of source region centre (deg) (-90-90) [58.815]
+      Radius of source region circle (deg) (0-180) [0.2]
 
-   The fit results, which are very similar to those obtained using ``CSTAT``
+   This produces an
+   :ref:`observation definition file <glossary_obsdef>`
+   ``onoff_obs_cstat.xml`` which has the ``statistic`` attribute set to
+   ``cstat``:
+
+   Now you can refit the data:
+
+   .. code-block:: bash
+
+      $ ctlike
+      Input event list, counts cube or observation definition XML file [onoff_obs.xml] onoff_obs_cstat.xml
+      Input model definition XML file [models.xml] onoff_model_cstat.xml
+      Output model definition XML file [CasA_results.xml] CasA_results_cstat.xml
+
+   The fit results, which are very similar to those obtained using ``WSTAT``
    before, are shown below:
 
    .. code-block:: none
 
-      2018-01-26T16:08:50: === GModelSky ===
-      2018-01-26T16:08:50:  Name ......................: Cassiopeia A
-      2018-01-26T16:08:50:  Instruments ...............: all
-      2018-01-26T16:08:50:  Instrument scale factors ..: unity
-      2018-01-26T16:08:50:  Observation identifiers ...: all
-      2018-01-26T16:08:50:  Model type ................: PointSource
-      2018-01-26T16:08:50:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
-      2018-01-26T16:08:50:  Number of parameters ......: 6
-      2018-01-26T16:08:50:  Number of spatial par's ...: 2
-      2018-01-26T16:08:50:   RA .......................: 350.85 deg (fixed,scale=1)
-      2018-01-26T16:08:50:   DEC ......................: 58.815 deg (fixed,scale=1)
-      2018-01-26T16:08:50:  Number of spectral par's ..: 3
-      2018-01-26T16:08:50:   Prefactor ................: 1.45590007496159e-18 +/- 4.94064694384203e-20 [0,infty[ ph/cm2/s/MeV (free,scale=1e-18,gradient)
-      2018-01-26T16:08:50:   Index ....................: -2.73193507197129 +/- 0.0232609160969081 [10,-10]  (free,scale=-1,gradient)
-      2018-01-26T16:08:50:   PivotEnergy ..............: 1000000 MeV (fixed,scale=1000000,gradient)
-      2018-01-26T16:08:50:  Number of temporal par's ..: 1
-      2018-01-26T16:08:50:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+      2019-04-09T21:27:21: === GModelSky ===
+      2019-04-09T21:27:21:  Name ......................: Cassiopeia A
+      2019-04-09T21:27:21:  Instruments ...............: all
+      2019-04-09T21:27:21:  Instrument scale factors ..: unity
+      2019-04-09T21:27:21:  Observation identifiers ...: all
+      2019-04-09T21:27:21:  Model type ................: PointSource
+      2019-04-09T21:27:21:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
+      2019-04-09T21:27:21:  Number of parameters ......: 6
+      2019-04-09T21:27:21:  Number of spatial par's ...: 2
+      2019-04-09T21:27:21:   RA .......................: 350.85 deg (fixed,scale=1)
+      2019-04-09T21:27:21:   DEC ......................: 58.815 deg (fixed,scale=1)
+      2019-04-09T21:27:21:  Number of spectral par's ..: 3
+      2019-04-09T21:27:21:   Prefactor ................: 1.40606639795433e-18 +/- 4.84093827184383e-20 [0,infty[ ph/cm2/s/MeV (free,scale=1e-18,gradient)
+      2019-04-09T21:27:21:   Index ....................: -2.75705171501787 +/- 0.023581178160149 [10,-10]  (free,scale=-1,gradient)
+      2019-04-09T21:27:21:   PivotEnergy ..............: 1000000 MeV (fixed,scale=1000000,gradient)
+      2019-04-09T21:27:21:  Number of temporal par's ..: 1
+      2019-04-09T21:27:21:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 
 Visualising the source spectrum

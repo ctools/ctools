@@ -133,6 +133,6 @@ version as follows:
    $ source activate ctools-devel
    $ conda install --use-local ctools=1.6.0.dev1
 
-Note that you can chose between Python 2.7, 3.5, 3.6 and 3.7 for your
+Note that you can choose between Python 2.7, 3.5, 3.6 and 3.7 for your
 conda environment.
 
