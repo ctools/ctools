@@ -174,10 +174,12 @@ if [ ! -d "$GAMMALIB" ]; then
         rm -rf $GAMMALIB.tar.gz
         cd $GAMMALIB
     fi
+else
+    cd $GAMMALIB
 fi
 # If we got code from GitLab, then try using release branch, and if not
 # available, use devel branch.
-USE_BRANCH=
+USE_BRANCH=release
 if [ -d ".git" ]; then
     git fetch
     git checkout release
@@ -231,6 +233,8 @@ if [ ! -d "$CTOOLS" ]; then
         rm -rf $CTOOLS.tar.gz
         cd $CTOOLS
     fi
+else
+    cd $CTOOLS
 fi
 # If we got code from GitLab, then use the same branch that was used for
 # GammaLib
