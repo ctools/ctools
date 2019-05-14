@@ -2,7 +2,7 @@
 # ==========================================================================
 # ctools Mac OS X package creation
 #
-# Copyright (C) 2017 Sylvie Brau-Nogué
+# Copyright (C) 2017-2019 Sylvie Brau-Nogué
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -134,7 +134,7 @@ make clean
 # =============== #
 cd $SRCDIR
 if [ ! -d "cfitsio" ]; then
-    wget http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/$CFITSIO.tar.gz
+    wget https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/$CFITSIO.tar.gz
     if [ "$?" -ne "0" ]; then
         echo "*** Unable to download $CFITSIO.tar.gz"
         exit 1
@@ -174,10 +174,12 @@ if [ ! -d "$GAMMALIB" ]; then
         rm -rf $GAMMALIB.tar.gz
         cd $GAMMALIB
     fi
+else
+    cd $GAMMALIB
 fi
 # If we got code from GitLab, then try using release branch, and if not
 # available, use devel branch.
-USE_BRANCH=
+USE_BRANCH=release
 if [ -d ".git" ]; then
     git fetch
     git checkout release
@@ -231,6 +233,8 @@ if [ ! -d "$CTOOLS" ]; then
         rm -rf $CTOOLS.tar.gz
         cd $CTOOLS
     fi
+else
+    cd $CTOOLS
 fi
 # If we got code from GitLab, then use the same branch that was used for
 # GammaLib
