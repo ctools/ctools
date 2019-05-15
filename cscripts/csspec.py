@@ -516,11 +516,13 @@ class csspec(ctools.csobservation):
                 rmf[idst_true, idst_reco] = obs.rmf()[isrc_true, isrc_reco]
 
         # Set On/Off observations
-        obsid     = obs.id()
-        statistic = obs.statistic()
+        obsid      = obs.id()
+        statistic  = obs.statistic()
+        instrument = obs.instrument()
         obs = gammalib.GCTAOnOffObservation(pha_on, pha_off, arf, rmf)
         obs.id(obsid)
         obs.statistic(statistic)
+        obs.instrument(instrument)
 
         # Return observation
         return obs

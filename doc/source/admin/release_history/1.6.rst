@@ -22,6 +22,7 @@ In particular, this release provides:
 Bug fixes
 ---------
 
+* :ref:`csspec` now properly propagates instrument name for On/Off observations
 * [`2883 <https://cta-redmine.irap.omp.eu/issues/2883>`_] -
   :ref:`csresspec` now also works for observation specific models
 * [`2839 <https://cta-redmine.irap.omp.eu/issues/2839>`_] -

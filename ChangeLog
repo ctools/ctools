@@ -1,8 +1,9 @@
-2019-05-06
+2019-05-15
 
         * Version 1.6.0 released
         ========================
 
+        csspec now properly propagates instrument name for On/Off observations
         csresspec now also works for observation specific models (#2883)
         Add more spatial models to csbkgmodel (#2878)
         Add GAUSS(E) model to csbkgmodel (#2868)
