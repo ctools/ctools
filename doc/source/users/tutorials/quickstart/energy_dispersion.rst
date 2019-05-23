@@ -147,7 +147,6 @@ And here is the output in the log file:
    2019-04-02T14:24:57: === GModelSky ===
    2019-04-02T14:24:57:  Name ......................: Crab
    2019-04-02T14:24:57:  Instruments ...............: all
-   2019-04-02T14:24:57:  Instrument scale factors ..: unity
    2019-04-02T14:24:57:  Observation identifiers ...: all
    2019-04-02T14:24:57:  Model type ................: PointSource
    2019-04-02T14:24:57:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
@@ -161,10 +160,10 @@ And here is the output in the log file:
    2019-04-02T14:24:57:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
    2019-04-02T14:24:57:  Number of temporal par's ..: 1
    2019-04-02T14:24:57:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-02T14:24:57:  Number of scale par's .....: 0
    2019-04-02T14:24:57: === GCTAModelCubeBackground ===
    2019-04-02T14:24:57:  Name ......................: BackgroundModel
    2019-04-02T14:24:57:  Instruments ...............: CTA, HESS, MAGIC, VERITAS
-   2019-04-02T14:24:57:  Instrument scale factors ..: unity
    2019-04-02T14:24:57:  Observation identifiers ...: all
    2019-04-02T14:24:57:  Model type ................: "PowerLaw" * "Constant"
    2019-04-02T14:24:57:  Number of parameters ......: 4
@@ -222,7 +221,6 @@ Here the output in the log file:
    2019-04-02T14:27:05: === GModelSky ===
    2019-04-02T14:27:05:  Name ......................: Crab
    2019-04-02T14:27:05:  Instruments ...............: all
-   2019-04-02T14:27:05:  Instrument scale factors ..: unity
    2019-04-02T14:27:05:  Observation identifiers ...: all
    2019-04-02T14:27:05:  Model type ................: PointSource
    2019-04-02T14:27:05:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
@@ -236,10 +234,10 @@ Here the output in the log file:
    2019-04-02T14:27:05:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
    2019-04-02T14:27:05:  Number of temporal par's ..: 1
    2019-04-02T14:27:05:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-02T14:27:05:  Number of scale par's .....: 0
    2019-04-02T14:27:05: === GCTAModelIrfBackground ===
    2019-04-02T14:27:05:  Name ......................: CTABackgroundModel
    2019-04-02T14:27:05:  Instruments ...............: CTA
-   2019-04-02T14:27:05:  Instrument scale factors ..: unity
    2019-04-02T14:27:05:  Observation identifiers ...: all
    2019-04-02T14:27:05:  Model type ................: "PowerLaw" * "Constant"
    2019-04-02T14:27:05:  Number of parameters ......: 4

@@ -179,7 +179,6 @@ both observations.
    2019-04-03T12:03:41: === GModelSky ===
    2019-04-03T12:03:41:  Name ......................: Crab
    2019-04-03T12:03:41:  Instruments ...............: all
-   2019-04-03T12:03:41:  Instrument scale factors ..: unity
    2019-04-03T12:03:41:  Observation identifiers ...: all
    2019-04-03T12:03:41:  Model type ................: PointSource
    2019-04-03T12:03:41:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
@@ -193,10 +192,10 @@ both observations.
    2019-04-03T12:03:41:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
    2019-04-03T12:03:41:  Number of temporal par's ..: 1
    2019-04-03T12:03:41:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-03T12:03:41:  Number of scale par's .....: 0
    2019-04-03T12:03:41: === GCTAModelIrfBackground ===
    2019-04-03T12:03:41:  Name ......................: CTABackgroundModel
    2019-04-03T12:03:41:  Instruments ...............: CTA
-   2019-04-03T12:03:41:  Instrument scale factors ..: unity
    2019-04-03T12:03:41:  Observation identifiers ...: all
    2019-04-03T12:03:41:  Model type ................: "PowerLaw" * "Constant"
    2019-04-03T12:03:41:  Number of parameters ......: 4

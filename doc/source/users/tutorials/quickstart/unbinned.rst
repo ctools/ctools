@@ -84,7 +84,6 @@ the same events for both analyses.
    2019-04-02T14:15:10: === GModelSky ===
    2019-04-02T14:15:10:  Name ......................: Crab
    2019-04-02T14:15:10:  Instruments ...............: all
-   2019-04-02T14:15:10:  Instrument scale factors ..: unity
    2019-04-02T14:15:10:  Observation identifiers ...: all
    2019-04-02T14:15:10:  Model type ................: PointSource
    2019-04-02T14:15:10:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
@@ -98,10 +97,10 @@ the same events for both analyses.
    2019-04-02T14:15:10:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
    2019-04-02T14:15:10:  Number of temporal par's ..: 1
    2019-04-02T14:15:10:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-02T14:15:10:  Number of scale par's .....: 0
    2019-04-02T14:15:10: === GCTAModelIrfBackground ===
    2019-04-02T14:15:10:  Name ......................: CTABackgroundModel
    2019-04-02T14:15:10:  Instruments ...............: CTA
-   2019-04-02T14:15:10:  Instrument scale factors ..: unity
    2019-04-02T14:15:10:  Observation identifiers ...: all
    2019-04-02T14:15:10:  Model type ................: "PowerLaw" * "Constant"
    2019-04-02T14:15:10:  Number of parameters ......: 4

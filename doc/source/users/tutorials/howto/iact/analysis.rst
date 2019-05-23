@@ -64,7 +64,6 @@ which will produce the following output in the log file ``ctlike.log``:
    2019-04-05T14:18:18: === GCTAModelAeffBackground ===
    2019-04-05T14:18:18:  Name ......................: bkg_23523
    2019-04-05T14:18:18:  Instruments ...............: HESS
-   2019-04-05T14:18:18:  Instrument scale factors ..: unity
    2019-04-05T14:18:18:  Observation identifiers ...: 23523
    2019-04-05T14:18:18:  Model type ................: "PowerLaw" * "Constant"
    2019-04-05T14:18:18:  Number of parameters ......: 4
@@ -77,7 +76,6 @@ which will produce the following output in the log file ``ctlike.log``:
    2019-04-05T14:18:18: === GCTAModelAeffBackground ===
    2019-04-05T14:18:18:  Name ......................: bkg_23526
    2019-04-05T14:18:18:  Instruments ...............: HESS
-   2019-04-05T14:18:18:  Instrument scale factors ..: unity
    2019-04-05T14:18:18:  Observation identifiers ...: 23526
    2019-04-05T14:18:18:  Model type ................: "PowerLaw" * "Constant"
    2019-04-05T14:18:18:  Number of parameters ......: 4
@@ -90,7 +88,6 @@ which will produce the following output in the log file ``ctlike.log``:
    2019-04-05T14:18:18: === GCTAModelAeffBackground ===
    2019-04-05T14:18:18:  Name ......................: bkg_23559
    2019-04-05T14:18:18:  Instruments ...............: HESS
-   2019-04-05T14:18:18:  Instrument scale factors ..: unity
    2019-04-05T14:18:18:  Observation identifiers ...: 23559
    2019-04-05T14:18:18:  Model type ................: "PowerLaw" * "Constant"
    2019-04-05T14:18:18:  Number of parameters ......: 4
@@ -103,7 +100,6 @@ which will produce the following output in the log file ``ctlike.log``:
    2019-04-05T14:18:18: === GCTAModelAeffBackground ===
    2019-04-05T14:18:18:  Name ......................: bkg_23592
    2019-04-05T14:18:18:  Instruments ...............: HESS
-   2019-04-05T14:18:18:  Instrument scale factors ..: unity
    2019-04-05T14:18:18:  Observation identifiers ...: 23592
    2019-04-05T14:18:18:  Model type ................: "PowerLaw" * "Constant"
    2019-04-05T14:18:18:  Number of parameters ......: 4
@@ -116,7 +112,6 @@ which will produce the following output in the log file ``ctlike.log``:
    2019-04-05T14:18:18: === GModelSky ===
    2019-04-05T14:18:18:  Name ......................: Crab
    2019-04-05T14:18:18:  Instruments ...............: all
-   2019-04-05T14:18:18:  Instrument scale factors ..: unity
    2019-04-05T14:18:18:  Observation identifiers ...: all
    2019-04-05T14:18:18:  Model type ................: PointSource
    2019-04-05T14:18:18:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
@@ -133,7 +128,6 @@ which will produce the following output in the log file ``ctlike.log``:
    2019-04-05T14:18:18: === GCTAModelIrfBackground ===
    2019-04-05T14:18:18:  Name ......................: CTABackgroundModel
    2019-04-05T14:18:18:  Instruments ...............: CTA
-   2019-04-05T14:18:18:  Instrument scale factors ..: unity
    2019-04-05T14:18:18:  Observation identifiers ...: all
    2019-04-05T14:18:18:  Model type ................: "PowerLaw" * "Constant"
    2019-04-05T14:18:18:  Number of parameters ......: 4

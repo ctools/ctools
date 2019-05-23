@@ -75,7 +75,6 @@ The source is detected with a TS value of 960.3.
    2019-04-04T10:02:58:  Name ......................: Src003
    2019-04-04T10:02:58:  Instruments ...............: all
    2019-04-04T10:02:58:  Test Statistic ............: 960.322220887407
-   2019-04-04T10:02:58:  Instrument scale factors ..: unity
    2019-04-04T10:02:58:  Observation identifiers ...: all
    2019-04-04T10:02:58:  Model type ................: ExtendedSource
    2019-04-04T10:02:58:  Model components ..........: "RadialDisk" * "PowerLaw" * "Constant"
@@ -90,6 +89,7 @@ The source is detected with a TS value of 960.3.
    2019-04-04T10:02:58:   PivotEnergy ..............: 300000 MeV (fixed,scale=300000,gradient)
    2019-04-04T10:02:58:  Number of temporal par's ..: 1
    2019-04-04T10:02:58:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-04T10:02:58:  Number of scale par's .....: 0
 
 .. warning::
    The parameter errors returned by :ref:`ctlike` are purely statistical. In

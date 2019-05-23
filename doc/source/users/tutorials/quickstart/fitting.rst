@@ -128,7 +128,6 @@ Below the last lines of the log file that was produced by this run:
    2019-04-02T13:55:48: === GModelSky ===
    2019-04-02T13:55:48:  Name ......................: Crab
    2019-04-02T13:55:48:  Instruments ...............: all
-   2019-04-02T13:55:48:  Instrument scale factors ..: unity
    2019-04-02T13:55:48:  Observation identifiers ...: all
    2019-04-02T13:55:48:  Model type ................: PointSource
    2019-04-02T13:55:48:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
@@ -142,10 +141,10 @@ Below the last lines of the log file that was produced by this run:
    2019-04-02T13:55:48:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
    2019-04-02T13:55:48:  Number of temporal par's ..: 1
    2019-04-02T13:55:48:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-02T13:55:48:  Number of scale par's .....: 0
    2019-04-02T13:55:48: === GCTAModelCubeBackground ===
    2019-04-02T13:55:48:  Name ......................: BackgroundModel
    2019-04-02T13:55:48:  Instruments ...............: CTA, HESS, MAGIC, VERITAS
-   2019-04-02T13:55:48:  Instrument scale factors ..: unity
    2019-04-02T13:55:48:  Observation identifiers ...: all
    2019-04-02T13:55:48:  Model type ................: "PowerLaw" * "Constant"
    2019-04-02T13:55:48:  Number of parameters ......: 4

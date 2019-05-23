@@ -245,7 +245,6 @@ log file ``ctlike.log`` that was also created by :ref:`ctlike`:
    2019-04-04T15:11:40:  Name ......................: Crab
    2019-04-04T15:11:40:  Instruments ...............: all
    2019-04-04T15:11:40:  Test Statistic ............: 915.478960024426
-   2019-04-04T15:11:40:  Instrument scale factors ..: unity
    2019-04-04T15:11:40:  Observation identifiers ...: all
    2019-04-04T15:11:40:  Model type ................: PointSource
    2019-04-04T15:11:40:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
@@ -259,6 +258,7 @@ log file ``ctlike.log`` that was also created by :ref:`ctlike`:
    2019-04-04T15:11:40:   PivotEnergy ..............: 1 [0.01,1000] MeV (fixed,scale=1,gradient)
    2019-04-04T15:11:40:  Number of temporal par's ..: 1
    2019-04-04T15:11:40:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-04T15:11:40:  Number of scale par's .....: 0
 
 The fit converged after 10 iterations and did a second fit without the
 source component to determine the Test Statistic value of the Crab.

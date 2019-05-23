@@ -137,7 +137,6 @@ log file ``ctlike.log`` that was also created by :ref:`ctlike`:
    2019-04-04T14:34:30: === GModelSky ===
    2019-04-04T14:34:30:  Name ......................: Vela
    2019-04-04T14:34:30:  Instruments ...............: all
-   2019-04-04T14:34:30:  Instrument scale factors ..: unity
    2019-04-04T14:34:30:  Observation identifiers ...: all
    2019-04-04T14:34:30:  Model type ................: PointSource
    2019-04-04T14:34:30:  Model components ..........: "PointSource" * "SuperExponentialCutoffPowerLaw" * "Constant"
@@ -153,10 +152,10 @@ log file ``ctlike.log`` that was also created by :ref:`ctlike`:
    2019-04-04T14:34:30:   Index2 ...................: 0.58755011716699 +/- 0.027919253961318 [0.1,5]  (free,scale=1,gradient)
    2019-04-04T14:34:30:  Number of temporal par's ..: 1
    2019-04-04T14:34:30:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-04T14:34:30:  Number of scale par's .....: 0
    2019-04-04T14:34:30: === GModelSky ===
    2019-04-04T14:34:30:  Name ......................: Galactic_diffuse
    2019-04-04T14:34:30:  Instruments ...............: all
-   2019-04-04T14:34:30:  Instrument scale factors ..: unity
    2019-04-04T14:34:30:  Observation identifiers ...: all
    2019-04-04T14:34:30:  Model type ................: DiffuseSource
    2019-04-04T14:34:30:  Model components ..........: "DiffuseMapCube" * "Constant" * "Constant"
@@ -167,10 +166,10 @@ log file ``ctlike.log`` that was also created by :ref:`ctlike`:
    2019-04-04T14:34:30:   Normalization ............: 1.10941973066989 +/- 0.00503412002600817 [0.1,1000]  (free,scale=1,gradient)
    2019-04-04T14:34:30:  Number of temporal par's ..: 1
    2019-04-04T14:34:30:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-04T14:34:30:  Number of scale par's .....: 0
    2019-04-04T14:34:30: === GModelSky ===
    2019-04-04T14:34:30:  Name ......................: Extragalactic_diffuse
    2019-04-04T14:34:30:  Instruments ...............: all
-   2019-04-04T14:34:30:  Instrument scale factors ..: unity
    2019-04-04T14:34:30:  Observation identifiers ...: all
    2019-04-04T14:34:30:  Model type ................: DiffuseSource
    2019-04-04T14:34:30:  Model components ..........: "DiffuseIsotropic" * "FileFunction" * "Constant"
@@ -181,6 +180,7 @@ log file ``ctlike.log`` that was also created by :ref:`ctlike`:
    2019-04-04T14:34:30:   Normalization ............: 1 [0,1000]  (fixed,scale=1,gradient)
    2019-04-04T14:34:30:  Number of temporal par's ..: 1
    2019-04-04T14:34:30:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-04T14:34:30:  Number of scale par's .....: 0
 
 The fit converged after 19 iterations with spectral parameters that are
 reasonably close to those found in

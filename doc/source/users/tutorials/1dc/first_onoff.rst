@@ -334,7 +334,6 @@ The fit result can be inspected by peeking the log file:
    2019-04-09T13:23:01: === GModelSky ===
    2019-04-09T13:23:01:  Name ......................: Dummy
    2019-04-09T13:23:01:  Instruments ...............: all
-   2019-04-09T13:23:01:  Instrument scale factors ..: unity
    2019-04-09T13:23:01:  Observation identifiers ...: all
    2019-04-09T13:23:01:  Model type ................: PointSource
    2019-04-09T13:23:01:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
@@ -348,6 +347,7 @@ The fit result can be inspected by peeking the log file:
    2019-04-09T13:23:01:   PivotEnergy ..............: 1000000 MeV (fixed,scale=1000000,gradient)
    2019-04-09T13:23:01:  Number of temporal par's ..: 1
    2019-04-09T13:23:01:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2019-04-09T13:23:01:  Number of scale par's .....: 0
 
 .. tip::
    By default the ``WSTAT`` statistic is used which does not require a
@@ -422,7 +422,6 @@ The fit result can be inspected by peeking the log file:
       2019-04-09T21:27:21: === GModelSky ===
       2019-04-09T21:27:21:  Name ......................: Cassiopeia A
       2019-04-09T21:27:21:  Instruments ...............: all
-      2019-04-09T21:27:21:  Instrument scale factors ..: unity
       2019-04-09T21:27:21:  Observation identifiers ...: all
       2019-04-09T21:27:21:  Model type ................: PointSource
       2019-04-09T21:27:21:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
@@ -436,6 +435,7 @@ The fit result can be inspected by peeking the log file:
       2019-04-09T21:27:21:   PivotEnergy ..............: 1000000 MeV (fixed,scale=1000000,gradient)
       2019-04-09T21:27:21:  Number of temporal par's ..: 1
       2019-04-09T21:27:21:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+      2019-04-09T21:27:21:  Number of scale par's .....: 0
 
 
 Visualising the source spectrum
