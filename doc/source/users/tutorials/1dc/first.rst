@@ -13,9 +13,8 @@ using ctools.
 We assume that you have downloaded the data of the
 :ref:`first CTA Data Challenge <glossary_1dc>`
 and that you have successfully installed and configured the ctools package.
-If this is not the case, please read
-:ref:`how to get the tools <1dc_getting_tools>` and
-:ref:`how to get the data <1dc_getting_data>`.
+If this is not the case, please read :ref:`how to get the data
+<1dc_getting_data>`.
 We also assume that you have read the section about
 :ref:`the data organisation <1dc_data_organisation>`.
 

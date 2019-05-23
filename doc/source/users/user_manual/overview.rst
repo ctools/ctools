@@ -74,10 +74,10 @@ map, and :ref:`ctmodel` computes the expected model cube for a given
 a residual map and :ref:`csresspec` a residual spectrum to allow assessing
 of the model fit quality.
 
-Finally a number of utilities exist. :ref:`csinfo` checks whether the software
+Finally a number of utilities exist. ``csinfo`` checks whether the software
 is properly installed, :ref:`cstsmapsplit` splits the test statistic
 computation in multiple jobs and :ref:`cstsmapmerge` merges the resulting
-maps into a single test statistic map, :ref:`csworkflow` implements a
+maps into a single test statistic map, ``csworkflow`` implements a
 workflow manager for analysis pipelines, :ref:`cstsdist` generates a test
 statistic distribution and :ref:`cspull` computes the pull distribution of
 model parameters for a given source based on simulations, :ref:`cssens`
