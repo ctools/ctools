@@ -94,3 +94,43 @@ term will be appended to each ``<parameter>`` tag.
    made some modifications.
    Nevertheless, the format used by the Fermi/LAT ScienceTools is also
    supported.
+
+.. note::
+
+   To cope with cross-calibration uncertainties between different instruments,
+   instrument specific scaling factors :math:`S_{\rm inst}` can be multiplied
+   to the source models according to
+
+   .. math::
+      M(p,E,t) = S_{\rm inst} \times M_{\rm spatial}(p|E) \times M_{\rm spectral}(E) \times M_{\rm temporal}(t)
+
+   and an example for the specification of scale factors :math:`S_{\rm CTA}` for
+   ``CTA`` and :math:`S_{\rm HESS}` for H.E.S.S. in the
+   :ref:`model definition XML file <glossary_moddef>`
+   is shown below.
+   In the example, :math:`S_{\rm CTA}` is fixed to :math:`1`, hence the
+   scale factor could also be omitted from the XML file.
+   The scale factor :math:`S_{\rm HESS}` is set to :math:`1.1` and will be
+   fitted during the model fit.
+
+   .. code-block:: xml
+
+      <?xml version="1.0" standalone="no"?>
+      <source_library title="source library">
+        <source name="Crab" type="PointSource">
+          <spectrum type="PowerLaw">
+             <parameter name="Prefactor"   scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
+             <parameter name="Index"       scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
+             <parameter name="PivotEnergy" scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
+          </spectrum>
+          <spatialModel type="PointSource">
+            <parameter name="RA"  scale="1.0" value="83.6331" min="-360" max="360" free="0"/>
+            <parameter name="DEC" scale="1.0" value="22.0145" min="-90"  max="90"  free="0"/>
+          </spatialModel>
+          <scaling>
+            <instrument name="CTA"  scale="1.0" min="0.1" max="10.0" value="1.0" free="0"/>
+            <instrument name="HESS" scale="1.0" min="0.1" max="10.0" value="1.1" free="1"/>
+          </scaling>
+        </source>
+      </source_library>
+
