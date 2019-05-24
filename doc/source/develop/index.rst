@@ -29,7 +29,7 @@ You are highly invited to join one of the next coding sprints.
 You can also follow `@ctools_software <https://twitter.com/ctools_software>`_ on
 twitter to get informed about new ctools releases.
 
-Below some reasources to learn how to contribute to ctools:
+Below some resources to learn how to contribute to ctools:
 
 .. toctree::
    :maxdepth: 1
