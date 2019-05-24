@@ -116,7 +116,7 @@ ctobservation::ctobservation(const std::string& name,
  *
  * @param[in] name Observation tool name.
  * @param[in] version Observation tool version.
- * param[in] obs Observation container.
+ * @param[in] obs Observation container.
  *
  * Constructs a observation tool from the @p name, @p version and an
  * observation container.

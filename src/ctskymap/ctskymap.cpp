@@ -610,8 +610,6 @@ void ctskymap::setup_maps(void)
 /***********************************************************************//**
  * @brief Generates map of pixel exclusions
  *
- * @param[in] filename Exclusion file name.
- *
  * Generates a sky map of the pixels that are to be excluded from the
  * background estimation. Pixels with values different from 0 will be
  * excluded.

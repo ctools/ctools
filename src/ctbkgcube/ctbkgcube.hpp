@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2018 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2019 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -87,7 +87,7 @@ protected:
 /***********************************************************************//**
  * @brief Set event cube
  *
- * @param[in] Event cube.
+ * @param[in] cntcube Event cube.
  ***************************************************************************/
 inline
 void ctbkgcube::cntcube(const GCTAEventCube& cntcube)

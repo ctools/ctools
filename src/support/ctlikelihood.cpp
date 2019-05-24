@@ -1,7 +1,7 @@
 /***************************************************************************
  *              ctlikelihood - Base class for likelihood tools             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2019 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -119,7 +119,7 @@ ctlikelihood::ctlikelihood(const std::string& name,
  *
  * @param[in] name Likelihood tool name.
  * @param[in] version Likelihood tool version.
- * param[in] obs Observation container.
+ * @param[in] obs Observation container.
  *
  * Constructs a likelihood tool from the @p name, @p version and an
  * observation container.

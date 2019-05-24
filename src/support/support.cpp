@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      support - support functions                        *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016 by Juergen Knoedlseder                              *
+ *  copyright (C) 2016-2019 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file support
+ * @file support.cpp
  * @brief Support function implementation
  * @author Juergen Knoedlseder
  */

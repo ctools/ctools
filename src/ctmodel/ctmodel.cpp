@@ -837,9 +837,10 @@ void ctmodel::extract_cube_properties(void)
 
 
 /***********************************************************************//**
- * @brief Fill model into model cube
+ * @brief Fill models into model cube
  *
  * @param[in] obs CTA observation.
+ * @param[in] models Model container.
  *
  * Adds the expected number of events for a given observation to the events
  * that are already found in the model cube. The method also updates the

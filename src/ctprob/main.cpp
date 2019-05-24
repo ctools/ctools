@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file main.cpp
+ * @file ctprob/main.cpp
  * @brief Computes event probability for a given model
  * @author Leonardo Di Venere
  */
