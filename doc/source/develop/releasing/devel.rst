@@ -34,9 +34,9 @@ Select ``2`` and enter the new version number:
 
 .. code-block:: bash
 
-   Current ctools version is '1.2.0'. Please enter new ctools version: 1.3.0.dev1
-   Change version to '1.3.0.dev1'? (y/n): y
-   ctools version changed to '1.3.0.dev1'
+   Current ctools version is '1.2.0'. Please enter new ctools version: 1.3.0.dev
+   Change version to '1.3.0.dev'? (y/n): y
+   ctools version changed to '1.3.0.dev'
 
    [1] Make a new release
    [2] Set the package version in current branch
@@ -59,8 +59,8 @@ Now commit the changes by chosing ``4``:
    M doc/source/conf.py
    M sonar-project.properties
    Commit all changes? (y/n): y
-   Please enter a commit message: Update to release version 1.3.0.dev1
-   [devel d38bbdc] Update to release version 1.3.0.dev1
+   Please enter a commit message: Update to release version 1.3.0.dev
+   [devel d38bbdc] Update to release version 1.3.0.dev
     6 files changed, 8 insertions(+), 8 deletions(-)
 
    [1] Make a new release
