@@ -1,7 +1,7 @@
 .. _1.6:
 
-ctools 1.6 release
-==================
+ctools 1.6 release (29 May 2019)
+================================
 
 Overview
 --------
@@ -16,7 +16,7 @@ In particular, this release provides:
 * Parallelisation of various cscripts
 * Support for source variability searches
 * Support for Python pickeling
-* A Code Generator to facilitate adding ctools and cscripts
+* Code Generator to facilitate adding ctools and cscripts
 
 
 Bug fixes
