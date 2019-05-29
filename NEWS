@@ -1,4 +1,4 @@
-New Features and Important Changes in ctools 1.6.0
+New Features and Important Changes in ctools 1.7.0
 
 29 May 2019
 
@@ -11,28 +11,17 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-CTA background rates are now per ontime and not livetime. This makes the IRF
-background consistent with the cube background, and is also consistent with
-the open gamma data format (#2758).
-
-A Code Generator was added to the development directory that can be started
-using dev/codegen.py and that requires GammaLib to be installed. The code
-generator allows adding ctools and cscripts, including unit tests and code
-documentation, that are fully functional. The developer then only needs to
-fill the skeleton with the relevant code (#2709).
-
-Keep existing library path in installation script on Mac OS X (#2420).
+None
 
 
 Documentation
 -------------
-Added documentation for analysing data of the H.E.S.S. public data release.
-A bunch of Jupyter notebooks were also added (#2712).
+None
 
 
 Python interface
 ----------------
-ctools and cscripts can now be pickled from Python (#1938).
+None
 
 
 Support model
@@ -42,75 +31,22 @@ None
 
 Base classes
 ------------
-The set_obs_bounds() method was moved from the ctool class to the ctobservation
-class.
-
-The ctool base class now implements a log_parameters() method that overwrites
-the base class method and that logs a warning if the tool has an "edisp"
-parameter but the parameter is set to "no" (#2842).
-
-The ctool base class now loads the application parameters from the file provided
-in the "syspfiles" folder and updates parameter values using the file found in
-the user's "pfiles" folder, so that any change to the parameter file structure
-is handled transparently and no longer leads to an exception (#2513).
-
-The ctool::time_reference constant was removed since it is not required
-anymore. The time reference is now transparently handled by the tools, and
-if there is a choice, a "mjdref" parameter was added to the tools (#2054).
-
-The ctool::create_cta_obs() method now queries the optional "mjdref" parameter
-so that a MJD reference time can be specified by the tool. This functionality
-is now used by ctobssim (#2054).
-
-The ctools::get_gti() method now takes GTimeReference as argument to enable
-tools to retrieve Mission Elapsed Time (MET) in the time reference of the
-observation (#2054).
-
-The ctools::is_valid_filename() method was removed since the validity check
-of the filename is now done by the GApplicationPar class.
+None
 
 
 ctbin - CTA event binning
 -------------------------
-Added the option to produce an individual counts cube for each event list in
-the input observation definition XML file. The option is enabled by setting
-the new hidden parameter "stack" to "no". The cube() method now has an optional
-index argument, providing access to the i'th counts cube that was produced.
-The cubes() method specifies the number of counts cubes that were produced.
-If no counts cube was produced, the cube() method now throws an exception
-(#2714).
-
-ctbin now accouts for varying energy thresholds when computing the weight
-array (#2685).
-
-Add hidden "nthreads" parameter to control parallel computations (#2421).
-
-Copy the time reference from the first input observation (#2054).
+None
 
 
 ctbkgcube - CTA background cube generation
 ------------------------------------------
-The tool now required a counts cube on input, either specified via the
-ctbkgcube::cntcube() method or the "incube" parameter. This assures that the
-background cube has the same dimension as the counts cube. All spatial and
-spectral binning parameters were removed from the parameter file (#2763).
-
-Add ctbkgcube::cntcube() method so that a counts cube be specified as
-instance before running the tool. This avoids storing the counts cube on
-disk if the counts cube definition should be used to generate a background
-cube. In addition, the background cube values are now devided by the
-weight values of the counts cube since later, during model evaluation,
-the model is multiplied by the weight values. This makes sure that the
-normalisation is correct (#2685).
+None
 
 
 ctbutterfly - Generate butterfly diagrams
 -----------------------------------------
-Add hidden "max_iter" parameter to allow control of the number of fit
-iterations.
-
-Add hidden "like_accuracy" parameter to allow control of the accuracy of
-the maximum log-likelikelihood value (#2662).
+None
 
 
 ctcubemask - CTA cube filtering
@@ -125,13 +61,7 @@ None
 
 cterror - Likelihood profile error computation
 ----------------------------------------------
-Add hidden "max_iter" parameter to allow control of the number of fit
-iterations.
-
-Add hidden "like_accuracy" parameter to allow control of the accuracy of
-the maximum log-likelikelihood value (#2662).
-
-Add hidden "nthreads" parameter to control parallel computations (#2421).
+None
 
 
 ctexpcube - CTA exposure cube generation
@@ -141,19 +71,12 @@ None
 
 ctfindvar - Variability search
 ------------------------------
-New: the ctfindvar tool searches for source variability using an On/Off method
-in the time domain (#2713).
+None
 
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
-Add hidden "max_iter" parameter to allow control of the number of fit
-iterations.
-
-Add hidden "like_accuracy" parameter to allow control of the accuracy of
-the maximum log-likelikelihood value (#2662).
-
-Add hidden "nthreads" parameter to control parallel computations (#2421).
+None
 
 
 ctmapcube - CTA map cube generation
@@ -163,26 +86,12 @@ None
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
-When running ctmodel on a counts cube, and specifically a stacked count cube,
-the event bin weighting is taken into account in the model evaluation. This
-is needed to properly take into account the changing thresholds. No such
-weighting is done if the model is computed from an event list, since in that
-case the model is properly computed for each observation using the run-wise
-response (#2721).
-
-The tools now computes DETX and DETY for every event bin if they are not
-available so that model that rely on the existence of these parameters can
-be handled (#2694).
-
-Add hidden "nthreads" parameter to control parallel computations (#2421).
+None
 
 
 ctobssim - CTA observation simulation
 -------------------------------------
-Add hidden "nthreads" parameter to control parallel computations (#2421).
-
-Add "mjdref" parameter to allow specification of the MJD reference time
-for the simulation (#2054).
+None
 
 
 ctphase - Event phase computation
@@ -202,65 +111,22 @@ None
 
 ctselect - CTA event selection
 ------------------------------
-Do no longer set missing energy and RoI boundaries in ctool::get_observations
-and ctool::setup_observations since this led to a problem in ctselect. For
-H.E.S.S. data, where the boundaries are not set, the boundaries were preset
-with the User parameters, which made event selection with the usepnt=no option
-impossible. It is not clear why the setting of missing boundaries was introduced
-but it looks like a dangerous thing to do. The setting has therefore been
-removed (#2686).
-
-Avoid an error in case that the RoI radius is identical to the existing RoI
-radius (#2682).
-
-Interpret MET specified by "tmin" and "tmax" parameters in the time reference
-of the input observations (#2054). 
+None
 
 
 ctskymap - CTA sky mapping
 --------------------------
-Fix an issue with artefacts for small roiradius values (#2839).
-
-Add exclusion_map() methods (#2725).
-
-Add the "inmap", "iterations" and "threshold" parameters. The hidden
-"inmap" parameter allows specifying a sky map file containing a "COUNTS"
-and "ACCEPTANCE" extension which avoids looping over event lists in an
-observation container. The "iterations" parameter allows the iterative
-determination of an exclusion map from the resulting significance map for
-the RING background method. The exclusion map will flag all pixels with
-significances above the "threshold" value so that they will be excluded
-in the subsequent RING background determination. Since this will impact
-the pixel significances, the procedure needs to be repeated a couple of
-times to stabilise (#2311).
-
-Accelerate the IRF and RING background methods. For the RING background
-method the computation is either performed using a FFT or using a direct
-computation. The FFT computation is faster, but assumed Euclidian
-distances for the sky map grid, the direct computation is slower, but
-accurately computes the distances between sky map pixels (#2309).
+None
 
 
 cttsmap - Generation of Test Statistic map
 ------------------------------------------
-Add hidden "max_iter" parameter to allow control of the number of fit
-iterations.
-
-Add hidden "like_accuracy" parameter to allow control of the accuracy of
-the maximum log-likelikelihood value (#2662).
+None
 
 
 ctulimit - Compute upper limit
 ------------------------------
-Add hidden "max_iter" parameter to allow control of the number of fit
-iterations.
-
-Add hidden "like_accuracy" parameter to allow control of the accuracy of
-the maximum log-likelikelihood value (#2662).
-
-Add "parname" parameter to allow upper limit computations also for a node
-function spectral model. In addition, it is now checked that the parameter
-values actually bracket the upper limit (#2233).
+None
 
 
 support - Support classes
@@ -270,17 +136,7 @@ None
 
 csbkgmodel - Generate background model for 3D analysis
 ------------------------------------------------------
-Three additional spatial models were added: LOOKUP which uses a 2D lookup table,
-PROFILE which uses an energy-independent profile, and POLYNOM which uses an
-energy-independent polynom of third order. The parameter "slufile" was added
-to allow specification of a lookup table file (#2878).
-
-A model named GAUSS(E) was added to implement an energy-dependent Gaussian
-spatial function (#2868).
-
-Introduced the script that generates a background for a 3D analysis. This
-script is particularly useful to generate a background model for the analysis
-of the H.E.S.S. public data release (#2694).
+None
 
 
 cscaldb - Inspect calibration database
@@ -315,15 +171,7 @@ None
 
 cslightcrv - Generate light curve
 ---------------------------------
-Add exclusion_map() methods (#2725)
-
-Add hidden "use_model_bkg" parameter for forwarding to csphagen.
-
-Add hidden "nthreads" parameter and implement parallelisation of light
-curve computation (#2421).
-
-Add hidden "mjdref" parameter for the specification of the MET reference
-(#2054).
+None
 
 
 csmodelinfo - Return model information
@@ -348,76 +196,37 @@ None
 
 csobs2caldb - Generate calibration database entry for an IACT observation
 -------------------------------------------------------------------------
-Change background template table name from "BGD" to "BKG" (#2343).
+None
 
 
 csobsdef - Generate observation definition XML file
 ---------------------------------------------------
-Add hidden "mjdref" parameter for the specification of the MET reference
-(#2054).
+None
 
 
 csobsinfo - Return observation definition information
 -----------------------------------------------------
-Add ras() and decs() methods (#2313)
+None
 
 
 csobsselect - Select observations
 ---------------------------------
-Use time reference of input observations if time selection is given in MET
-(#2054).
+None
 
 
 csphagen - Generate On/Off observations
 ---------------------------------------
-Add exclusion_map() methods (#2725)
-
-A "outmodel" parameter was added and the script now produces an appropriate
-background model for maximum likelihood model fitting. The script now also
-sets the appropriate fit statistic depending on the "use_model_bkg" parameter
-(#2711).
-
-The script now supports any kind of background model, not only IRF background
-models (#2710).
-
-Add hidden "use_model_bkg" parameter. By default the parameter is set to "yes",
-which means that the background model provided in the model container is used
-for the computation of the alpha parameter and the background rate, stored in
-the "BACKSCAL" column of the On spectrum and the "BACKRESP" column of the Off
-spectrum, respectively. If the parameter is set to "no" it is assumed that the
-background rate in the On and Off regions are the same, and the model background
-is not used. In that case, the "BACKSCAL" column gives the ratio of the solid
-angles between On and Off regions, and the "BACKRESP" column is set to the
-solid angle of the On region. The resulting data can only be fitted using the
-"WSTAT" statistic (#2659).
-
-Add hidden "nthreads" parameter and implement parallelisation of computations
-(#2421).
-
-The true number of energy bins is now computed using
-   int(bins_per_decade * num_of_decades + 0.5)
-making sure in addition that the result is at least 1. This provides better
-control over the number of energy bins (#2490).
-
-The script now produces data that are compliant with Xspec. An Xspec howto
-tutorial was added to the user documentation (#2404).
+None
 
 
 csphasecrv - Generate phase curve
 ---------------------------------
-Add exclusion_map() methods (#2725)
-
-Add hidden "nthreads" parameter and implement parallelisation of computations
-(#2421).
+None
 
 
 cspull - Generate pull distributions
 ------------------------------------
-Add hidden "nthreads" parameter and implement parallelisation of computations
-(#2421).
-
-Add hidden "mjdref" parameter for the specification of the MET reference
-(#2054).
+None
 
 
 csresmap - Generate residual map
@@ -427,67 +236,32 @@ None
 
 csresspec - Generate residual spectrum
 --------------------------------------
-The script now also works for observation specific models. Stacking of
-residuals is now only performed after residual computation for each
-observation, so that stacking of observation specific models becomes
-possible (#2883).
-
-An exception occured when using a pre-computed model cube via the modcube
-parameter due to a bug in the code. This bug was fixed (#2448).
+None
 
 
 csroot2caldb - Generates calibration database from ROOT file
 ------------------------------------------------------------
-Change energy dispersion energy axis name from "ETRUE" to "ENERG" (#2670).
-
-Change background template table name from "BGD" to "BKG" (#2343).
-
-The ROOT Python module is now imported in the run method and not globally so
-that no conflit arises with the "--help" option (#2652).
+None
 
 
 cssens - Computes sensitivity curve
 -----------------------------------
-Add hidden "nthreads" parameter and implement parallelisation of computations
-(#2421).
+None
 
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-Correctly propagate the instrument name for On/Off observations.
-
-The script no longer skips energy bins with zero counts (#2671).
-
-The full true energy range of the RMF is now used in an On/Off analysis to
-prevent cutting off the tails of the energy dispersion, which happened before
-when the script was used for the analysis of H.E.S.S. data (#2656).
-
-Add hidden "nthreads" parameter and implement parallelisation of computations
-(#2421).
-
-csspec now properly computes the Test Statistic for an On/Off analysis using
-the "wstat" statistic in the case that the input model definition XML file
-did not contain a background model (#2312).
-
-csspec now computes upper limits also for the NODES method by fixing all node
-intensities and varying each node until the log-likelihood increases by a
-certain amount (#2233).
+None
 
 
 cssrcdetect - Detects sources in sky map
 ----------------------------------------
-The script was made more robust by optionally convolving the input sky map
-with a smoothing kernel with a specified correlation radius (options are a
-"DISK" or a "GAUSSIAN" kernel, default is now "DISK"). In addition, the mean
-and standard deviation of the pixel values are now computed locally over a
-given radius, controlled through the "avgrad" parameter. This accomodates for
-counts variations in the field of view (#2498).
+None
 
 
 cstsdist - Computes Test Statistic distribution
 -----------------------------------------------
-Add hidden "nthreads" parameter and implement parallelisation of computations
-(#2421).
+None
 
 
 cstsmapmerge - Merge Test Statistic maps
@@ -497,17 +271,12 @@ None
 
 cstsmapsplit - Prepare split Test Statistic computation
 -------------------------------------------------------
-Add hidden "max_iter" parameter to allow control of the number of fit
-iterations.
-
-Add hidden "like_accuracy" parameter to allow control of the accuracy of
-the maximum log-likelikelihood value (#2662).
+None
 
 
 csviscube - Generate visibility cube
 ------------------------------------
-Add hidden "mjdref" parameter for the specification of the MET reference
-(#2054).
+None
 
 
 csworkflow - Execute workflow
@@ -532,21 +301,17 @@ None
 
 mputils - Multiprocessing utilities
 -----------------------------------
-Introduce module (#2421).
+None
 
 
 obsutils - Observation utilities
 --------------------------------
-Add "mjdref" parameter to set_obs() function (#2054).
+None
 
 
 Examples
 --------
-Add show_significance_distribution.py example script (#2723)
-
-Handle zero model values for SUBVID method in show_response.py script (#2456).
-
-Added show_rmf.py script.
+None
 
 
 caldb
