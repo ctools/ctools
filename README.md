@@ -1,6 +1,6 @@
 ctools information
 ==================
-* Version:             1.6.0
+* Version:             1.6.0 (29 May 2019)
 * Author:              Juergen Knoedlseder (jurgen.knodlseder@irap.omp.eu)
 * GammaLib dependency: 1.6.0
 
@@ -45,15 +45,45 @@ The following tools are available:
     ctedispcube - generate energy dispersion cube
     cterror     - likelihood profile error estimation
     ctexpcube   - generate an exposure cube
+    ctfindvar   - search for source variability
     ctlike      - maximum likelihood model fitting
     ctmapcube   - generate sky map cube
     ctmodel     - generation of model counts map
     ctobssim    - simulation of CTA observations
+    ctphase     - computes the phase of each event
+    ctprob      - computes event probability for a given model
     ctpsfcube   - generate a PSF cube
     ctselect    - event selection
     ctskymap    - CTA sky mapping tool
     cttsmap     - generate a TS map
     ctulimit    - compute upper limits
+
+The following scripts are available:
+
+    csbkgmodel    - generates background model for 3D analysis
+    cscaldb       - lists available instrument response functions
+    csebins       - generates energy boundaries for stacked analysis
+    cslightcrv    - computes light curve
+    csmodelinfo   - shows model container content
+    csmodelmerge  - merges several model containers into one file
+    csmodelselect - select models from model definition file
+    csmodelsois   - generate map cube from subset of models
+    csobsdef      - generates observation definition file
+    csobsinfo     - shows observation container content
+    csobsselect   - select observations from observation definition file
+    csphagen      - generates PHA, ARF, RMF files based on source/background regions
+    csphasecrv    - computes phase curve
+    cspull        - generates pull distribution
+    csresmap      - generates residual map
+    csresspec     - generates residual spectrum
+    csroot2caldb  - creates a caldb entry from a ROOT file
+    cssens        - computes CTA sensitivity
+    csspec        - computes spectral points
+    cssrcdetect   - detects sources in sky map
+    cstsdist      - generates Test Statistic distribution
+    cstsmapmerge  - merges slices from Test Statistic map computations
+    cstsmapsplit  - creates commands to split the Test Statistic map computations
+    csviscube     - computes visibility cube
 
 
 Web sites
@@ -64,9 +94,8 @@ https://cta-redmine.irap.omp.eu/projects/ctools   - for ctools development
 
 Prerequisites
 =============
-ctools require GammaLib.  Please refer to http://gammalib.sourceforge.net
-for instructions about how to install GammaLib.  The GammaLib code can
-be downloaded from https://sourceforge.net/projects/gammalib/.
+ctools require GammaLib.  Please refer to http://cta.irap.omp.eu/gammalib
+for instructions about how to install GammaLib.
 
 Once GammaLib is properly installed, make sure that you added the setup
 script to your .bashrc or $HOME/.profile script:
@@ -86,6 +115,17 @@ please adapt the path correspondingly.
 If you really insist, you may install ctools in a directory different to
 that hosting GammaLib, but we highly recommend to install both packages
 together.
+
+
+Conda Installation
+==================
+The easiest is to install ctools via conda.  This also takes care of the
+installation of GammaLib.  Assuming that you have installed anaconda, type
+the following:
+
+     $ conda config --append channels conda-forge
+     $ conda config --append channels cta-observatory
+     $ conda install ctools
 
 
 Unix Installation
