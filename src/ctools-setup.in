@@ -1,4 +1,5 @@
-#  Filename:   ctools-setup(.in)
+#! /bin/sh
+# Filename:    ctools-setup(.in)
 # Description: Writes an initialization script for ctools software
 #              which is custom fit to the user and the particular
 #              software installation. Note that this script is
