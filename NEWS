@@ -1,6 +1,6 @@
-New Features and Important Changes in ctools 1.6.1
+New Features and Important Changes in ctools 1.6.2
 
-5 June 2019
+25 June 2019
 
 
 Introduction
@@ -11,7 +11,7 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-Fix initialisation script for c-shell (#2724).
+None
 
 
 Documentation
