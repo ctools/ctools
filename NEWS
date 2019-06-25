@@ -31,7 +31,8 @@ None
 
 Base classes
 ------------
-None
+Make ctool::create_ebounds() OpenMP thread save so that multiple threads can
+call the method and load energy boudnary FITS files (#2912).
 
 
 ctbin - CTA event binning
