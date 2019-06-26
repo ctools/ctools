@@ -594,7 +594,8 @@ GEbounds ctool::create_ebounds(void)
 
             // Make loading of energy boundaries OpenMP thread save
             #pragma omp critical(ctool_create_ebounds1)
-            {
+            //{
+            try {
 
                 // Open energy boundary file using the EBOUNDS or ENERGYBINS
                 // extension or energy values using the ENERGIES extension.
@@ -624,8 +625,11 @@ GEbounds ctool::create_ebounds(void)
                           "file \""+ebinfile+"\". Please specify a "
                           "valid energy binning file.";
                 }
-
-            } // end: omp critical section
+            }
+            catch (const std::exception& e) {
+                msg = e.what();
+            }
+            //} // end: omp critical section
 
         } // endif: no extension name specified
 
@@ -635,7 +639,8 @@ GEbounds ctool::create_ebounds(void)
 
             // Make loading of energy boundaries OpenMP thread save
             #pragma omp critical(ctool_create_ebounds2)
-            {
+            //{
+            try {
 
                 // Open energy boundary file
                 GFits file(ebinfile.url());
@@ -669,7 +674,11 @@ GEbounds ctool::create_ebounds(void)
 
                 } // endelse: extension name was present in FITS file
 
-            } // end: omp critical section
+            }
+            catch (const std::exception& e) {
+                msg = e.what();
+            }
+            //} // end: omp critical section
 
         } // endelse: loaded energy boundaries from table extension
 
