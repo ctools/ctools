@@ -586,6 +586,9 @@ GEbounds ctool::create_ebounds(void)
         // Get filename
         GFilename ebinfile = (*this)["ebinfile"].filename();
 
+        // Initialise exception message string
+        std::string msg;
+
         // If no extension name was provided then use default extension names
         if (!ebinfile.has_extname()) {
 
@@ -595,7 +598,9 @@ GEbounds ctool::create_ebounds(void)
 
                 // Open energy boundary file using the EBOUNDS or ENERGYBINS
                 // extension or energy values using the ENERGIES extension.
-                // Throw an exception if opening fails.
+                // If opening fails then set exception message. The
+                // exception is thrown later outside the critical OpenMP
+                // block.
                 GFits file(ebinfile.url());
                 if (file.contains(gammalib::extname_ebounds)) {
                     file.close();
@@ -612,13 +617,12 @@ GEbounds ctool::create_ebounds(void)
                 }
                 else {
                     file.close();
-                    std::string msg = "No extension with name \""+
-                                      gammalib::extname_ebounds+"\", "
-                                      "\"ENERGYBINS\" or \""+
-                                      gammalib::extname_energies+"\" found in FITS "
-                                      "file \""+ebinfile+"\". Please specify a "
-                                      "valid energy binning file.";
-                    throw GException::invalid_value(G_CREATE_EBOUNDS, msg);
+                    msg = "No extension with name \""+
+                          gammalib::extname_ebounds+"\", "
+                          "\"ENERGYBINS\" or \""+
+                          gammalib::extname_energies+"\" found in FITS "
+                          "file \""+ebinfile+"\". Please specify a "
+                          "valid energy binning file.";
                 }
 
             } // end: omp critical section
@@ -636,33 +640,45 @@ GEbounds ctool::create_ebounds(void)
                 // Open energy boundary file
                 GFits file(ebinfile.url());
 
-                // If FITS file does not contain requested extension then throw
-                // an exception
+                // If FITS file does not contain requested extension then set
+                // exception message. The exception is thrown later outside the
+                // critical OpenMP
                 if (!file.contains(ebinfile.extname())) {
-                    std::string msg = "No extension \""+ebinfile.extname()+"\" "
-                                      "found in energy binning file \""+
-                                      ebinfile.url()+"\". Please provide a valid "
-                                      "extension name.";
-                    throw GException::invalid_value(G_CREATE_EBOUNDS, msg);
+                    msg = "No extension \""+ebinfile.extname()+"\" "
+                          "found in energy binning file \""+
+                          ebinfile.url()+"\". Please provide a valid "
+                          "extension name.";
                 }
 
-                // Get table extension
-                GFitsTable& table = *file.table(ebinfile.extname());
-
-                // If table contains one column then load energies, otherwise load
-                // energy boundaries.
-                if (table.ncols() == 1) {
-                    file.close();
-                    ebounds.set(GEnergies(ebinfile));
-                }
+                // ... otherwise load energy boundaries
                 else {
-                    file.close();
-                    ebounds.load(ebinfile);
-                }
+
+                    // Get table extension
+                    GFitsTable& table = *file.table(ebinfile.extname());
+
+                    // If table contains one column then load energies, otherwise load
+                    // energy boundaries.
+                    if (table.ncols() == 1) {
+                        file.close();
+                        ebounds.set(GEnergies(ebinfile));
+                    }
+                    else {
+                        file.close();
+                        ebounds.load(ebinfile);
+                    }
+
+                } // endelse: extension name was present in FITS file
 
             } // end: omp critical section
 
         } // endelse: loaded energy boundaries from table extension
+
+        // If we have an exception message then throw an exception now. We
+        // have to do this since we should not throw exceptions inside OpenMP
+        // critical blocks
+        if (!msg.empty()) {
+            throw GException::invalid_value(G_CREATE_EBOUNDS, msg);
+        }
 
     } // endif: ebinalg was "FILE"
 
@@ -730,6 +746,9 @@ GEnergies ctool::create_energies(void)
         // Get filename
         GFilename ebinfile = (*this)["ebinfile"].filename();
 
+        // Initialise exception message string
+        std::string msg;
+
         // If no extension name was provided then use default extension names
         if (!ebinfile.has_extname()) {
 
@@ -739,7 +758,9 @@ GEnergies ctool::create_energies(void)
 
                 // Open energy boundary file using the EBOUNDS or ENERGYBINS
                 // extension or energy values using the ENERGIES extension.
-                // Throw an exception if opening fails.
+                // If opening fails then set exception message. The
+                // exception is thrown later outside the critical OpenMP
+                // block.
                 GFits file(ebinfile.url());
                 if (file.contains(gammalib::extname_energies)) {
                     file.close();
@@ -756,13 +777,12 @@ GEnergies ctool::create_energies(void)
                 }
                 else {
                     file.close();
-                    std::string msg = "No extension with name \""+
-                                      gammalib::extname_energies+"\", "
-                                      "\"ENERGYBINS\" or \""+
-                                      gammalib::extname_ebounds+"\" found in FITS "
-                                      "file \""+ebinfile+"\". Please specify a "
-                                      "valid energy binning file.";
-                    throw GException::invalid_value(G_CREATE_ENERGIES, msg);
+                    msg = "No extension with name \""+
+                           gammalib::extname_energies+"\", "
+                           "\"ENERGYBINS\" or \""+
+                           gammalib::extname_ebounds+"\" found in FITS "
+                           "file \""+ebinfile+"\". Please specify a "
+                           "valid energy binning file.";
                 }
 
             } // end: omp critical section
@@ -780,14 +800,14 @@ GEnergies ctool::create_energies(void)
                 // Open energy boundary file
                 GFits file(ebinfile.url());
 
-                // If FITS file does not contain requested extension then throw
-                // an exception
+                // If FITS file does not contain requested extension then set
+                // exception message. The exception is thrown later outside the
+                // critical OpenMP
                 if (!file.contains(ebinfile.extname())) {
-                    std::string msg = "No extension \""+ebinfile.extname()+"\" "
-                                      "found in energy node file \""+
-                                      ebinfile.url()+"\". Please provide a valid "
-                                      "extension name.";
-                    throw GException::invalid_value(G_CREATE_ENERGIES, msg);
+                    msg = "No extension \""+ebinfile.extname()+"\" "
+                          "found in energy node file \""+
+                          ebinfile.url()+"\". Please provide a valid "
+                          "extension name.";
                 }
 
                 // Get table extension
@@ -807,6 +827,13 @@ GEnergies ctool::create_energies(void)
             } // end: omp critical section
 
         } // endelse: loaded energy boundaries from table extension
+
+        // If we have an exception message then throw an exception now. We
+        // have to do this since we should not throw exceptions inside OpenMP
+        // critical blocks
+        if (!msg.empty()) {
+            throw GException::invalid_value(G_CREATE_ENERGIES, msg);
+        }
 
     } // endif: ebinalg was "FILE"
 
