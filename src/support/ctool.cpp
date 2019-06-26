@@ -733,7 +733,7 @@ GEnergies ctool::create_energies(void)
         // If no extension name was provided then use default extension names
         if (!ebinfile.has_extname()) {
 
-            // Make loading of energy boundaries OpenMP thread save
+            // Make loading of energies OpenMP thread save
             #pragma omp critical(ctool_create_energies1)
             {
 
@@ -773,7 +773,7 @@ GEnergies ctool::create_energies(void)
         // extension
         else {
 
-            // Make loading of energy boundaries OpenMP thread save
+            // Make loading of energies OpenMP thread save
             #pragma omp critical(ctool_create_energies2)
             {
 
@@ -2229,34 +2229,40 @@ void ctool::save_event_list(const GCTAObservation* obs,
             }
         }
 
-        // Create output FITS file
-        GFits outfits;
+        // Make writing of FITS file OpenMP thread save
+        #pragma omp critical(ctool_save_event_list)
+        {
 
-        // Write observation into FITS file
-        obs->write(outfits, outevt, outgti);
+            // Create output FITS file
+            GFits outfits;
 
-        // Copy all extensions other than evtname and gtiname extensions
-        // from the input to the output event list. The evtname and
-        // gtiname extensions are written by the save method, all others
-        // that may eventually be present have to be copied over
-        // explicitly.
-        GFits infits(infile);
-        for (int extno = 1; extno < infits.size(); ++extno) {
-            GFitsHDU* hdu = infits.at(extno);
-            if (hdu->extname() != evtname &&
-                hdu->extname() != gtiname &&
-                hdu->extname() != outevt  &&
-                hdu->extname() != outgti) {
-                outfits.append(*hdu);
+            // Write observation into FITS file
+            obs->write(outfits, outevt, outgti);
+
+            // Copy all extensions other than evtname and gtiname extensions
+            // from the input to the output event list. The evtname and
+            // gtiname extensions are written by the save method, all others
+            // that may eventually be present have to be copied over
+            // explicitly.
+            GFits infits(infile);
+            for (int extno = 1; extno < infits.size(); ++extno) {
+                GFitsHDU* hdu = infits.at(extno);
+                if (hdu->extname() != evtname &&
+                    hdu->extname() != gtiname &&
+                    hdu->extname() != outevt  &&
+                    hdu->extname() != outgti) {
+                    outfits.append(*hdu);
+                }
             }
-        }
 
-        // Close input file
-        infits.close();
+            // Close input file
+            infits.close();
 
-        // Save file to disk and close it (we need both operations)
-        outfits.saveto(outname.url(), clobber());
-        outfits.close();
+            // Save file to disk and close it (we need both operations)
+            outfits.saveto(outname.url(), clobber());
+            outfits.close();
+
+        } // end: omp critical section
 
     } // endif: observation was unbinned
 

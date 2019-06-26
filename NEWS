@@ -31,8 +31,9 @@ None
 
 Base classes
 ------------
-Make ctool::create_ebounds() OpenMP thread save so that multiple threads can
-call the method and load energy boudnary FITS files (#2912).
+Make ctool::create_ebounds(), ctool::create_energies() and
+ctool::save_event_list() methods OpenMP thread save so that multiple threads
+can call the method at the same time (#2912).
 
 
 ctbin - CTA event binning
