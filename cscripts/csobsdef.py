@@ -133,9 +133,9 @@ class csobsdef(ctools.cscript):
             Instrument response function
 
         Returns
+        -------
         obs : `~gammalib.GCTAObservation`
             CTA observation with response attached
-        -------
         """
         # Create XML element
         xml = gammalib.GXmlElement()
