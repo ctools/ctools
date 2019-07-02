@@ -282,7 +282,10 @@ class csphagen(ctools.csobservation):
         self._src_reg = gammalib.GSkyRegions()
 
         # Exclusion map
-        if self['inexclusion'].is_valid():
+        if (self._excl_reg is not None) and (self._excl_reg.map().npix() > 0):
+            # Exclusion map set and is not empty
+            self._has_exclusion = True
+        elif self['inexclusion'].is_valid():
             inexclusion         = self['inexclusion'].filename()
             self._excl_reg      = gammalib.GSkyRegionMap(inexclusion)
             self._has_exclusion = True

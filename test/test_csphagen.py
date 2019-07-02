@@ -335,6 +335,42 @@ class Test(test):
                                0, check_regions=False)
         self._check_outobs('csphagen_py6_obs.xml', 1)
 
+        # Same test as from command line, but set exclusion with csphagen.exclusion_map
+        phagen = cscripts.csphagen()
+        phagen['inobs']       = self._myevents1
+        phagen['inmodel']     = 'NONE'
+        phagen['caldb']       = self._caldb
+        phagen['irf']         = self._irf
+        phagen['ebinalg']     = 'LOG'
+        phagen['emin']        = 0.1
+        phagen['emax']        = 100.0
+        phagen['enumbins']    = self._nbins
+        phagen['coordsys']    = 'CEL'
+        phagen['ra']          = 83.633
+        phagen['dec']         = 22.0145
+        phagen['rad']         = 0.2
+        phagen['stack']       = False
+        phagen['bkgmethod']   = 'REFLECTED'
+        phagen['etruemin']    = 0.05
+        phagen['etruemax']    = 150.0
+        phagen['etruebins']   = 5
+        phagen['outobs']      = 'csphagen_py7_obs.xml'
+        phagen['outmodel']    = 'csphagen_py7_model.xml'
+        phagen['prefix']      = 'csphagen_py7'
+        phagen['logfile']     = 'csphagen_py7.log'
+        phagen['chatter']     = 1
+
+        # Set exclusion map
+        exclmap = gammalib.GSkyRegionMap(self._exclusion)
+        phagen.exclusion_map(exclmap)
+
+        # Execute script
+        phagen.execute()
+
+        # Check output
+        self._check_output('csphagen_py7', self._nbins, self._nreg_with_excl)
+        self._check_outobs('csphagen_py7_obs.xml', 1)
+
         # Return
         return
 
