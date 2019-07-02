@@ -135,7 +135,7 @@ def fill_cmr(row, counts, model, resid, e_counts, e_resid, c_counts, c_model,
 # ====================== #
 # Plot residual spectrum #
 # ====================== #
-def plot_residuals(filename, plotfile, hdu):
+def plot_residuals(filename, plotfile, hdu, fits=None):
     """
     Plot spectrum
 
@@ -147,9 +147,12 @@ def plot_residuals(filename, plotfile, hdu):
         Plot file name
     hdu : int
         Number of observation to plot
+    fits : `~gammalib.GFits`
+        GFits object containing csresspec results
     """
-    # Read spectrum file    
-    fits     = gammalib.GFits(filename)
+    # Read spectrum file
+    if fits is None:
+        fits = gammalib.GFits(filename)
     table    = fits.table(1 + hdu)
     c_emin   = table['Emin']
     c_emax   = table['Emax']
