@@ -30,6 +30,92 @@ import gammalib
 import cscripts
 
 
+def get_spectrum_file(filename):
+    """
+    Extract the spectrum info from a file for plotting
+
+    Parameters
+    ----------
+    filename : str
+        Name of spectrum FITS file
+
+    Returns
+    -------
+    Python dictionary defining spectral plot parameters
+    """
+    # Read spectrum file    
+    fits = gammalib.GFits(filename)
+    return get_spectrum_fits(fits)
+
+
+def get_spectrum_fits(fits):
+    """
+    Extract the spectrum info from a GFits object
+
+    Parameters
+    ----------
+    fits : `~gammalib.GFits`
+        Spectral GFits object
+    
+    Returns
+    -------
+    Python dictionary defining spectral plot parameters
+    """
+    # Read spectrum objects
+    table    = fits.table(1)
+    c_energy = table['Energy']
+    c_ed     = table['ed_Energy']
+    c_eu     = table['eu_Energy']
+    c_flux   = table['Flux']
+    c_eflux  = table['e_Flux']
+    c_ts     = table['TS']
+    c_upper  = table['UpperLimit']
+
+    # Initialise arrays to be filled
+    spec = {
+        'energies'    : [],
+        'flux'        : [],
+        'ed_engs'     : [],
+        'eu_engs'     : [],
+        'e_flux'      : [],
+        'ul_energies' : [],
+        'ul_ed_engs'  : [],
+        'ul_eu_engs'  : [],
+        'ul_flux'     : [],
+        'yerr'        : []
+    }
+
+    # Loop over rows of the file
+    nrows = table.nrows()
+    for row in range(nrows):
+
+        # Get Test Statistic, flux and flux error
+        ts    = c_ts.real(row)
+        flx   = c_flux.real(row)
+        e_flx = c_eflux.real(row)
+
+        # If Test Statistic is larger than 9 and flux error is smaller than
+        # flux then append flux plots ...
+        if ts > 9.0 and e_flx < flx:
+            spec['energies'].append(c_energy.real(row))
+            spec['flux'].append(c_flux.real(row))
+            spec['ed_engs'].append(c_ed.real(row))
+            spec['eu_engs'].append(c_eu.real(row))
+            spec['e_flux'].append(c_eflux.real(row))
+
+        # ... otherwise append upper limit
+        else:
+            spec['ul_energies'].append(c_energy.real(row))
+            spec['ul_flux'].append(c_upper.real(row))
+            spec['ul_ed_engs'].append(c_ed.real(row))
+            spec['ul_eu_engs'].append(c_eu.real(row))
+
+    # Set upper limit errors
+    spec['yerr'] = [0.6 * x for x in spec['ul_flux']]
+
+    return spec
+
+
 # ============= #
 # Plot spectrum #
 # ============= #
@@ -44,66 +130,23 @@ def plot_spectrum(filename, plotfile):
     plotfile : str
         Plot file name
     """
-    # Read spectrum file    
-    fits     = gammalib.GFits(filename)
-    table    = fits.table(1)
-    c_energy = table['Energy']
-    c_ed     = table['ed_Energy']
-    c_eu     = table['eu_Energy']
-    c_flux   = table['Flux']
-    c_eflux  = table['e_Flux']
-    c_ts     = table['TS']
-    c_upper  = table['UpperLimit']
+    spec = get_spectrum_file(filename)
 
-    # Initialise arrays to be filled
-    energies    = []
-    flux        = []
-    ed_engs     = []
-    eu_engs     = []
-    e_flux      = []
-    ul_energies = []
-    ul_ed_engs  = []
-    ul_eu_engs  = []
-    ul_flux     = []
-
-    # Loop over rows of the file
-    nrows = table.nrows()
-    for row in range(nrows):
-
-        # Get Test Statistic, flux and flux error
-        ts    = c_ts.real(row)
-        flx   = c_flux.real(row)
-        e_flx = c_eflux.real(row)
-
-        # If Test Statistic is larger than 9 and flux error is smaller than
-        # flux then append flux plots ...
-        if ts > 9.0 and e_flx < flx:
-            energies.append(c_energy.real(row))
-            flux.append(c_flux.real(row))
-            ed_engs.append(c_ed.real(row))
-            eu_engs.append(c_eu.real(row))
-            e_flux.append(c_eflux.real(row))
-
-        # ... otherwise append upper limit
-        else:
-            ul_energies.append(c_energy.real(row))
-            ul_flux.append(c_upper.real(row))
-            ul_ed_engs.append(c_ed.real(row))
-            ul_eu_engs.append(c_eu.real(row))
-
-    # Set upper limit errors
-    yerr = [0.6 * x for x in ul_flux]
-
-    # Plot the spectrum 
+    # Create the plot
     plt.figure()
     plt.loglog()
     plt.grid()
-    plt.errorbar(energies, flux, yerr=e_flux, xerr=[ed_engs, eu_engs],
-                 fmt='ro')
-    plt.errorbar(ul_energies, ul_flux, xerr=[ul_ed_engs, ul_eu_engs],
-                 yerr=yerr, uplims=True, fmt='ro')
     plt.xlabel('Energy (TeV)')
     plt.ylabel(r'E$^2$ $\times$ dN/dE (erg cm$^{-2}$ s$^{-1}$)')
+
+    # Plot the spectrum
+    plt.errorbar(spec['energies'], spec['flux'], 
+                 yerr=spec['e_flux'], xerr=[spec['ed_engs'], spec['eu_engs']],
+                 fmt='ro')
+    # Plot upper limits
+    plt.errorbar(spec['ul_energies'], spec['ul_flux'], 
+                 yerr=spec['yerr'], xerr=[spec['ul_ed_engs'], spec['ul_eu_engs']],
+                 uplims=True, fmt='ro')
 
     # Show figure
     if len(plotfile) > 0:
