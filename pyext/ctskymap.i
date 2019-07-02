@@ -49,6 +49,7 @@ public:
     void           save(void);
     void           publish(const std::string& name = "");
     const GSkyMap& skymap(void) const;
+    const GFits&   fits(void) const;
     void           exclusion_map(const GSkyRegionMap& exclusion_map);
     GSkyRegionMap  exclusion_map(void) const;
 };

@@ -290,6 +290,11 @@ class Test(test):
         self._check_result_file('ctskymap_ring_py1.fits[BACKGROUND]', 10, 10)
         self._check_result_file('ctskymap_ring_py1.fits[SIGNIFICANCE]', 10, 10)
 
+        # Check generated fits object
+        self._check_map(gammalib.GSkyMap(skymap.fits().image('SKYMAP')), nx=10, ny=10)
+        self._check_map(gammalib.GSkyMap(skymap.fits().image('BACKGROUND')), nx=10, ny=10)
+        self._check_map(gammalib.GSkyMap(skymap.fits().image('SIGNIFICANCE')), nx=10, ny=10)
+
         # Test iterative RING background subtraction
         skymap = ctools.ctskymap()
         skymap['inobs']       = self._events

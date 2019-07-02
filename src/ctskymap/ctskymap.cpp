@@ -240,6 +240,9 @@ void ctskymap::run(void)
         publish();
     }
 
+    // Create the output fits object
+    construct_fits();
+
     // Return
     return;
 }
@@ -262,40 +265,8 @@ void ctskymap::save(void)
         // Get sky map filename
         m_outmap = (*this)["outmap"].filename();
 
-        // Create empty FITS file
-        GFits fits;
-
-        // Write sky map into FITS file
-        write_map(fits, m_skymap, "SKYMAP");
-
-        // If background subtraction is requested then write the background map,
-        // the significance map, the counts map and the acceptance map to the
-        // FITS file
-        if (m_bkgsubtract != "NONE") {
-
-            // Write background map into FITS file
-            write_map(fits, m_bkgmap, "BACKGROUND");
-
-
-            // Write significance map into FITS file
-            write_map(fits, m_sigmap, "SIGNIFICANCE");
-
-            // Write counts map into FITS file
-            write_map(fits, m_counts, "COUNTS");
-
-            // Write acceptance map into FITS file
-            write_map(fits, m_acceptance, "ACCEPTANCE");
-
-            // If RING background subtraction is requested then write also
-            // the exclusion map to the FITS file
-            if (m_bkgsubtract == "RING") {
-                write_map(fits, m_exclmap, "EXCLUSION");
-            }
-
-        } // endif: background subtraction was requested
-
         // Save FITS file to disk
-        fits.saveto(m_outmap, clobber());
+        m_fits.saveto(m_outmap, clobber());
 
     } // endif: filename and map were not empty
 
@@ -307,6 +278,47 @@ void ctskymap::save(void)
     log_value(NORMAL, "Sky map file", fname);
 
     // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Construct GFits object consisting of all maps
+ *
+ * Assembles all of the skymaps into a GFits object. This object is saved
+ * when ctskymap::save() is called. the object can also be accessed by 
+ * calling ctskymap::fits().
+ ***************************************************************************/
+void ctskymap::construct_fits(void)
+{
+    // Write sky map into FITS object
+    write_map(m_fits, m_skymap, "SKYMAP");
+
+    // If background subtraction is requested then write the background map,
+    // the significance map, the counts map and the acceptance map to the
+    // FITS file
+    if (m_bkgsubtract != "NONE") {
+
+        // Write background map into FITS file
+        write_map(m_fits, m_bkgmap, "BACKGROUND");
+
+        // Write significance map into FITS file
+        write_map(m_fits, m_sigmap, "SIGNIFICANCE");
+
+        // Write counts map into FITS file
+        write_map(m_fits, m_counts, "COUNTS");
+
+        // Write acceptance map into FITS file
+        write_map(m_fits, m_acceptance, "ACCEPTANCE");
+
+        // If RING background subtraction is requested then write also
+        // the exclusion map to the FITS file
+        if (m_bkgsubtract == "RING") {
+            write_map(m_fits, m_exclmap, "EXCLUSION");
+        }
+
+    } // endif: background subtraction was requested
+
     return;
 }
 
@@ -372,6 +384,7 @@ void ctskymap::init_members(void)
     m_counts.clear();
     m_acceptance.clear();
     m_exclmap.clear();
+    m_fits.clear();
 
     // Initialise cache
     m_solidangle.clear();
@@ -415,6 +428,7 @@ void ctskymap::copy_members(const ctskymap& app)
     m_counts     = app.m_counts;
     m_acceptance = app.m_acceptance;
     m_exclmap    = app.m_exclmap;
+    m_fits       = app.m_fits;
 
     // Copy cache
     m_solidangle    = app.m_solidangle;

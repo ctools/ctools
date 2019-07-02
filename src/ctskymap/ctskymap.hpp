@@ -61,6 +61,7 @@ public:
     void           save(void);
     void           publish(const std::string& name = "");
     const GSkyMap& skymap(void) const;
+    const GFits&   fits(void) const;
     void           exclusion_map(const GSkyRegionMap& exclusion_map);
     GSkyRegionMap  exclusion_map(void) const;
 
@@ -87,6 +88,7 @@ protected:
                                  double&        non,
                                  double&        noff,
                                  double&        alpha);
+    void     construct_fits(void);
     void     ring_bounding_box(const int& ipixel, int& ix1, int& ix2,
                                                   int& iy1, int& iy2) const;
     GSkyMap  ring_convolve(const GSkyMap& map, const double& rmin,
@@ -123,6 +125,7 @@ protected:
     GSkyMap       m_counts;      //!< Counts map
     GSkyMap       m_acceptance;  //!< Acceptance map
     GSkyMap       m_exclmap;     //!< Exclusion map for RING background
+    GFits         m_fits;        //!< Output GFits object
 
     // Caching variables to prevent multiple computations of the same thing
     std::vector<double>  m_solidangle;    //!< Cached pixel solid angles
@@ -142,6 +145,13 @@ inline
 const GSkyMap& ctskymap::skymap(void) const
 {
     return m_skymap;
+}
+
+
+inline
+const GFits& ctskymap::fits(void) const
+{
+    return m_fits;
 }
 
 
