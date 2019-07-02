@@ -30,6 +30,73 @@ except (ImportError, RuntimeError):
     sys.exit()
 
 
+def get_butterfly_file(filename):
+    """
+    Get butterfly diagram values
+
+    Parameters
+    ----------
+    filename : str
+        Butterfly CSV file
+    
+    Returns
+    -------
+    See `get_butterfly_csv`
+    """
+    # Read butterfly file
+    csv = gammalib.GCsv(filename)
+
+    return get_butterfly_csv(csv)
+
+
+def get_butterfly_csv(csv):
+    """
+    Get butterfly diagram values from GCsv object
+
+    Parameters
+    ----------
+    csv : `~gammalib.GCsv`
+        GCsv object containing butterfly plot information
+
+    Returns
+    -------
+    'dict' defining butterfly plot and best fit spectrum
+    """
+    # Initialise arrays to be filled
+    btrfly = {
+        'butterfly_x' : [],
+        'butterfly_y' : [],
+        'line_x'      : [],
+        'line_y'      : []
+    }
+
+    # Loop over rows of the file
+    nrows = csv.nrows()
+    for row in range(nrows):
+
+        # Get conversion coefficient
+        conv = csv.real(row,0) * csv.real(row,0) * gammalib.MeV2erg
+
+        # Compute upper edge of confidence band
+        btrfly['butterfly_x'].append(csv.real(row,0)/1.0e6) # TeV
+        btrfly['butterfly_y'].append(csv.real(row,2)*conv)
+
+        # Set line values
+        btrfly['line_x'].append(csv.real(row,0)/1.0e6) # TeV
+        btrfly['line_y'].append(csv.real(row,1)*conv)
+
+    # Loop over the rows backwards to compute the lower edge of the
+    # confidence band
+    for row in range(nrows):
+        index = nrows - 1 - row
+        conv  = csv.real(index,0) * csv.real(index,0) * gammalib.MeV2erg
+        btrfly['butterfly_x'].append(csv.real(index,0)/1.0e6)
+        low_error = max(csv.real(index,3)*conv, 1e-26)
+        btrfly['butterfly_y'].append(low_error)
+
+    return btrfly
+
+
 # ============== #
 # Plot butterfly #
 # ============== #
@@ -45,46 +112,18 @@ def plot_butterfly(filename, plotfile):
         Plot filename
     """
     # Read butterfly file
-    csv = gammalib.GCsv(filename)
-
-    # Initialise arrays to be filled
-    butterfly_x = []
-    butterfly_y = []
-    line_x      = []
-    line_y      = []
-
-    # Loop over rows of the file
-    nrows = csv.nrows()
-    for row in range(nrows):
-
-        # Get conversion coefficient
-        conv = csv.real(row,0) * csv.real(row,0) * gammalib.MeV2erg
-
-        # Compute upper edge of confidence band
-        butterfly_x.append(csv.real(row,0)/1.0e6) # TeV
-        butterfly_y.append(csv.real(row,2)*conv)
-
-        # Set line values
-        line_x.append(csv.real(row,0)/1.0e6) # TeV
-        line_y.append(csv.real(row,1)*conv)
-
-    # Loop over the rows backwards to compute the lower edge of the
-    # confidence band
-    for row in range(nrows):
-        index = nrows - 1 - row
-        conv  = csv.real(index,0) * csv.real(index,0) * gammalib.MeV2erg
-        butterfly_x.append(csv.real(index,0)/1.0e6)
-        low_error = max(csv.real(index,3)*conv, 1e-26)
-        butterfly_y.append(low_error)
+    btrfly = get_butterfly_file(filename)
     
     # Plot the butterfly and spectral line       
     plt.figure()
     plt.loglog()
     plt.grid()
-    plt.plot(line_x,line_y,color='black',ls='-')
-    plt.fill(butterfly_x,butterfly_y,color='green',alpha=0.5)
     plt.xlabel('Energy (TeV)')
     plt.ylabel(r'E$^2$ $\times$ dN/dE (erg cm$^{-2}$ s$^{-1}$)')
+    
+    # Plot the butterfly and spectral line
+    plt.plot(btrfly['line_x'],btrfly['line_y'],color='black',ls='-')
+    plt.fill(btrfly['butterfly_x'],btrfly['butterfly_y'],color='green',alpha=0.5)
 
     # Show spectrum or save it into file
     if len(plotfile) > 0:
@@ -116,7 +155,7 @@ def show_butterfly():
     plotfile = options[0]['value']
 
     # Plot butterfly diagram
-    plot_butterfly(args[0], plotfile)
+    plot_butterfly(filename=args[0], plotfile=plotfile)
 
     # Return
     return
