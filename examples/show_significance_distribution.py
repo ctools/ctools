@@ -175,14 +175,14 @@ def skymap_to_numpy_ndarray(skymap):
     return array
 
 
-def read_regions(fpath, init_map):
+def regions_to_map(regions, init_map):
     """
-    Read a regions WCS FITS or ds9 file and return a mask WCS map.
+    Generate a regions map based on an input skymap and a set of regions
 
     Parameters
     ----------
-    fpath : str
-        Path to regions file
+    region : `~gammalib.GSkyRegions`
+        List of regions to be filled into a sky map
     init_map : `~gammalib.GSkyMap`
         Sky map representing fov of interest. Used for initialisation of
         regions map.
@@ -192,41 +192,59 @@ def read_regions(fpath, init_map):
     map : `~gammalib.GSkyMap`
         Sky map.
     """
-
     # Create starter map for user fov filled with zeros
     regions_map  = init_map.copy()
     regions_map *= 0.0
+
+    # Loop over regions
+    for reg in regions:
+
+        # Make map from region
+        ds9_map = gammalib.GSkyRegionMap(reg)
+
+        # Add ds9 region map to global map
+        regions_map += ds9_map.map()
+
+    return regions_map
+
+
+def read_regions(fpath):
+    """
+    Read a regions WCS FITS or ds9 file and return a GSkyRegions container.
+
+    Parameters
+    ----------
+    fpath : str
+        Path to regions file
+
+    Returns
+    -------
+    regions : `~gammalib.GSkyRegions`
+        Collection of regions specified in fpath
+    """
+    regions = gammalib.GSkyRegions()
 
     # Take care about ds9 region files
     if fpath.lower().endswith('.reg'):
 
         # Read ds9 regions
-        ds9_regions = gammalib.GSkyRegions(fpath)
-
-        # Loop over regions
-        for reg in ds9_regions:
-
-            # Make map from region
-            ds9_map = gammalib.GSkyRegionMap(reg)
-
-            # Add ds9 region map to global map
-            regions_map += ds9_map.map()
+        regions = gammalib.GSkyRegions(fpath)
 
     # Take care about fits WCS files
     elif gammalib.GFilename(fpath).is_fits():
 
         # Read wcs regions map
-        wcs_regions = gammalib.GSkyMap(fpath)
+        wcs_regions = gammalib.GSkyRegionMap(fpath)
 
-        # Add wcs regions map to global map
-        regions_map += wcs_regions
+        # Add wcs regions map to global regions
+        regions.append(wcs_regions)
 
     else:
         raise RuntimeError('Invalid regions file detected. Please provide ' +
                            'a valid ds9 or FITS WCS regions file.')
 
     # Return
-    return regions_map
+    return regions
 
 
 def linspace(minval, maxval, nbins):
@@ -290,26 +308,70 @@ def plot_significance_distribution(mappath, nbins, sigma_min, sigma_max,
     # Read significance map
     significance_map = gammalib.GSkyMap(mappath+'[SIGNIFICANCE]')
 
+    # Read inclusion region file
+    include_regs = None
+    if len(includedreg) > 0:
+        include_regs = read_regions(includedreg)
+
+    # Read exclusion region file
+    exclude_regs = None
+    if len(excludedreg) > 0:
+        exclude_regs = read_regions(excludedreg)
+
+    # Generate the plot
+    plot_significance(significance_map, nbins, sigma_min, sigma_max,
+                      includedregs=include_regs, excludedregs=exclude_regs,
+                      title=title, plotfile=plotfile)
+
+    return
+
+
+def plot_significance(sigmap, nbins, sigma_min, sigma_max,
+                      includedregs=None, excludedregs=None, 
+                      title='', plotfile=''):
+    """
+    Plot the significance distribution and return instance of pyplot
+    figure and axis.
+
+    Parameters
+    ----------
+    sigmap : `~gammalib.GSkyMap`
+        Significance sky map
+    nbins : int
+        Number of bins in histogram
+    sigma_min : float
+        Lower limit of the x axis in the plot
+    sigma_max : float
+        Upper limit of the x axis in the plot
+    includedregs : `~gammalib.GSkyRegions`
+        Container of inclusion regions
+    excludedregs : `~gammalib.GSkyRegions`
+        Container for exclusion regions
+    title : str
+        Title of the plot
+    plotfile : str
+        Name of file for plotting
+    """
 
     # Read included regions
     inclusion_available = False
-    if len(includedreg) > 0:
-        regions_map         = read_regions(includedreg, init_map=significance_map)
+    if includedregs is not None:
+        regions_map         = regions_to_map(includedregs, init_map=sigmap)
         mask_include        = skymap_to_numpy_ndarray(regions_map).astype(bool)
         inclusion_available = True
 
     # Read excluded regions
     src_exclusion_available = False
-    if len(excludedreg) > 0:
-        regions_map             = read_regions(excludedreg, init_map=significance_map)
+    if excludedregs is not None:
+        regions_map             = regions_to_map(excludedregs, init_map=sigmap)
         mask_exclude            = skymap_to_numpy_ndarray(regions_map).astype(bool)
         src_exclusion_available = True
 
     # Convert significance map to flat array
-    data = skymap_to_numpy_ndarray(significance_map)
+    data = skymap_to_numpy_ndarray(sigmap)
 
     # Initialise dummy mask allowing all pixels
-    mask = np.ones(significance_map.npix()).astype(bool)
+    mask = np.ones(sigmap.npix()).astype(bool)
 
     # Apply inclusion region spatial cuts
     if inclusion_available:
@@ -318,7 +380,7 @@ def plot_significance_distribution(mappath, nbins, sigma_min, sigma_max,
 
     # Apply exclusion region spatial cuts
     if src_exclusion_available:
-        data_without_sources = skymap_to_numpy_ndarray(significance_map)
+        data_without_sources = skymap_to_numpy_ndarray(sigmap)
         mask &= ~mask_exclude
         data_without_sources = data_without_sources[mask]
 
