@@ -142,5 +142,5 @@ Clean up
 * [`2758 <https://cta-redmine.irap.omp.eu/issues/2758>`_] -
   CTA background rates are now per ontime
 * Remove ``ctools::is_valid_filename()`` method
-* [`2045 <https://cta-redmine.irap.omp.eu/issues/2045>`_] -
+* [`2054 <https://cta-redmine.irap.omp.eu/issues/2054>`_] -
   Remove ``ctools::time_reference`` constant

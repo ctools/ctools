@@ -44,6 +44,16 @@ in your paper as well as the identifiers
 `ascl:1601.005 <http://ascl.net/1601.005>`_ and
 `ascl:1110.007 <http://ascl.net/1110.007>`_ of the ctools and GammaLib
 packages in the Astrophysics Source Code Library (ASCL).
+You can also reference ctools via
+
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3265423.svg
+   :target: https://doi.org/10.5281/zenodo.3265423
+
+and GammaLib via
+
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3265404.svg
+   :target: https://doi.org/10.5281/zenodo.3265404
+
 In addition please add the following acknowledgment:
 
    *This research made use of ctools, a community-developed analysis package
