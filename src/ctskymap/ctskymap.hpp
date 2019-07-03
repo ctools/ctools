@@ -148,6 +148,11 @@ const GSkyMap& ctskymap::skymap(void) const
 }
 
 
+/***********************************************************************//**
+ * @brief Return fits container
+ *
+ * @return Reference to fits container
+ ***************************************************************************/
 inline
 const GFits& ctskymap::fits(void) const
 {
