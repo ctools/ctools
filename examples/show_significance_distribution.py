@@ -171,7 +171,7 @@ def skymap_to_numpy_ndarray(skymap):
     for ipix in range(npix):
         array[ipix] = skymap[ipix]
 
-    # Return
+    # Return array
     return array
 
 
@@ -205,6 +205,7 @@ def regions_to_map(regions, init_map):
         # Add ds9 region map to global map
         regions_map += ds9_map.map()
 
+    # Return regions map
     return regions_map
 
 
@@ -243,7 +244,7 @@ def read_regions(fpath):
         raise RuntimeError('Invalid regions file detected. Please provide ' +
                            'a valid ds9 or FITS WCS regions file.')
 
-    # Return
+    # Return regions
     return regions
 
 
@@ -323,15 +324,18 @@ def plot_significance_distribution(mappath, nbins, sigma_min, sigma_max,
                       includedregs=include_regs, excludedregs=exclude_regs,
                       title=title, plotfile=plotfile)
 
+    # Return
     return
 
 
+# ========================== #
+# Generate significance plot #
+# ========================== #
 def plot_significance(sigmap, nbins, sigma_min, sigma_max,
                       includedregs=None, excludedregs=None, 
                       title='', plotfile=''):
     """
-    Plot the significance distribution and return instance of pyplot
-    figure and axis.
+    Generate significance plot
 
     Parameters
     ----------

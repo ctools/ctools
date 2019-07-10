@@ -291,6 +291,9 @@ void ctskymap::save(void)
  ***************************************************************************/
 void ctskymap::construct_fits(void)
 {
+    // Clear FITS object
+    m_fits.clear();
+
     // Write sky map into FITS object
     write_map(m_fits, m_skymap, "SKYMAP");
 

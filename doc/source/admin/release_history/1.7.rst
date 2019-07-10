@@ -22,6 +22,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`2925 <https://cta-redmine.irap.omp.eu/issues/2925>`_] -
+  Enabling running of example scripts from objects in memory
 
 
 New features

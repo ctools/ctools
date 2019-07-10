@@ -2,7 +2,7 @@
 # ==========================================================================
 # Shows butterfly diagram created with ctbutterfly
 #
-# Copyright (C) 2014-2017 Michael Mayer
+# Copyright (C) 2014-2019 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,6 +30,9 @@ except (ImportError, RuntimeError):
     sys.exit()
 
 
+# ======================================== #
+# Get butterfly diagram values from a file #
+# ======================================== #
 def get_butterfly_file(filename):
     """
     Get butterfly diagram values
@@ -41,14 +44,19 @@ def get_butterfly_file(filename):
     
     Returns
     -------
-    See `get_butterfly_csv`
+    btrfly : dict
+        Python dictionary defining butterfly plot and best fit spectrum
     """
     # Read butterfly file
     csv = gammalib.GCsv(filename)
 
+    # Return dictionary
     return get_butterfly_csv(csv)
 
 
+# =============================================== #
+# Get butterfly diagram values from a GCsv object #
+# =============================================== #
 def get_butterfly_csv(csv):
     """
     Get butterfly diagram values from GCsv object
@@ -60,7 +68,8 @@ def get_butterfly_csv(csv):
 
     Returns
     -------
-    'dict' defining butterfly plot and best fit spectrum
+    btrfly : dict
+        Python dictionary defining butterfly plot and best fit spectrum
     """
     # Initialise arrays to be filled
     btrfly = {
@@ -94,6 +103,7 @@ def get_butterfly_csv(csv):
         low_error = max(csv.real(index,3)*conv, 1e-26)
         btrfly['butterfly_y'].append(low_error)
 
+    # Return dictionary
     return btrfly
 
 
@@ -113,14 +123,14 @@ def plot_butterfly(filename, plotfile):
     """
     # Read butterfly file
     btrfly = get_butterfly_file(filename)
-    
+
     # Plot the butterfly and spectral line       
     plt.figure()
     plt.loglog()
     plt.grid()
     plt.xlabel('Energy (TeV)')
     plt.ylabel(r'E$^2$ $\times$ dN/dE (erg cm$^{-2}$ s$^{-1}$)')
-    
+
     # Plot the butterfly and spectral line
     plt.plot(btrfly['line_x'],btrfly['line_y'],color='black',ls='-')
     plt.fill(btrfly['butterfly_x'],btrfly['butterfly_y'],color='green',alpha=0.5)

@@ -30,6 +30,9 @@ import gammalib
 import cscripts
 
 
+# ===================================== #
+# Extract the spectrum info from a file #
+# ===================================== #
 def get_spectrum_file(filename):
     """
     Extract the spectrum info from a file for plotting
@@ -41,13 +44,19 @@ def get_spectrum_file(filename):
 
     Returns
     -------
-    Python dictionary defining spectral plot parameters
+    spec : dict
+        Python dictionary defining spectral plot parameters
     """
     # Read spectrum file    
     fits = gammalib.GFits(filename)
+
+    # Return dictionary
     return get_spectrum_fits(fits)
 
 
+# ============================================= #
+# Extract the spectrum info from a GFits object #
+# ============================================= #
 def get_spectrum_fits(fits):
     """
     Extract the spectrum info from a GFits object
@@ -59,7 +68,8 @@ def get_spectrum_fits(fits):
     
     Returns
     -------
-    Python dictionary defining spectral plot parameters
+    spec : dict
+        Python dictionary defining spectral plot parameters
     """
     # Read spectrum objects
     table    = fits.table(1)
@@ -113,6 +123,7 @@ def get_spectrum_fits(fits):
     # Set upper limit errors
     spec['yerr'] = [0.6 * x for x in spec['ul_flux']]
 
+    # Return dictionary
     return spec
 
 
@@ -130,6 +141,7 @@ def plot_spectrum(filename, plotfile):
     plotfile : str
         Plot file name
     """
+    # Get spectrum parameters
     spec = get_spectrum_file(filename)
 
     # Create the plot

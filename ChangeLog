@@ -1,7 +1,9 @@
-2019-05-29
+2019-07-10
 
         * Version 1.7.0 released
         ========================
+
+        Enabling running of example scripts from objects in memory (#2925)
 
 
 2019-06-25
