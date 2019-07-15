@@ -14,3 +14,5 @@ The following bugs were fixed:
   Improve documentation and tutorials
 * [`2912 <https://cta-redmine.irap.omp.eu/issues/2912>`_] -
   Fix OpenMP issue in ctbin when using energy bounds from file
+* [`2862 <https://cta-redmine.irap.omp.eu/issues/2862>`_] -
+  Fix multi-instrument handling in :ref:`csbkgmodel`

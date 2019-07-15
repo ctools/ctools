@@ -138,7 +138,9 @@ None
 
 csbkgmodel - Generate background model for 3D analysis
 ------------------------------------------------------
-None
+The script now handles observation definition files with multiple instruments,
+stripping all instruments that do not corresponds to the "instrument" parameter
+(#2862).
 
 
 cscaldb - Inspect calibration database
