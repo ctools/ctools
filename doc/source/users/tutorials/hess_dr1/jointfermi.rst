@@ -10,7 +10,7 @@ Joint analysis of H.E.S.S. and Fermi data
 
 In this tutorial you will learn how to jointly analyse data observed with
 H.E.S.S. and the Fermi-LAT. This follows the same procedure illustrated in
-`this section <../howto/howto_combine_instruments>`_.
+`this section <../howto/howto_combine_instruments.html>`_.
 
 Prepare Fermi-LAT data
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -18,20 +18,20 @@ Prepare Fermi-LAT data
 For this tutorial you need to gather data for a source available in
 the H.E.S.S. public data release, the Crab nebula.
 The preparation of Fermi-LAT data can be adapted from
-`this section <..howto/howto_fermi_prepare>`_. Get Source Class LAT data from the
-Crab in the energy range 50-800 GeV. Apply a zenith angle cut at 105
+`this section <../howto/fermi/howto_fermi_prepare.html>`_. Get Source Class LAT data from the
+Crab in the energy range 50-1000 GeV. Apply a zenith angle cut at 105
 deg. Then bin them on a 60x60 pixel
 grid with 0.05 deg step, and on a logarithmic energy grid with 15 bins
-from 50 GeV to 800 GeV, and calculate livetime cube, exposure map, and
+from 50 GeV to 1 TeV, and calculate livetime cube, exposure map, and
 diffuse model source maps. The results shown here correspond to P8R3 LAT
 data covering the Fermi Mission Elapsed Time (MET) between 239557417 s
-and 565315205 s, analysed using the fermitools 1.0.3. To run the tutorial
+and 565315205 s, analysed using the fermitools 1.0.1. To run the tutorial
 faster you can select a shorter dataset. 
 
 Prepare H.E.S.S. data
 ^^^^^^^^^^^^^^^^^^^^^
 
-We will use the On/Off observations generated in `this section <classical>`_.
+We will use the On/Off observations generated in `this section <classical.html>`_.
 
 Combining the observations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -48,7 +48,7 @@ to combine the data for an analysis:
       <parameter name="CountsMap"    file="srcmaps.fits"/>
       <parameter name="ExposureMap"  file="expmap.fits"/>
       <parameter name="LiveTimeCube" file="ltcube.fits"/>
-      <parameter name="IRF"          value="P8R2_SOURCE_V6"/>
+      <parameter name="IRF"          value="P8R3_SOURCE_V2"/>
     </observation>
     <observation name="Crab" id="000002" instrument="HESSOnOff" statistic="wstat">
       <parameter name="Pha_on" file="onoff_stacked_pha_on.fits" />
@@ -95,12 +95,12 @@ The model that will be used in this analysis is shown below:
       <spectrum type="Constant">
         <parameter name="Normalization" scale="1.0" value="1.0" min="0.1" max="10.0" free="1"/>
       </spectrum>
-      <spatialModel type="DiffuseMapCube" file="gll_iem_v06.fits">
+      <spatialModel type="DiffuseMapCube" file="gll_iem_v07.fits">
         <parameter name="Normalization" scale="1.0" value="1.0" min="0.1" max="10.0" free="0"/>
       </spatialModel>
     </source>
     <source type="DiffuseSource" name="Isotropic_diffuse"  instrument="LAT">
-      <spectrum type="FileFunction" file="iso_P8R2_SOURCE_V6_v06.txt">
+      <spectrum type="FileFunction" file="iso_P8R2_SOURCE_V2_v1.txt">
         <parameter name="Normalization" scale="1.0" value="1.0" min="0.0" max="1000.0" free="0"/>
       </spectrum>
       <spatialModel type="DiffuseIsotropic">
@@ -124,9 +124,9 @@ Now you can fit the model to the data using  :ref:`ctlike`:
 		Input model definition XML file [] joint_models.xml
 		Output model definition XML file [] joint_results.xml
 
-The results are: prefactor (for 1 TeV pivot energy) (4.4±0.2)×10−11
+The results are: prefactor (for 1 TeV pivot energy) (4.5±0.2)×10−11
 photons cm−2 s−1 TeV−1, spectral index 2.42±0.04, and curvature
--0.106±0.018. They are broadly consistent with results from published
+-0.109±0.018. They are broadly consistent with results from published
 studies, e.g., `MAGIC collaboration (2015)
 <http://adsabs.harvard.edu/abs/2015JHEAp...5...30A>`_.
 We have used an energy threshold of 50 GeV to avoid contamination from
