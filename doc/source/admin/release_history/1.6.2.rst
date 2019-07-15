@@ -1,6 +1,6 @@
 .. _1.6.2:
 
-ctools 1.6.2 release (25 June 2019)
+ctools 1.6.2 release (15 July 2019)
 ===================================
 
 Overview
@@ -10,5 +10,7 @@ ctools 1.6.2 is a bug fix release for ctools release 1.6.
 
 The following bugs were fixed:
 
+* [`2962 <https://cta-redmine.irap.omp.eu/issues/2962>`_] -
+  Improve documentation and tutorials
 * [`2912 <https://cta-redmine.irap.omp.eu/issues/2912>`_] -
   Fix OpenMP issue in ctbin when using energy bounds from file

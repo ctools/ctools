@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.6.2
 
-25 June 2019
+15 July 2019
 
 
 Introduction
@@ -16,7 +16,7 @@ None
 
 Documentation
 -------------
-None
+Improve documentation and tutorials (#2962).
 
 
 Python interface

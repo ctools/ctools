@@ -1,8 +1,9 @@
-2019-06-25
+2019-07-15
 
         * Bug fix version 1.6.2 released
         ================================
 
+        Improve documentation and tutorials (#2962)
         Fix OpenMP issue in ctbin when using energy bounds from file (#2912)
 
 
