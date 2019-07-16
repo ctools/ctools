@@ -13,10 +13,6 @@ Doing an On/Off analysis
      (background) regions. An On/Off analysis is recommended if you
      want to assure minimal dependency on the Monte Carlo background model.
 
-  .. warning::
-     For the time being the **On/Off analysis only works for point sources**. Make
-     sure that the spatial component of the model you want to analyse is of
-     type ``PointSource``.
 
 Finally, we consider the classical technique for IACT spectral analysis,
 in which 1D spectra for On and Off regions are used jointly to
@@ -63,6 +59,21 @@ To derive On/Off observations from the ``events_edisp.fits`` event list, type:
    Right Ascension of source region centre (deg) (0-360) [83.63]
    Declination of source region centre (deg) (-90-90) [22.01]
    Radius of source region circle (deg) (0-180) [0.2]
+
+We have provided in input a model definition file. This serves
+a twofold purpose: 1) a source model is used to compute the instrument
+response in the On region taking into account the source morphology
+and instrument PSF; 2) a background model is used to calculate the
+background response, namely the expected background rate in each
+energy bin and the ratio of background rate in the On region over the
+rate in the Off regions. You can skip using a background model by
+setting the hidden parameter ``use_model_bkg=no``: in this case the
+background rate as a function of energy will be determined later
+during the fit, and the ratio of background rate in the On region over the
+rate in the Off regions is set to the ratio of the respective solid
+angles. Furthermore, you can skip passing a model definition file
+(pass ``NONE``): in this case the response will be calculated for a
+pointlike source at the centre of the On region.
 
 .. note::
    We have used the events simulated accounting for energy dispersion, since
@@ -253,7 +264,14 @@ Alternatively, you can use ``WSTAT`` for an On/Off analysis, which treats the
 number of background counts in each energy bin as a nuisance parameter that is
 derived from the On and Off counts by profiling the likelihood function. In
 this case, the only assumption is that the background rate spectrum is the same
-in the On and Off regions. Below the results for a :ref:`ctlike` run with
+in the On and Off regions.
+
+.. note::
+   You must use ``WSTAT`` if you have selected
+   ``use_model_bkg=no``  in `csphagen` . `csphagen` sets automatically ``WSTAT`` as
+   statistic in the  :ref:`observation definition file <glossary_obsdef>` in this case.
+
+Below the results for a :ref:`ctlike` run with
 the ``statistic=wstat`` option.
 
 .. code-block:: none

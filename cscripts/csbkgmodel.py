@@ -470,6 +470,15 @@ class csbkgmodel(ctools.csobservation):
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
+        # Remove observations from wrong instruments
+        obs = self.obs()
+        for i in range(obs.size()-1, -1, -1):
+            if obs[i].instrument() != self._instrument:
+                obs.remove(i)
+
+        # Log observations to be used
+        self._log_value(gammalib.NORMAL, 'Obs matching instrument', self.obs().size())
+
         # Write header
         self._log_header1(gammalib.TERSE, 'Generate background models')
 

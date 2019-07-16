@@ -359,6 +359,37 @@ class Test(test):
         # Check background model
         self._check_bkg_model('csbkgmodel_py9.xml')
 
+        # Check with data from multiple instruments
+        new_inst = 'INST2'
+        obs_multi_inst = gammalib.GObservations(obs)
+        for run in obs_multi_inst:
+            run.instrument(new_inst)
+        obs_multi_inst.extend(obs)
+
+        # Set-up csbkgmodel
+        bkgmodel = cscripts.csbkgmodel(obs_multi_inst)
+        bkgmodel['instrument'] = new_inst
+        bkgmodel['spatial']    = 'GAUSS'
+        bkgmodel['gradient']   = True
+        bkgmodel['spectral']   = 'NODES'
+        bkgmodel['ebinalg']    = 'POW'
+        bkgmodel['emin']       = 1.0
+        bkgmodel['emax']       = 100.0
+        bkgmodel['enumbins']   = 8
+        bkgmodel['ebingamma']  = 1.1
+        bkgmodel['runwise']    = True
+        bkgmodel['rad']        = 2.0
+        bkgmodel['chatter']    = 2
+        bkgmodel['outmodel']   = 'csbkgmodel_py10.xml'
+        bkgmodel['logfile']    = 'csbkgmodel_py10.log'
+
+        # Execute csbkgmodel script
+        bkgmodel.logFileOpen()   # Make sure we get a log file
+        bkgmodel.execute()
+
+        # Check background model
+        self._check_bkg_model('csbkgmodel_py10.xml', nmodels=obs.size())
+
         # Return
         return
 
