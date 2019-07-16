@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a spectrum.
 #
-# Copyright (C) 2014-2018 Michael Mayer
+# Copyright (C) 2014-2019 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -728,6 +728,15 @@ class csspec(ctools.csobservation):
                 e_flux    = fitted_flux * rel_error
             else:
                 e_flux = 0.0
+
+            # If the source model is a cube then multiply-in the cube
+            # spectrum
+            if source.spatial().classname() == 'GModelSpatialDiffuseCube':
+                dir          = gammalib.GSkyDir()
+                source.spatial().set_mc_cone(dir, 180.0)
+                norm         = source.spatial().spectrum().eval(elogmean)
+                fitted_flux *= norm
+                e_flux      *= norm
 
             # Convert differential flux and flux error to nuFnu
             elogmean2          = elogmean.MeV() * elogmean.MeV()

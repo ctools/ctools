@@ -12,6 +12,8 @@ The following bugs were fixed:
 
 * [`2962 <https://cta-redmine.irap.omp.eu/issues/2962>`_] -
   Improve documentation and tutorials
+* [`2954 <https://cta-redmine.irap.omp.eu/issues/2954>`_] -
+  Correct handling of flux for diffuse cube models in csspec
 * [`2912 <https://cta-redmine.irap.omp.eu/issues/2912>`_] -
   Fix OpenMP issue in ctbin when using energy bounds from file
 * [`2862 <https://cta-redmine.irap.omp.eu/issues/2862>`_] -

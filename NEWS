@@ -255,7 +255,8 @@ None
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-None
+If a diffuse cube sky model is used the script now correctly multiplies the
+result with the diffuse cube sky model spectrum (#2954).
 
 
 cssrcdetect - Detects sources in sky map

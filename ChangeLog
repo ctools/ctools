@@ -4,6 +4,7 @@
         ================================
 
         Improve documentation and tutorials (#2962)
+        Correct handling of flux for diffuse cube models in csspec (#2954)
         Fix OpenMP issue in ctbin when using energy bounds from file (#2912)
         Fix multi-instrument handling in csbkgmodel (#2862)
 
