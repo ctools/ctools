@@ -274,18 +274,16 @@ void cttsmap::run(void)
         log_header2(EXPLICIT, "Computing TS for bin number "+gammalib::str(i)+
                     " at "+bincentre.print());
 
-        // Sets unique test source name. This avoids caching of response
-        // values
-        std::string srcname = m_srcname + "_" + gammalib::str(i);
-
     	// Add test source at current bin position
         (*m_testsource)["RA"].value(bincentre.ra_deg());
         (*m_testsource)["DEC"].value(bincentre.dec_deg());
-        m_testsource->name(srcname);
         models.append(*m_testsource);
 
     	// Assign models to observations
     	m_obs.models(models);
+
+        // Make sure that no values are cached for test source
+        m_obs.remove_response_cache(m_srcname);
 
     	// Optimize observation container
     	m_obs.optimize(m_opt);
@@ -315,7 +313,7 @@ void cttsmap::run(void)
 
     	// Get test source model instance
     	GModels best_fit_model = m_obs.models();
-    	GModel* testsource     = best_fit_model[srcname];
+    	GModel* testsource     = best_fit_model[m_srcname];
 
     	// Assign values to the maps
     	m_tsmap(i) = ts;
@@ -345,7 +343,7 @@ void cttsmap::run(void)
         m_statusmap(i) = status;
 
     	// Remove model from container
-    	models.remove(srcname);
+    	models.remove(m_srcname);
 
     } // endfor: looped over grid positions
 

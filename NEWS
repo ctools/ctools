@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.7.0
 
-10 July 2019
+23 July 2019
 
 
 Introduction
@@ -123,7 +123,7 @@ writing a FITS file (#2925).
 
 cttsmap - Generation of Test Statistic map
 ------------------------------------------
-None
+Remove response cache for test source before fitting the source (#2973).
 
 
 ctulimit - Compute upper limit
