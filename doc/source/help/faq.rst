@@ -17,6 +17,7 @@ asked.
 - :ref:`I want to upgrade ctools, do I have to upgrade GammaLib? <faq_upgrade>`
 - :ref:`Should I used binned or unbinned analysis? <faq_analysis>`
 - :ref:`How precise are ctools? <faq_precision>`
+- :ref:`How to get a ctools log file when running the tool from Python? <faq_python_logging>`
 
 
 .. _faq_ctools_gammalib:
@@ -45,77 +46,97 @@ asked.
 
 .. topic:: Are ctools and GammaLib specific to CTA?
 
-  The short answer is: ctools yes, GammaLib no.
+   The short answer is: ctools yes, GammaLib no.
 
-  ctools have been specifically designed to provide the functionalities that 
-  are required to analyse CTA data.
-  This does not mean that ctools can not be used for analysing data from 
-  other Imaging Air Cherenkov Telescopes; the sole requirement is that the
-  data and response files are provided in a CTA compliant format.
-  However, ctools are not designed to analyse data from Fermi/LAT, 
-  INTEGRAL, COMPTEL or other gamma-ray telescopes.
-  Nevertheless, some joint multi-telescope analysis is supported by ctools.
+   ctools have been specifically designed to provide the functionalities that
+   are required to analyse CTA data.
+   This does not mean that ctools can not be used for analysing data from
+   other Imaging Air Cherenkov Telescopes; the sole requirement is that the
+   data and response files are provided in a CTA compliant format.
+   However, ctools are not designed to analyse data from Fermi/LAT,
+   INTEGRAL, COMPTEL or other gamma-ray telescopes.
+   Nevertheless, some joint multi-telescope analysis is supported by ctools.
 
-  GammaLib, however, is a universal framework with a core that is completely
-  independent of any telescope.
-  Plugins are used to interface GammaLib with the data and response files of
-  specific telescopes.
-  For every new instrument that shall be supported a new plugin needs to be
-  developed.
-  So far, plugins exists for CTA (and Imaging Air Cherenkov Telescopes in
-  general), Fermi/LAT, and COMPTEL.
-  Some support for integration of any arbitrary multi-wavelength data 
-  exists.
+   GammaLib, however, is a universal framework with a core that is completely
+   independent of any telescope.
+   Plugins are used to interface GammaLib with the data and response files of
+   specific telescopes.
+   For every new instrument that shall be supported a new plugin needs to be
+   developed.
+   So far, plugins exists for CTA (and Imaging Air Cherenkov Telescopes in
+   general), Fermi/LAT, and COMPTEL.
+   Some support for integration of any arbitrary multi-wavelength data
+   exists.
 
 
 .. _faq_upgrade:
 
 .. topic:: I want to upgrade ctools, do I have to upgrade GammaLib?
 
-  For the moment yes.
+   For the moment yes.
 
-  The GammaLib interface is still not fully stabilised, hence ctools is
-  continuously adapted to match the interface evolution
-  (see the :ref:`sec_download` section for a correspondance of versions).
-  We plan however to put the GammaLib interface under change control.
-  ctools should then become more independent from GammaLib.
+   The GammaLib interface is still not fully stabilised, hence ctools is
+   continuously adapted to match the interface evolution
+   (see the :ref:`sec_download` section for a correspondance of versions).
+   We plan however to put the GammaLib interface under change control.
+   ctools should then become more independent from GammaLib.
 
 
 .. _faq_analysis:
 
 .. topic:: Should I used binned or unbinned analysis?
 
-  This depends on the amount of data you want to analyse and to some extent
-  on the question you want to answer with your analysis.
-  For an unbinned analysis, the computation time increases about linearly
-  with the number of events and hence with the duration of the observation,
-  while for binned analysis the computation time depends only on the number
-  of bins that is used.
-  Consequently, for short observation times (below 30 hours), unbinned
-  analysis is faster, while for longer times it is advantageous to use
-  a binned analysis.
-  If you go to very low energies, either make sure that you have enough
-  energy bins in a binned analysis to sample properly the strong drop in the
-  effective area towards small energies, or better, use unbinned analysis.
-  If you'd like to fit a Gaussian line to your data you may also prefer
-  unbinned over binned analysis, as the fine sampling required to resolve
-  the line may require a prohibitive large number of energy bins for a binned
-  analysis.
+   This depends on the amount of data you want to analyse and to some extent
+   on the question you want to answer with your analysis.
+   For an unbinned analysis, the computation time increases about linearly
+   with the number of events and hence with the duration of the observation,
+   while for binned analysis the computation time depends only on the number
+   of bins that is used.
+   Consequently, for short observation times (below 30 hours), unbinned
+   analysis is faster, while for longer times it is advantageous to use
+   a binned analysis.
+   If you go to very low energies, either make sure that you have enough
+   energy bins in a binned analysis to sample properly the strong drop in the
+   effective area towards small energies, or better, use unbinned analysis.
+   If you'd like to fit a Gaussian line to your data you may also prefer
+   unbinned over binned analysis, as the fine sampling required to resolve
+   the line may require a prohibitive large number of energy bins for a binned
+   analysis.
 
 
 .. _faq_precision:
 
 .. topic:: How precise are ctools?
 
-  The ctools and gammalib codes have a numerical accuracy of better than 1%.
-  This means that if you use ctools to determine for example the flux 
-  received from a source or the spectral points of an SED, the relative 
-  precision of the flux or the spectral points is better than 1%.
-  The same is true for spatial parameters, such as source position or
-  source extension.
-  For many cases the actual numerical precision is in fact much better
-  than 1%, but in any case, it should never be worse.
-  Note, however, that this does not imply that source parameters can be
-  determined with CTA with an accuracy of 1%. The accuracy depends in the
-  end on the precision to which the instrument response function is known,
-  which should be more in the 10% range.
+   The ctools and gammalib codes have a numerical accuracy of better than 1%.
+   This means that if you use ctools to determine for example the flux
+   received from a source or the spectral points of an SED, the relative
+   precision of the flux or the spectral points is better than 1%.
+   The same is true for spatial parameters, such as source position or
+   source extension.
+   For many cases the actual numerical precision is in fact much better
+   than 1%, but in any case, it should never be worse.
+   Note, however, that this does not imply that source parameters can be
+   determined with CTA with an accuracy of 1%. The accuracy depends in the
+   end on the precision to which the instrument response function is known,
+   which should be more in the 10% range.
+
+
+.. _faq_python_logging:
+
+.. topic:: How to get a ctools log file when running the tool from Python?
+
+   By default, tools and scripts run from Python will not generate a log file.
+   The reason for this is that Python scripts are often used to build ctools
+   analysis pipelines and workflows, and one generally does not want that such
+   a script pollutes the workspace with log files. You can however instruct a
+   ctool or cscript to generate a log file by invoking the ``logFileOpen()``
+   method before running the tool, for example
+
+   .. code-block:: python
+
+      >>> import ctools
+      >>> sim = ctools.ctobssim()
+      >>> sim.logFileOpen()
+      >>> sim.run()
+

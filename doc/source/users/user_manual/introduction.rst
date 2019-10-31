@@ -103,7 +103,7 @@ example
 
 .. code-block:: bash
 
-  $ ctobssim seed=41
+   $ ctobssim seed=41
 
 will run :ref:`ctobssim` with a seed value of 41. Multiple hidden parameters
 specified on the command line need to be separated by a white space. In the
@@ -116,3 +116,32 @@ values of queried parameters, e.g.
    >>> sim = ctools.ctobssim()
    >>> sim["seed"] = 41
    ...
+
+
+Log files
+---------
+
+Each ctool and cscript will produce a log file that is written in the working
+directory. The log file is in ASCII file format and can be read by any editor.
+By default, the name of the ASCII file is the name of the tool or script,
+suffixed by ``.log``. You can change the log file name using the hidden
+``logfile`` parameter, for example
+
+.. code-block:: bash
+
+   $ ctobssim logfile=my_first_simulation.log
+
+When calling a ctool or cscript from Python, no log file will be written by
+default. The reason for this is that Python scripts are often used to build
+ctools analysis pipelines and workflows, and one generally does not want that
+such a script pollutes the workspace with log files. You can however instruct
+a ctool or cscript to generate a log file by invoking the ``logFileOpen()``
+method before running the tool, for example
+
+.. code-block:: python
+
+   >>> import ctools
+   >>> sim = ctools.ctobssim()
+   ...
+   >>> sim.logFileOpen()
+   >>> sim.run()
