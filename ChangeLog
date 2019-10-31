@@ -1,10 +1,12 @@
-2019-07-23
+2019-10-31
 
         * Version 1.7.0 released
         ========================
 
         Remove response cache before source testing in cttsmap (#2973)
         Enabling running of example scripts from objects in memory (#2925)
+        Allow using spectral models without "Prefactor" parameter in cssens
+          and cstsdist (#1889)
 
 
 2019-07-15

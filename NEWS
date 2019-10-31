@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.7.0
 
-23 July 2019
+31 October 2019
 
 
 Introduction
@@ -254,7 +254,8 @@ None
 
 cssens - Computes sensitivity curve
 -----------------------------------
-None
+Allow using spectral models without "Prefactor" parameter for sensitivity
+computation (#1889).
 
 
 csspec - Generates Spectral Energy Distribution
@@ -269,7 +270,8 @@ None
 
 cstsdist - Computes Test Statistic distribution
 -----------------------------------------------
-None
+Allow using spectral models without "Prefactor" parameter for computation of
+TS distribution (#1889).
 
 
 cstsmapmerge - Merge Test Statistic maps
@@ -304,7 +306,9 @@ None
 
 modutils - Model utilities
 --------------------------
-None
+Allow using spectral models without "Prefactor" parameter as test source in
+test_source() function. Add normalisation_parameter() function to retrieve
+spectral normalisation parameter from any model (#1889).
 
 
 mputils - Multiprocessing utilities

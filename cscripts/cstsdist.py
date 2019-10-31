@@ -232,9 +232,10 @@ class cstsdist(ctools.csobservation):
                 for par in model:
                     self._log_string(gammalib.EXPLICIT, str(par))
         elif self._logNormal():
-            name  = 'Trial %d' % seed
-            value = 'TS=%.3f  Prefactor=%e +/- %e' % \
-                    (ts, model['Prefactor'].value(), model['Prefactor'].error())
+            prefactor = modutils.normalisation_parameter(model)
+            name      = 'Trial %d' % seed
+            value     = 'TS=%.3f  %s=%e +/- %e' % \
+                        (ts, prefactor.name(), prefactor.value(), prefactor.error())
             self._log_value(gammalib.TERSE, name, value)
 
         # Initialise results

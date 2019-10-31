@@ -1,7 +1,7 @@
 # ==========================================================================
 # Utility functions for model handling
 #
-# Copyright (C) 2016-2017 Juergen Knoedlseder
+# Copyright (C) 2016-2019 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -61,10 +61,20 @@ def test_source(models, srcname, ra=None, dec=None, fitspat=False,
     model = outmodels[srcname]
     model.tscalc(True)
 
-    # If source model has no "Prefactor" parameter then raise an exception
-    if not model.has_par('Prefactor'):
-        msg = ('Model "%s" has no parameter "Prefactor". Only spectral '
-               'models with a "Prefactor" parameter are supported.' %
+    # Get spectral model component
+    spectral = model.spectral()
+
+    # If source model has no normalisation parameter then raise an exception
+    if not (spectral.has_par('Normalization') or
+            spectral.has_par('Value') or
+            spectral.has_par('Prefactor') or
+            spectral.has_par('Integral') or
+            spectral.has_par('PhotonFlux') or
+            spectral.has_par('EnergyFlux')):
+        msg = ('Model "%s" has no flux normalisation parameter. Only spectral '
+               'models with a flux normalisation parameter (one of '
+               '"Normalization", "Value", "Prefactor", "Integral", '
+               '"PhotonFlux", and "EnergyFlux") are supported.' %
                srcname)
         raise RuntimeError(msg)
 
@@ -98,6 +108,51 @@ def test_source(models, srcname, ra=None, dec=None, fitspat=False,
 
     # Return model container
     return outmodels
+
+
+# ============================================= #
+# Return spectral model normalisation parameter #
+# ============================================= #
+def normalisation_parameter(model):
+    """
+    Return spectral model normalisation parameter
+
+    Parameters
+    ----------
+    model : `~gammalib.GModel`
+        Input model
+
+    Returns
+    -------
+    par : `~gammalib.GModelPar`
+        Spectral model normalisation parameter
+    """
+    # Initialise normalisation parameter as None
+    par = None
+
+    # Set list of possible normalisation parameters
+    norm_pars = ['Normalization', 'Value', 'Prefactor', 'Integral',
+                 'PhotonFlux', 'EnergyFlux']
+
+    # Get spectral model component
+    spectral = model.spectral()
+
+    # Find normalisation parameter
+    for norm_par in norm_pars:
+        if spectral.has_par(norm_par):
+            par = spectral[norm_par]
+
+    # If no normalisation parameter then raise an exception
+    if par == None:
+        msg = ('Model "%s" has no flux normalisation parameter. Only spectral '
+               'models with a flux normalisation parameter (one of '
+               '"Normalization", "Value", "Prefactor", "Integral", '
+               '"PhotonFlux", and "EnergyFlux") are supported.' %
+               model.name())
+        raise RuntimeError(msg)
+
+    # Return normalisation parameter
+    return par
 
 
 # ================================= #

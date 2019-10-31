@@ -2,7 +2,7 @@
 # ==========================================================================
 # Computes the array sensitivity using the Test Statistic for a test source
 #
-# Copyright (C) 2011-2018 Juergen Knoedlseder
+# Copyright (C) 2011-2019 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -377,13 +377,14 @@ class cssens(ctools.csobservation):
             # Write header for iteration into logger
             self._log_header2(gammalib.EXPLICIT, 'Iteration '+str(iterations))
 
-            # Create a copy of the test models, set the prefactor of the test
-            # source in the models, and append the models to the observation.
-            # "crab_prefactor" is the Prefactor that corresponds to a flux of
-            # 1 Crab.
+            # Create a copy of the test models, set the normalisation parameter
+            # of the test source in the models, and append the models to the
+            # observation. "crab_prefactor" is the prefactor that corresponds
+            # to a flux of 1 Crab.
             models         = test_model.copy()
-            crab_prefactor = models[self._srcname]['Prefactor'].value() * crab_unit
-            models[self._srcname]['Prefactor'].value(crab_prefactor * test_crab_flux)
+            prefactor      = modutils.normalisation_parameter(models[self._srcname])
+            crab_prefactor = prefactor.value() * crab_unit
+            prefactor.value(crab_prefactor * test_crab_flux)
             self.obs().models(models)
 
             # Simulate events for the models. "sim" holds an observation
@@ -422,7 +423,8 @@ class cssens(ctools.csobservation):
             ts     = source.ts()
 
             # Get fitted Crab, photon and energy fluxes
-            crab_flux   = source['Prefactor'].value() / crab_prefactor
+            prefactor   = modutils.normalisation_parameter(source)
+            crab_flux   = prefactor.value() / crab_prefactor
             photon_flux = source.spectral().flux(emin, emax)
             energy_flux = source.spectral().eflux(emin, emax)
 
@@ -679,7 +681,7 @@ class cssens(ctools.csobservation):
 
         # Set test source model for this observation
         self._models = modutils.test_source(self.obs().models(), self._srcname,
-                                      ra=self._ra, dec=self._dec)
+                                            ra=self._ra, dec=self._dec)
 
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')

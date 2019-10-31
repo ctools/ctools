@@ -26,6 +26,8 @@ Improvements
   Remove response cache before source testing in cttsmap
 * [`2925 <https://cta-redmine.irap.omp.eu/issues/2925>`_] -
   Enabling running of example scripts from objects in memory
+* [`1889 <https://cta-redmine.irap.omp.eu/issues/1889>`_] -
+  Allow using spectral models without ``Prefactor`` parameter in :ref:`cssens` and :ref:`cstsdist`
 
 
 New features
