@@ -61,6 +61,9 @@ Point source
 Radial source
 ^^^^^^^^^^^^^
 
+RadialDisk
+~~~~~~~~~~
+
   The ``RadialDisk`` model describes a uniform intensity distribution within
   a given radius
 
@@ -82,6 +85,9 @@ Radial source
   * ``RA`` is the Right Ascension (degrees)
   * ``DEC`` is the Declination (degrees)
   * ``Radius`` is the disk radius (degrees)
+
+RadialGaussian
+~~~~~~~~~~~~~~
 
   The ``RadialGaussian`` model describes a Gaussian intensity distribution
 
@@ -108,7 +114,10 @@ Radial source
 
   * ``RA`` is the Right Ascension (degrees)
   * ``DEC`` is the Declination (degrees)
-  * :math:`\sigma` == ``Sigma`` (degrees)
+  * :math:`\sigma` = ``Sigma`` (degrees)
+
+RadialShell
+~~~~~~~~~~~
 
   The ``RadialShell`` model describes a spherical shell projected on the sky
 
@@ -159,6 +168,9 @@ Radial source
 Elliptical source
 ^^^^^^^^^^^^^^^^^
 
+EllipticalDisk
+~~~~~~~~~~~~~~
+
   The ``EllipticalDisk`` model describes a uniform intensity distribution within
   an elliptical circumference:
 
@@ -184,6 +196,9 @@ Elliptical source
   * ``PA`` is the position angle, counted counterclockwise from North (degrees)
   * ``MinorRadius`` is the minor radius of the ellipse (degrees)
   * ``MajorRadius`` is the major radius of the ellipse (degrees)
+
+EllipticalGaussian
+~~~~~~~~~~~~~~~~~~
 
   The ``EllipticalGaussian`` model describes a Gaussian intensity distribution
 
@@ -232,6 +247,9 @@ Elliptical source
 Diffuse source
 ^^^^^^^^^^^^^^
 
+DiffuseIsotropic
+~~~~~~~~~~~~~~~~
+
   The ``DiffuseIsotropic`` model describes an isotropic intensity distribution
 
   .. code-block:: xml
@@ -252,6 +270,9 @@ Diffuse source
   .. note::
      For compatibility with the Fermi/LAT ScienceTools the model type
      ``DiffuseIsotropic`` can be replaced by ``ConstantValue``.
+
+DiffuseMap
+~~~~~~~~~~
 
   The ``DiffuseMap`` model describes an arbitrary intensity distribution in
   form of a sky map
@@ -281,8 +302,15 @@ Diffuse source
      ``Normalization`` can be replaced by ``Prefactor``.
 
   .. note::
-     You may add the ``normalize="0"`` to the spatial model tag to avoid the
-     normalization of the diffuse map to an integral of unity
+     By default, the diffuse map is normalised so that
+
+     .. math::
+        \int_{\Omega} M_{\rm spatial}(p|E) \, d\Omega = 1
+
+     which means that the units of the spatial model component are
+     :math:`[M_{\rm spatial}] = {\rm sr}^{-1}`.
+     To avoid the normalisation you may add the ``normalize="0"`` attribute
+     to the spatial model tag.
 
      .. code-block:: xml
 
@@ -294,6 +322,19 @@ Diffuse source
             ...
           </spectrum>
         </source>
+
+     In that case, generally
+
+     .. math::
+        \int_{\Omega} M_{\rm spatial}(p|E) \, d\Omega \neq 1
+
+     and the spectral component cannot be directly interpreted as a physical
+     source intensity.
+
+  .. _um_models_spatial_src_diffuse_cube:
+
+DiffuseMapCube
+~~~~~~~~~~~~~~
 
   The ``DiffuseMapCube`` model describes an arbitrary energy-dependent intensity
   distribution in form of a map cube
@@ -312,6 +353,18 @@ Diffuse source
   where
 
   * ``Normalization`` is a normalization value
+
+  Note that the map cube is not normalised to unit, hence generally
+
+  .. math::
+     \int_{\Omega} M_{\rm spatial}(p|E) \, d\Omega \neq 1
+
+  To compute the flux in a given energy band for a ``DiffuseMapCube`` model
+  you have to integrated both the spatial and spectral components, i.e.
+
+  .. math::
+     \Phi = \int_{\Omega} \int_{E} M_{\rm spatial}(p|E) \times
+            M_{\rm spectral}(E)\, d\Omega \, dE
 
   .. note::
      For compatibility with the Fermi/LAT ScienceTools the model type

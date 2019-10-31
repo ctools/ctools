@@ -15,6 +15,42 @@ a temporal component (tag ``<temporal>``).
 .. math::
    M(p,E,t) = M_{\rm spatial}(p|E) \times M_{\rm spectral}(E) \times M_{\rm temporal}(t)
 
+where :math:`M(p,E,t)` is given in units of
+:math:`photons \,\, cm^{-2} s^{-1} MeV^{-1} sr^{-1}`.
+
+The spatial model component describes the energy dependent morphology of the
+source.
+It satisfies
+
+.. math::
+   \int_{\Omega} M_{\rm spatial}(p|E) \, d\Omega = 1
+
+for all :math:`E`, hence the spatial component does not
+impact the spatially integrated spectral and temporal properties of the
+source (the integration is done here over the spatial parameters
+:math:`p` in a spherical coordinate system).
+The units of the spatial model component are
+:math:`[M_{\rm spatial}] = {\rm sr}^{-1}`
+(but see the exception of the
+:ref:`DiffuseMapCube spatial model component <um_models_spatial_src_diffuse_cube>`).
+
+The spectral model component describes the spatially integrated spectral
+distribution of the source.
+It satisfies
+
+.. math::
+   \int_{E} M_{\rm spectral}(E) \, dE = \Phi
+
+where :math:`\Phi` is the spatially and spectrally integrated total source
+flux.
+The units of the spectral model component
+are :math:`[M_{\rm spectral}] = {\rm cm}^{-2} {\rm s}^{-1} {\rm MeV}^{-1}`.
+
+The temporal model component describes the relative variation of the
+source flux with respect to the mean value given by the spectral model
+component.
+The temporal model component is unit less.
+
 In this specific example, the source component ``Crab`` describes 
 a point source at the location of the Crab nebula with a power law spectral
 shape that is constant in time.
