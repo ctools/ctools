@@ -1,6 +1,6 @@
-New Features and Important Changes in ctools 1.6.2
+New Features and Important Changes in ctools 1.6.3
 
-15 July 2019
+7 November 2019
 
 
 Introduction
@@ -16,7 +16,7 @@ None
 
 Documentation
 -------------
-Improve documentation and tutorials (#2962).
+Improve documentation and tutorials.
 
 
 Python interface
@@ -31,9 +31,7 @@ None
 
 Base classes
 ------------
-Make ctool::create_ebounds(), ctool::create_energies() and
-ctool::save_event_list() methods OpenMP thread save so that multiple threads
-can call the method at the same time (#2912).
+None
 
 
 ctbin - CTA event binning
@@ -138,9 +136,7 @@ None
 
 csbkgmodel - Generate background model for 3D analysis
 ------------------------------------------------------
-The script now handles observation definition files with multiple instruments,
-stripping all instruments that do not corresponds to the "instrument" parameter
-(#2862).
+None
 
 
 cscaldb - Inspect calibration database
@@ -255,8 +251,7 @@ None
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-If a diffuse cube sky model is used the script now correctly multiplies the
-result with the diffuse cube sky model spectrum (#2954).
+None
 
 
 cssrcdetect - Detects sources in sky map
