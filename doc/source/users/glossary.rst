@@ -48,7 +48,7 @@ Glossary
    .. math::
       E_{\rm disp}(E'| p, E) =
       \frac{\sum_i E_{\rm disp,i}(E'| p, E) \times A_{\rm eff,i}(p, E) \times \tau_i}
-           {\sum_i E_{\rm disp,i}(E'| p, E) \times \tau_i}
+           {\sum_i A_{\rm eff,i}(p, E) \times \tau_i}
 
    where
    :math:`E_{\rm disp,i}(E'| p, E)` is the energy dispersion for observation :math:`i`,
