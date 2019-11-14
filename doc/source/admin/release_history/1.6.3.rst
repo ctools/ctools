@@ -1,0 +1,12 @@
+.. _1.6.3:
+
+ctools 1.6.3 release (7 November 2019)
+======================================
+
+Overview
+--------
+
+ctools 1.6.3 is a bug fix release for ctools release 1.6.
+
+No changes were made to the code base. The bug fix release is made for
+compliance reasons with the GammaLib 1.6.3 bug fix release.
