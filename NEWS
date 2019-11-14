@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.7.0
 
-31 October 2019
+14 November 2019
 
 
 Introduction
@@ -286,7 +286,15 @@ None
 
 csviscube - Generate visibility cube
 ------------------------------------
-None
+Moon contraints were added to compute a more accurate visibility cube. So far
+there are two constraints:
+- moonzenith, which specifies a minimum allow zenith angle for the Moon. In
+  other words, if the Moon is higher in the sky than the specified zenith
+  angle, the corresponding times are excluded from the visibility cube.
+- maxfli, which specifies the maximum fraction of lunar illumination. If the
+  Moon has an illumination that is equal or larger than this fraction, the
+  corresponding times are excluded from the visibility cube.
+(#3065).
 
 
 csworkflow - Execute workflow
@@ -323,6 +331,8 @@ None
 
 Examples
 --------
+The show_viscube.py script was added to display a visibility cube (#3065).
+
 The example scripts show_butterfly.py, show_spectrum.py, show_residuals.py
 and show_significance_distribution.py can now be run using objects that only
 exist in memory (#2925).

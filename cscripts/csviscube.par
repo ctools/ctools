@@ -21,8 +21,9 @@ tmax,       t, a, 2021-01-01T00:00:00,,, "Stop time of observation (UTC string, 
 mjdref,     r, h, 51544.5,,, "Reference MJD for MET"
 geolon,     r, a,  79.4041,,, "Geographic longitude of array (deg)"
 geolat,     r, a, -24.6272,,, "Geographic latitude of array (deg)"
-sunzenith,  r, h, 105.0,,, "Minimum Sun zenith angle for observations (deg)"
-moonzenith, r, h, 90.0,,, "Minimum Moon zenith angle for observations (deg)"
+sunzenith,  r, h, 105.0,0.0,180.0, "Minimum Sun zenith angle for observations (deg)"
+moonzenith, r, h, 90.0,0.0,180.0, "Minimum Moon zenith angle for observations (deg)"
+maxfli,     r, h, 0.4,0.0,1.0, "Maximum fraction of lunar illumation"
 outfile,    f, a, viscube.fits,,, "Visibility cube output file"
 
 #

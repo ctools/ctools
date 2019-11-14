@@ -14,11 +14,24 @@ Ascension, Declination and zenith angle that provides the number of hours
 that a given position on the sky is observable under a given zenith angle
 by an IACT array during a given time period.
 
-For the moment, the script takes into account a Sun constraint, specified as
-a minimum zenith angle of the Sun for observations (hidden parameter ``sunzenith``).
-No Moon constraint has been implemented so far.
+For the moment, the script takes into account:
+- a Sun constraint, specified as a minimum zenith angle of the Sun (hidden
+  parameter ``sunzenith``). If the Sun is higher in the sky than this zenith
+  angle the corresponding times are excluded
+- a Moon constraint, specified as a minimum zenith angle of the Moon (hidden
+  parameter ``moonzenith``). If the Moon is higher in the sky than this zenith
+  angle the corresponding times are excluded
+- a constraint on the lunar illumination (hidden parameter ``maxfli``). If the
+  Moon has an illumination that is equal or larger than this fraction the
+  corresponding times are excluded
 
 On output, the script will provide a FITS file containing the visibility cube.
+In addition, the FITS file will also contain a ``VISIBILITY`` extension in
+form of a binary table that provides a number of parameters, such as the
+positions of the Sun and the Moon, the fraction of lunar illumation and the
+Dark Time as function of time.
+
+Use the example script ``show_viscube.py`` to display a visibility cube.
 
 
 General parameters
@@ -42,8 +55,20 @@ General parameters
 ``(sunzenith = 105.0) [real]``
     Minimum Sun zenith angle for observations in degrees.
 
+    If the Sun is higher in the sky than the specified zenith angle, the
+    corresponding times are excluded from the visibility cube.
+
 ``(moonzenith = 90.0) [real]``
     Minimum Moon zenith angle for observations in degrees.
+
+    If the Moon is higher in the sky than the specified zenith angle, the
+    corresponding times are excluded from the visibility cube.
+
+``(maxfli = 0.4) [real]``
+    Maximum fraction of lunar illumination.
+
+    If the Moon has an illumination that is equal or larger than this fraction,
+    the corresponding times are excluded from the visibility cube.
 
 ``outfile [file]``
     Output visibility cube file.

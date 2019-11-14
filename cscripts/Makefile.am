@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for cscripts scripts                                             #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2018 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2019 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -236,6 +236,7 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/model_crab_radialacceptance.xml \
            $(top_srcdir)/test/data/sigdist_map.fits.gz \
            $(top_srcdir)/test/data/variability.fits.gz \
+           $(top_srcdir)/test/data/viscube.fits.gz \
            $(top_srcdir)/test/data/hess_bkg_lookup.fits
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data/iactdata

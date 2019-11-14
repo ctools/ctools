@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools examples                                              #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2018 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2019 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -39,7 +39,8 @@ scripts = README.md \
           show_significance_distribution.py \
           show_spectrum.py \
           show_ts_distribution.py \
-          show_variability_evolution.py
+          show_variability_evolution.py \
+          show_viscube.py
 
 # Set install directories
 scriptsdir    = $(datadir)/examples/python

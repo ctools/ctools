@@ -2,7 +2,7 @@
 # ==========================================================================
 # Performs unit tests for the ctools example scripts
 #
-# Copyright (C) 2016-2018 Juergen Knoedlseder
+# Copyright (C) 2016-2019 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -127,6 +127,8 @@ class Test(gammalib.GPythonTestSuite):
                     'Test show_ts_distribution.py')
         self.append(self.test_show_variability_evolution,
                     'Test show_variability_evolution.py')
+        self.append(self.test_show_viscube,
+                    'Test show_viscube.py')
 
         # Return
         return
@@ -452,6 +454,21 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute script
         self._execute_python('show_variability_evolution', args=args)
+
+        # Return
+        return
+
+    # Test show_viscube
+    def test_show_viscube(self):
+        """
+        Test show_viscube
+        """
+        # Set arguments
+        args = ('-p example_show_viscube.eps %s/viscube.fits' %
+                self._datadir)
+
+        # Execute script
+        self._execute_python('show_viscube', args=args)
 
         # Return
         return

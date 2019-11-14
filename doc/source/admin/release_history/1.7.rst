@@ -22,6 +22,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`3065 <https://cta-redmine.irap.omp.eu/issues/3065>`_] -
+  Add Moon constraints to :ref:`csviscube`
 * [`2973 <https://cta-redmine.irap.omp.eu/issues/2973>`_] -
   Remove response cache before source testing in cttsmap
 * [`2925 <https://cta-redmine.irap.omp.eu/issues/2925>`_] -

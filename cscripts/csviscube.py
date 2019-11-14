@@ -2,7 +2,7 @@
 # ==========================================================================
 # Compute a visibility cube
 #
-# Copyright (C) 2016-2018 Juergen Knoedlseder
+# Copyright (C) 2016-2019 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -52,7 +52,8 @@ class csviscube(ctools.cscript):
         self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise members
-        self._cube = gammalib.GSkyMap()
+        self._cube    = gammalib.GSkyMap()
+        self._results = []
 
         # Return
         return
@@ -81,6 +82,20 @@ class csviscube(ctools.cscript):
         """
         Compute zenith angle map
 
+        The zenith angle of a position (ra,dec) depends on the declination and
+        the hour angle h and is given by
+
+        zenith(h,dec) = arccos( sin(lat) * sin(dec) + cos(lat) * cos(dec) * cos(h) )
+
+        The hour angle h (or local hour angle, LHA) is defined as the difference
+        between local siderial time (LST) and the Right Ascension
+
+        h = LST - ra
+
+        The map is computed for h=-ra which is equivalent to GST=lon (or LST=0).
+        In other words, the map corresponds to the time when ra=0 passes through
+        the local meridian.
+
         Parameters
         ----------
         nx : int
@@ -96,26 +111,12 @@ class csviscube(ctools.cscript):
         -------
         zmap : `~gammalib.GSkyMap`
             Allsky map comprising the zenith angle for an hour angle of 0.
-
-        The zenith angle of a position (ra,dec) depends on the declination and
-        the hour angle h and is given by
-
-        zenith(h,dec) = arccos( sin(lat) * sin(dec) + cos(lat) * cos(dec) * cos(h) )
-
-        The hour angle h (or local hour angle, LHA) is defined as the difference
-        between local siderial time (LST) and the Right Ascension
-
-        h = LST - ra
-
-        The map is computed for h=-ra which is equivalent to GST=lon (or LST=0).
-        In other words, the map corresponds to the time when ra=0 passes through
-        the local meridian.
         """
         # Initialise zenith angle map
         zmap = gammalib.GSkyMap('CAR','CEL',0.0,0.0,-dx,dy,nx,ny)
 
         # Set hour angle and declination vectors
-        hours = [(float(i)+0.5)*dx for i in range(nx)]
+        hours = [(float(i)+0.5)*dx      for i in range(nx)]
         decs  = [(float(i)+0.5)*dy-90.0 for i in range(ny)]
 
         # Get array geographic latitude
@@ -136,7 +137,7 @@ class csviscube(ctools.cscript):
                 zenith = math.acos(sin_lat*sin_dec +
                                    cos_lat*cos_dec*cos_h)*gammalib.rad2deg
                 zmap[index] = zenith
-                index     += 1
+                index      += 1
 
         # Log zenith angle map
         self._log_header2(gammalib.EXPLICIT, 'Zenith angle map')
@@ -145,67 +146,14 @@ class csviscube(ctools.cscript):
         # Return zenith angle map
         return zmap
 
-    def _sun_radec(self, time):
-        """
-        Compute Right Ascension and Declination of the Sun
-
-        Parameters
-        ----------
-        time : `~gammalib.GTime()`
-            Time for which declination is to be computed
-
-        Returns
-        -------
-        ra, dec : tuple of float
-            Right Ascension and Declination of the Sun in degrees
-
-        The formulae are inspired from
-        https://en.wikipedia.org/wiki/Position_of_the_Sun
-        """
-        # Compute number of days since Greenwich noon, Terrestrial Time, on
-        # 1 January 2000
-        n = time.jd() - 2451545.0
-
-        # Compute mean longitude of the Sun in degrees, corrected for the
-        # aberration of light
-        L = 280.460 + 0.9856474 * n
-        while L < 0.0:
-            L += 360.0
-        while L >= 360.0:
-            L -= 360.0
-
-        # Compute the mean anomaly of the Sun in radians
-        g = (357.528 + 0.9856003 * n) * gammalib.deg2rad
-
-        # Compute the ecliptic longitude of the Sun in degrees
-        lam = L + 1.915 * math.sin(g) + 0.020 * math.sin(2.0*g)
-
-        # Compute Right Ascension and Declination of the Sun in degrees
-        ra  = math.atan(math.cos(23.43711*gammalib.deg2rad) *
-                        math.tan(lam*gammalib.deg2rad))*gammalib.rad2deg
-        dec = math.asin(math.sin(23.43711*gammalib.deg2rad) *
-                        math.sin(lam*gammalib.deg2rad))*gammalib.rad2deg
-
-        # Put ra in the right quadrant (same quadrant as lam)
-        while lam < 0.0:
-            lam += 360.0
-        while lam >= 360.0:
-            lam -= 360.0
-        while ra < 0.0:
-            ra += 360.0
-        while ra >= 360.0:
-            ra -= 360.0
-        q_lam = int(lam / 90.0)
-        q_ra  = int(ra / 90.0)
-        ra   += (q_lam-q_ra)*90.0
-
-        # Return declination of the Sun
-        return ra, dec
-
     def _sun_ra_exclusion(self, time):
         """
-        Compute the Right Ascension difference in degrees before and after
-        noon that are excluded due to the Sun constraint
+        Compute the half length of the Right Ascension interval to exclude due
+        to the Sun constraint
+
+        The Sun zenith angle constraint implies an interval in Right Ascension
+        that is to be excluded (that's the interval during which it is day).
+        This method computes half the length of this interval in degrees.
 
         Parameters
         ----------
@@ -215,15 +163,17 @@ class csviscube(ctools.cscript):
         Returns
         -------
         dra : float
-            Positive Right Ascension difference in degrees.
+            Right Ascension interval half length (degrees)
         """
         # Get array geographic latitude and minimum Sun zenith angle in radians
-        geolat    = self['geolat'].real() * gammalib.deg2rad
+        geolat    = self['geolat'].real()    * gammalib.deg2rad
         sunzenith = self['sunzenith'].real() * gammalib.deg2rad
 
         # Compute Right Ascension and Declination of Sun in degrees and
         # convert the Declination into radians
-        sundec = self._sun_radec(time)[1] * gammalib.deg2rad
+        sun = gammalib.GSkyDir()
+        sun.sun(time)
+        sundec = sun.dec()
 
         # Compute some sines and cosines
         cos_sunzenith = math.cos(sunzenith)
@@ -234,31 +184,179 @@ class csviscube(ctools.cscript):
 
         # Compute Right Ascension difference when Sun is below the mimimum
         # zenith angle in degrees
-        dra = math.acos((cos_sunzenith - sin_geolat * sin_sundec) /
-                        (cos_geolat * cos_sundec)) * gammalib.rad2deg
+        dra   = 0.0
+        nom   = cos_sunzenith - sin_geolat * sin_sundec
+        denom = cos_geolat * cos_sundec
+        if denom != 0.0:
+            arg = nom/denom
+            if arg >= -1.0 and arg <= 1.0:
+                dra = math.acos(arg) * gammalib.rad2deg
 
         # Return
         return dra
+
+    def _moon_ra_exclusion(self, time):
+        """
+        Compute the half length of the Right Ascension interval to exclude due
+        to the Moon constraint
+        
+        The Moon zenith angle constraint implies an interval in Right Ascension
+        that is to be excluded. This method computes half the length of this
+        interval.
+
+        Parameters
+        ----------
+        time : `~gammalib.GTime()`
+            Time for which the Moon exclusion is to be computed
+
+        Returns
+        -------
+        dra : float
+            Right Ascension interval half length (degrees)
+        """
+        # Get array geographic latitude and minimum Moon zenith angle in radians
+        geolat     = self['geolat'].real()     * gammalib.deg2rad
+        moonzenith = self['moonzenith'].real() * gammalib.deg2rad
+
+        # Compute Right Ascension and Declination of Moon in degrees and
+        # convert the Declination into radians
+        moon = gammalib.GSkyDir()
+        moon.moon(time)
+        moondec = moon.dec()
+
+        # Compute some sines and cosines
+        cos_moonzenith = math.cos(moonzenith)
+        sin_geolat     = math.sin(geolat)
+        cos_geolat     = math.cos(geolat)
+        sin_moondec    = math.sin(moondec)
+        cos_moondec    = math.cos(moondec)
+
+        # Compute Right Ascension difference when Moon is below the mimimum
+        # zenith angle in degrees
+        dra   = 0.0
+        nom   = cos_moonzenith - sin_geolat * sin_moondec
+        denom = cos_geolat * cos_moondec
+        if denom != 0.0:
+            arg = nom/denom
+            if arg >= -1.0 and arg <= 1.0:
+                dra = math.acos(arg) * gammalib.rad2deg
+
+        # Return
+        return dra
+
+    def _adjust_ra_interval(self, ra_start, ra_stop):
+        """
+        Adjust Right Ascension interval so that it overlaps with the [0,360[
+        interval
+
+        Parameters
+        ----------
+        ra_start : float
+            Start of interval to exclude (degrees)
+        ra_stop : float
+            Stop of interval to exclude (degrees)
+
+        Returns
+        -------
+        ra_start : float
+            Adjusted start of interval to exclude (degrees)
+        ra_stop : float
+            Adjusted stop of interval to exclude (degrees)
+        """
+        # Adjust interval if both boundaries are negative
+        while ra_start < 0.0 and ra_stop < 0.0:
+            ra_start += 360.0
+            ra_stop  += 360.0
+
+        # Adjust interval if both boundaries are equal or larger than 360
+        # degrees
+        while ra_start >= 360.0 and ra_stop >= 360.0:
+            ra_start -= 360.0
+            ra_stop  -= 360.0
+
+        # Return interval
+        return ra_start, ra_stop
+
+    def _exclude_ra_interval(self, hours, ra_start, ra_stop):
+        """
+        Exclude Right Ascension interval from array of hour angles
+
+        Parameters
+        ----------
+        hours : list of floats
+            Array of hours
+        ra_start : float
+            Start of interval to exclude (degrees)
+        ra_stop : float
+            Stop of interval to exclude (degrees)
+
+        Returns
+        -------
+        hours : list of floats
+            Array of hours with excluded Right Ascension interval
+        """
+        # Conversion from RA (degrees) to index
+        nhours = len(hours)
+        ra2inx = float(nhours)/360.0
+
+        # Adjust interval
+        ra_start, ra_stop = self._adjust_ra_interval(ra_start, ra_stop)
+
+        # Case 1: The RA interval is fully comprised within the [0,360]
+        #         interval, hence we simply exclude this interval.
+        if ra_start >= 0.0 and ra_stop <= 360.0:
+            inx_start = int(ra_start * ra2inx + 0.5)
+            inx_stop  = int(ra_stop  * ra2inx + 0.5)
+            for i in range(inx_start,inx_stop):
+                hours[i] = 0.0
+
+        # Case 2: The RA interval is starting at negative RA. In that case
+        #         there are two intervals to exclude:
+        #         [ra_start+360,360] and [0,ra_stop]
+        elif ra_start < 0.0:
+            inx_start = int((ra_start+360.0) * ra2inx + 0.5)
+            inx_stop  = int(ra_stop * ra2inx + 0.5)
+            for i in range(inx_start,nhours):
+                hours[i] = 0.0
+            for i in range(0,inx_stop):
+                hours[i] = 0.0
+
+        # Case 3: The RA interval is stopping at RA>360. In that case there
+        #         are two intervals to exclude:
+        #         [0,ra_stop-360] and [0,ra_start]
+        elif ra_stop > 360.0:
+            inx_start = int(ra_start * ra2inx + 0.5)
+            inx_stop  = int((ra_stop-360.0) * ra2inx + 0.5)
+            for i in range(0,inx_stop):
+                hours[i] = 0.0
+            for i in range(inx_start,nhours):
+                hours[i] = 0.0
+
+        # Return hours
+        return hours
 
     def _hour_angle_weight(self):
         """
         Compute hour angle weights
 
-        Computes an array specifying how many hours the array was observing
-        for a given hour angle during the time interval [tmin,tmax]. The hour
-        angle runs from 0 to 360 degrees.
+        Computes an array that specifies the time during which a given hour
+        angle was observed during the observing time interval [tmin,tmax].
+        The hour angle runs from 0 to 360 degrees, array values are in units
+        of hours.
 
-        Compute during which time the array was observing due to hour angle
-        constraints. We take here a very simple model where the night lasts
-        between 6 and 10 hours (or 90-150 degrees), with a sinusoidal variation
-        along the year. Every day the hour angle of the Sun set is advancing by
-        4 minutes.
+        The method loops over the days in the time interval [tmin,tmax], with
+        time = tmin + i*86400 seconds. At each time step the position in Right
+        Ascension and Declination of the Sun is computed (the Sun's
+        Declination is in fact not used here).
+
+        An interval of [ra_sun-dra_sun, ra_sun+dra_sun] is assumed to be the
+        day. The method _sun_ra_exclusion() is used to compute dra_sun, which
+        is half of the length of the day in degrees (recall that 15 degrees
+        is one hour). The length of the day is computed using the sunzenith
+        constraint.
         """
         # Write header
         self._log_header2(gammalib.NORMAL, 'Hour angle weights')
-
-        # Get array geographic longitude
-        #geolon = self['geolon'].real()
 
         # Get MET time reference
         tref = gammalib.GTimeReference(self['mjdref'].real(),'s','TT','LOCAL')
@@ -267,8 +365,9 @@ class csviscube(ctools.cscript):
         tmin = self['tmin'].time(tref)
         tmax = self['tmax'].time(tref)
 
-        # Initialise hour angle list
-        hour_angles = []
+        # Initialise hour angle list and results
+        hour_angles   = []
+        self._results = []
 
         # Set number of hour angle bins and compute conversion factor and weight
         nsteps = 1000
@@ -282,79 +381,79 @@ class csviscube(ctools.cscript):
         time = tmin
         while time <= tmax:
 
-            # Compute Right Ascension and Declination of Sun in degrees
-            sunra, sundec = self._sun_radec(time)
+            # Initialise hours array for this time step
+            hours_time = [weight for i in range(nsteps)]
 
-            # Compute by how much the zenith angle map needs to be shifted
-            # to correspond to the actual time
-            #
-            # NOTE: The local apparent siderial time only is relevant if
-            # the time interval is shorter than a day. Only in that case
-            # we have to set the corresponding hour angles to zero. We need
-            # to think how to properly implement that.
-            #last = time.last(geolon) * 15.0
-            #print(last)
+            # Compute half the length of the exclusion intervals in degrees
+            sun_dra  = self._sun_ra_exclusion(time)
+            moon_dra = self._moon_ra_exclusion(time)
 
-            # Compute the time from now when the Sun will culminate. The time
-            # is here expressed in degrees
-            dra_sun = self._sun_ra_exclusion(time)
+            # Compute Right Ascension and Declination of Sun in degrees and
+            # derive Sun exclusion interval
+            sun = gammalib.GSkyDir()
+            sun.sun(time)
+            sun_ra       = sun.ra_deg()
+            sun_dec      = sun.dec_deg()
+            sun_ra_start = sun_ra - sun_dra
+            sun_ra_stop  = sun_ra + sun_dra
 
-            # Set [0,ra_start] and [ra_stop,360.0]
-            ra_start = sunra - dra_sun
-            ra_stop  = sunra + dra_sun
+            # Adjust interval
+            sun_ra_start, sun_ra_stop = self._adjust_ra_interval(sun_ra_start,
+                                                                 sun_ra_stop)
 
-            # Case 1: The RA interval during which the Sun is above the zenith
-            # angle constraint is fully comprised within the [0,360] interval.
-            # In that case the dark time is comprised of two intervals:
-            # [0,ra_start] and [ra_stop,360]
-            if ra_start >= 0.0 and ra_stop <= 360.0:
-                inx_stop  = int(ra_start * ra2inx + 0.5)
-                inx_start = int(ra_stop  * ra2inx + 0.5)
-                for i in range(0,inx_stop):
-                    hours[i] += weight
-                for i in range(inx_start,nsteps):
-                    hours[i] += weight
+            # Compute Right Ascension and Declination of Moon in degrees and
+            # derive Moon exclusion interval
+            moon = gammalib.GSkyDir()
+            moon.moon(time)
+            moon_ra       = moon.ra_deg()
+            moon_dec      = moon.dec_deg()
+            moon_ra_start = moon_ra - moon_dra
+            moon_ra_stop  = moon_ra + moon_dra
 
-                # Log setting
-                logs = 'Sun=(%.3f,%.3f) dRA=%.3f RA_excl=[%.3f,%.3f] '\
-                       'Indices=[0-%d] & [%d-%d] Dark time=%.2f h %s' % \
-                       (sunra, sundec, dra_sun, ra_start, ra_stop, inx_stop, inx_start,
-                        nsteps, float(inx_stop+(nsteps-inx_start))*weight,
-                        '(Case 1)')
-                self._log_value(gammalib.VERBOSE, time.utc(), logs)
+            # Adjust interval
+            moon_ra_start, moon_ra_stop = self._adjust_ra_interval(moon_ra_start,
+                                                                   moon_ra_stop)
 
-            # Case 2: The RA interval during which the Sun is above the zenith
-            # angle constraint is starting at negative RA. In that case the
-            # dark time is comprised of a single interval
-            # [ra_stop,ra_start+360]
-            elif ra_start < 0.0:
-                inx_start = int(ra_stop * ra2inx + 0.5)
-                inx_stop  = int((ra_start+360.0) * ra2inx + 0.5)
-                for i in range(inx_start,inx_stop):
-                    hours[i] += weight
+            # Compute Moon elongation and illumation fraction (Moon phase)
+            elongation = sun.dist_deg(moon)
+            fli        = (1.0 - math.cos(elongation * gammalib.deg2rad))/2.0
 
-                # Log setting
-                logs = 'Sun=(%.3f,%.3f) dRA=%.3f RA_excl=[%.3f,%.3f] '\
-                       'Indices=[%d-%d] Dark time=%.2f h %s' % \
-                       (sunra, sundec, dra_sun, ra_start, ra_stop, inx_start, inx_stop,
-                        float(inx_stop-inx_start)*weight, '(Case 2)')
-                self._log_value(gammalib.VERBOSE, time.utc(), logs)
+            # Exclude hours due to Sun constraint (this defines the night)
+            hours_time = self._exclude_ra_interval(hours_time, sun_ra_start,
+                                                               sun_ra_stop)
 
-            # Case 3: The RA interval during which the Sun is above the zenith
-            # angle constraint is stopping at RA>360. In that case the dark
-            # time is comprised of a single interval [ra_stop-360,ra_start]
-            elif ra_stop > 360.0:
-                inx_start = int((ra_stop-360.0) * ra2inx + 0.5)
-                inx_stop  = int(ra_start * ra2inx + 0.5)
-                for i in range(inx_start,inx_stop):
-                    hours[i] += weight
+            # Exclude hours due to Moon constraint if the illumination fraction
+            # is equal to or above the maximim fraction of illumination
+            if fli >= self['maxfli'].real():
+                hours_time = self._exclude_ra_interval(hours_time, moon_ra_start,
+                                                                   moon_ra_stop)
 
-                # Log setting
-                logs = 'Sun=(%.3f,%.3f) dRA=%.3f RA_excl=[%.3f,%.3f] '\
-                       'Indices=[%d-%d] Dark time=%.2f h %s' % \
-                       (sunra, sundec, dra_sun, ra_start, ra_stop, inx_start, inx_stop,
-                        float(inx_stop-inx_start)*weight, '(Case 3)')
-                self._log_value(gammalib.VERBOSE, time.utc(), logs)
+            # Add hours
+            dark_time = 0.0
+            for i in range(nsteps):
+                hours[i]  += hours_time[i]
+                dark_time += hours_time[i]
+
+            # Set result record
+            result = {'time': time.copy(),
+                      'sun_ra': sun_ra, 'sun_dec': sun_dec,
+                      'moon_ra': moon_ra, 'moon_dec': moon_dec,
+                      'elongation': elongation, 'fli': fli,
+                      'sun_ra_start': sun_ra_start, 'sun_ra_stop': sun_ra_stop,
+                      'moon_ra_start': moon_ra_start, 'moon_ra_stop': moon_ra_stop,
+                      'dark_time' : dark_time}
+
+            # Append result record to results
+            self._results.append(result)
+
+            # Log results
+            logs = 'Sun=(%8.3f,%7.3f) Moon=(%8.3f,%7.3f) '\
+                   'Sun_RA_excl=[%8.3f,%8.3f] Moon_RA_excl=[%8.3f,%8.3f] '\
+                   'FLI=%4.2f Dark time=%5.2f h' % \
+                   (sun_ra, sun_dec, moon_ra, moon_dec,
+                    sun_ra_start, sun_ra_stop, moon_ra_start, moon_ra_stop,
+                    fli, dark_time)
+            self._log_value(gammalib.VERBOSE, time.utc(), logs)
 
             # Add seconds of one day and start with next day
             time += 86400.0
@@ -443,6 +542,93 @@ class csviscube(ctools.cscript):
         # Return
         return
 
+    def _save_results(self, outfile, clobber):
+        """
+        Save results in VISIBILITY FITS table
+
+        Parameters
+        ----------
+        outfile : str
+            Result FITS file name
+        clobber : bool
+            Overwrite existing file?
+        """
+        # Create FITS table columns
+        nrows         = len(self._results)
+        time          = gammalib.GFitsTableStringCol('Time', nrows, 20)
+        mjd           = gammalib.GFitsTableDoubleCol('MJD', nrows)
+        sun_ra        = gammalib.GFitsTableDoubleCol('RA_sun', nrows)
+        sun_dec       = gammalib.GFitsTableDoubleCol('DEC_sun', nrows)
+        moon_ra       = gammalib.GFitsTableDoubleCol('RA_moon', nrows)
+        moon_dec      = gammalib.GFitsTableDoubleCol('DEC_moon', nrows)
+        sun_ra_start  = gammalib.GFitsTableDoubleCol('RA_sun_start', nrows)
+        sun_ra_stop   = gammalib.GFitsTableDoubleCol('RA_sun_stop', nrows)
+        moon_ra_start = gammalib.GFitsTableDoubleCol('RA_moon_start', nrows)
+        moon_ra_stop  = gammalib.GFitsTableDoubleCol('RA_moon_stop', nrows)
+        elongation    = gammalib.GFitsTableDoubleCol('Elongation', nrows)
+        fli           = gammalib.GFitsTableDoubleCol('FLI', nrows)
+        dark_time     = gammalib.GFitsTableDoubleCol('Darktime', nrows)
+
+        # Set units of table columns
+        mjd.unit('days')
+        sun_ra.unit('deg')
+        sun_dec.unit('deg')
+        moon_ra.unit('deg')
+        moon_dec.unit('deg')
+        sun_ra_start.unit('deg')
+        sun_ra_stop.unit('deg')
+        moon_ra_start.unit('deg')
+        moon_ra_stop.unit('deg')
+        elongation.unit('deg')
+        dark_time.unit('hours')
+
+        # File FITS table columns
+        for i, result in enumerate(self._results):
+            time[i]          = result['time'].utc()
+            mjd[i]           = result['time'].mjd()
+            sun_ra[i]        = result['sun_ra']
+            sun_dec[i]       = result['sun_dec']
+            moon_ra[i]       = result['moon_ra']
+            moon_dec[i]      = result['moon_dec']
+            sun_ra_start[i]  = result['sun_ra_start']
+            sun_ra_stop[i]   = result['sun_ra_stop']
+            moon_ra_start[i] = result['moon_ra_start']
+            moon_ra_stop[i]  = result['moon_ra_stop']
+            elongation[i]    = result['elongation']
+            fli[i]           = result['fli']
+            dark_time[i]     = result['dark_time']
+
+        # Initialise FITS Table with extension "VISIBILITY"
+        table = gammalib.GFitsBinTable(nrows)
+        table.extname('VISIBILITY')
+
+        # Add Header for compatibility with gammalib.GMWLSpectrum
+        table.card('INSTRUME', 'CTA', 'Name of Instrument')
+        table.card('TELESCOP', 'CTA', 'Name of Telescope')
+
+        # Append filled columns to fits table    
+        table.append(time)
+        table.append(mjd)
+        table.append(sun_ra)
+        table.append(sun_dec)
+        table.append(moon_ra)
+        table.append(moon_dec)
+        table.append(sun_ra_start)
+        table.append(sun_ra_stop)
+        table.append(moon_ra_start)
+        table.append(moon_ra_stop)
+        table.append(elongation)
+        table.append(fli)
+        table.append(dark_time)
+
+        # Append table to result FITS file
+        fits = gammalib.GFits(outfile)
+        fits.append(table)
+        fits.save(clobber)
+
+        # Return
+        return
+
 
     # Public methods
     def run(self):
@@ -481,6 +667,9 @@ class csviscube(ctools.cscript):
 
         # Save the visibility cube
         self._cube.save(outfile, self['clobber'].boolean())
+
+        # Save the results in VISIBILITY table extension
+        self._save_results(outfile, self['clobber'].boolean())
 
         # Return
         return
