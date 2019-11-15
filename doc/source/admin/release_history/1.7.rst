@@ -17,6 +17,8 @@ In particular, this release provides:
 Bug fixes
 ---------
 
+* [`3066 <https://cta-redmine.irap.omp.eu/issues/3066>`_] -
+  Fix log file header repetition in some cscripts
 
 
 Improvements

@@ -1,8 +1,9 @@
-2019-11-14
+2019-11-15
 
         * Version 1.7.0 released
         ========================
 
+        Fix log file header repetition in some cscripts (#3066)
         Add Moon constraints to csviscube (#3065)
         Remove response cache before source testing in cttsmap (#2973)
         Enabling running of example scripts from objects in memory (#2925)

@@ -202,7 +202,6 @@ def _init_csobservation(self, name, version, argv):
     else:
         csobservation.__init__(self, name, version)
     # Set logger properties
-    self._log_header()
     self._log.date(True)
 csobservation._init_csobservation = _init_csobservation
 
@@ -217,7 +216,6 @@ cscript._unbinned_observations = _unbinned_observations
 
 # Execute the script
 def _execute(self):
-    self.logFileOpen()
     self._read_ahead(True)
     self.run()
     self.save()

@@ -198,7 +198,7 @@ public:
  * handling.
  ***************************************************************************/
 class cscript : public ctool  {
-public:        
+public:
     // Constructors and destructors
     cscript(const std::string& name,
             const std::string& version);
@@ -276,23 +276,21 @@ def _set_input_obs(self, argv):
     if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
         obs  = argv[0]
         argv = argv[1:]
-    else:      
+    else:
         obs = gammalib.GObservations()
     return (obs, argv)
 cscript._set_input_obs = _set_input_obs 
 
 # Initialise application by calling the appropriate class constructor
 def _init_cscript(self, name, version, argv):
-    if len(argv) == 0:
-        cscript.__init__(self, name, version)
-    elif len(argv) == 1:
-        cscript.__init__(self, name, version, *argv)
-    elif len(argv) == 3:
-        cscript.__init__(self, name, version, argv[2])
+    if len(argv) > 0:
+        if len(argv) == 3 and argv[0] == name and argv[1] == version:
+            cscript.__init__(self, name, version, argv[2])
+        else:
+            cscript.__init__(self, name, version, *argv)
     else:
-        raise TypeError('Invalid number of arguments given.')
+        cscript.__init__(self, name, version)
     # Set logger properties
-    self._log_header()
     self._log.date(True)
 cscript._init_cscript = _init_cscript
 

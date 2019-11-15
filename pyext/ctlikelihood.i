@@ -1,7 +1,7 @@
 /***************************************************************************
  *              ctlikelihood - Base class for likelihood tools             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2019 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -187,13 +187,11 @@ def _init_cslikelihood(self, name, version, argv):
     else:
         cslikelihood.__init__(self, name, version)
     # Set logger properties
-    self._log_header()
     self._log.date(True)
 cslikelihood._init_cslikelihood = _init_cslikelihood
 
 # Execute the script
 def _execute(self):
-    self.logFileOpen()
     self._read_ahead(True)
     self.run()
     self.save()
