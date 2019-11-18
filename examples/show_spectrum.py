@@ -19,12 +19,18 @@
 #
 # ==========================================================================
 import sys
+import math
 try:
     import matplotlib.pyplot as plt
     plt.figure()
     plt.close()
 except (ImportError, RuntimeError):
     print('This script needs the "matplotlib" module')
+    sys.exit()
+try:
+    import numpy as np
+except ImportError:
+    print('This script needs the "numpy" module')
     sys.exit()
 import gammalib
 import cscripts
@@ -92,8 +98,20 @@ def get_spectrum_fits(fits):
         'ul_ed_engs'  : [],
         'ul_eu_engs'  : [],
         'ul_flux'     : [],
-        'yerr'        : []
+        'yerr'        : [],
+        'loglike'     : [],
+        'engs_scan'   : [],
+        'norm_scan'   : [],
+        'dll_scan'    : []
     }
+
+    try:
+        c_loglike   = table['loglike']
+        c_norm_scan = table['norm_scan']
+        c_dll_scan  = table['dloglike_scan']
+        load_dll    = True
+    except:
+        load_dll = False
 
     # Loop over rows of the file
     nrows = table.nrows()
@@ -120,11 +138,67 @@ def get_spectrum_fits(fits):
             spec['ul_ed_engs'].append(c_ed.real(row))
             spec['ul_eu_engs'].append(c_eu.real(row))
 
+    # Load the delta log-likelihood values
+    if load_dll:
+        spec['norm_scan'] = np.zeros((nrows, c_norm_scan.elements(0)))
+        spec['dll_scan']  = np.zeros((nrows, c_norm_scan.elements(0)))
+
+        for row in range(nrows):
+            loglike   = c_loglike.real(row)
+            spec['loglike'].append(loglike)
+            spec['engs_scan'].append(c_energy.real(row) - c_ed.real(row))
+            for col in range(c_norm_scan.elements(row)):
+                spec['norm_scan'][row,col] = c_norm_scan.real(row,col)
+                spec['dll_scan'][row,col] = c_dll_scan.real(row,col)
+        spec['engs_scan'].append(c_energy.real(nrows-1)+c_eu.real(nrows-1))
+
     # Set upper limit errors
     spec['yerr'] = [0.6 * x for x in spec['ul_flux']]
 
     # Return dictionary
     return spec
+
+
+def plot_dloglike(spec):
+    """
+    Plot delta log-likelihood
+
+    Parameters
+    ----------
+    spec : dict
+        Python dictionary defining spectral plot parameters
+    """
+    # Establish the bounds on the x,y plot
+    ymin,ymax = plt.gca().get_ylim()
+    ymin = math.log10(ymin)
+    ymax = math.log10(ymax)
+    steps = 1000
+    y_bounds = np.linspace(ymin, ymax, steps+1)
+    fluxpnts = []
+    for i in range(steps):
+        mid_pnt = (y_bounds[i] + y_bounds[i+1]) / 2.0
+        fluxpnts.append( 10 ** mid_pnt )
+    # Scale the points
+    y_bounds = 10 ** y_bounds
+
+    dll_hist = []
+    for ebin in range(len(spec['norm_scan'])):
+
+        # Interpolate the dlogLike values
+        dll_interp = np.interp(fluxpnts, spec['norm_scan'][ebin], 
+                                         spec['dll_scan'][ebin])
+        dll_hist.append(dll_interp)
+
+    # Transpose the dll_hist array
+    dll_hist = [[row[i] for row in dll_hist] for i in range(len(dll_hist[0]))]
+
+    plt.pcolormesh(spec['engs_scan'], y_bounds, dll_hist, vmin=-10.0, vmax=0.0, 
+            cmap='Reds', alpha=0.9)
+    cbar = plt.colorbar()
+    cbar.set_label(r'$\Delta$ log-likelihood')
+    plt.grid()
+
+    return
 
 
 # ============= #
@@ -159,6 +233,9 @@ def plot_spectrum(filename, plotfile):
     plt.errorbar(spec['ul_energies'], spec['ul_flux'], 
                  yerr=spec['yerr'], xerr=[spec['ul_ed_engs'], spec['ul_eu_engs']],
                  uplims=True, fmt='ro')
+
+    if len(spec['dll_scan']) > 0:
+        plot_dloglike(spec)
 
     # Show figure
     if len(plotfile) > 0:

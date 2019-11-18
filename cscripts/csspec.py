@@ -19,6 +19,7 @@
 #
 # ==========================================================================
 import sys
+import math
 import gammalib
 import ctools
 from cscripts import mputils
@@ -177,6 +178,10 @@ class csspec(ctools.csobservation):
         self['calc_ts'].boolean()
         self['fix_bkg'].boolean()
         self['fix_srcs'].boolean()
+
+        # Setup dlog-likelihood parameters
+        self['dll_sigstep'].real()
+        self['dll_sigmax'].real()
 
         # Read ahead output parameters
         if self._read_ahead():
@@ -651,7 +656,10 @@ class csspec(ctools.csobservation):
                   'flux_err':    0.0,
                   'TS':          0.0,
                   'ulimit':      0.0,
-                  'Npred':       0.0}
+                  'Npred':       0.0,
+                  'logL':        0.0,
+                  'dloglike':    [],
+                  'norm_scan':   []}
 
         # Write header for fitting
         self._log_header3(gammalib.EXPLICIT, 'Performing fit in energy bin')
@@ -678,6 +686,16 @@ class csspec(ctools.csobservation):
             # Get results
             fitted_models = like.obs().models()
             source        = fitted_models[self['srcname'].string()]
+
+            # Compute delta log-likelihood
+            if self['dll_sigstep'].real() > 0.0:
+
+                # Extract the normalization scan values
+                parname = source.spectral()[0].name()
+                (norm_scan, dlogL, loglike) = self._profile_logL(like.copy(), parname, elogmean)
+                result['norm_scan'] = norm_scan
+                result['dloglike']  = dlogL
+                result['logL']      = loglike
 
             # Extract Test Statistic value
             if self['calc_ts'].boolean():
@@ -850,7 +868,10 @@ class csspec(ctools.csobservation):
                       'flux_err':    0.0,
                       'TS':          0.0,
                       'ulimit':      0.0,
-                      'Npred':       0.0}
+                      'Npred':       0.0,
+                      'logL':        0.0,
+                      'dloglike':    [],
+                      'norm_scan':   []}
 
             # Convert differential flux and flux error to nuFnu
             norm               = elogmean.MeV() * elogmean.MeV()  * gammalib.MeV2erg
@@ -859,6 +880,17 @@ class csspec(ctools.csobservation):
 
             # Compute upper flux limit
             ulimit_value = -1.0
+            parname = 'Intensity%d' % i
+
+            # Compute delta log-likelihood
+            if self['dll_sigstep'].real() > 0.0:
+
+                # Extract the normalization scan values
+                (norm_scan, dlogL, loglike) = self._profile_logL(like.copy(), parname, elogmean)
+                result['norm_scan'] = norm_scan
+                result['dloglike']  = dlogL
+                result['logL']      = loglike
+
             if self['calc_ulim'].boolean():
 
                 # Logging information
@@ -877,7 +909,7 @@ class csspec(ctools.csobservation):
                 # Create upper limit object  
                 ulimit = ctools.ctulimit(obs)
                 ulimit['srcname'] = self['srcname'].string()
-                ulimit['parname'] = 'Intensity%d' % i
+                ulimit['parname'] = parname
                 ulimit['eref']    = elogmean.TeV()
                 ulimit['tol']     = 1.0e-3
 
@@ -935,6 +967,85 @@ class csspec(ctools.csobservation):
         # Return results
         return results
 
+    def _profile_logL(self, like, parname, elogmean):
+        """
+        Computes the delta log-likelihood profile in a single energy bin
+
+        Parameters
+        ----------
+        like : `~ctools.ctlike()`
+            ctlike fitter containing prefit model
+        parname : str
+            Name of the spectral parameter to be fit
+        elogmean : `~gammalib.GEnergy()`
+            Energy at which the model is to be evaluated
+
+        Returns
+        -------
+        norm_scan : list
+            Normalization values 
+        dloglike_scan : list
+            Computed loglikelihood values
+        loglike: float
+            Computed reference log-likelihood for dloglike_scan
+        """
+        # Compute number of steps
+        dll_sigmax  = self['dll_sigmax'].real()
+        dll_sigstep = self['dll_sigstep'].real()
+        sigsteps    = int(2 * (dll_sigmax/dll_sigstep) + 1)
+        scale       = elogmean.MeV() * elogmean.MeV() * gammalib.MeV2erg
+
+        # Setup the source model for fitting
+        source   = like.obs().models()[self['srcname'].string()]
+        spectral = source.spectral()
+        flux_par = spectral[parname]
+        norm     = flux_par.value()
+        norm_err = flux_par.error()
+        source.tscalc(False)
+
+        # Fix all parameters in the spectral model
+        for par in spectral:
+            par.fix()
+
+        # Re-compute the log-likelihood
+        like.run()
+        loglike = like.obs().logL()
+
+        # Store the resulting log-likelihood
+        norm_scan = []
+        dloglike  = []
+
+        # Compute the flux values to evaluate loglike at
+        log_norm = math.log10(norm)
+        if (norm_err > 0.0) and (norm > norm_err):
+            log_step = log_norm - math.log10(norm-norm_err)
+            log_start = log_norm - (sigsteps/2) * log_step
+        else:
+            # For an upper limit bin use a broad range of steps in flux
+            # from [10^-24, 10^-15] or [norm, 10^-15] whichever is broader
+            log_start = -24 if (log_norm > -24) else log_norm
+            log_step = (-15 - log_start) / (sigsteps-1)
+        
+        norm_vals = [10 ** (log_start + i*log_step) for i in range(sigsteps)]
+
+        # Loop through normalizations
+        flux_par.factor_min(0.0)
+        flux_par.factor_max(1e30)
+        for new_norm in norm_vals:
+            flux_par.value(new_norm)
+
+            # Re-run the fit
+            like.run()
+            
+            # Store dlikelihood & norm
+            dloglike.append(loglike - like.obs().logL())
+            if self._method == 'SLICE':
+                norm_scan.append(spectral.eval(elogmean) * scale)
+            else:
+                norm_scan.append(new_norm * scale)  
+            
+        return (norm_scan, dloglike, -loglike)
+
     def _create_fits(self, results):
         """
         Create FITS file
@@ -946,6 +1057,7 @@ class csspec(ctools.csobservation):
         """
         # Create FITS table columns
         nrows        = self._ebounds.size()
+        ncols        = len(results[0]['norm_scan'])
         energy       = gammalib.GFitsTableDoubleCol('Energy', nrows)
         energy_low   = gammalib.GFitsTableDoubleCol('ed_Energy', nrows)
         energy_high  = gammalib.GFitsTableDoubleCol('eu_Energy', nrows)
@@ -954,12 +1066,18 @@ class csspec(ctools.csobservation):
         TSvalues     = gammalib.GFitsTableDoubleCol('TS', nrows)
         ulim_values  = gammalib.GFitsTableDoubleCol('UpperLimit', nrows)
         Npred_values = gammalib.GFitsTableDoubleCol('Npred', nrows)
+        loglike      = gammalib.GFitsTableDoubleCol('loglike', nrows)
+        norm_scan    = gammalib.GFitsTableDoubleCol('norm_scan', nrows, ncols)
+        dloglike_scan= gammalib.GFitsTableDoubleCol('dloglike_scan', nrows, ncols)
         energy.unit('TeV')
         energy_low.unit('TeV')
         energy_high.unit('TeV')
         flux.unit('erg/cm2/s')
         flux_err.unit('erg/cm2/s')
         ulim_values.unit('erg/cm2/s')
+        loglike.unit('')
+        norm_scan.unit('erg/cm2/s')
+        dloglike_scan.unit('')
 
         # File FITS table columns
         for i, result in enumerate(results):
@@ -971,6 +1089,12 @@ class csspec(ctools.csobservation):
             TSvalues[i]     = result['TS']
             ulim_values[i]  = result['ulimit']
             Npred_values[i] = result['Npred']
+            loglike[i]      = result['logL']
+
+            # Add likelihood scan values
+            for fbin in range(ncols):
+                dloglike_scan[i,fbin] = result['dloglike'][fbin]
+                norm_scan[i,fbin]     = result['norm_scan'][fbin]
 
         # Initialise FITS Table with extension "SPECTRUM"
         table = gammalib.GFitsBinTable(nrows)
@@ -989,6 +1113,20 @@ class csspec(ctools.csobservation):
         table.append(TSvalues)
         table.append(ulim_values)
         table.append(Npred_values)
+
+        # Define the SED type
+        sed_type = 'e2dnde'
+        if ncols > 0:
+            sed_type = 'likelihood'
+            table.append(loglike)
+            table.append(norm_scan)
+            table.append(dloglike_scan)
+        table.card('SED_TYPE', sed_type, 'SED type')
+
+        # Define the upper limit confidence level
+        ulimit = ctools.ctulimit()
+        table.card('UL_CONF', ulimit['confidence'].real(), 
+                   'Confidence level of upper limits')
 
         # Create the FITS file now
         self._fits = gammalib.GFits()
