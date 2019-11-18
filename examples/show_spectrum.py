@@ -79,13 +79,13 @@ def get_spectrum_fits(fits):
     """
     # Read spectrum objects
     table    = fits.table(1)
-    c_energy = table['Energy']
-    c_ed     = table['ed_Energy']
-    c_eu     = table['eu_Energy']
-    c_flux   = table['Flux']
-    c_eflux  = table['e_Flux']
-    c_ts     = table['TS']
-    c_upper  = table['UpperLimit']
+    c_energy = table['e_ref']
+    c_ed     = table['e_min']
+    c_eu     = table['e_max']
+    c_flux   = table['e2dnde']
+    c_eflux  = table['e2dnde_err']
+    c_ts     = table['ts']
+    c_upper  = table['e2dnde_ul']
 
     # Initialise arrays to be filled
     spec = {
@@ -105,13 +105,14 @@ def get_spectrum_fits(fits):
         'dll_scan'    : []
     }
 
-    try:
+    # Determine if we can load the delta-log-likelihood profiles
+    load_dll = False
+    if (fits.table(1).has_card('SED_TYPE') and 
+        fits.table(1).card('SED_TYPE').string() == 'likelihood'):
         c_loglike   = table['loglike']
         c_norm_scan = table['norm_scan']
         c_dll_scan  = table['dloglike_scan']
         load_dll    = True
-    except:
-        load_dll = False
 
     # Loop over rows of the file
     nrows = table.nrows()
