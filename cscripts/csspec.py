@@ -1022,9 +1022,9 @@ class csspec(ctools.csobservation):
             log_start = log_norm - (sigsteps/2) * log_step
         else:
             # For an upper limit bin use a broad range of steps in flux
-            # from [10^-24, 10^-15] or [norm, 10^-15] whichever is broader
+            # from [10^-24, 10^-14] or [norm, 10^-14] whichever is broader
             log_start = -24 if (log_norm > -24) else log_norm
-            log_step = (-15 - log_start) / (sigsteps-1)
+            log_step = (-14 - log_start) / (sigsteps-1)
         
         norm_vals = [10 ** (log_start + i*log_step) for i in range(sigsteps)]
 
