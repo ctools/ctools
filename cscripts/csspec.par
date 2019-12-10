@@ -44,6 +44,7 @@ fix_srcs,  b, h, yes,,, "Fix other skymodel parameters"
 fix_bkg,   b, h, no,,, "Fix background parameters"
 dll_sigstep, r, h, 0,0,100, "Step size in standard deviations for log-like profiles"
 dll_sigmax,  r, h, 5,1,100, "Maximum number of standard deviations for log-like profiles"
+dll_freenodes, b, h, no,,, "Free nodes not being fit when computing log-like profiles"
 
 #
 # Standard parameters

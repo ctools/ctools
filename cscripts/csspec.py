@@ -182,6 +182,7 @@ class csspec(ctools.csobservation):
         # Setup dlog-likelihood parameters
         self['dll_sigstep'].real()
         self['dll_sigmax'].real()
+        self['dll_freenodes'].boolean()
 
         # Read ahead output parameters
         if self._read_ahead():
@@ -1004,9 +1005,10 @@ class csspec(ctools.csobservation):
         source.tscalc(False)
 
         # Fix all parameters in the spectral model
-        for par in spectral:
-            par.fix()
-
+        if (self._method != 'NODES') or (not self['dll_freenodes'].boolean()):
+            for par in spectral:
+                par.fix()
+        
         # Re-compute the log-likelihood
         like.run()
         loglike = like.obs().logL()
