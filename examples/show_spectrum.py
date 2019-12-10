@@ -82,10 +82,11 @@ def get_spectrum_fits(fits):
     c_energy = table['e_ref']
     c_ed     = table['e_min']
     c_eu     = table['e_max']
-    c_flux   = table['e2dnde']
-    c_eflux  = table['e2dnde_err']
+    c_flux   = table['ref_e2dnde']
+    c_norm   = table['norm']
+    c_eflux  = table['norm_err']
+    c_upper  = table['norm_ul']
     c_ts     = table['ts']
-    c_upper  = table['e2dnde_ul']
 
     # Initialise arrays to be filled
     spec = {
@@ -101,18 +102,22 @@ def get_spectrum_fits(fits):
         'yerr'        : [],
         'loglike'     : [],
         'engs_scan'   : [],
-        'norm_scan'   : [],
+        'e2dnde_scan' : [],
         'dll_scan'    : []
     }
 
     # Determine if we can load the delta-log-likelihood profiles
+    has_sedtype = table.has_card('SED_TYPE')
     load_dll = False
-    if (fits.table(1).has_card('SED_TYPE') and 
-        fits.table(1).card('SED_TYPE').string() == 'likelihood'):
-        c_loglike   = table['loglike']
-        c_norm_scan = table['norm_scan']
-        c_dll_scan  = table['dloglike_scan']
-        load_dll    = True
+    if has_sedtype:
+        seds = table.card('SED_TYPE').string().split(',')
+
+        # Load likelhood columns if present
+        if seds[0] == 'likelihood':
+            load_dll = True
+            c_loglike   = table['loglike']
+            c_norm_scan = table['norm_scan']
+            c_dll_scan  = table['dloglike_scan']
 
     # Loop over rows of the file
     nrows = table.nrows()
@@ -120,36 +125,37 @@ def get_spectrum_fits(fits):
 
         # Get Test Statistic, flux and flux error
         ts    = c_ts.real(row)
-        flx   = c_flux.real(row)
-        e_flx = c_eflux.real(row)
+        norm  = c_norm.real(row)
+        flx   = norm * c_flux.real(row)
+        e_flx = flx * c_eflux.real(row)
 
         # If Test Statistic is larger than 9 and flux error is smaller than
         # flux then append flux plots ...
         if ts > 9.0 and e_flx < flx:
             spec['energies'].append(c_energy.real(row))
-            spec['flux'].append(c_flux.real(row))
+            spec['flux'].append(flx)
             spec['ed_engs'].append(c_ed.real(row))
             spec['eu_engs'].append(c_eu.real(row))
-            spec['e_flux'].append(c_eflux.real(row))
+            spec['e_flux'].append(e_flx)
 
         # ... otherwise append upper limit
         else:
             spec['ul_energies'].append(c_energy.real(row))
-            spec['ul_flux'].append(c_upper.real(row))
+            spec['ul_flux'].append(flx*c_upper.real(row))
             spec['ul_ed_engs'].append(c_ed.real(row))
             spec['ul_eu_engs'].append(c_eu.real(row))
 
     # Load the delta log-likelihood values
     if load_dll:
-        spec['norm_scan'] = np.zeros((nrows, c_norm_scan.elements(0)))
-        spec['dll_scan']  = np.zeros((nrows, c_norm_scan.elements(0)))
+        spec['e2dnde_scan'] = np.zeros((nrows, c_norm_scan.elements(0)))
+        spec['dll_scan']    = np.zeros((nrows, c_norm_scan.elements(0)))
 
         for row in range(nrows):
             loglike   = c_loglike.real(row)
             spec['loglike'].append(loglike)
             spec['engs_scan'].append(c_energy.real(row) - c_ed.real(row))
             for col in range(c_norm_scan.elements(row)):
-                spec['norm_scan'][row,col] = c_norm_scan.real(row,col)
+                spec['e2dnde_scan'][row,col] = c_norm_scan.real(row,col) * c_flux.real(row)
                 spec['dll_scan'][row,col] = c_dll_scan.real(row,col)
         spec['engs_scan'].append(c_energy.real(nrows-1)+c_eu.real(nrows-1))
 
@@ -183,10 +189,10 @@ def plot_dloglike(spec):
     y_bounds = 10 ** y_bounds
 
     dll_hist = []
-    for ebin in range(len(spec['norm_scan'])):
+    for ebin in range(len(spec['e2dnde_scan'])):
 
         # Interpolate the dlogLike values
-        dll_interp = np.interp(fluxpnts, spec['norm_scan'][ebin], 
+        dll_interp = np.interp(fluxpnts, spec['e2dnde_scan'][ebin], 
                                          spec['dll_scan'][ebin])
         dll_hist.append(dll_interp)
 

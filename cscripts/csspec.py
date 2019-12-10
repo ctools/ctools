@@ -645,6 +645,7 @@ class csspec(ctools.csobservation):
         emin      = self._ebounds.emin(i)
         emax      = self._ebounds.emax(i)
         elogmean  = self._ebounds.elogmean(i)
+        e_scale   = elogmean.MeV() * elogmean.MeV() * gammalib.MeV2erg
 
         # Select observations for energy bin
         obs = self._select_obs(emin, emax)
@@ -654,6 +655,7 @@ class csspec(ctools.csobservation):
                   'energy_low':  (elogmean - emin).TeV(),
                   'energy_high': (emax - elogmean).TeV(),
                   'flux':        0.0,
+                  'e2dnde':      0.0,
                   'flux_err':    0.0,
                   'TS':          0.0,
                   'ulimit':      0.0,
@@ -736,8 +738,7 @@ class csspec(ctools.csobservation):
 
                 # Compute upper limit
                 if ulimit_value > 0.0:
-                    result['ulimit'] = ulimit_value * elogmean.MeV() * \
-                                       elogmean.MeV() * gammalib.MeV2erg
+                    result['ulimit'] = ulimit_value
 
             # Compute differential flux and flux error
             fitted_flux = source.spectral().eval(elogmean)
@@ -758,14 +759,14 @@ class csspec(ctools.csobservation):
                 e_flux      *= norm
 
             # Convert differential flux and flux error to nuFnu
-            elogmean2          = elogmean.MeV() * elogmean.MeV()
-            result['flux']     = fitted_flux * elogmean2 * gammalib.MeV2erg
-            result['flux_err'] = e_flux      * elogmean2 * gammalib.MeV2erg
+            result['flux']     = fitted_flux
+            result['e2dnde']   = fitted_flux * e_scale
+            result['flux_err'] = e_flux
 
             # Log information
-            value = '%e +/- %e' % (result['flux'], result['flux_err'])
+            value = '%e +/- %e' % (result['e2dnde'], result['flux_err']*e_scale)
             if self['calc_ulim'].boolean() and result['ulimit'] > 0.0:
-                value += ' [< %e]' % (result['ulimit'])
+                value += ' [< %e]' % (result['ulimit']*e_scale)
             value += ' erg/cm2/s'
             if self['calc_ts'].boolean() and result['TS'] > 0.0:
                 value += ' (TS = %.3f)' % (result['TS'])
@@ -866,6 +867,7 @@ class csspec(ctools.csobservation):
                       'energy_low':  (elogmean - emin).TeV(),
                       'energy_high': (emax - elogmean).TeV(),
                       'flux':        0.0,
+                      'e2dnde':      0.0,
                       'flux_err':    0.0,
                       'TS':          0.0,
                       'ulimit':      0.0,
@@ -876,8 +878,9 @@ class csspec(ctools.csobservation):
 
             # Convert differential flux and flux error to nuFnu
             norm               = elogmean.MeV() * elogmean.MeV()  * gammalib.MeV2erg
-            result['flux']     = spectrum[i*2+1].value() * norm
-            result['flux_err'] = spectrum[i*2+1].error() * norm
+            result['flux']     = spectrum[i*2+1].value()
+            result['e2dnde']   = spectrum[i*2+1].value() * norm
+            result['flux_err'] = spectrum[i*2+1].error()
 
             # Compute upper flux limit
             ulimit_value = -1.0
@@ -925,8 +928,7 @@ class csspec(ctools.csobservation):
 
                 # Compute upper limit
                 if ulimit_value > 0.0:
-                    result['ulimit'] = ulimit_value * elogmean.MeV() * \
-                                       elogmean.MeV() * gammalib.MeV2erg
+                    result['ulimit'] = ulimit_value
 
             # Compute TS
             if self['calc_ts'].boolean():
@@ -954,9 +956,9 @@ class csspec(ctools.csobservation):
                 result['TS'] = 2.0 * (logL1 - logL0)
 
             # Log information
-            value = '%e +/- %e' % (result['flux'], result['flux_err'])
+            value = '%e +/- %e' % (result['e2dnde'], result['flux_err']*norm)
             if self['calc_ulim'].boolean() and result['ulimit'] > 0.0:
-                value += ' [< %e]' % (result['ulimit'])
+                value += ' [< %e]' % (result['ulimit']*norm)
             value += ' erg/cm2/s'
             if self['calc_ts'].boolean() and result['TS'] > 0.0:
                 value += ' (TS = %.3f)' % (result['TS'])
@@ -994,7 +996,6 @@ class csspec(ctools.csobservation):
         dll_sigmax  = self['dll_sigmax'].real()
         dll_sigstep = self['dll_sigstep'].real()
         sigsteps    = int(2 * (dll_sigmax/dll_sigstep) + 1)
-        scale       = elogmean.MeV() * elogmean.MeV() * gammalib.MeV2erg
 
         # Setup the source model for fitting
         source   = like.obs().models()[self['srcname'].string()]
@@ -1016,6 +1017,9 @@ class csspec(ctools.csobservation):
         # Store the resulting log-likelihood
         norm_scan = []
         dloglike  = []
+        ref_norm = norm
+        if self._method == 'SLICE':
+            ref_norm = spectral.eval(elogmean)
 
         # Compute the flux values to evaluate loglike at
         log_norm = math.log10(norm)
@@ -1042,9 +1046,9 @@ class csspec(ctools.csobservation):
             # Store dlikelihood & norm
             dloglike.append(loglike - like.obs().logL())
             if self._method == 'SLICE':
-                norm_scan.append(spectral.eval(elogmean) * scale)
+                norm_scan.append(spectral.eval(elogmean))
             else:
-                norm_scan.append(new_norm * scale)  
+                norm_scan.append(new_norm)
             
         return (norm_scan, dloglike, -loglike)
 
@@ -1063,22 +1067,27 @@ class csspec(ctools.csobservation):
         energy       = gammalib.GFitsTableDoubleCol('e_ref', nrows)
         energy_low   = gammalib.GFitsTableDoubleCol('e_min', nrows)
         energy_high  = gammalib.GFitsTableDoubleCol('e_max', nrows)
-        flux         = gammalib.GFitsTableDoubleCol('e2dnde', nrows)
-        flux_err     = gammalib.GFitsTableDoubleCol('e2dnde_err', nrows)
+        norm         = gammalib.GFitsTableDoubleCol('norm', nrows)
+        norm_err     = gammalib.GFitsTableDoubleCol('norm_err', nrows)
+        ulim_values  = gammalib.GFitsTableDoubleCol('norm_ul', nrows)
+        e2dnde       = gammalib.GFitsTableDoubleCol('ref_e2dnde', nrows)
+        flux         = gammalib.GFitsTableDoubleCol('ref_flux', nrows)
+        Npred_values = gammalib.GFitsTableDoubleCol('ref_npred', nrows)
         TSvalues     = gammalib.GFitsTableDoubleCol('ts', nrows)
-        ulim_values  = gammalib.GFitsTableDoubleCol('e2dnde_ul', nrows)
-        Npred_values = gammalib.GFitsTableDoubleCol('npred', nrows)
         loglike      = gammalib.GFitsTableDoubleCol('loglike', nrows)
         norm_scan    = gammalib.GFitsTableDoubleCol('norm_scan', nrows, ncols)
         dloglike_scan= gammalib.GFitsTableDoubleCol('dloglike_scan', nrows, ncols)
         energy.unit('TeV')
         energy_low.unit('TeV')
         energy_high.unit('TeV')
-        flux.unit('erg/cm2/s')
-        flux_err.unit('erg/cm2/s')
-        ulim_values.unit('erg/cm2/s')
+        norm.unit('')
+        norm_err.unit('')
+        ulim_values.unit('')
+        e2dnde.unit('erg/cm2/s')
+        flux.unit('counts/MeV/cm2/s')
+        Npred_values.unit('counts')
         loglike.unit('')
-        norm_scan.unit('erg/cm2/s')
+        norm_scan.unit('')
         dloglike_scan.unit('')
 
         # File FITS table columns
@@ -1086,17 +1095,19 @@ class csspec(ctools.csobservation):
             energy[i]       = result['energy']
             energy_low[i]   = result['energy_low']
             energy_high[i]  = result['energy_high']
+            norm[i]         = 1.0
+            norm_err[i]     = result['flux_err'] / result['flux']
+            ulim_values[i]  = result['ulimit'] / result['flux']
+            e2dnde[i]       = result['e2dnde']
             flux[i]         = result['flux']
-            flux_err[i]     = result['flux_err']
-            TSvalues[i]     = result['TS']
-            ulim_values[i]  = result['ulimit']
             Npred_values[i] = result['Npred']
+            TSvalues[i]     = result['TS']
             loglike[i]      = result['logL']
 
             # Add likelihood scan values
             for fbin in range(ncols):
                 dloglike_scan[i,fbin] = result['dloglike'][fbin]
-                norm_scan[i,fbin]     = result['norm_scan'][fbin]
+                norm_scan[i,fbin]     = result['norm_scan'][fbin] / result['flux']
 
         # Initialise FITS Table with extension "SPECTRUM"
         table = gammalib.GFitsBinTable(nrows)
@@ -1110,25 +1121,28 @@ class csspec(ctools.csobservation):
         table.append(energy)
         table.append(energy_low)
         table.append(energy_high)
-        table.append(flux)
-        table.append(flux_err)
-        table.append(TSvalues)
+        table.append(norm)
+        table.append(norm_err)
         table.append(ulim_values)
+        table.append(e2dnde)
+        table.append(flux)
+        table.append(TSvalues)
         table.append(Npred_values)
-
+        
         # Define the SED type
-        sed_type = 'e2dnde'
-        if ncols > 0:
-            sed_type = 'likelihood'
-            table.append(loglike)
-            table.append(norm_scan)
-            table.append(dloglike_scan)
-        table.card('SED_TYPE', sed_type, 'SED type')
+        table.card('SED_TYPE', 'norm,e2dnde,flux,npred', 'SED type')
 
         # Define the upper limit confidence level
         ulimit = ctools.ctulimit()
         table.card('UL_CONF', ulimit['confidence'].real(), 
                    'Confidence level of upper limits')
+
+        # Add the likelihood data
+        if ncols > 0:
+            table.card('SED_TYPE', 'likelihood,e2dnde,flux,npred', 'Likelihood scan data')
+            table.append(loglike)
+            table.append(norm_scan)
+            table.append(dloglike_scan)
 
         # Create the FITS file now
         self._fits = gammalib.GFits()
