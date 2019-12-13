@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.7.0
 
-15 November 2019
+13 December 2019
 
 
 Introduction
@@ -270,7 +270,10 @@ None
 
 cssrcdetect - Detects sources in sky map
 ----------------------------------------
-None
+The using of a smoothing kernel in the _map_moments() method can lead to
+negative squared standard deviations that lead to an exception when the
+square root is taken. A filter was introduced that sets all small values
+of mean and std to zero, avoiding thus the exception.
 
 
 cstsdist - Computes Test Statistic distribution
