@@ -2,7 +2,7 @@
 # ==========================================================================
 # Detects sources in a sky map
 #
-# Copyright (C) 2016-2018 Juergen Knoedlseder
+# Copyright (C) 2016-2019 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -234,8 +234,21 @@ class cssrcdetect(ctools.cscript):
         mean.smooth('DISK', radius)
         std.smooth('DISK', radius)
 
-        # Compute the standard deviation for each pixel
+        # Compute the squared of the standard deviation for each pixel
         std = std - (mean*mean)
+
+        # Set all pixels with small number of events or small number of
+        # squared standard deviation to zero. Such pixels may occur due to
+        # the smoothing operation that uses a fast fourrier transform.
+        for iy in range(std.ny()):
+            offset = iy * std.nx()
+            for ix in range(std.nx()):
+                index = ix + offset
+                if mean[index] < 1.0 or std[index] < 1.0:
+                    mean[index] = 0.0
+                    std[index]  = 0.0
+
+        # Compute standard deviation
         std = std.sqrt()
 
         # Return mean and standard deviation
