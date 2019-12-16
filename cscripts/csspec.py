@@ -1071,7 +1071,7 @@ class csspec(ctools.csobservation):
         norm_err     = gammalib.GFitsTableDoubleCol('norm_err', nrows)
         ulim_values  = gammalib.GFitsTableDoubleCol('norm_ul', nrows)
         e2dnde       = gammalib.GFitsTableDoubleCol('ref_e2dnde', nrows)
-        flux         = gammalib.GFitsTableDoubleCol('ref_flux', nrows)
+        dnde         = gammalib.GFitsTableDoubleCol('ref_dnde', nrows)
         Npred_values = gammalib.GFitsTableDoubleCol('ref_npred', nrows)
         TSvalues     = gammalib.GFitsTableDoubleCol('ts', nrows)
         loglike      = gammalib.GFitsTableDoubleCol('loglike', nrows)
@@ -1084,7 +1084,7 @@ class csspec(ctools.csobservation):
         norm_err.unit('')
         ulim_values.unit('')
         e2dnde.unit('erg/cm2/s')
-        flux.unit('counts/MeV/cm2/s')
+        dnde.unit('counts/MeV/cm2/s')
         Npred_values.unit('counts')
         loglike.unit('')
         norm_scan.unit('')
@@ -1099,7 +1099,7 @@ class csspec(ctools.csobservation):
             norm_err[i]     = result['flux_err'] / result['flux']
             ulim_values[i]  = result['ulimit'] / result['flux']
             e2dnde[i]       = result['e2dnde']
-            flux[i]         = result['flux']
+            dnde[i]         = result['flux']
             Npred_values[i] = result['Npred']
             TSvalues[i]     = result['TS']
             loglike[i]      = result['logL']
@@ -1125,12 +1125,12 @@ class csspec(ctools.csobservation):
         table.append(norm_err)
         table.append(ulim_values)
         table.append(e2dnde)
-        table.append(flux)
+        table.append(dnde)
         table.append(TSvalues)
         table.append(Npred_values)
         
         # Define the SED type
-        table.card('SED_TYPE', 'norm,e2dnde,flux,npred', 'SED type')
+        table.card('SED_TYPE', 'norm,e2dnde,dnde,npred', 'SED type')
 
         # Define the upper limit confidence level
         ulimit = ctools.ctulimit()
@@ -1139,7 +1139,7 @@ class csspec(ctools.csobservation):
 
         # Add the likelihood data
         if ncols > 0:
-            table.card('SED_TYPE', 'likelihood,e2dnde,flux,npred', 'Likelihood scan data')
+            table.card('SED_TYPE').value('likelihood,e2dnde,dnde,npred')
             table.append(loglike)
             table.append(norm_scan)
             table.append(dloglike_scan)
