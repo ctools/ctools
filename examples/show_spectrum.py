@@ -19,6 +19,8 @@
 #
 # ==========================================================================
 import sys
+import gammalib
+import cscripts
 try:
     import matplotlib.pyplot as plt
     plt.figure()
@@ -31,8 +33,6 @@ try:
 except ImportError:
     print('This script needs the "numpy" module')
     sys.exit()
-import gammalib
-import cscripts
 
 
 # ===================================== #
