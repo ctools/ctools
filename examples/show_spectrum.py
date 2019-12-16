@@ -19,7 +19,6 @@
 #
 # ==========================================================================
 import sys
-import math
 try:
     import matplotlib.pyplot as plt
     plt.figure()
@@ -177,8 +176,8 @@ def plot_dloglike(spec):
     """
     # Establish the bounds on the x,y plot
     ymin,ymax = plt.gca().get_ylim()
-    ymin = math.log10(ymin)
-    ymax = math.log10(ymax)
+    ymin = np.log10(ymin)
+    ymax = np.log10(ymax)
     steps = 1000
     y_bounds = np.linspace(ymin, ymax, steps+1)
     fluxpnts = []

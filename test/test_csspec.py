@@ -234,6 +234,32 @@ class Test(test):
         # Check result file
         self._check_result_file('csspec_py5.fits', 2)
 
+        # Set-up unbinned csspec with likelihood profile (no multi-processing)
+        spec = cscripts.csspec()
+        spec['inobs']       = self._events
+        spec['inmodel']     = self._model
+        spec['srcname']     = 'Crab'
+        spec['caldb']       = self._caldb
+        spec['irf']         = self._irf
+        spec['method']      = 'AUTO'
+        spec['ebinalg']     = 'LOG'
+        spec['enumbins']    = 2
+        spec['emin']        = 1.0
+        spec['emax']        = 100.0
+        spec['nthreads']    = 1
+        spec['dll_sigstep'] = 2.5
+        spec['dll_sigmax']  = 5
+        spec['outfile']     = 'csspec_py6.fits'
+        spec['logfile']     = 'csspec_py6.log'
+        spec['chatter']     = 2
+        spec['publish']     = True
+
+        # Run csspec script
+        spec.execute()
+
+        # Check result file
+        self._check_result_file('csspec_py6.fits', 2, 5)
+
         # Return
         return
 
@@ -277,7 +303,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, bins):
+    def _check_result_file(self, filename, bins, lbins=0):
         """
         Check result file
         """
@@ -290,8 +316,33 @@ class Test(test):
         # Check dimensions
         self.test_value(spectrum.nrows(), bins,
              'Check for %d rows in spectrum' % bins)
-        self.test_value(spectrum.ncols(), 8,
-             'Check for 8 columns in spectrum')
 
+        # Make sure that the header keywords are present
+        req_keywords = ['SED_TYPE', 'UL_CONF']
+        for keyword in req_keywords:
+            self.test_assert(spectrum.has_card(keyword), 
+                'Check that SED has \'%s\' keyword' % keyword)
+
+        # Do checks specific to likelihood profile table
+        flux_keys = spectrum.card('SED_TYPE').string()
+        flux_keys = flux_keys.split(',')
+        if lbins > 0:
+            # Should be 13 columns
+            self.test_value(spectrum.ncols(), 13,
+                'Check for 8 columns in spectrum')
+            self.test_value(flux_keys[0], 'likelihood',
+                'Check that \'SED_TYPE\' card is \'likelihood\'')
+            # Make sure the profile has the appropriate entries
+            self.test_value(spectrum['norm_scan'].elements(0), lbins,
+                'Check for %d rows in flux scan profile' % lbins)
+            self.test_value(spectrum['dloglike_scan'].elements(0), lbins,
+                'Check for %d rows in likelihood profile' % lbins)
+        else:
+            # Should be 10 columns
+            self.test_value(spectrum.ncols(), 10,
+                'Check for 8 columns in spectrum')
+            self.test_value(flux_keys[0], 'norm',
+                'Check that \'SED_TYPE\' card is \'norm\'')
+        
         # Return
         return
