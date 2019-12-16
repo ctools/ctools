@@ -329,7 +329,7 @@ class Test(test):
         if lbins > 0:
             # Should be 13 columns
             self.test_value(spectrum.ncols(), 13,
-                'Check for 8 columns in spectrum')
+                'Check for 13 columns in spectrum')
             self.test_value(flux_keys[0], 'likelihood',
                 'Check that \'SED_TYPE\' card is \'likelihood\'')
             # Make sure the profile has the appropriate entries
@@ -340,7 +340,7 @@ class Test(test):
         else:
             # Should be 10 columns
             self.test_value(spectrum.ncols(), 10,
-                'Check for 8 columns in spectrum')
+                'Check for 10 columns in spectrum')
             self.test_value(flux_keys[0], 'norm',
                 'Check that \'SED_TYPE\' card is \'norm\'')
         
