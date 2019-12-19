@@ -176,30 +176,30 @@ def plot_dloglike(spec):
     """
     # Establish the bounds on the x,y plot
     ymin,ymax = plt.gca().get_ylim()
-    ymin = np.log10(ymin)
-    ymax = np.log10(ymax)
-    steps = 1000
-    y_bounds = np.linspace(ymin, ymax, steps+1)
-    fluxpnts = []
-    for i in range(steps):
-        mid_pnt = (y_bounds[i] + y_bounds[i+1]) / 2.0
-        fluxpnts.append( 10 ** mid_pnt )
-    # Scale the points
+    ymin      = np.log10(ymin)
+    ymax      = np.log10(ymax)
+    steps     = 1000
+    ebins     = len(spec['e2dnde_scan'])
+    y_bounds  = np.linspace(ymin, ymax, steps+1)
+
+    # Compute the logarithmic center of each bin
+    fluxpnts = 10 ** ((y_bounds[1:]+y_bounds[:-1]) / 2.0)
+    
+    # Scale the boundaries on the grid
     y_bounds = 10 ** y_bounds
 
-    dll_hist = []
-    for ebin in range(len(spec['e2dnde_scan'])):
+    # Interpolate the dlogLike values
+    dll_hist = [[]]*ebins
+    for ebin in range(ebins):
+        dll_hist[ebin] = np.interp(fluxpnts, spec['e2dnde_scan'][ebin], 
+                                             spec['dll_scan'][ebin])
 
-        # Interpolate the dlogLike values
-        dll_interp = np.interp(fluxpnts, spec['e2dnde_scan'][ebin], 
-                                         spec['dll_scan'][ebin])
-        dll_hist.append(dll_interp)
+    # Transpose the dll_hist array so x=energy, y=dnde
+    dll_hist = [[row[i] for row in dll_hist] for i in range(steps)]
 
-    # Transpose the dll_hist array
-    dll_hist = [[row[i] for row in dll_hist] for i in range(len(dll_hist[0]))]
-
+    # Plot the likelihood profiles
     plt.pcolormesh(spec['engs_scan'], y_bounds, dll_hist, vmin=-10.0, vmax=0.0, 
-            cmap='Reds', alpha=0.9)
+                   cmap='Reds', alpha=0.9)
     cbar = plt.colorbar()
     cbar.set_label(r'$\Delta$ log-likelihood')
     plt.grid()
