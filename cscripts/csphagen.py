@@ -374,7 +374,7 @@ class csphagen(ctools.csobservation):
                 # Determine number of background regions to skip
                 N_skip  = self['bkgregskip'].integer()
                 N_start = 1 + N_skip
-                N_lim   = 1 + 2*N_skip
+                N_lim   = 1 + 2 * N_skip
 
                 # Compute the angular separation of reflected regions wrt
                 # camera center. The factor 1.05 ensures background regions
@@ -397,14 +397,11 @@ class csphagen(ctools.csobservation):
                 # regions
                 else:
 
-                    # Log appending of reflected regions
-                    msg = ' Use %d reflected regions.' % (N-N_lim)
-                    self._log_string(gammalib.NORMAL, msg)
-
                     # Append reflected regions
                     alpha = 360.0 / N
-                    for s in range(N_start, N - N_skip):
-                        dphi    = s * alpha
+                    dphi_max = 360. - alpha * (1 + N_skip)
+                    dphi = alpha * (1 + N_skip)
+                    while dphi <= dphi_max:
                         ctr_dir = pnt_dir.clone()
                         ctr_dir.rotate_deg(posang + dphi, offset)
                         region = gammalib.GSkyRegionCircle(ctr_dir, self._rad)
@@ -413,10 +410,19 @@ class csphagen(ctools.csobservation):
                                 msg = ' Reflected region overlaps with '\
                                       'exclusion region.'
                                 self._log_string(gammalib.EXPLICIT, msg)
+                                # if region overlaps with exclusion region
+                                # try to increment by 10% of angular step
+                                dphi += 0.1 * alpha
                             else:
                                 regions.append(region)
+                                dphi += alpha
                         else:
                             regions.append(region)
+                            dphi += alpha
+
+                    # Log number of reflected regions
+                    msg = ' Use %d reflected regions.' % (regions.size())
+                    self._log_string(gammalib.NORMAL, msg)
 
         # Return reflected regions
         return regions
@@ -669,6 +675,13 @@ class csphagen(ctools.csobservation):
 
                 # Set On/Off observation ID
                 onoff.id(obs.id())
+
+            # Otherwise log observation skipped
+            else:
+                msg = ' Skip because the number %d of regions ' \
+                      'for background estimation is smaller than ' \
+                      '"bkgregmin"=%d.' % (bkg_reg.size(), self['bkgregmin'].integer())
+                self._log_string(gammalib.NORMAL, msg)
 
         # Construct dictionary with results
         result = {'onoff'     : onoff,
