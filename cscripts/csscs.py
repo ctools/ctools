@@ -415,6 +415,7 @@ class csscs(ctools.csobservation):
                         masked_obs = self._mask_evlist(obs,ra,dec,rad)
                     elif self['method'].string() == 'ONOFF':
                         pass
+                        pass
                         # TODO: implement Onoff analysis
                         # masked_obs = self._mask_onoff(obs, ra, dec, rad)
                 new_obs.append(masked_obs)
@@ -501,7 +502,7 @@ class csscs(ctools.csobservation):
                 # Multiply by flux from spatial component in ROI
                 flux *= source.spatial().flux(roi)
                 # Divide by solid angle of ROI
-                flux /= 1 - math.cos(math.radians(self._roisz))
+                flux /= gammalib.twopi * (1 - math.cos(math.radians(self._roisz)))
                 result[name]['flux'] = flux
 
                 # Get flux error
