@@ -429,7 +429,7 @@ class csscs(ctools.csobservation):
         # Return
         return new_obs
 
-    def _pixel_analysis(self,ra,dec):
+    def _pixel_analysis(self,inx):
         """
         Performs analysis over the region of interest
         corresponding to a single pixel of output map
@@ -437,13 +437,19 @@ class csscs(ctools.csobservation):
         Parameters
         ----------
         inx     : `int` pixel index
-        ra      : `float` R.A. (deg)
-        dec     : `float` Dec (deg)
 
         Returns
         -------
         result  : `dict` Results
         """
+
+        # Create template for output map to extract pixel coordinates
+        outmap = self._create_map()
+
+        # Determine pixel centre coordinates
+        pixdir = outmap.inx2dir(inx)
+        ra = pixdir.ra_deg()
+        dec = pixdir.dec_deg()
 
         # Write header for spatial bin
         msg = 'Spatial bin centred on (R.A.,Dec) = (%f,%f) deg' % (ra,dec)
@@ -614,24 +620,39 @@ class csscs(ctools.csobservation):
         # Write input observation container into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
-        # Create template for output map, to use to extract pixel values
-        outmap = self._create_map()
-
         # Adjust model parameters dependent on input user parameters
         self._adjust_model_pars()
 
-        # Loop over pixels and extract results
-        results = {}
-        for inx in range(outmap.npix()):
+        # Compute number of pixels of output map
+        npix = self._create_map().npix()
 
-            # Determine pixel centre
-            pixdir = outmap.inx2dir(inx)
-            ra = pixdir.ra_deg()
-            dec = pixdir.dec_deg()
+        # If more than a single thread is requested then use multiprocessing
+        if self._nthreads > 1:
 
-            # Analyse ROI
-            result = self._pixel_analysis(ra,dec)
-            results[inx] = result
+            # Compute values in pixels
+            args        = [(self, '_pixel_analysis', i)
+                           for i in range(npix)]
+            poolresults = mputils.process(self._nthreads, mputils.mpfunc, args)
+
+            # Construct results
+            results = []
+            for i in range(npix):
+                results.append(poolresults[i][0])
+                self._log_string(gammalib.TERSE, poolresults[i][1]['log'], False)
+
+        # Otherwise loop over pixels and run the pixel analysis
+        else:
+            results = []
+            for i in range(npix):
+                results.append(self._pixel_analysis(i))
+
+        # # Loop over pixels and extract results
+        # results = []
+        # for inx in range(self._create_map().npix()):
+        #
+        #     # Analyse ROI
+        #     result = self._pixel_analysis(inx)
+        #     results.append(result)
 
         # Fill output Fits
         self._fits = self._fill_fits(results)
