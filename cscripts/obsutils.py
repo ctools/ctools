@@ -745,7 +745,7 @@ def get_stacked_obs(cls, obs, nthreads=0):
 # ================================ #
 # Get On/Off observation container #
 # ================================ #
-def get_onoff_obs(cls, obs, nthreads=0):
+def get_onoff_obs(cls, obs, nthreads=0, ra = None, dec = None, srcname = ''):
     """
     Create On/Off observations container from given observations
 
@@ -757,6 +757,12 @@ def get_onoff_obs(cls, obs, nthreads=0):
         Observation container
     nthreads : str, optional
         Number of parallel processes for On/Off spectra computation (0=all available CPUs)
+    ra : float, optional
+        R.A. of source region centre
+    dec : float, optional
+        Dec. of source region centre
+    srcname : str, optional
+        Source name
 
     Returns
     -------
@@ -767,9 +773,8 @@ def get_onoff_obs(cls, obs, nthreads=0):
     if cls._logExplicit():
         cls._log.header3('Creating On/Off observations')
 
-    # Initialise inmodel, srcname, inexclusion and use_model_bkg
+    # Initialise inmodel, inexclusion and use_model_bkg
     inmodel       = 'NONE'
-    srcname       = ''
     inexclusion   = 'NONE'
     use_model_bkg = True
 
@@ -777,7 +782,7 @@ def get_onoff_obs(cls, obs, nthreads=0):
     if cls.has_par('inmodel') and obs.models().size() == 0:
         if cls['inmodel'].is_valid():
             inmodel = cls['inmodel'].value()
-    if cls.has_par('srcname'):
+    if srcname == '' and cls.has_par('srcname'):
         srcname = cls['srcname'].value()
     if cls.has_par('inexclusion'):
         if cls['inexclusion'].is_valid():
@@ -795,13 +800,20 @@ def get_onoff_obs(cls, obs, nthreads=0):
     phagen['enumbins']    = cls['enumbins'].integer()
     phagen['ebinalg']     = 'LOG'
     phagen['srcshape']    = cls['srcshape'].string()
-    phagen['coordsys']    = cls['coordsys'].string()
-    if cls['coordsys'].string() == 'CEL':
-        phagen['ra']  = cls['xref'].real()
-        phagen['dec'] = cls['yref'].real()
-    elif cls['coordsys'].string() == 'GAL':
-        phagen['glon'] = cls['xref'].real()
-        phagen['glat'] = cls['yref'].real()
+    # User has specified custom centre for the source region
+    if ra != None and dec != None:
+        phagen['coordsys'] = 'CEL'
+        phagen['ra'] = ra
+        phagen['dec'] = dec
+    # Otherwise use default in class
+    else:
+        phagen['coordsys']    = cls['coordsys'].string()
+        if cls['coordsys'].string() == 'CEL':
+            phagen['ra']  = cls['xref'].real()
+            phagen['dec'] = cls['yref'].real()
+        elif cls['coordsys'].string() == 'GAL':
+            phagen['glon'] = cls['xref'].real()
+            phagen['glat'] = cls['yref'].real()
     if cls['srcshape'].string() == 'CIRCLE':
         phagen['rad'] = cls['rad'].real()
     phagen['bkgmethod'] = cls['bkgmethod'].string()

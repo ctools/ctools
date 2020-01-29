@@ -50,8 +50,8 @@ class csscs(ctools.csobservation):
 
         # Initialise data members
         self._nthreads = 0
-        self._roisz = 0.
         self._srcnames = []
+        self._method = None
         self._fits = None
         self._excl_reg_map = None # Exclusion region map for on/off analysis
 
@@ -72,7 +72,7 @@ class csscs(ctools.csobservation):
         # Set pickled dictionary
         state = {'base'     : ctools.csobservation.__getstate__(self),
                  'nthreads' : self._nthreads,
-                 'roisz'    : self._roisz,
+                 'method'   : self._method,
                  'srcnames' : self._srcnames,
                  'fits'     : self._fits,
                  'excl_reg_map' : self._excl_reg_map}
@@ -92,8 +92,8 @@ class csscs(ctools.csobservation):
         # Set state
         ctools.csobservation.__setstate__(self, state['base'])
         self._nthreads = state['nthreads']
-        self._roisz = state['roisz']
         self._srcnames = state['srcnames']
+        self._method = state['method']
         self._fits = state['fits']
         self._excl_reg_map = state['excl_reg_map']
 
@@ -102,6 +102,39 @@ class csscs(ctools.csobservation):
 
 
     # Private methods
+    def _get_onoff_parameters(self):
+        """
+        Get On/Off analysis parameters.
+        This is done here rather then in ctools.is_onoff
+        because the exclusion map needs to be handled differently
+        as an automatic parameter but queried only if not already set
+        and we need to verify is not empty.
+        Also many parameters are already queried for all methods
+        TODO: verify if this can be made more uniform with other scripts
+        """
+        # Exclusion map
+        if (self._excl_reg_map is not None) and (self._excl_reg_map.map().npix() > 0):
+            # Exclusion map set and is not empty
+            pass
+        elif self['inexclusion'].is_valid():
+            inexclusion = self['inexclusion'].filename()
+            self._excl_reg_map = gammalib.GSkyRegionMap(inexclusion)
+        else:
+            msg = 'csscs in On/Off mode requires input exclusion region.'
+            raise RuntimeError(msg)
+
+        # Other csphagen parameters
+        self["enumbins"].integer()
+        if self["bkgmethod"].string() == "REFLECTED":
+            self["bkgregmin"].integer()
+            self['bkgregskip'].integer()
+        self["maxoffset"].real()
+        self["etruemin"].real()
+        self["etruemax"].real()
+        self["etruebins"].integer()
+
+        return
+
     def _get_parameters(self):
         """
         Get parameters from parfile
@@ -110,6 +143,9 @@ class csscs(ctools.csobservation):
         # Set observation if not done before
         if self.obs().is_empty():
             self.obs(self._get_observations())
+
+        # Set observation statistic
+        self._set_obs_statistic(gammalib.toupper(self['statistic'].string()))
 
         # Collect number of unbinned, binned and On/Off observations in
         # observation container
@@ -124,23 +160,24 @@ class csscs(ctools.csobservation):
                     n_unbinned += 1
             elif obs.classname() == 'GCTAOnOffObservation':
                 n_onoff += 1
+        n_cta   = n_unbinned + n_binned + n_onoff
+        n_other = self.obs().size() - n_cta
 
-        # Check that we have at least one unbinned or binned CTA observation
-        if n_unbinned == 0 and n_binned == 0:
-            msg = 'No unbinned or binned CTA observations found. ' \
-                  'Please provide at least one unbinned or binned ' \
-                  'CTA observation.'
+        # Check if there are On/Off or non-IACT observations
+        if n_onoff > 0 or n_other > 0:
+            msg = 'On/Off or non-CTA observations found. '\
+                  'csscs does not support this type of observations.'
             raise RuntimeError(msg)
-
-        # Set observation statistic
-        self._set_obs_statistic(gammalib.toupper(self['statistic'].string()))
+        # Otherwise check if there is a mix of binned and unbinned
+        elif n_unbinned > 0 and n_binned>0:
+            msg = 'Mix of unbinned and binned CTA observations ' \
+                  'found in observation container. csscs does not ' \
+                  'support this mix.'
+            raise RuntimeError(msg)
 
         # Set models if there are none in the container
         if self.obs().models().size() == 0:
             self.obs().models(self['inmodel'].filename())
-
-        # Query exclusion region
-        self["inexclusion"].query()
 
         # Query the map definition parameters
         self['xref'].real()
@@ -149,29 +186,24 @@ class csscs(ctools.csobservation):
         self['proj'].string()
         self['nxpix'].integer()
         self['nypix'].integer()
+        self['binsz'].real()
 
-        # Compute the size of the ROIs for the analysis in deg
-        self._roisz = self['binsz'].real() * self['roisz'].real()
+        # Radius of ROI for component separation
+        self['rad'].real()
 
-        # Query energy boundaries
+        # Energy boundaries
         self["emin"].real()
         self["emax"].real()
 
-        # If we have unbinned observations query the analysis method
+        # If we have unbinned observations query analysis method
         if n_unbinned > 0:
-            # If method is ONOFF query some csphagen parameters
-            if self['method'].string() == 'ONOFF':
-                pass
-                # TODO: implement Onoff analysis
-                # self["enumbins"].integer()
-                # self['use_model_bkg'].boolean()
-                # if self["bkgmethod"].string() == "REFLECTED":
-                #     self["srcshape"].string()
-                #     self["bkgregmin"].integer()
-                #     self["maxoffset"].real()
-                #     self["etruemin"].real()
-                #     self["etruemax"].real()
-                #     self["etruebins"].integer()
+            self._method = self['method'].string()
+            # If method is Onoff query csphagen parameters
+            if self._method == 'ONOFF':
+                self._get_onoff_parameters()
+        # Otherwise set method to binned
+        else:
+            self._method = 'BINNED'
 
         # Query target source names
         srcnames = self['srcnames'].string()
@@ -190,7 +222,27 @@ class csscs(ctools.csobservation):
             msg = 'Not all target sources are present in input model.'
             raise RuntimeError(msg)
 
-        # Query the hidden parameters, just in case
+        # For On/Off analysis check the number of gamma-ray sources in the model
+        if self._method == 'ONOFF':
+            nsources = 0
+            # Verify if model is of type GModelSky
+            for model in self.obs().models():
+                try:
+                    gammalib.GModelSky(model)
+                    nsources +=1
+                except:
+                    pass
+            # If there are background gamma-ray sources in the model
+            # throw runtime error
+            if nsources > len(self._srcnames):
+                msg = 'Background gamma-ray sources found in the model. ' \
+                      'On/Off analysis does not support this feature.'
+                raise RuntimeError(msg)
+            # Otherwise continue
+            else:
+                pass
+
+        # Query other hidden parameters, just in case
         self['edisp'].boolean()
         self['calc_ulim'].boolean()
         self['calc_ts'].boolean()
@@ -242,6 +294,24 @@ class csscs(ctools.csobservation):
 
             # Log model name
             self._log_header3(gammalib.EXPLICIT, model.name())
+
+            # In On/Off mode we cannot support multiple source morphologies
+            # Thus, if we have more than one target we will set them all
+            # to isotropic
+            if self._method == 'ONOFF' and len(self._srcnames) > 1:
+                # Check if it is a source
+                try:
+                    gammalib.GModelSky(model)
+                    # In this case check if the spatial model is already isotropic
+                    if model.spatial() == 'DiffuseIsotropic':
+                        pass
+                    # Otherwise change it to isotropic
+                    else:
+                        msg = ' Setting spatial model to diffuse isotropic'
+                        self._log_string(gammalib.EXPLICIT, msg)
+                        model.spatial(gammalib.GModelSpatialDiffuseConst())
+                except:
+                    pass
 
             # Freeze all parameters except the normalization
             # which is assumed to be the first spectral parameter
@@ -298,26 +368,29 @@ class csscs(ctools.csobservation):
 
         Returns
         -------
-        new_obs : `gammalib.GCTAObservation`
-            Output observation with masked cube
+        new_obs : `gammalib.GCTAObservations`
+            Output observations with masked cubes
         """
 
-        # Put observation in container
-        container = gammalib.GObservations()
-        container.append(obs)
-
         # Filter cube according to ROI and user energy range
-        cubemask = ctools.ctcubemask(container)
+        cubemask = ctools.ctcubemask(obs)
         cubemask['ra'] = ra
         cubemask['dec'] = dec
         cubemask['rad'] = rad
         cubemask['regfile'] = 'NONE'
         cubemask['emin'] = self['emin'].real()
         cubemask['emax'] = self['emax'].real()
+
+        # If chatter level is verbose and debugging is requested then
+        # switch also on the debug model in ctcubemask
+        if self._logVerbose() and self._logDebug():
+            cubemask['debug'] = True
+
+        # Mask cube
         cubemask.run()
 
-        # Get deep copy of filtered observation
-        new_obs = cubemask.obs()[0].copy()
+        # Get deep copy of filtered observations
+        new_obs = cubemask.obs().copy()
 
         # Return
         return new_obs
@@ -328,23 +401,19 @@ class csscs(ctools.csobservation):
 
         Parameters
         ----------
-        obs     : `gammalib.GCTAObservation` Input observation of type cube
+        obs     : `gammalib.GCTAObservations` Input observations of type event list
         ra      : `float` R.A. (deg)
         dec     : `float` Dec (deg)
         rad     : `float` radius (deg)
 
         Returns
         -------
-        new_obs : `gammalib.GCTAObservation`
-            Output observation with masked event list
+        new_obs : `gammalib.GCTAObservations`
+            Output observations with masked event lists
         """
 
-        # Put observation in container
-        container = gammalib.GObservations()
-        container.append(obs)
-
         # Filter event list according to ROI and user energy range
-        select = ctools.ctselect(container)
+        select = ctools.ctselect(obs)
         select['ra'] = ra
         select['dec'] = dec
         select['rad'] = rad
@@ -352,39 +421,20 @@ class csscs(ctools.csobservation):
         select['emax'] = self['emax'].real()
         select['tmin'] = 'INDEF'
         select['tmax'] = 'INDEF'
+
+        # If chatter level is verbose and debugging is requested then
+        # switch also on the debug model in ctcubemask
+        if self._logVerbose() and self._logDebug():
+            select['debug'] = True
+
+        # Select event list
         select.run()
 
         # Get deep copy of filtered observation
-        new_obs = select.obs()[0].copy()
+        new_obs = select.obs().copy()
 
         # Return
         return new_obs
-
-    def _mask_onoff(self,obs,ra,dec,rad):
-        """
-        Create On/Off observation
-        with On region matching the required mask
-
-        Parameters
-        ----------
-        obs     : `gammalib.GCTAObservation` Input observation of type cube
-        ra      : `float` R.A. (deg)
-        dec     : `float` Dec (deg)
-        rad     : `float` radius (deg)
-
-        Returns
-        -------
-        new_obs : `gammalib.GCTAOnoffObservation`
-            Output On/Off observation
-        """
-
-        # Put observation in container
-        container = gammalib.GObservations()
-        container.append(obs)
-
-        onoff_obs = obsutils.get_onoff_obs(self, container, ra=ra, dec=dec, rad=rad)
-
-        return onoff_obs[0]
 
     def _mask_observations(self,ra,dec,rad):
         """
@@ -402,29 +452,16 @@ class csscs(ctools.csobservation):
             Observations in circular ROI
         """
 
-        # Create output observation container
-        new_obs = gammalib.GObservations()
-
-        # Loop over input observations
-        for obs in self.obs():
-            if obs.classname() == 'GCTAObservation':
-                if obs.eventtype() == 'CountsCube':
-                    masked_obs = self._mask_cube(obs,ra,dec,rad)
-                else:
-                    if self['method'].string() == '3D':
-                        masked_obs = self._mask_evlist(obs,ra,dec,rad)
-                    elif self['method'].string() == 'ONOFF':
-                        pass
-                        pass
-                        # TODO: implement Onoff analysis
-                        # masked_obs = self._mask_onoff(obs, ra, dec, rad)
-                new_obs.append(masked_obs)
-            # Skip On-Off and non-CTA observations
-            else:
-                pass
-
-        # Append models to output observations
-        new_obs.models(self.obs().models())
+        # Determine type of masking according
+        # to observation type and analysis method
+        if self._method == 'UNBINNED':
+            new_obs = self._mask_evlist(self.obs(), ra, dec, rad)
+        elif self._method == 'BINNED':
+            new_obs = self._mask_cube(self.obs(), ra, dec, rad)
+        elif self._method == 'ONOFF':
+            new_obs = obsutils.get_onoff_obs(self,self.obs(),nthreads=1,
+                                             ra = ra, dec = dec,
+                                             srcname = self._srcnames[0])
 
         # Return
         return new_obs
@@ -465,7 +502,7 @@ class csscs(ctools.csobservation):
 
         # Mask observations
         self._log_header3(gammalib.EXPLICIT, 'Masking observations')
-        masked_obs = self._mask_observations(ra,dec,self._roisz)
+        masked_obs = self._mask_observations(ra,dec,self['rad'].real())
 
         # Set up likelihood analysis
         self._log_header3(gammalib.EXPLICIT, 'Performing fit in energy bin')
@@ -488,7 +525,7 @@ class csscs(ctools.csobservation):
         # ROI
         centre = gammalib.GSkyDir()
         centre.radec_deg(ra,dec)
-        roi = gammalib.GSkyRegionCircle(centre,self._roisz)
+        roi = gammalib.GSkyRegionCircle(centre,self['rad'].real())
         # Energy boundaries
         emin = gammalib.GEnergy(self['emin'].real(),'TeV')
         emax = gammalib.GEnergy(self['emax'].real(), 'TeV')
@@ -508,7 +545,7 @@ class csscs(ctools.csobservation):
                 # Multiply by flux from spatial component in ROI
                 flux *= source.spatial().flux(roi)
                 # Divide by solid angle of ROI
-                flux /= gammalib.twopi * (1 - math.cos(math.radians(self._roisz)))
+                flux /= gammalib.twopi * (1 - math.cos(math.radians(self['rad'].real())))
                 result[name]['flux'] = flux
 
                 # Get flux error
@@ -561,7 +598,7 @@ class csscs(ctools.csobservation):
         # Prepare some header cards
         # Flux units
         fcard = gammalib.GFitsHeaderCard('BUNIT', 'ph/cm2/s/sr' , 'Photon flux')
-        txt = 'Correlation radius %f deg' %(self._roisz)
+        txt = 'Correlation radius %f deg' %(self['rad'].real())
         roiszcard = gammalib.GFitsHeaderCard('COMMENT', '' , txt)
 
         # Loop over target sources
@@ -645,14 +682,6 @@ class csscs(ctools.csobservation):
             results = []
             for i in range(npix):
                 results.append(self._pixel_analysis(i))
-
-        # # Loop over pixels and extract results
-        # results = []
-        # for inx in range(self._create_map().npix()):
-        #
-        #     # Analyse ROI
-        #     result = self._pixel_analysis(inx)
-        #     results.append(result)
 
         # Fill output Fits
         self._fits = self._fill_fits(results)
