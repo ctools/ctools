@@ -498,7 +498,7 @@ class csscs(ctools.csobservation):
             result[name] = {'flux'    : 0.0,
                             'flux_err': 0.0,
                             'TS'      : 0.0,
-                            'ulimit'  : 0.0}
+                            'ulimit'  : -1.0}
 
         # Mask observations
         self._log_header3(gammalib.EXPLICIT, 'Masking observations')
@@ -542,10 +542,12 @@ class csscs(ctools.csobservation):
                 # Get flux
                 # Integrate spectral model between emin and emax
                 flux = source.spectral().flux(emin,emax)
-                # Multiply by flux from spatial component in ROI
-                flux *= source.spatial().flux(roi)
-                # Divide by solid angle of ROI
-                flux /= gammalib.twopi * (1 - math.cos(math.radians(self['rad'].real())))
+                # Calculate correction factor
+                # Spatial model flux over ROI divided by ROI solid angle
+                corr_factor = source.spatial().flux(roi)
+                corr_factor /= gammalib.twopi * (1 - math.cos(math.radians(self['rad'].real())))
+                # Multiply flux by correction factor
+                flux *= corr_factor
                 result[name]['flux'] = flux
 
                 # Get flux error
@@ -564,8 +566,35 @@ class csscs(ctools.csobservation):
                 if self['calc_ts'].boolean():
                     result[name]['TS'] = source.ts()
 
-                # Upper limit
-                # TODO
+                # If requested compute upper flux limit
+                if self['calc_ulim'].boolean():
+
+                    # Logging information
+                    self._log_header3(gammalib.EXPLICIT,
+                                      'Computing upper limit for source ' + name)
+
+                    # Create upper limit object
+                    ulimit = ctools.ctulimit(like.obs())
+                    ulimit['srcname'] = name
+                    ulimit['emin'] = self['emin'].real()
+                    ulimit['emax'] = self['emax'].real()
+
+                    # If chatter level is verbose and debugging is requested
+                    # then switch also on the debug model in ctulimit
+                    if self._logVerbose() and self._logDebug():
+                        ulimit['debug'] = True
+
+                    # Try to run upper limit and catch exceptions
+                    try:
+                        ulimit.run()
+                        ulimit_value = ulimit.flux_ulimit()
+                        # Multiply by correction factor to get flux per solid angle in ROI
+                        ulimit_value *= corr_factor
+                        result[name]['ulimit'] = ulimit_value
+                    except:
+                        self._log_string(gammalib.EXPLICIT, 'Upper limit '
+                                                            'calculation failed.')
+
 
         else:
             value = 'Likelihood is zero. Bin is skipped.'
@@ -604,24 +633,22 @@ class csscs(ctools.csobservation):
         # Loop over target sources
         for s, name in enumerate(self._srcnames):
 
-            # Create minimal set of skymaps to store fluxes and flux errors
+            # Create skymaps to store results
+            # Maps for TS and upper limits created and filled to avoid if statements
+            # Will not be saved in the end if not requested
             fmap = self._create_map()
             errmap = self._create_map()
-
-            #Create map for TS
-            if self['calc_ts'].boolean():
-                tsmap = self._create_map()
+            tsmap = self._create_map()
+            ulmap = self._create_map()
 
             # Loop over pixels and fill maps
             for inx in range(fmap.npix()):
 
-                # Fill flux and flux error
+                # Fill maps
                 fmap[inx,0] = results[inx][name]['flux']
                 errmap[inx, 0] = results[inx][name]['flux_error']
-
-                # If requested fill TS
-                if self['calc_ts'].boolean():
-                    tsmap[inx, 0] = results[inx][name]['TS']
+                tsmap[inx, 0] = results[inx][name]['TS']
+                ulmap[inx, 0] = results[inx][name]['ulimit']
 
             # Write maps to Fits
             fhdu = fmap.write(fits, name + ' FLUX')
@@ -637,6 +664,12 @@ class csscs(ctools.csobservation):
             if self['calc_ts'].boolean():
                 tshdu = tsmap.write(fits, name + ' TS')
                 tshdu.header().append(roiszcard)
+
+            # If requested write upper limit map to fits
+            if self['calc_ulim'].boolean():
+                ulhdu = ulmap.write(fits, name + ' FLUX UPPER LIMIT')
+                ulhdu.header().append(fcard)
+                ulhdu.header().append(roiszcard)
 
         # Return
         return fits

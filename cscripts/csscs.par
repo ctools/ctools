@@ -27,7 +27,7 @@ caldb,       s, a, prod2,,, "Calibration database"
 irf,         s, a, South_0.5h,,, "Instrument response function"
 inexclusion, f, a, NONE,,, "Exclusion regions TODO: add meaningful default"
 edisp,       b, h, no,,, "Apply energy dispersion?"
-outfile,     f, a, map.fits,,, "Output map"
+outfile,     f, a, maps.fits,,, "Output maps"
 
 #
 # Script parameters
@@ -56,9 +56,9 @@ etruemin,      r, h, 0.01,,, "Minimum true energy (TeV)"
 etruemax,      r, h, 300.0,,, "Maximum true energy (TeV)"
 etruebins,     i, h, 30,,, "Number of bins per decade for true energy bins"
 calc_ts,       b, h, yes,,, "Compute TS value in each bin"
-calc_ulim,     b, h, yes,,, "Compute upper limit in each bin"
-fix_srcs,      b, h, yes,,, "Fix other skymodel parameters"
-fix_bkg,       b, h, no,,, "Fix background parameters"
+calc_ulim,     b, h, no,,, "Compute upper limit in each bin"
+fix_srcs,      b, h, yes,,, "Fix other skymodel normalisations"
+fix_bkg,       b, h, no,,, "Fix background normalisation"
 
 #
 # Standard parameters
