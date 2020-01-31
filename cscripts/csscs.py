@@ -227,11 +227,8 @@ class csscs(ctools.csobservation):
             nsources = 0
             # Verify if model is of type GModelSky
             for model in self.obs().models():
-                try:
-                    gammalib.GModelSky(model)
+                if model.classname() == 'GModelSky':
                     nsources +=1
-                except:
-                    pass
             # If there are background gamma-ray sources in the model
             # throw runtime error
             if nsources > len(self._srcnames):
@@ -286,7 +283,7 @@ class csscs(ctools.csobservation):
         # Write header
         self._log_header1(gammalib.TERSE, 'Adjust model parameters')
 
-        # Adjust model parameters dependent on input user parameters
+        # Adjust model parameters based on input user parameters
         for model in self.obs().models():
 
             # Initialise TS flag for all models to false
@@ -619,10 +616,8 @@ class csscs(ctools.csobservation):
         # Create new Fits object
         fits = gammalib.GFits()
 
-        # If more than one source of interest
-        # append empty primary HDU
-        if len(self._srcnames) > 1:
-            fits.append(gammalib.GFitsImageDouble())
+        # Append empty primary HDU
+        fits.append(gammalib.GFitsImageDouble())
 
         # Prepare some header cards
         # Flux units
@@ -674,6 +669,45 @@ class csscs(ctools.csobservation):
         # Return
         return fits
 
+    def _get_skymap(self, name, quantity):
+        """
+        Fetches skymap from FITS container
+
+        Parameters
+        ----------
+        name : str
+            Source name
+        quantity : str
+            Quantity
+
+        Returns
+        -------
+        skymap : `~gammalib.GSkyMap`
+            Skymap
+
+        Raises
+        ------
+        NameError
+        """
+
+        # Initialise skymap object
+        skymap = None
+
+        if self._fits !=  None:
+            hduname = name + ' ' + quantity
+            try:
+                if name in self._srcnames:
+                    hdu = self._fits[hduname]
+                    skymap = gammalib.GSkyMap(hdu)
+                else:
+                    print('ERROR: Source "' + name + '" not found in list of target sources.')
+                    raise NameError(name)
+            except:
+                print('ERROR: HDU "' + hduname + '" not found in FITS container.')
+                raise NameError(hduname)
+
+        return skymap
+
 
     # Public methods
     def run(self):
@@ -690,7 +724,7 @@ class csscs(ctools.csobservation):
         # Write input observation container into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
-        # Adjust model parameters dependent on input user parameters
+        # Adjust model parameters based on input user parameters
         self._adjust_model_pars()
 
         # Compute number of pixels of output map
@@ -764,6 +798,94 @@ class csscs(ctools.csobservation):
 
         # Return
         return self._excl_reg_map
+
+    def fits(self):
+        """
+        Return fits container
+
+        Returns
+        -------
+        fits : `~gammalib.GFits()`
+            FITS file containing the maps
+        """
+        # Return
+        return self._fits
+
+    def flux(self,name):
+        """
+        Return flux skymap
+
+        Parameters
+        ----------
+        name : str
+            Source name
+
+        Returns
+        -------
+        skymap : `~gammalib.GSkyMap`
+            Flux skymap
+        """
+
+        skymap = self._get_skymap(name,'FLUX')
+
+        return skymap
+
+    def flux_error(self,name):
+        """
+        Return flux error skymap
+
+        Parameters
+        ----------
+        name : str
+            Source name
+
+        Returns
+        -------
+        skymap : `~gammalib.GSkyMap`
+            Flux error skymap
+        """
+
+        skymap = self._get_skymap(name,'FLUX ERROR')
+
+        return skymap
+
+    def ts(self,name):
+        """
+        Return TS skymap
+
+        Parameters
+        ----------
+        name : str
+            Source name
+
+        Returns
+        -------
+        skymap : `~gammalib.GSkyMap`
+            TS skymap
+        """
+
+        skymap = self._get_skymap(name,'TS')
+
+        return skymap
+
+    def ulimit(self,name):
+        """
+        Return flux upper limit skymap
+
+        Parameters
+        ----------
+        name : str
+            Source name
+
+        Returns
+        -------
+        skymap : `~gammalib.GSkyMap`
+            Flux upper limit skymap
+        """
+
+        skymap = self._get_skymap(name,'FLUX UPPER LIMIT')
+
+        return skymap
 
 
 # ======================== #
