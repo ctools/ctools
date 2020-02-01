@@ -225,7 +225,7 @@ class csscs(ctools.csobservation):
         # For On/Off analysis check the number of gamma-ray sources in the model
         if self._method == 'ONOFF':
             nsources = 0
-            # Verify if model is of type GModelSky
+            # Loop over models and verify if model is of type GModelSky
             for model in self.obs().models():
                 if model.classname() == 'GModelSky':
                     nsources +=1
@@ -486,7 +486,7 @@ class csscs(ctools.csobservation):
         dec = pixdir.dec_deg()
 
         # Write header for spatial bin
-        msg = 'Spatial bin centred on (R.A.,Dec) = (%f,%f) deg' % (ra,dec)
+        msg = 'Spatial bin (%d) centred on (R.A.,Dec) = (%f,%f) deg' % (inx,ra,dec)
         self._log_header2(gammalib.EXPLICIT, msg)
 
         # Initialize results
@@ -693,19 +693,27 @@ class csscs(ctools.csobservation):
         # Initialise skymap object
         skymap = None
 
+        # Proceed only if fits has been filled
         if self._fits !=  None:
-            hduname = name + ' ' + quantity
-            try:
-                if name in self._srcnames:
+            # Check that the name is in the list of target sources
+            if name in self._srcnames:
+                # Assemble HDU name
+                hduname = name + ' ' + quantity
+                # Try to fetch HDU
+                try:
                     hdu = self._fits[hduname]
+                    # Convert to GSkyMap
                     skymap = gammalib.GSkyMap(hdu)
-                else:
-                    print('ERROR: Source "' + name + '" not found in list of target sources.')
-                    raise NameError(name)
-            except:
-                print('ERROR: HDU "' + hduname + '" not found in FITS container.')
-                raise NameError(hduname)
+                # Catch exception if HDU does not exist
+                except:
+                    msg = 'HDU "' + hduname + '" not found in FITS container.'
+                    raise RuntimeError(msg)
+            # Otherwise throw name error
+            else:
+                print('ERROR: Source "' + name + '" not found in list of target sources.')
+                raise NameError(name)
 
+        # Return
         return skymap
 
 
@@ -864,7 +872,15 @@ class csscs(ctools.csobservation):
             TS skymap
         """
 
-        skymap = self._get_skymap(name,'TS')
+        # Check that TS computation is requested
+        if self['calc_ts'].boolean():
+            skymap = self._get_skymap(name,'TS')
+        # Otherwise throw error
+        else:
+            msg = 'TS computation not requested. ' \
+                  'Change user parameter calc_ts to True ' \
+                  'to obtain TS.'
+            raise RuntimeError(msg)
 
         return skymap
 
@@ -883,7 +899,16 @@ class csscs(ctools.csobservation):
             Flux upper limit skymap
         """
 
-        skymap = self._get_skymap(name,'FLUX UPPER LIMIT')
+        # Check that upper limit computation is requested
+        if self['calc_ulim'].boolean():
+            skymap = self._get_skymap(name,'FLUX UPPER LIMIT')
+        # Otherwise throw error
+        else:
+            msg = 'Upper limit computation not requested. ' \
+                  'Change user parameter calc_ulimit to True ' \
+                  'to obtain upper limit.'
+            raise RuntimeError(msg)
+
 
         return skymap
 
