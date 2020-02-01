@@ -487,7 +487,7 @@ class csscs(ctools.csobservation):
 
         # Write header for spatial bin
         msg = 'Spatial bin (%d) centred on (R.A.,Dec) = (%f,%f) deg' % (inx,ra,dec)
-        self._log_header2(gammalib.EXPLICIT, msg)
+        self._log_header2(gammalib.TERSE, msg)
 
         # Initialize results
         result = {}
@@ -498,11 +498,11 @@ class csscs(ctools.csobservation):
                             'ulimit'  : -1.0}
 
         # Mask observations
-        self._log_header3(gammalib.EXPLICIT, 'Masking observations')
+        self._log_header3(gammalib.NORMAL, 'Masking observations')
         masked_obs = self._mask_observations(ra,dec,self['rad'].real())
 
         # Set up likelihood analysis
-        self._log_header3(gammalib.EXPLICIT, 'Performing fit in energy bin')
+        self._log_header3(gammalib.NORMAL, 'Performing fit in energy bin')
         like = ctools.ctlike(masked_obs)
         like['edisp']    = self['edisp'].boolean()
         like['nthreads'] = 1  # Avoids OpenMP conflict
@@ -567,7 +567,7 @@ class csscs(ctools.csobservation):
                 if self['calc_ulim'].boolean():
 
                     # Logging information
-                    self._log_header3(gammalib.EXPLICIT,
+                    self._log_header3(gammalib.NORMAL,
                                       'Computing upper limit for source ' + name)
 
                     # Create upper limit object
@@ -589,7 +589,7 @@ class csscs(ctools.csobservation):
                         ulimit_value *= corr_factor
                         result[name]['ulimit'] = ulimit_value
                     except:
-                        self._log_string(gammalib.EXPLICIT, 'Upper limit '
+                        self._log_string(gammalib.NORMAL, 'Upper limit '
                                                             'calculation failed.')
 
 
