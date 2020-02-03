@@ -411,6 +411,7 @@ class csscs(ctools.csobservation):
 
         # Filter event list according to ROI and user energy range
         select = ctools.ctselect(obs)
+        select['usepnt'] = False
         select['ra'] = ra
         select['dec'] = dec
         select['rad'] = rad
@@ -502,7 +503,7 @@ class csscs(ctools.csobservation):
         masked_obs = self._mask_observations(ra,dec,self['rad'].real())
 
         # Set up likelihood analysis
-        self._log_header3(gammalib.NORMAL, 'Performing fit in energy bin')
+        self._log_header3(gammalib.NORMAL, 'Performing fit in region')
         like = ctools.ctlike(masked_obs)
         like['edisp']    = self['edisp'].boolean()
         like['nthreads'] = 1  # Avoids OpenMP conflict
