@@ -18,6 +18,7 @@ CTA data analysis
    howto_connect_irfs
    howto_connect_models
    howto_xspec
+   howto_likelhood_profiles
 
 
 CTA first Data Challenge data analysis
