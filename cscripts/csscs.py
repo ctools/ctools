@@ -601,6 +601,47 @@ class csscs(ctools.csobservation):
         # Return result
         return result
 
+    def _write_hdu_keywords(self,hdu, is_flux = False):
+        """
+        Append cards to HDU
+
+        Parameters
+        ----------
+        hdu  : `dict` HDU
+        """
+
+        # Flux units
+        if is_flux:
+            hdu.card('BUNIT', 'ph/cm2/s/sr' , 'Photon flux')
+
+        # Minimum and maximum energy
+        hdu.card("E_MIN",  self['emin'].real(), "[TeV] Lower energy boundary")
+        hdu.card("E_MAX",  self['emax'].real(), "[TeV] Upper energy boundary")
+        hdu.card("EUNIT",  "TeV",  "Units for E_MIN and E_MAX")
+
+        # ROI size
+        hdu.card('ROISZ', self['rad'].real() ,
+                 '[deg] Size of ROI used for component separation')
+
+        # Analysis method
+        hdu.card('METHOD',self._method, 'Analysis method')
+
+        # For On/Off log information
+        if self._method == 'ONOFF':
+
+            # Exclusion map
+            if (self._excl_reg_map is not None) and self['inexclusion'].is_valid():
+                hdu.card("EXCLMAP", self['inexclusion'].filename().url(), "Exclusion map name")
+
+            # Model background?
+            hdu.card("BKGMODEL", self['use_model_bkg'].boolean(),'Use background model?')
+
+            # Fit statistic
+            hdu.card("STAT", self['statistic'].string(),'Fit statistic')
+
+        return
+
+
     def _fill_fits(self,results):
         """
         Fill FITS object to store the results
@@ -619,12 +660,6 @@ class csscs(ctools.csobservation):
 
         # Append empty primary HDU
         fits.append(gammalib.GFitsImageDouble())
-
-        # Prepare some header cards
-        # Flux units
-        fcard = gammalib.GFitsHeaderCard('BUNIT', 'ph/cm2/s/sr' , 'Photon flux')
-        txt = 'Correlation radius %f deg' %(self['rad'].real())
-        roiszcard = gammalib.GFitsHeaderCard('COMMENT', '' , txt)
 
         # Loop over target sources
         for s, name in enumerate(self._srcnames):
@@ -648,24 +683,19 @@ class csscs(ctools.csobservation):
 
             # Write maps to Fits
             fhdu = fmap.write(fits, name + ' FLUX')
+            self._write_hdu_keywords(fhdu,is_flux=True)
             errhdu = errmap.write(fits, name + ' FLUX ERROR')
-
-            # Add units and comments to headers
-            fhdu.header().append(fcard)
-            errhdu.header().append(fcard)
-            fhdu.header().append(roiszcard)
-            errhdu.header().append(roiszcard)
+            self._write_hdu_keywords(errhdu, is_flux=True)
 
             # If requested write TS map to fits
             if self['calc_ts'].boolean():
                 tshdu = tsmap.write(fits, name + ' TS')
-                tshdu.header().append(roiszcard)
+                self._write_hdu_keywords(tshdu)
 
             # If requested write upper limit map to fits
             if self['calc_ulim'].boolean():
                 ulhdu = ulmap.write(fits, name + ' FLUX UPPER LIMIT')
-                ulhdu.header().append(fcard)
-                ulhdu.header().append(roiszcard)
+                self._write_hdu_keywords(ulhdu, is_flux=True)
 
         # Return
         return fits
