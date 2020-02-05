@@ -22,7 +22,6 @@ import sys
 import cscripts
 try:
     import matplotlib.pyplot as plt
-    import matplotlib.mlab as mlab
     plt.figure()
     plt.close()
 except (ImportError, RuntimeError):
@@ -61,7 +60,7 @@ def plot_pull_histogram(filename, parname, nbins, plotfile):
                           normed=True, facecolor='green')
 
     # Create expected distribution
-    y = mlab.normpdf(bins, 0.0, 1.0)
+    y = np.exp(-0.5*bins*bins) / np.sqrt(2.0*np.pi)
     plt.plot(bins, y, 'r-', linewidth=2)
 
     # Set plot
