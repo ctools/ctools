@@ -656,6 +656,7 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = "cscripts" \
+                         "pyext/build/ctools/ctools" \
                          "src"
 
 # This tag can be used to specify the character encoding of the source files
