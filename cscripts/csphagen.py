@@ -3,7 +3,7 @@
 # Computes the PHA spectra for source/background and ARF/RMF files using the
 # reflected region method
 #
-# Copyright (C) 2017-2019 Luigi Tibaldo
+# Copyright (C) 2017-2020 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -398,21 +398,25 @@ class csphagen(ctools.csobservation):
                 else:
 
                     # Append reflected regions
-                    alpha = 360.0 / N
-                    dphi_max = 360. - alpha * (1 + N_skip)
-                    dphi = alpha * (1 + N_skip)
+                    alpha    = 360.0 / N
+                    dphi_max = 360.0 - alpha * (1 + N_skip)
+                    dphi     = alpha         * (1 + N_skip)
                     while dphi <= dphi_max:
                         ctr_dir = pnt_dir.clone()
                         ctr_dir.rotate_deg(posang + dphi, offset)
                         region = gammalib.GSkyRegionCircle(ctr_dir, self._rad)
                         if self._has_exclusion:
                             if self._excl_reg.overlaps(region):
+
+                                # Signal region overlap
                                 msg = ' Reflected region overlaps with '\
                                       'exclusion region.'
                                 self._log_string(gammalib.EXPLICIT, msg)
-                                # if region overlaps with exclusion region
+
+                                # If region overlaps with exclusion region
                                 # try to increment by 10% of angular step
                                 dphi += 0.1 * alpha
+
                             else:
                                 regions.append(region)
                                 dphi += alpha
