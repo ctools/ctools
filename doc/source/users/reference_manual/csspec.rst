@@ -145,17 +145,17 @@ General parameters
 ``(fix_bkg = no) [boolean]``
     Fix background model parameters?
 
-``(dll_sigstep) [real]``
+``(dll_sigstep = 0) [real]``
     Step size in standard deviations for log-like profiles. Note this value 
     determines the number of steps to use.
 
-``(dll_sigmax) [real]``
+``(dll_sigmax = 5.0) [real]``
     Maximum number of standard deviations for log-like profiles. The final number
     of bins generated in the likelihood profile will be:
        2*(dll_sigmax/dll_sigstep) + 1
     ensuring that the central flux will always be evaluated.
 
-``(dll_freenodes) [boolean]``
+``(dll_freenodes = no) [boolean]``
     Free nodes not being fit when computing log-like profiles. This parameter
     only has an effect if 'method=NODES' is set.
 

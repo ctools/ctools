@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a spectrum.
 #
-# Copyright (C) 2014-2019 Michael Mayer
+# Copyright (C) 2014-2020 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1031,7 +1031,6 @@ class csspec(ctools.csobservation):
             # from [10^-24, 10^-14] or [norm, 10^-14] whichever is broader
             log_start = -24 if (log_norm > -24) else log_norm
             log_step = (-14 - log_start) / (sigsteps-1)
-        
         norm_vals = [10 ** (log_start + i*log_step) for i in range(sigsteps)]
 
         # Loop through normalizations
@@ -1042,14 +1041,15 @@ class csspec(ctools.csobservation):
 
             # Re-run the fit
             like.run()
-            
+
             # Store dlikelihood & norm
             dloglike.append(loglike - like.obs().logL())
             if self._method == 'SLICE':
                 norm_scan.append(spectral.eval(elogmean))
             else:
                 norm_scan.append(new_norm)
-            
+
+        # Return
         return (norm_scan, dloglike, -loglike)
 
     def _create_fits(self, results):
