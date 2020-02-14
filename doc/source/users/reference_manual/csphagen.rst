@@ -88,8 +88,11 @@ General parameters
     Instrument response function.
 
 ``(inexclusion = NONE) [file]``
-    Optional FITS file containing a WCS map in the first extension that defines
-    sky regions not to be used for background estimation (where map value != 0).
+    Optional FITS file containing a WCS map that defines sky regions
+    not to be used for background estimation (where map value !=
+    0). If the file contains multiple extensions the user may specify
+    which one to use. Otherwise, the extention ``EXCLUSION`` will be
+    used if available, or else the primary extension will be used.
 
 ``outobs [file]``
     Output observation definition XML file.

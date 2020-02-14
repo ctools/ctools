@@ -87,8 +87,11 @@ General parameters
     Instrument response function.
 
 ``inexclusion [file]``
-    Optional FITS file containing a WCS map in the first extension that defines
-    sky regions not to be used for background estimation (where map value != 0).
+    FITS file containing a WCS map that defines sky regions not to be used for
+    background estimation (where map value != 0). If the file
+    contains multiple extensions the user may specify which one
+    to use. Otherwise, the extention ``EXCLUSION`` will be used if
+    available, or else the primary extension will be used.  
 
 ``(edisp = no) [boolean]``
     Apply energy dispersion to response computation?
@@ -118,12 +121,12 @@ General parameters
     Declination / Galactic latitude of image centre (J2000, in
     degrees).
 
- ``rad [real]``
+``rad [real]``
     Radius of region of interest for component separation (deg). Sets
     the correlation scale between neighbour pixels in the output maps. Must
     be at least sqrt(2) times ``binsz`` for full coverage of input data.
 
- ``emin [real]``
+``emin [real]``
     Minimum energy (in TeV).
 
 ``emax [real]``
@@ -152,7 +155,7 @@ General parameters
     On/Off analysis. If this number of background regions is not available the
     observation is skipped.
 
- ``(bkgregskip = 1) [integer]``
+``(bkgregskip = 1) [integer]``
     Number of background regions that should be skipped next to the On regions.
     Typically, one region is skipped so that the Off regions are taken sufficiently
     distant from the On region, but in some cases it may be useful to keep the
