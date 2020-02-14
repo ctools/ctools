@@ -825,18 +825,34 @@ def get_onoff_obs(cls, obs, nthreads=0, ra = None, dec = None, srcname = ''):
     phagen['debug']         = cls['debug'].boolean()
     phagen['nthreads']      = nthreads
 
-    # Pipe exclusion map in memory
+    # Set exclusion map
+    # Initialise exclusion map flag to False
+    use_excl_map = False
+    # Initialise inexclusion par flag to False
+    use_inexclusion = False
+    # Do we have valid exclusion map in memory?
     if hasattr(cls, 'exclusion_map'):
         exclusion_map = cls.exclusion_map()
         if exclusion_map is not None:
+            # Set use exclusion map flag to True
+            use_excl_map = True
+            # Set exclusion map
             phagen.exclusion_map(exclusion_map)
-    # Otherwise try to read it as user parameter
-    elif cls.has_par('inexclusion'):
-        if cls['inexclusion'].is_valid():
-            inexclusion = cls['inexclusion'].value()
-            phagen['inexclusion'] = inexclusion
-    # Otherwise set to None
-    else:
+    # If we do not have valid exclusion map in memory ...
+    if not use_excl_map:
+        # ... do we have an inxeclusion parameter?
+        if cls.has_par('inexclusion'):
+            # If the inexclusion parameter is valid
+            if cls['inexclusion'].is_valid():
+                # Set use inexclusion flag to True
+                use_inexclusion = True
+                # Set inexclusion parameter
+                inexclusion = cls['inexclusion'].value()
+                phagen['inexclusion'] = inexclusion
+    # If there is no valid exclusion map in memory
+    # nor valid inexclusion parameter
+    if not use_excl_map and not use_inexclusion:
+        # Set inexclusion for csphagen to None
         phagen['inexclusion'] = 'NONE'
 
     # Run csphagen
