@@ -1,7 +1,6 @@
 .. _reference:
 
 Reference Manual
-
 ================
 
 
@@ -13,11 +12,9 @@ manual is documented `here <usage.html>`__.
 Below you find links to the command line reference for all available tools and scripts.
 
 ctools
-
 ------
 
 .. toctree::
-
    :maxdepth: 1
 
    ctbin --- Generates counts cube <ctbin>
@@ -41,11 +38,9 @@ ctools
    ctulimit --- Calculates upper limit <ctulimit>
 
 cscripts
-
 --------
 
 .. toctree::
-
    :maxdepth: 1
 
    csbkgmodel --- Generates background model for 3D analysis <csbkgmodel>
@@ -75,11 +70,9 @@ cscripts
    csviscube --- Computes visibility cube <csviscube>
 
 Scripts to manage an IACT database
-
 ----------------------------------
 
 .. warning::
-
    The ``csiactdata``, ``csiactobs``, ``csfindobs`` and ``csiactcopy`` scripts
    rely on the ``json`` Python module which is only available in Python 2.6
    or higher. These scripts will not work on older Python versions.
@@ -87,7 +80,6 @@ Scripts to manage an IACT database
 
 
 .. toctree::
-
    :maxdepth: 1
 
    csobs2caldb --- Creates a caldb entry from an input observation <csobs2caldb>
