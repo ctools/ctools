@@ -775,18 +775,14 @@ def get_onoff_obs(cls, obs, nthreads=0, ra = None, dec = None, srcname = ''):
 
     # Initialise inmodel, inexclusion and use_model_bkg
     inmodel       = 'NONE'
-    inexclusion   = 'NONE'
     use_model_bkg = True
 
-    # Set inmodel, srcname, inexclusion and use_model_bkg if they are available
+    # Set inmodel, srcname, and use_model_bkg if they are available
     if cls.has_par('inmodel') and obs.models().size() == 0:
         if cls['inmodel'].is_valid():
             inmodel = cls['inmodel'].value()
     if srcname == '' and cls.has_par('srcname'):
         srcname = cls['srcname'].value()
-    if cls.has_par('inexclusion'):
-        if cls['inexclusion'].is_valid():
-            inexclusion = cls['inexclusion'].value()
     if cls.has_par('use_model_bkg'):
         use_model_bkg = cls['use_model_bkg'].boolean()
 
@@ -794,7 +790,6 @@ def get_onoff_obs(cls, obs, nthreads=0, ra = None, dec = None, srcname = ''):
     phagen = cscripts.csphagen(obs)
     phagen['inmodel']     = inmodel
     phagen['srcname']     = srcname
-    phagen['inexclusion'] = inexclusion
     phagen['emin']        = cls['emin'].real()
     phagen['emax']        = cls['emax'].real()
     phagen['enumbins']    = cls['enumbins'].integer()
@@ -830,13 +825,21 @@ def get_onoff_obs(cls, obs, nthreads=0, ra = None, dec = None, srcname = ''):
     phagen['debug']         = cls['debug'].boolean()
     phagen['nthreads']      = nthreads
 
-    # Pipe exclusion map
+    # Pipe exclusion map in memory
     if hasattr(cls, 'exclusion_map'):
         exclusion_map = cls.exclusion_map()
         if exclusion_map is not None:
             phagen.exclusion_map(exclusion_map)
+    # Otherwise try to read it as user parameter
+    elif cls.has_par('inexclusion'):
+        if cls['inexclusion'].is_valid():
+            inexclusion = cls['inexclusion'].value()
+            phagen['inexclusion'] = inexclusion
+    # Otherwise set to None
+    else:
+        phagen['inexclusion'] = 'NONE'
 
-	# Run csphagen
+    # Run csphagen
     phagen.run()
 
     # Clone resulting observation container

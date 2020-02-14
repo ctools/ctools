@@ -18,12 +18,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import sys
-import gammalib
 import ctools
+import gammalib
+import math
+import sys
 from cscripts import mputils
 from cscripts import obsutils
-import math
 
 
 # ================= #
@@ -53,7 +53,8 @@ class csscs(ctools.csobservation):
         self._srcnames = []
         self._method = None
         self._fits = None
-        self._excl_reg_map = None # Exclusion region map for on/off analysis
+        self._excl_reg_map = None  # Exclusion region map for on/off analysis
+        self._excl_reg_name = None
 
         # Return
         return
@@ -70,12 +71,13 @@ class csscs(ctools.csobservation):
         """
         # Set pickled dictionary
         # Set pickled dictionary
-        state = {'base'     : ctools.csobservation.__getstate__(self),
-                 'nthreads' : self._nthreads,
-                 'method'   : self._method,
-                 'srcnames' : self._srcnames,
-                 'fits'     : self._fits,
-                 'excl_reg_map' : self._excl_reg_map}
+        state = {'base': ctools.csobservation.__getstate__(self),
+                 'nthreads': self._nthreads,
+                 'method': self._method,
+                 'srcnames': self._srcnames,
+                 'fits': self._fits,
+                 'excl_reg_map': self._excl_reg_map,
+                 'excl_reg_name' : self._excl_reg_name}
 
         # Return pickled dictionary
         return state
@@ -96,10 +98,10 @@ class csscs(ctools.csobservation):
         self._method = state['method']
         self._fits = state['fits']
         self._excl_reg_map = state['excl_reg_map']
+        self._excl_reg_name = state['excl_reg_name']
 
         # Return
         return
-
 
     # Private methods
     def _get_onoff_parameters(self):
@@ -117,8 +119,8 @@ class csscs(ctools.csobservation):
             # Exclusion map set and is not empty
             pass
         elif self['inexclusion'].is_valid():
-            inexclusion = self['inexclusion'].filename()
-            self._excl_reg_map = gammalib.GSkyRegionMap(inexclusion)
+            self._excl_reg_name = self['inexclusion'].filename()
+            self._excl_reg_map = gammalib.GSkyRegionMap(self._excl_reg_name)
         else:
             msg = 'csscs in On/Off mode requires input exclusion region.'
             raise RuntimeError(msg)
@@ -150,8 +152,8 @@ class csscs(ctools.csobservation):
         # Collect number of unbinned, binned and On/Off observations in
         # observation container
         n_unbinned = 0
-        n_binned   = 0
-        n_onoff    = 0
+        n_binned = 0
+        n_onoff = 0
         for obs in self.obs():
             if obs.classname() == 'GCTAObservation':
                 if obs.eventtype() == 'CountsCube':
@@ -160,16 +162,16 @@ class csscs(ctools.csobservation):
                     n_unbinned += 1
             elif obs.classname() == 'GCTAOnOffObservation':
                 n_onoff += 1
-        n_cta   = n_unbinned + n_binned + n_onoff
+        n_cta = n_unbinned + n_binned + n_onoff
         n_other = self.obs().size() - n_cta
 
         # Check if there are On/Off or non-IACT observations
         if n_onoff > 0 or n_other > 0:
-            msg = 'On/Off or non-CTA observations found. '\
+            msg = 'On/Off or non-CTA observations found. ' \
                   'csscs does not support this type of observations.'
             raise RuntimeError(msg)
         # Otherwise check if there is a mix of binned and unbinned
-        elif n_unbinned > 0 and n_binned>0:
+        elif n_unbinned > 0 and n_binned > 0:
             msg = 'Mix of unbinned and binned CTA observations ' \
                   'found in observation container. csscs does not ' \
                   'support this mix.'
@@ -228,7 +230,7 @@ class csscs(ctools.csobservation):
             # Loop over models and verify if model is of type GModelSky
             for model in self.obs().models():
                 if model.classname() == 'GModelSky':
-                    nsources +=1
+                    nsources += 1
             # If there are background gamma-ray sources in the model
             # throw runtime error
             if nsources > len(self._srcnames):
@@ -327,7 +329,7 @@ class csscs(ctools.csobservation):
                 # Free the normalisation parameter which is assumed to be
                 # the first spectral parameter
                 if normpar.is_fixed():
-                    self._log_string(gammalib.EXPLICIT, ' Freeing "'+normpar.name()+'"')
+                    self._log_string(gammalib.EXPLICIT, ' Freeing "' + normpar.name() + '"')
                     normpar.free()
 
                 # Optionally compute Test Statistic value
@@ -338,7 +340,7 @@ class csscs(ctools.csobservation):
             elif self['fix_bkg'].boolean() and not model.classname() == 'GModelSky':
 
                 if normpar.is_free():
-                    self._log_string(gammalib.EXPLICIT, ' Fixing "'+normpar.name()+'"')
+                    self._log_string(gammalib.EXPLICIT, ' Fixing "' + normpar.name() + '"')
                     normpar.fix()
 
 
@@ -346,13 +348,13 @@ class csscs(ctools.csobservation):
             elif self['fix_srcs'].boolean() and model.classname() == 'GModelSky':
 
                 if normpar.is_free():
-                    self._log_string(gammalib.EXPLICIT, ' Fixing "'+normpar.name()+'"')
+                    self._log_string(gammalib.EXPLICIT, ' Fixing "' + normpar.name() + '"')
                     normpar.fix()
 
         # Return
         return
 
-    def _mask_cube(self,obs,ra,dec,rad):
+    def _mask_cube(self, obs, ra, dec, rad):
         """
         Mask cube observation
 
@@ -392,7 +394,7 @@ class csscs(ctools.csobservation):
         # Return
         return new_obs
 
-    def _mask_evlist(self,obs,ra,dec,rad):
+    def _mask_evlist(self, obs, ra, dec, rad):
         """
         Mask event list
 
@@ -434,7 +436,7 @@ class csscs(ctools.csobservation):
         # Return
         return new_obs
 
-    def _mask_observations(self,ra,dec,rad):
+    def _mask_observations(self, ra, dec, rad):
         """
         Create observations restricted to circular ROI
 
@@ -457,14 +459,14 @@ class csscs(ctools.csobservation):
         elif self._method == 'BINNED':
             new_obs = self._mask_cube(self.obs(), ra, dec, rad)
         elif self._method == 'ONOFF':
-            new_obs = obsutils.get_onoff_obs(self,self.obs(),nthreads=1,
-                                             ra = ra, dec = dec,
-                                             srcname = self._srcnames[0])
+            new_obs = obsutils.get_onoff_obs(self, self.obs(), nthreads=1,
+                                             ra=ra, dec=dec,
+                                             srcname=self._srcnames[0])
 
         # Return
         return new_obs
 
-    def _pixel_analysis(self,inx):
+    def _pixel_analysis(self, inx):
         """
         Performs analysis over the region of interest
         corresponding to a single pixel of output map
@@ -487,25 +489,25 @@ class csscs(ctools.csobservation):
         dec = pixdir.dec_deg()
 
         # Write header for spatial bin
-        msg = 'Spatial bin (%d) centred on (R.A.,Dec) = (%f,%f) deg' % (inx,ra,dec)
+        msg = 'Spatial bin (%d) centred on (R.A.,Dec) = (%f,%f) deg' % (inx, ra, dec)
         self._log_header2(gammalib.TERSE, msg)
 
         # Initialize results
         result = {}
         for name in self._srcnames:
-            result[name] = {'flux'    : 0.0,
+            result[name] = {'flux': 0.0,
                             'flux_err': 0.0,
-                            'TS'      : 0.0,
-                            'ulimit'  : -1.0}
+                            'TS': 0.0,
+                            'ulimit': -1.0}
 
         # Mask observations
         self._log_header3(gammalib.NORMAL, 'Masking observations')
-        masked_obs = self._mask_observations(ra,dec,self['rad'].real())
+        masked_obs = self._mask_observations(ra, dec, self['rad'].real())
 
         # Set up likelihood analysis
         self._log_header3(gammalib.NORMAL, 'Performing fit in region')
         like = ctools.ctlike(masked_obs)
-        like['edisp']    = self['edisp'].boolean()
+        like['edisp'] = self['edisp'].boolean()
         like['nthreads'] = 1  # Avoids OpenMP conflict
 
         # If chatter level is verbose and debugging is requested then
@@ -522,10 +524,10 @@ class csscs(ctools.csobservation):
         # Prepare objects for flux extraction
         # ROI
         centre = gammalib.GSkyDir()
-        centre.radec_deg(ra,dec)
-        roi = gammalib.GSkyRegionCircle(centre,self['rad'].real())
+        centre.radec_deg(ra, dec)
+        roi = gammalib.GSkyRegionCircle(centre, self['rad'].real())
         # Energy boundaries
-        emin = gammalib.GEnergy(self['emin'].real(),'TeV')
+        emin = gammalib.GEnergy(self['emin'].real(), 'TeV')
         emax = gammalib.GEnergy(self['emax'].real(), 'TeV')
 
         # Continue only if log-likelihood is non-zero
@@ -539,11 +541,12 @@ class csscs(ctools.csobservation):
 
                 # Get flux
                 # Integrate spectral model between emin and emax
-                flux = source.spectral().flux(emin,emax)
+                flux = source.spectral().flux(emin, emax)
                 # Calculate correction factor
                 # Spatial model flux over ROI divided by ROI solid angle
                 corr_factor = source.spatial().flux(roi)
-                corr_factor /= gammalib.twopi * (1 - math.cos(math.radians(self['rad'].real())))
+                corr_factor /= gammalib.twopi * (
+                            1 - math.cos(math.radians(self['rad'].real())))
                 # Multiply flux by correction factor
                 flux *= corr_factor
                 result[name]['flux'] = flux
@@ -555,7 +558,7 @@ class csscs(ctools.csobservation):
                 # Relative error on flux is same as on normalization
                 # Avoid zero division error
                 if normpar.value() > 0.:
-                    flux_error = flux * normpar.error()/normpar.value()
+                    flux_error = flux * normpar.error() / normpar.value()
                 else:
                     flux_error = 0.
                 result[name]['flux_error'] = flux_error
@@ -591,58 +594,57 @@ class csscs(ctools.csobservation):
                         result[name]['ulimit'] = ulimit_value
                     except:
                         self._log_string(gammalib.NORMAL, 'Upper limit '
-                                                            'calculation failed.')
+                                                          'calculation failed.')
 
 
         else:
             value = 'Likelihood is zero. Bin is skipped.'
-            self._log_value(gammalib.TERSE, '(R.A.,Dec) = (%f,%f) deg' % (ra,dec), value)
+            self._log_value(gammalib.TERSE, '(R.A.,Dec) = (%f,%f) deg' % (ra, dec), value)
 
         # Return result
         return result
 
-    def _write_hdu_keywords(self,hdu, is_flux = False):
+    def _write_hdu_keywords(self, hdu, is_flux=False):
         """
         Append cards to HDU
 
         Parameters
         ----------
-        hdu  : `dict` HDU
+        hdu  : `~gammalib.GFitsHDU` HDU
         """
 
         # Flux units
         if is_flux:
-            hdu.card('BUNIT', 'ph/cm2/s/sr' , 'Photon flux')
+            hdu.card('BUNIT', 'ph/cm2/s/sr', 'Photon flux')
 
         # Minimum and maximum energy
-        hdu.card("E_MIN",  self['emin'].real(), "[TeV] Lower energy boundary")
-        hdu.card("E_MAX",  self['emax'].real(), "[TeV] Upper energy boundary")
-        hdu.card("EUNIT",  "TeV",  "Units for E_MIN and E_MAX")
+        hdu.card("E_MIN", self['emin'].real(), "[TeV] Lower energy boundary")
+        hdu.card("E_MAX", self['emax'].real(), "[TeV] Upper energy boundary")
+        hdu.card("EUNIT", "TeV", "Units for E_MIN and E_MAX")
 
         # ROI size
-        hdu.card('ROISZ', self['rad'].real() ,
+        hdu.card('ROISZ', self['rad'].real(),
                  '[deg] Size of ROI used for component separation')
 
         # Analysis method
-        hdu.card('METHOD',self._method, 'Analysis method')
+        hdu.card('METHOD', self._method, 'Analysis method')
 
         # For On/Off log information
         if self._method == 'ONOFF':
 
             # Exclusion map
-            if (self._excl_reg_map is not None) and self['inexclusion'].is_valid():
-                hdu.card("EXCLMAP", self['inexclusion'].filename().url(), "Exclusion map name")
+            if self._excl_reg_name is not None:
+                hdu.card("EXCLMAP", self._excl_reg_name.url(), "Exclusion map name")
 
             # Model background?
-            hdu.card("BKGMODEL", self['use_model_bkg'].boolean(),'Use background model?')
+            hdu.card("BKGMODEL", self['use_model_bkg'].boolean(), 'Use background model?')
 
             # Fit statistic
-            hdu.card("STAT", self['statistic'].string(),'Fit statistic')
+            hdu.card("STAT", self['statistic'].string(), 'Fit statistic')
 
         return
 
-
-    def _fill_fits(self,results):
+    def _fill_fits(self, results):
         """
         Fill FITS object to store the results
 
@@ -674,27 +676,29 @@ class csscs(ctools.csobservation):
 
             # Loop over pixels and fill maps
             for inx in range(fmap.npix()):
-
                 # Fill maps
-                fmap[inx,0] = results[inx][name]['flux']
+                fmap[inx, 0] = results[inx][name]['flux']
                 errmap[inx, 0] = results[inx][name]['flux_error']
                 tsmap[inx, 0] = results[inx][name]['TS']
                 ulmap[inx, 0] = results[inx][name]['ulimit']
 
+            # Uppercase name to adhere to gammalib convention
+            Name = gammalib.toupper(name)
+
             # Write maps to Fits
-            fhdu = fmap.write(fits, name + ' FLUX')
-            self._write_hdu_keywords(fhdu,is_flux=True)
-            errhdu = errmap.write(fits, name + ' FLUX ERROR')
+            fhdu = fmap.write(fits, Name + ' FLUX')
+            self._write_hdu_keywords(fhdu, is_flux=True)
+            errhdu = errmap.write(fits, Name + ' FLUX ERROR')
             self._write_hdu_keywords(errhdu, is_flux=True)
 
             # If requested write TS map to fits
             if self['calc_ts'].boolean():
-                tshdu = tsmap.write(fits, name + ' TS')
+                tshdu = tsmap.write(fits, Name + ' TS')
                 self._write_hdu_keywords(tshdu)
 
             # If requested write upper limit map to fits
             if self['calc_ulim'].boolean():
-                ulhdu = ulmap.write(fits, name + ' FLUX UPPER LIMIT')
+                ulhdu = ulmap.write(fits, Name + ' FLUX UPPER LIMIT')
                 self._write_hdu_keywords(ulhdu, is_flux=True)
 
         # Return
@@ -725,11 +729,13 @@ class csscs(ctools.csobservation):
         skymap = None
 
         # Proceed only if fits has been filled
-        if self._fits !=  None:
+        if self._fits != None:
             # Check that the name is in the list of target sources
             if name in self._srcnames:
+                # Uppercase name
+                Name = gammalib.toupper(name)
                 # Assemble HDU name
-                hduname = name + ' ' + quantity
+                hduname = Name + ' ' + quantity
                 # Try to fetch HDU
                 try:
                     hdu = self._fits[hduname]
@@ -746,7 +752,6 @@ class csscs(ctools.csobservation):
 
         # Return
         return skymap
-
 
     # Public methods
     def run(self):
@@ -773,8 +778,8 @@ class csscs(ctools.csobservation):
         if self._nthreads > 1:
 
             # Compute values in pixels
-            args        = [(self, '_pixel_analysis', i)
-                           for i in range(npix)]
+            args = [(self, '_pixel_analysis', i)
+                    for i in range(npix)]
             poolresults = mputils.process(self._nthreads, mputils.mpfunc, args)
 
             # Construct results
@@ -804,7 +809,6 @@ class csscs(ctools.csobservation):
 
         # Continue only if FITS file is valid
         if self._fits != None:
-
             # Get outmap parameter
             outfile = self['outfile'].filename()
 
@@ -850,7 +854,7 @@ class csscs(ctools.csobservation):
         # Return
         return self._fits
 
-    def flux(self,name):
+    def flux(self, name):
         """
         Return flux skymap
 
@@ -865,11 +869,11 @@ class csscs(ctools.csobservation):
             Flux skymap
         """
 
-        skymap = self._get_skymap(name,'FLUX')
+        skymap = self._get_skymap(name, 'FLUX')
 
         return skymap
 
-    def flux_error(self,name):
+    def flux_error(self, name):
         """
         Return flux error skymap
 
@@ -884,11 +888,11 @@ class csscs(ctools.csobservation):
             Flux error skymap
         """
 
-        skymap = self._get_skymap(name,'FLUX ERROR')
+        skymap = self._get_skymap(name, 'FLUX ERROR')
 
         return skymap
 
-    def ts(self,name):
+    def ts(self, name):
         """
         Return TS skymap
 
@@ -905,7 +909,7 @@ class csscs(ctools.csobservation):
 
         # Check that TS computation is requested
         if self['calc_ts'].boolean():
-            skymap = self._get_skymap(name,'TS')
+            skymap = self._get_skymap(name, 'TS')
         # Otherwise throw error
         else:
             msg = 'TS computation not requested. ' \
@@ -915,7 +919,7 @@ class csscs(ctools.csobservation):
 
         return skymap
 
-    def ulimit(self,name):
+    def ulimit(self, name):
         """
         Return flux upper limit skymap
 
@@ -932,14 +936,13 @@ class csscs(ctools.csobservation):
 
         # Check that upper limit computation is requested
         if self['calc_ulim'].boolean():
-            skymap = self._get_skymap(name,'FLUX UPPER LIMIT')
+            skymap = self._get_skymap(name, 'FLUX UPPER LIMIT')
         # Otherwise throw error
         else:
             msg = 'Upper limit computation not requested. ' \
                   'Change user parameter calc_ulimit to True ' \
                   'to obtain upper limit.'
             raise RuntimeError(msg)
-
 
         return skymap
 
@@ -948,7 +951,6 @@ class csscs(ctools.csobservation):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-
     # Create instance of application
     app = csscs(sys.argv)
 
