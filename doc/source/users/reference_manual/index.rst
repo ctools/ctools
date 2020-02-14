@@ -37,7 +37,7 @@ ctools
    cttsmap --- Generates Test Statistic map <cttsmap>
    ctulimit --- Calculates upper limit <ctulimit>
 
-   
+
 cscripts
 --------
 
@@ -70,12 +70,12 @@ cscripts
    cstsmapsplit --- Creates commands to split the Test Statistic map computations <cstsmapsplit>
    csviscube --- Computes visibility cube <csviscube>
 
-   
+
 Scripts to manage an IACT database
 ----------------------------------
 
 .. warning::
-   
+
    The ``csiactdata``, ``csiactobs``, ``csfindobs`` and ``csiactcopy`` scripts
    rely on the ``json`` Python module which is only available in Python 2.6
    or higher. These scripts will not work on older Python versions.
@@ -88,3 +88,4 @@ Scripts to manage an IACT database
    csiactobs --- Generates observation definition file for IACT data from observation IDs <csiactobs>
    csfindobs --- Generates a list of IACT observation IDs <csfindobs>
    csiactcopy --- Copies IACT data from one location to another <csiactcopy>
+   
