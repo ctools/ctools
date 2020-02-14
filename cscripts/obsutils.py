@@ -773,7 +773,7 @@ def get_onoff_obs(cls, obs, nthreads=0, ra = None, dec = None, srcname = ''):
     if cls._logExplicit():
         cls._log.header3('Creating On/Off observations')
 
-    # Initialise inmodel, inexclusion and use_model_bkg
+    # Initialise inmodel and use_model_bkg
     inmodel       = 'NONE'
     use_model_bkg = True
 
