@@ -1,12 +1,14 @@
-2019-12-13
+2020-02-17
 
         * Version 1.7.0 released
         ========================
 
+        Adapt show_pull_histogram.py to matplotlib > 3.1.0 (#3156)
         Avoid negative squared standard deviations in cssrcdetect
         Fix log file header repetition in some cscripts (#3066)
         Add Moon constraints to csviscube (#3065)
         Remove response cache before source testing in cttsmap (#2973)
+        Add support for Castro plots to csspec (#2938)
         Enabling running of example scripts from objects in memory (#2925)
         Allow using spectral models without "Prefactor" parameter in cssens
           and cstsdist (#1889)
