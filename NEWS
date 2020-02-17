@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.7.0
 
-13 December 2019
+17 February 2020
 
 
 Introduction
@@ -265,7 +265,8 @@ computation (#1889).
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-None
+Support to generate Castro plots was added and the relevant information is
+now sorted in the output FITS file (#2938).
 
 
 cssrcdetect - Detects sources in sky map
@@ -339,6 +340,10 @@ None
 
 Examples
 --------
+In show_pull_histogram.py relpaced the call to mlab.normpdf() by a direct
+computation of the normalisation, so that the code also works for matplotlib
+> 3.1.0 (#3156).
+
 The show_viscube.py script was added to display a visibility cube (#3065).
 
 The example scripts show_butterfly.py, show_spectrum.py, show_residuals.py
