@@ -291,8 +291,6 @@ class Test(test):
         # Check result
         self._check_result_file('csscs_py5.fits')
 
-        # TODO: test unbinned analysis
-
         # Set up for test in On/Off mode with background model
         script = cscripts.csscs()
         script['logfile'] = 'csscs_py6.log'
@@ -389,6 +387,36 @@ class Test(test):
 
         # Check result
         self._check_result_file('csscs_py8.fits')
+
+        # Set up for test in unbinned mode
+        script = cscripts.csscs()
+        script['logfile'] = 'csscs_py9.log'
+        script['inobs'] = self._evs_offaxis
+        script['caldb'] = self._caldb
+        script['irf'] = self._irf
+        script['inmodel'] = self._model
+        script['srcnames'] = 'Crab'
+        script['emin'] = 1.
+        script['emax'] = 100.
+        script['nxpix'] = 2
+        script['nypix'] = 2
+        script['binsz'] = 0.1
+        script['coordsys'] = 'CEL'
+        script['proj'] = 'CAR'
+        script['xref'] = 83.63
+        script['yref'] = 22.01
+        script['rad'] = 0.2
+        script['method'] = 'UNBINNED'
+        script['enumbins'] = 2
+        script['outfile'] = 'csscs_py9.fits'
+        script['chatter'] = 2
+
+        # Run csscs script and save results
+        script.logFileOpen()
+        script.execute()
+
+        # Check result
+        self._check_result_file('csscs_py9.fits')
 
         # Return
         return
