@@ -1,41 +1,23 @@
 #############################################################################
 
 # Makefile for cscripts scripts                                             #
-
 # ------------------------------------------------------------------------- #
-
 # Copyright (C) 2016-2019 Juergen Knoedlseder                               #
-
 # ------------------------------------------------------------------------- #
-
 #                                                                           #
-
 #  This program is free software: you can redistribute it and/or modify     #
-
 #  it under the terms of the GNU General Public License as published by     #
-
 #  the Free Software Foundation, either version 3 of the License, or        #
-
 #  (at your option) any later version.                                      #
-
 #                                                                           #
-
 #  This program is distributed in the hope that it will be useful,          #
-
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of           #
-
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
-
 #  GNU General Public License for more details.                             #
-
 #                                                                           #
-
 #  You should have received a copy of the GNU General Public License        #
-
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
-
 #                                                                           #
-
 #############################################################################
 
 
@@ -301,45 +283,27 @@ testiactevents = $(top_srcdir)/test/data/iactdata/events/irf_file.fits.gz \
                  $(top_srcdir)/test/data/iactdata/events/events_8.fits.gz
 
 
-
 # Install scripts, parfiles, test scripts and test data. Note that we don't
-
 # need to prepend $(DESTDIR) here (not fully clear why, but that's the way
-
 # it is)
 
 binscriptsdir       = $(bindir)
-
 binscripts_DATA     = $(binscripts)
-
 pythonscriptsdir    = $(pyexecdir)/cscripts
-
 pythonscripts_DATA  = $(pythonscripts)
-
 pfilesdir           = $(prefix)/syspfiles
-
 pfiles_DATA         = $(parfiles)
-
 testscriptsdir      = $(pyexecdir)/cscripts/tests
-
 testscripts_DATA    = $(testscripts)
-
 testdatadir         = $(pyexecdir)/cscripts/tests/data
-
 testdata_DATA       = $(testdata)
-
 testiactdatadir     = $(pyexecdir)/cscripts/tests/data/iactdata
-
 testiactdata_DATA   = $(testiactdata)
-
 testiacteventsdir   = $(pyexecdir)/cscripts/tests/data/iactdata/events
-
 testiactevents_DATA = $(testiactevents)
 
 
-
 # Files to be distributed in the tar file
-
 EXTRA_DIST = $(binscripts) $(pythonscripts) $(parfiles) \
              $(testscripts) $(testdata) $(testiactdata) \
              $(testiactevents)
@@ -390,7 +354,6 @@ clean-local:
 	fi
 
 	rm -rf $(top_builddir)/cscripts/*.pyc
-
 	rm -rf $(top_builddir)/cscripts/__pycache__
 
 
@@ -400,12 +363,8 @@ clean-local:
 uninstall-local:
 
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/*.pyc
-
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/*.pyc
-
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/__pycache__
-
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/tests/*.pyc
-
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/tests/__pycache__
 
