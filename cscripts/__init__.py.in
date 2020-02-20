@@ -1,217 +1,120 @@
 # ==========================================================================
-
 # cscripts Python module
-
 #
-
 # Copyright (C) 2015-2018 Juergen Knoedlseder
-
 #
-
 # This program is free software: you can redistribute it and/or modify
-
 # it under the terms of the GNU General Public License as published by
-
 # the Free Software Foundation, either version 3 of the License, or
-
 # (at your option) any later version.
-
 #
-
 # This program is distributed in the hope that it will be useful,
-
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-
 # GNU General Public License for more details.
-
 #
-
 # You should have received a copy of the GNU General Public License
-
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 #
-
 # ==========================================================================
 
 # Python version check
-
 import sys
-
 req_version = (2,6)
-
 cur_version = sys.version_info
 
 
-
 # List all scripts in this module
-
 __all__ = [
-
     "csbkgmodel",
-
     "cscaldb",
-
     "csebins",
-
     "csinfo",
-
     "cslightcrv",
-
     "csmodelinfo",
-
     "csmodelmerge",
-
     "csmodelselect",
-
     "csmodelsois",
-
     "csobs2caldb",
-
     "csobsdef",
-
     "csobsinfo",
-
     "csobsselect",
-
     "csphagen",
-
     "csphasecrv",
-
     "cspull",
-
     "csresmap",
-
     "csresspec",
-
     "csroot2caldb",
-
     "cssens",
-
     "csspec",
-
-    "cssrcdetect",
-
+    "cssrcdetect"
     "cstsdist",
-
     "cstsmapmerge",
-
     "cstsmapsplit",
-
     "csviscube",
-
     "csscs",
     "csworkflow",
-
     "obsutils",
-
     "modutils",
-
     "calutils",
-
     "ioutils",
-
     "mputils"
 
 ]
 
 if cur_version > req_version:
-
     __all__.extend(["csfindobs",
-
                     "csiactcopy",
-
                     "csiactdata",
-
                     "csiactobs"])
 
 
 
 # Import
-
 from cscripts.csbkgmodel    import csbkgmodel
-
 from cscripts.cscaldb       import cscaldb
-
 from cscripts.csebins       import csebins
-
 from cscripts.csinfo        import csinfo
-
 from cscripts.cslightcrv    import cslightcrv
-
 from cscripts.csmodelinfo   import csmodelinfo
-
 from cscripts.csmodelmerge  import csmodelmerge
-
 from cscripts.csmodelselect import csmodelselect
-
 from cscripts.csmodelsois   import csmodelsois
-
 from cscripts.csobs2caldb   import csobs2caldb
-
 from cscripts.csobsdef      import csobsdef
-
 from cscripts.csobsinfo     import csobsinfo
-
 from cscripts.csobsselect   import csobsselect
-
 from cscripts.csphagen      import csphagen
-
 from cscripts.csphasecrv    import csphasecrv
-
 from cscripts.cspull        import cspull
-
 from cscripts.csresmap      import csresmap
-
 from cscripts.csresspec     import csresspec
-
 from cscripts.csroot2caldb  import csroot2caldb
-
 from cscripts.cssens        import cssens
-
 from cscripts.csspec        import csspec
-
 from cscripts.cssrcdetect   import cssrcdetect
-
 from cscripts.cstsdist      import cstsdist
-
 from cscripts.cstsmapmerge  import cstsmapmerge
-
 from cscripts.cstsmapsplit  import cstsmapsplit
-
 from cscripts.csviscube     import csviscube
-
-from cscripts.csscs    import csscs
+from cscripts.csscs         import csscs
 from cscripts.csworkflow    import csworkflow
-
 from cscripts               import obsutils
-
 from cscripts               import modutils
-
 from cscripts               import calutils
-
 from cscripts               import ioutils
 
 if cur_version > req_version:
-
     from cscripts.csfindobs  import csfindobs
-
     from cscripts.csiactcopy import csiactcopy
-
     from cscripts.csiactdata import csiactdata
-
     from cscripts.csiactobs  import csiactobs
 
 
 
 # Delete version check variables
-
 del sys
-
 del req_version
-
 del cur_version
 
 
@@ -219,17 +122,12 @@ del cur_version
 # Add test function
 
 def test():
-
     """
-
     Run cscripts tests.
-
     """
 
     from cscripts.tests import test_python_cscripts
-
     test_python_cscripts.test(installed=True)
-
 
 
 # Add version
