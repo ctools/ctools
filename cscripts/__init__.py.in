@@ -47,7 +47,7 @@ __all__ = [
     "csroot2caldb",
     "cssens",
     "csspec",
-    "cssrcdetect"
+    "cssrcdetect",
     "cstsdist",
     "cstsmapmerge",
     "cstsmapsplit",
