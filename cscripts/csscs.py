@@ -504,101 +504,109 @@ class csscs(ctools.csobservation):
         self._log_header3(gammalib.NORMAL, 'Masking observations')
         masked_obs = self._mask_observations(ra, dec, self['rad'].real())
 
-        # Set up likelihood analysis
-        self._log_header3(gammalib.NORMAL, 'Performing fit in region')
-        like = ctools.ctlike(masked_obs)
-        like['edisp'] = self['edisp'].boolean()
-        like['nthreads'] = 1  # Avoids OpenMP conflict
+        # Continue only if we have at least one observation
+        if masked_obs.size() > 0:
 
-        # If chatter level is verbose and debugging is requested then
-        # switch also on the debug model in ctlike
-        if self._logVerbose() and self._logDebug():
-            like['debug'] = True
+            # Set up likelihood analysis
+            self._log_header3(gammalib.NORMAL, 'Performing fit in region')
+            like = ctools.ctlike(masked_obs)
+            like['edisp'] = self['edisp'].boolean()
+            like['nthreads'] = 1  # Avoids OpenMP conflict
 
-        # Perform maximum likelihood fit
-        like.run()
+            # If chatter level is verbose and debugging is requested then
+            # switch also on the debug model in ctlike
+            if self._logVerbose() and self._logDebug():
+                like['debug'] = True
 
-        # Write model results for explicit chatter level
-        self._log_string(gammalib.EXPLICIT, str(like.obs().models()))
+            # Perform maximum likelihood fit
+            like.run()
 
-        # Prepare objects for flux extraction
-        # ROI
-        centre = gammalib.GSkyDir()
-        centre.radec_deg(ra, dec)
-        roi = gammalib.GSkyRegionCircle(centre, self['rad'].real())
-        # Energy boundaries
-        emin = gammalib.GEnergy(self['emin'].real(), 'TeV')
-        emax = gammalib.GEnergy(self['emax'].real(), 'TeV')
+            # Write model results for explicit chatter level
+            self._log_string(gammalib.EXPLICIT, str(like.obs().models()))
 
-        # Continue only if log-likelihood is non-zero
-        if like.obs().logL() != 0.0:
+            # Continue only if log-likelihood is non-zero
+            if like.obs().logL() != 0.0:
 
-            # Loop over target sources
-            for name in self._srcnames:
+                # Prepare objects for flux extraction
+                # ROI
+                centre = gammalib.GSkyDir()
+                centre.radec_deg(ra, dec)
+                roi = gammalib.GSkyRegionCircle(centre, self['rad'].real())
+                # Energy boundaries
+                emin = gammalib.GEnergy(self['emin'].real(), 'TeV')
+                emax = gammalib.GEnergy(self['emax'].real(), 'TeV')
 
-                # Get source
-                source = like.obs().models()[name]
+                # Loop over target sources
+                for name in self._srcnames:
 
-                # Get flux
-                # Integrate spectral model between emin and emax
-                flux = source.spectral().flux(emin, emax)
-                # Calculate correction factor
-                # Spatial model flux over ROI divided by ROI solid angle
-                corr_factor = source.spatial().flux(roi)
-                corr_factor /= gammalib.twopi * (
-                            1 - math.cos(math.radians(self['rad'].real())))
-                # Multiply flux by correction factor
-                flux *= corr_factor
-                result[name]['flux'] = flux
+                    # Get source
+                    source = like.obs().models()[name]
 
-                # Get flux error
-                # Normalization parameter
-                normpar = source.spectral()[0]
-                # Only normalization parameter free
-                # Relative error on flux is same as on normalization
-                # Avoid zero division error
-                if normpar.value() > 0.:
-                    flux_error = flux * normpar.error() / normpar.value()
-                else:
-                    flux_error = 0.
-                result[name]['flux_error'] = flux_error
+                    # Get flux
+                    # Integrate spectral model between emin and emax
+                    flux = source.spectral().flux(emin, emax)
+                    # Calculate correction factor
+                    # Spatial model flux over ROI divided by ROI solid angle
+                    corr_factor = source.spatial().flux(roi)
+                    corr_factor /= gammalib.twopi * (
+                                1 - math.cos(math.radians(self['rad'].real())))
+                    # Multiply flux by correction factor
+                    flux *= corr_factor
+                    result[name]['flux'] = flux
 
-                # If requested get TS
-                if self['calc_ts'].boolean():
-                    result[name]['TS'] = source.ts()
+                    # Get flux error
+                    # Normalization parameter
+                    normpar = source.spectral()[0]
+                    # Only normalization parameter free
+                    # Relative error on flux is same as on normalization
+                    # Avoid zero division error
+                    if normpar.value() > 0.:
+                        flux_error = flux * normpar.error() / normpar.value()
+                    else:
+                        flux_error = 0.
+                    result[name]['flux_error'] = flux_error
 
-                # If requested compute upper flux limit
-                if self['calc_ulim'].boolean():
+                    # If requested get TS
+                    if self['calc_ts'].boolean():
+                        result[name]['TS'] = source.ts()
 
-                    # Logging information
-                    self._log_header3(gammalib.NORMAL,
-                                      'Computing upper limit for source ' + name)
+                    # If requested compute upper flux limit
+                    if self['calc_ulim'].boolean():
 
-                    # Create upper limit object
-                    ulimit = ctools.ctulimit(like.obs())
-                    ulimit['srcname'] = name
-                    ulimit['emin'] = self['emin'].real()
-                    ulimit['emax'] = self['emax'].real()
+                        # Logging information
+                        self._log_header3(gammalib.NORMAL,
+                                          'Computing upper limit for source ' + name)
 
-                    # If chatter level is verbose and debugging is requested
-                    # then switch also on the debug model in ctulimit
-                    if self._logVerbose() and self._logDebug():
-                        ulimit['debug'] = True
+                        # Create upper limit object
+                        ulimit = ctools.ctulimit(like.obs())
+                        ulimit['srcname'] = name
+                        ulimit['emin'] = self['emin'].real()
+                        ulimit['emax'] = self['emax'].real()
 
-                    # Try to run upper limit and catch exceptions
-                    try:
-                        ulimit.run()
-                        ulimit_value = ulimit.flux_ulimit()
-                        # Multiply by correction factor to get flux per solid angle in ROI
-                        ulimit_value *= corr_factor
-                        result[name]['ulimit'] = ulimit_value
-                    except:
-                        self._log_string(gammalib.NORMAL, 'Upper limit '
-                                                          'calculation failed.')
+                        # If chatter level is verbose and debugging is requested
+                        # then switch also on the debug model in ctulimit
+                        if self._logVerbose() and self._logDebug():
+                            ulimit['debug'] = True
 
+                        # Try to run upper limit and catch exceptions
+                        try:
+                            ulimit.run()
+                            ulimit_value = ulimit.flux_ulimit()
+                            # Multiply by correction factor to get flux per solid angle in ROI
+                            ulimit_value *= corr_factor
+                            result[name]['ulimit'] = ulimit_value
+                        except:
+                            self._log_string(gammalib.NORMAL, 'Upper limit '
+                                                              'calculation failed.')
 
+            # if likelihood is zero
+            else:
+                value = 'Likelihood is zero. Bin is skipped.'
+                self._log_value(gammalib.TERSE, '(R.A.,Dec) = (%f,%f) deg' % (ra, dec), value)
+
+        # if observation size = 0
         else:
-            value = 'Likelihood is zero. Bin is skipped.'
+            value = 'Size of masked observations is zero. Bin is skipped.'
             self._log_value(gammalib.TERSE, '(R.A.,Dec) = (%f,%f) deg' % (ra, dec), value)
 
         # Return result
@@ -844,7 +852,7 @@ class csscs(ctools.csobservation):
 
     def fits(self):
         """
-        Return fits container
+        Return copy of the fits container
 
         Returns
         -------
@@ -852,7 +860,7 @@ class csscs(ctools.csobservation):
             FITS file containing the maps
         """
         # Return
-        return self._fits
+        return self._fits.copy()
 
     def flux(self, name):
         """

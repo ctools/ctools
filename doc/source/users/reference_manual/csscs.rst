@@ -137,22 +137,45 @@ General parameters
     (3D spatial/energy likelihood without binning) and ``ONOFF``
     analysis (1D likelihood with background from Off regions).
 
+``(statistic = DEFAULT) <DEFAULT|CSTAT|WSTAT|CHI2> [string]``
+    Optimization statistic. ``DEFAULT`` uses the default statistic for all
+    observations, which is ``CSTAT`` or the statistic specified in the
+    observation definition XML file. ``CSTAT`` uses the C statistic for
+    all observations, ``WSTAT`` uses the W statistic for On/Off
+    observations, and ``CHI2`` uses the Chi squared statistic for
+    binned or stacked observations.
+
+``(calc_ts = yes) [boolean]``
+    Compute TS value for each map bin?
+
+``(calc_ulim = no) [boolean]``
+    Compute upper limit for each map bin?
+
+``(fix_srcs = yes) [boolean]``
+    Fix other sky model parameters?
+
+``(fix_bkg = no) [boolean]``
+    Fix background model parameters?
+
+On/Off parameters
+-------------------
+
 ``enumbins [integer]``
-    Number of energy bins per light curve bin (for On/Off analysis only).
+    Number of energy bins.
 
 ``(bkgmethod = REFLECTED) [string]``
-    Method for background estimation in On/Off analysis.
+    Method for background estimation.
     ``REFLECTED:`` background evaluated in regions with the same shape as
     source region reflected w.r.t. pointing direction for each
     observation.
 
 ``(srcshape = CIRCLE) [string]``
-    Shape of the source region for On/Off analysis.
+    Shape of the source region.
     ``CIRCLE``: circular region around given position.
 
 ``(bkgregmin = 2) [integer]``
-    Minimum number of background regions that are required for an observation in
-    On/Off analysis. If this number of background regions is not available the
+    Minimum number of background regions that are required for an
+    observation. If this number of background regions is not available the
     observation is skipped.
 
 ``(bkgregskip = 1) [integer]``
@@ -189,27 +212,6 @@ General parameters
 ``(etruebins = 30) [integer]``
     Number of bins per decade for true energy bins to evaluate instrumental
     response in On/Off analysis.
-
-``(statistic = DEFAULT) <DEFAULT|CSTAT|WSTAT|CHI2> [string]``
-    Optimization statistic. ``DEFAULT`` uses the default statistic for all
-    observations, which is ``CSTAT`` or the statistic specified in the
-    observation definition XML file. ``CSTAT`` uses the C statistic for
-    all observations, ``WSTAT`` uses the W statistic for On/Off
-    observations, and ``CHI2`` uses the Chi squared statistic for
-    binned or stacked observations.
-
-``(calc_ts = yes) [boolean]``
-    Compute TS value for each map bin?
-
-``(calc_ulim = yes) [boolean]``
-    Compute upper limit for each map bin?
-
-``(fix_srcs = yes) [boolean]``
-    Fix other sky model parameters?
-
-``(fix_bkg = no) [boolean]``
-    Fix background model parameters?
-
 
 Standard parameters
 -------------------
