@@ -17,7 +17,8 @@ this page.
 * :download:`Using ctools from Python <quickstart/ctools-from-python.ipynb>`
 * :download:`How to combine observations? <howto/howto_combine_observations.ipynb>`
 * :download:`How to connect observations to specific models? <howto/howto_connect_models.ipynb>`
-* :download:`How to perform a stacked analysis? <howto/howto_stacked_analysis.ipynb>`
+* :download:`How to perform a stacked analysis?<howto/howto_stacked_analysis.ipynb>`
+* :download:`How to handle models from Python? <howto/howto_model_handling_python.ipynb>`
 * :download:`How to do advanced model manipulation and fitting in Python? <howto/howto_advanced_python_fitting.ipynb>`
 * :download:`How to generate likelihood profiles for a fitted spectrum? <howto/howto_likelihood_profiles.ipynb>`
 * :download:`Data preparation for 1DC How-to <howto/howto_prepare_1dc.ipynb>`

@@ -14,6 +14,7 @@ CTA data analysis
 
    howto_combine_observations
    howto_stacked_analysis
+   howto_model_handling_python
    howto_advanced_python_fitting
    howto_connect_irfs
    howto_connect_models
