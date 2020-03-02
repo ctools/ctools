@@ -59,6 +59,7 @@ class cssens(ctools.csobservation):
         self._dec         = None
         self._log_clients = False
         self._models      = gammalib.GModels()
+        self._is_cube     = False
         self._nthreads    = 0
 
         # Return
@@ -83,6 +84,7 @@ class cssens(ctools.csobservation):
                  'dec'          : self._dec,
                  'log_clients'  : self._log_clients,
                  'models'       : self._models,
+                 'is_cube'      : self._is_cube,
                  'nthreads'     : self._nthreads}
 
         # Return pickled dictionary
@@ -105,6 +107,7 @@ class cssens(ctools.csobservation):
         self._dec         = state['dec']
         self._log_clients = state['log_clients']
         self._models      = state['models']
+        self._is_cube     = state['is_cube']
         self._nthreads    = state['nthreads']
 
         # Return
@@ -125,7 +128,7 @@ class cssens(ctools.csobservation):
         # Set models if we have none
         if self.obs().models().size() == 0:
             self.obs().models(self['inmodel'].filename())
-
+        
         # Get source name
         self._srcname = self['srcname'].string()
 
@@ -339,11 +342,19 @@ class cssens(ctools.csobservation):
         e_mean   = math.sqrt(emin.TeV()*emax.TeV())
         loge     = math.log10(e_mean)
         erg_mean = e_mean * tev2erg
-
+        energy   = gammalib.GEnergy(e_mean, 'TeV')
+        
+        # Compute initial source flux in that bin. If spatial model is a map cube, 
+        # specific calculation is needed (intensity in map scaled by spectral model)
+        if self._is_cube:
+            src_flux = test_model[self._srcname].spectral().eval(energy) \
+                       *test_model[self._srcname].spatial().spectrum().flux(emin, emax)
+        else:
+            src_flux = test_model[self._srcname].spectral().flux(emin, emax)
+        
         # Compute Crab unit. This is the factor with which the Prefactor needs
         # to be multiplied to get 1 Crab.
         crab_flux = self._get_crab_flux(emin, emax)
-        src_flux  = test_model[self._srcname].spectral().flux(emin, emax)
         crab_unit = crab_flux/src_flux
 
         # Initialise regression coefficient
@@ -422,11 +433,18 @@ class cssens(ctools.csobservation):
             source = models[self._srcname]
             ts     = source.ts()
 
-            # Get fitted Crab, photon and energy fluxes
+            # Get fitted Crab flux
             prefactor   = modutils.normalisation_parameter(source)
             crab_flux   = prefactor.value() / crab_prefactor
-            photon_flux = source.spectral().flux(emin, emax)
-            energy_flux = source.spectral().eflux(emin, emax)
+            # Compute photon and energy fluxes. If spatial model is a map cube, 
+            # specific calculation is needed (flux in map scaled by spectral model)
+            if self._is_cube:
+                cube_scale  = source.spectral().eval(energy)
+                photon_flux = cube_scale*source.spatial().spectrum().flux(emin, emax)
+                energy_flux = cube_scale*source.spatial().spectrum().eflux(emin, emax)
+            else:
+                photon_flux = source.spectral().flux(emin, emax)
+                energy_flux = source.spectral().eflux(emin, emax)
 
             # Compute differential sensitivity in unit erg/cm2/s by evaluating
             # the spectral model at the "e_mean" energy and by multipling the
@@ -434,8 +452,12 @@ class cssens(ctools.csobservation):
             # an intensity in units of ph/cm2/s/MeV we multiply by 1.0e6 to
             # convert into ph/cm2/s/TeV, by "e_mean" to convert into ph/cm2/s,
             # and finally by "erg_mean" to convert to erg/cm2/s.
-            energy      = gammalib.GEnergy(e_mean, 'TeV')
-            sensitivity = source.spectral().eval(energy) * e_mean*erg_mean*1.0e6
+            # If spatial model is a map cube, specific calculation is needed
+            if self._is_cube:
+                sensitivity = cube_scale*source.spatial().spectrum().eval(energy) \
+                              *e_mean*erg_mean*1.0e6
+            else:
+                sensitivity = source.spectral().eval(energy)*e_mean*erg_mean*1.0e6
 
             # Write fit results into logger
             name  = 'Iteration %d' % iterations
@@ -682,7 +704,13 @@ class cssens(ctools.csobservation):
         # Set test source model for this observation
         self._models = modutils.test_source(self.obs().models(), self._srcname,
                                             ra=self._ra, dec=self._dec)
-
+        
+        # If test source spatial model is a map cube, compute intensity in each map
+        # and set a flag to apply specific calculation in get_sensitivity method
+        if self._models[self._srcname].spatial().type() == 'MapCubeFunction':
+            self._models[self._srcname].spatial().set_mc_cone(gammalib.GSkyDir(),180.0)
+            self._is_cube=True
+        
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
