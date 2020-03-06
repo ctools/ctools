@@ -349,7 +349,7 @@ class cssens(ctools.csobservation):
         # If spatial model is a map cube, make sure map cube spectrum
         # was computed already and set flag
         mapcube=False
-        if test_model[self._srcname].spatial().type() == 'MapCubeFunction':
+        if test_model[self._srcname].spatial().classname() == 'GModelSpatialDiffuseCube':
             mapcube=True
             if test_model[self._srcname].spatial().spectrum().nodes() == 0:
                 test_model[self._srcname].spatial().set_mc_cone(gammalib.GSkyDir(),180.0)
@@ -734,7 +734,7 @@ class cssens(ctools.csobservation):
                                             ra=self._ra, dec=self._dec)
         
         # If test source spatial model is a map cube, compute intensity in each map
-        if self._models[self._srcname].spatial().type() == 'MapCubeFunction':
+        if self._models[self._srcname].spatial().classname() == 'GModelSpatialDiffuseCube':
             self._models[self._srcname].spatial().set_mc_cone(gammalib.GSkyDir(),180.0)
         
         # Write observation into logger
