@@ -28,7 +28,7 @@ import cscripts
 # ===================== #
 def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         emin=None, emax=None, nbins=0, onsrc=None, onrad=0.2, addbounds=False,
-        binsz=0.05, npix=200, proj='TAN', coord='GAL', nthreads=0):
+        binsz=0.05, npix=200, stack=True, response=None, proj='TAN', coord='GAL', nthreads=0):
     """
     Simulate events for all observations in the container
 
@@ -70,6 +70,10 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         Pixel size for binned simulation (deg/pixel)
     npix : int, optional
         Number of pixels in X and Y for binned simulation
+    stack : bool, optional
+        Perform stacked analysis?
+    response: dict, optional
+        Dictionary of previously computed stacked response components
     proj : str, optional
         Projection for binned simulation
     coord : str, optional
@@ -177,21 +181,40 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
             # the container and bin the events in counts maps
             binning.run()
 
-            # If we have multiple input observations then create stacked response
+            # If requested, create or load stacked response
             # cubes and append them to the observation
-            if len(obssim.obs()) > 1:
+            if stack:
 
-                # Get counts cube. The counts cube is needed to obtained a
-                # proper background cube.
-                cntcube = binning.cube()
-
-                # Get stacked response
-                response = get_stacked_response(obssim.obs(), cntcube,
-                                                edisp=edisp,
-                                                addbounds=addbounds,
-                                                log=log, debug=debug,
-                                                chatter=chatter)
-
+                # If a dictionary is provided as stacked response
+                if type(response) is dict:
+                    
+                    # If one component is missing, dismiss response
+                    if not 'expcube' in response.keys() \
+                       or not 'psfcube' in response.keys() \
+                       or not 'bkgcube' in response.keys() \
+                       or not 'models' in response.keys() \
+                       or (edisp and not 'edispcube' in response.keys()):
+                        response=None
+                
+                # ...else response is not dictionary so drop it
+                else:
+                    response=None
+                
+                # Compute stacked response if not provided or not a dictionary
+                # with the expected entries
+                if response == None:
+                    
+                    # Get counts cube. The counts cube is needed to obtain a
+                    # proper background cube.
+                    cntcube = binning.cube()
+                    
+                    # Compute response
+                    response = get_stacked_response(obssim.obs(), cntcube,
+                                                    edisp=edisp,
+                                                    addbounds=addbounds,
+                                                    log=log, debug=debug,
+                                                    chatter=chatter)
+                    
                 # Set stacked response
                 if edisp:
                     binning.obs()[0].response(response['expcube'],

@@ -59,7 +59,6 @@ class cssens(ctools.csobservation):
         self._dec         = None
         self._log_clients = False
         self._models      = gammalib.GModels()
-        self._is_cube     = False
         self._nthreads    = 0
 
         # Return
@@ -84,7 +83,6 @@ class cssens(ctools.csobservation):
                  'dec'          : self._dec,
                  'log_clients'  : self._log_clients,
                  'models'       : self._models,
-                 'is_cube'      : self._is_cube,
                  'nthreads'     : self._nthreads}
 
         # Return pickled dictionary
@@ -107,7 +105,6 @@ class cssens(ctools.csobservation):
         self._dec         = state['dec']
         self._log_clients = state['log_clients']
         self._models      = state['models']
-        self._is_cube     = state['is_cube']
         self._nthreads    = state['nthreads']
 
         # Return
@@ -150,7 +147,8 @@ class cssens(ctools.csobservation):
         self['outfile'].filename()
         self['edisp'].boolean()
         self['debug'].boolean()
-
+        self['stack'].boolean()
+        
         # Derive some parameters
         self._ebounds = gammalib.GEbounds(bins,
                                           gammalib.GEnergy(emin, 'TeV'),
@@ -334,7 +332,11 @@ class cssens(ctools.csobservation):
 
         # Set flux ratio precision required for convergence to 5%
         ratio_precision = 0.05
-
+        
+        # Write header for energy bin
+        self._log_string(gammalib.TERSE, '')
+        self._log_header2(gammalib.TERSE, 'Energies: '+str(emin)+' - '+str(emax))
+        
         # Set energy boundaries
         self._set_obs_ebounds(emin, emax)
 
@@ -344,9 +346,17 @@ class cssens(ctools.csobservation):
         erg_mean = e_mean * tev2erg
         energy   = gammalib.GEnergy(e_mean, 'TeV')
         
+        # If spatial model is a map cube, make sure map cube spectrum
+        # was computed already and set flag
+        mapcube=False
+        if test_model[self._srcname].spatial().type() == 'MapCubeFunction':
+            mapcube=True
+            if test_model[self._srcname].spatial().spectrum().nodes() == 0:
+                test_model[self._srcname].spatial().set_mc_cone(gammalib.GSkyDir(),180.0)
+        
         # Compute initial source flux in that bin. If spatial model is a map cube, 
         # specific calculation is needed (intensity in map scaled by spectral model)
-        if self._is_cube:
+        if mapcube:
             src_flux = test_model[self._srcname].spectral().eval(energy) \
                        *test_model[self._srcname].spatial().spectrum().flux(emin, emax)
         else:
@@ -357,24 +367,23 @@ class cssens(ctools.csobservation):
         crab_flux = self._get_crab_flux(emin, emax)
         crab_unit = crab_flux/src_flux
 
-        # Initialise regression coefficient
-        regcoeff = 0.0
-
-        # Write header for energy bin
-        self._log_string(gammalib.TERSE, '')
-        self._log_header2(gammalib.TERSE, 'Energies: '+str(emin)+' - '+str(emax))
-
         # Write initial parameters
         self._log_header3(gammalib.TERSE, 'Initial parameters')
         self._log_value(gammalib.TERSE, 'Crab flux', str(crab_flux)+' ph/cm2/s')
         self._log_value(gammalib.TERSE, 'Source model flux', str(src_flux)+' ph/cm2/s')
         self._log_value(gammalib.TERSE, 'Crab unit factor', crab_unit)
-
+        
+        # Initialise regression coefficient
+        regcoeff = 0.0
+        
         # Initialise loop
         results        = []
         iterations     = 0
         test_crab_flux = 0.1 # Initial test flux in Crab units (100 mCrab)
-
+        
+        # Initialize empty response
+        response       = None
+        
         # Write header for iterations for terse chatter level
         if self._logTerse():
             self._log_header3(gammalib.TERSE, 'Iterations')
@@ -405,8 +414,20 @@ class cssens(ctools.csobservation):
                                log=self._log_clients,
                                debug=self['debug'].boolean(),
                                edisp=self['edisp'].boolean(),
+                               stack=self['stack'].boolean(),
+                               stackrsp=response,
                                nthreads=1)
-
+            
+            # Retrieve stacked response if computed and not already done
+            if self['stack'].boolean() and response == None:
+                response = {}
+                response['expcube'] = sim[0].response().exposure().copy()
+                response['psfcube'] = sim[0].response().psf().copy()
+                response['bkgcube'] = sim[0].response().background().copy()
+                response['models']  = sim.models().copy()
+                if self['edisp'].boolean():
+                    response['edispcube'] = sim[0].response().edisp().copy()
+            
             # Determine number of events in simulation by summing the events
             # over all observations in the observation container
             nevents = 0.0
@@ -438,7 +459,7 @@ class cssens(ctools.csobservation):
             crab_flux   = prefactor.value() / crab_prefactor
             # Compute photon and energy fluxes. If spatial model is a map cube, 
             # specific calculation is needed (flux in map scaled by spectral model)
-            if self._is_cube:
+            if mapcube:
                 cube_scale  = source.spectral().eval(energy)
                 photon_flux = cube_scale*source.spatial().spectrum().flux(emin, emax)
                 energy_flux = cube_scale*source.spatial().spectrum().eflux(emin, emax)
@@ -453,7 +474,7 @@ class cssens(ctools.csobservation):
             # convert into ph/cm2/s/TeV, by "e_mean" to convert into ph/cm2/s,
             # and finally by "erg_mean" to convert to erg/cm2/s.
             # If spatial model is a map cube, specific calculation is needed
-            if self._is_cube:
+            if mapcube:
                 sensitivity = cube_scale*source.spatial().spectrum().eval(energy) \
                               *e_mean*erg_mean*1.0e6
             else:
@@ -706,10 +727,8 @@ class cssens(ctools.csobservation):
                                             ra=self._ra, dec=self._dec)
         
         # If test source spatial model is a map cube, compute intensity in each map
-        # and set a flag to apply specific calculation in get_sensitivity method
         if self._models[self._srcname].spatial().type() == 'MapCubeFunction':
             self._models[self._srcname].spatial().set_mc_cone(gammalib.GSkyDir(),180.0)
-            self._is_cube=True
         
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
