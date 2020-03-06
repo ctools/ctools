@@ -404,7 +404,14 @@ class cssens(ctools.csobservation):
             models         = test_model.copy()
             prefactor      = modutils.normalisation_parameter(models[self._srcname])
             crab_prefactor = prefactor.value() * crab_unit
-            prefactor.value(crab_prefactor * test_crab_flux)
+            new_norm       = crab_prefactor*test_crab_flux
+            if new_norm <= prefactor.min():
+                test_crab_flux = 1.01*prefactor.min()/crab_prefactor
+                new_norm       = crab_prefactor*test_crab_flux
+            elif new_norm >= prefactor.max():
+                test_crab_flux = 0.99*prefactor.max()/crab_prefactor
+                new_norm       = crab_prefactor*test_crab_flux
+            prefactor.value(new_norm)
             self.obs().models(models)
 
             # Simulate events for the models. "sim" holds an observation
