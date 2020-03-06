@@ -415,7 +415,7 @@ class cssens(ctools.csobservation):
                                debug=self['debug'].boolean(),
                                edisp=self['edisp'].boolean(),
                                stack=self['stack'].boolean(),
-                               stackrsp=response,
+                               response=response,
                                nthreads=1)
             
             # Retrieve stacked response if computed and not already done
