@@ -287,6 +287,15 @@ class csphagen(ctools.csobservation):
             self._has_exclusion = True
         elif self['inexclusion'].is_valid():
             inexclusion         = self['inexclusion'].filename()
+            # If the user has not specified the extension to use
+            # and there is an extension called 'EXCLUSION' ...
+            if not inexclusion.has_extname()\
+                    and not inexclusion.has_extno()\
+                    and gammalib.GFits(inexclusion).contains('EXCLUSION'):
+                # ... choose it for the exclusion map
+                extname = inexclusion.url() + '[EXCLUSION]'
+                inexclusion = gammalib.GFilename(extname)
+            # Otherwise will pick the default (primary) HDU
             self._excl_reg      = gammalib.GSkyRegionMap(inexclusion)
             self._has_exclusion = True
         else:

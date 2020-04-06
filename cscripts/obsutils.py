@@ -745,7 +745,7 @@ def get_stacked_obs(cls, obs, nthreads=0):
 # ================================ #
 # Get On/Off observation container #
 # ================================ #
-def get_onoff_obs(cls, obs, nthreads=0):
+def get_onoff_obs(cls, obs, nthreads=0, ra = None, dec = None, srcname = ''):
     """
     Create On/Off observations container from given observations
 
@@ -757,6 +757,12 @@ def get_onoff_obs(cls, obs, nthreads=0):
         Observation container
     nthreads : str, optional
         Number of parallel processes for On/Off spectra computation (0=all available CPUs)
+    ra : float, optional
+        R.A. of source region centre
+    dec : float, optional
+        Dec. of source region centre
+    srcname : str, optional
+        Source name
 
     Returns
     -------
@@ -767,21 +773,16 @@ def get_onoff_obs(cls, obs, nthreads=0):
     if cls._logExplicit():
         cls._log.header3('Creating On/Off observations')
 
-    # Initialise inmodel, srcname, inexclusion and use_model_bkg
+    # Initialise inmodel and use_model_bkg
     inmodel       = 'NONE'
-    srcname       = ''
-    inexclusion   = 'NONE'
     use_model_bkg = True
 
-    # Set inmodel, srcname, inexclusion and use_model_bkg if they are available
+    # Set inmodel, srcname, and use_model_bkg if they are available
     if cls.has_par('inmodel') and obs.models().size() == 0:
         if cls['inmodel'].is_valid():
             inmodel = cls['inmodel'].value()
-    if cls.has_par('srcname'):
+    if srcname == '' and cls.has_par('srcname'):
         srcname = cls['srcname'].value()
-    if cls.has_par('inexclusion'):
-        if cls['inexclusion'].is_valid():
-            inexclusion = cls['inexclusion'].value()
     if cls.has_par('use_model_bkg'):
         use_model_bkg = cls['use_model_bkg'].boolean()
 
@@ -789,19 +790,25 @@ def get_onoff_obs(cls, obs, nthreads=0):
     phagen = cscripts.csphagen(obs)
     phagen['inmodel']     = inmodel
     phagen['srcname']     = srcname
-    phagen['inexclusion'] = inexclusion
     phagen['emin']        = cls['emin'].real()
     phagen['emax']        = cls['emax'].real()
     phagen['enumbins']    = cls['enumbins'].integer()
     phagen['ebinalg']     = 'LOG'
     phagen['srcshape']    = cls['srcshape'].string()
-    phagen['coordsys']    = cls['coordsys'].string()
-    if cls['coordsys'].string() == 'CEL':
-        phagen['ra']  = cls['xref'].real()
-        phagen['dec'] = cls['yref'].real()
-    elif cls['coordsys'].string() == 'GAL':
-        phagen['glon'] = cls['xref'].real()
-        phagen['glat'] = cls['yref'].real()
+    # User has specified custom centre for the source region
+    if ra != None and dec != None:
+        phagen['coordsys'] = 'CEL'
+        phagen['ra'] = ra
+        phagen['dec'] = dec
+    # Otherwise use default in class
+    else:
+        phagen['coordsys']    = cls['coordsys'].string()
+        if cls['coordsys'].string() == 'CEL':
+            phagen['ra']  = cls['xref'].real()
+            phagen['dec'] = cls['yref'].real()
+        elif cls['coordsys'].string() == 'GAL':
+            phagen['glon'] = cls['xref'].real()
+            phagen['glat'] = cls['yref'].real()
     if cls['srcshape'].string() == 'CIRCLE':
         phagen['rad'] = cls['rad'].real()
     phagen['bkgmethod'] = cls['bkgmethod'].string()
@@ -818,13 +825,37 @@ def get_onoff_obs(cls, obs, nthreads=0):
     phagen['debug']         = cls['debug'].boolean()
     phagen['nthreads']      = nthreads
 
-    # Pipe exclusion map
+    # Set exclusion map
+    # Initialise exclusion map flag to False
+    use_excl_map = False
+    # Initialise inexclusion par flag to False
+    use_inexclusion = False
+    # Do we have valid exclusion map in memory?
     if hasattr(cls, 'exclusion_map'):
         exclusion_map = cls.exclusion_map()
         if exclusion_map is not None:
+            # Set use exclusion map flag to True
+            use_excl_map = True
+            # Set exclusion map
             phagen.exclusion_map(exclusion_map)
+    # If we do not have valid exclusion map in memory ...
+    if not use_excl_map:
+        # ... do we have an inxeclusion parameter?
+        if cls.has_par('inexclusion'):
+            # If the inexclusion parameter is valid
+            if cls['inexclusion'].is_valid():
+                # Set use inexclusion flag to True
+                use_inexclusion = True
+                # Set inexclusion parameter
+                inexclusion = cls['inexclusion'].value()
+                phagen['inexclusion'] = inexclusion
+    # If there is no valid exclusion map in memory
+    # nor valid inexclusion parameter
+    if not use_excl_map and not use_inexclusion:
+        # Set inexclusion for csphagen to None
+        phagen['inexclusion'] = 'NONE'
 
-	# Run csphagen
+    # Run csphagen
     phagen.run()
 
     # Clone resulting observation container

@@ -18,11 +18,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+
+import cscripts
+import gammalib
 import os
 import sys
-import gammalib
-import cscripts
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 import test_cscript
 import test_cscaldb
 import test_csbkgmodel
@@ -51,6 +54,7 @@ import test_cstsdist
 import test_cstsmapmerge
 import test_cstsmapsplit
 import test_csviscube
+import test_csscs
 import test_csworkflow
 import test_obsutils
 import test_mputils
@@ -60,8 +64,11 @@ import test_csiactobs
 
 
 # ================== #
+
 # Perform unit tests #
+
 # ================== #
+
 def test(installed=False, debug=False):
     """
     Perform cscripts unit testing.
@@ -73,37 +80,34 @@ def test(installed=False, debug=False):
     debug : bool, optional
         Enables debugging
     """
+
     # If we have an installed version then create a temporary directory and
     # copy over all information that is needed
     if installed:
-
         # Create temporary working directory
         import tempfile
         path = tempfile.mkdtemp()
         os.chdir(path)
-
         # Get test directory
         import inspect
         testdir = inspect.getfile(cscripts.tests)
         dirname = os.path.dirname(testdir)
-
         # Copy test data in "data" directory
-        os.system('cp -r %s %s' % (dirname+'/data', 'data'))
-
+        os.system('cp -r %s %s' % (dirname + '/data', 'data'))
         # Set test data environment variable
         os.environ['TEST_DATA'] = 'data'
-
     # ... otherwise set the calibration database to the one shipped with the
     # package; we don't need to set the 'TEST_DATA', this is done by the
     # test environment
     else:
         os.environ['CALDB'] = '%s/caldb' % (os.environ['TEST_SRCDIR'])
-
     # Create a local "pfiles" directory and set PFILES environment variable
+
     try:
         os.mkdir('pfiles')
     except:
         pass
+
     os.environ['PFILES'] = 'pfiles'
 
     # Copy the cscripts parameter files into the "pfiles" directory. For a
@@ -111,8 +115,9 @@ def test(installed=False, debug=False):
     # source directory into the "pfiles" directory, for an installed version
     # we get all parameter files from the "syspfiles" directory. Also make
     # sure that all parameter files are writable.
+
     if not installed:
-        os.system('cp -r %s/cscripts/*.par pfiles/'% (os.environ['TEST_SRCDIR']))
+        os.system('cp -r %s/cscripts/*.par pfiles/' % (os.environ['TEST_SRCDIR']))
         os.system('chmod u+w pfiles/*')
     else:
         os.system('cp -r %s/syspfiles/*.par pfiles/' % (os.environ['CTOOLS']))
@@ -146,6 +151,7 @@ def test(installed=False, debug=False):
              test_cstsmapmerge.Test(),
              test_cstsmapsplit.Test(),
              test_csviscube.Test(),
+             test_csscs.Test(),
              test_csworkflow.Test(),
              test_obsutils.Test(),
              test_mputils.Test()]
@@ -154,10 +160,8 @@ def test(installed=False, debug=False):
     # module which is only available since Python 2.6+)
     ver = sys.version.split()[0]
     if ver >= '2.6.0':
-
         # Check for VHEFITS environment variable
         if 'VHEFITS' in os.environ:
-
             # If the environment variable exists then unset it for the test
             # cases. Since Python is executed in a subprocess this will not
             # impact the environment variable in the parent shell.
@@ -203,9 +207,12 @@ def test(installed=False, debug=False):
 
 
 # ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
 
+# Main routine entry point #
+
+# ======================== #
+
+if __name__ == '__main__':
     # Run tests
+
     test()

@@ -1,0 +1,70 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      csscs.par                                                     #
+#                                                                           #
+#  Author:    Luigi Tibaldo                                                 #
+#             luigi.tibaldo@irap.omp.eu                                     #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the csscs script                           #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,       f, a, events.fits,,, "Input event list, counts cube, or observation definition XML file"
+inmodel,     f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
+srcnames,    s, a, Crab,,, "Semicolon-separated list of sources"
+expcube,     f, a, NONE,,, "Input exposure cube file"
+psfcube,     f, a, NONE,,, "Input PSF cube file"
+edispcube,   f, a, NONE,,, "Input energy dispersion cube file"
+bkgcube,     f, a, NONE,,, "Input background cube file"
+caldb,       s, a, prod2,,, "Calibration database"
+irf,         s, a, South_0.5h,,, "Instrument response function"
+inexclusion, f, a, skymap.fits,,, "Exclusion regions file"
+edisp,       b, h, no,,, "Apply energy dispersion?"
+outfile,     f, a, maps.fits,,, "Output maps"
+
+#
+# Script parameters
+#==================
+nxpix,         i, a, 20,,, "Size of the X axis in pixels"
+nypix,         i, a, 20,,, "Size of the Y axis in pixels"
+binsz,         r, a, 0.1,,, "Pixel size (deg/pixel)"
+coordsys,      s, a, CEL,CEL|GAL,, "Coordinate System"
+proj,          s, a, CAR,AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN,, "Projection method"
+xref,          r, a, 83.63,0,360, "First coordinate of image center in degrees (RA or galactic l)"
+yref,          r, a, 22.51,-90,90, "Second coordinate of image center in degrees (DEC or galactic b)"
+rad,           r, a, 0.2,,, "Radius of the region for component separation (deg)"
+emin,          r, a, 0.1,,, "Lower energy limit (TeV)"
+emax,          r, a, 100.0,,, "Upper energy limit (TeV)"
+method,        s, a, UNBINNED, UNBINNED|ONOFF,, "Analysis method"
+enumbins,      i, a, 20,,, "Number of energy bins"
+bkgmethod,     s, h, REFLECTED,REFLECTED,, "Method for background estimation"
+srcshape,      s, h, CIRCLE,CIRCLE,, "Shape of the source region"
+bkgregmin,     i, h, 2,1,1000, "Minimum number of background regions"
+bkgregskip,    i, h, 1,0,10, "Number of background regions to skip next to On region"
+use_model_bkg, b, h, yes,,, "Use background model?"
+maxoffset,     r, h, 4.0,,, "Maximum offset of source from camera center to accept observation"
+etruemin,      r, h, 0.01,,, "Minimum true energy (TeV)"
+etruemax,      r, h, 300.0,,, "Maximum true energy (TeV)"
+etruebins,     i, h, 30,,, "Number of bins per decade for true energy bins"
+statistic,     s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statistic"
+calc_ts,       b, h, yes,,, "Compute TS value for each map bin"
+calc_ulim,     b, h, no,,, "Compute upper limit for each map bin"
+fix_srcs,      b, h, yes,,, "Fix normalisations of other skymodels"
+fix_bkg,       b, h, no,,, "Fix background normalisation"
+
+#
+# Standard parameters
+#====================
+nthreads, i, h, 0,0,1000, "Number of parallel processes (0=use all available CPUs)"
+chatter,  i, h, 2,0,4, "Chattiness of output"
+clobber,  b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,    b, h, no,,, "Activate debugging mode?"
+mode,     s, h, ql,,, "Mode of automatic parameters"
+logfile,  f, h, csscs.log,,, "Log filename"

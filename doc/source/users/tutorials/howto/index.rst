@@ -16,6 +16,7 @@ CTA data analysis
    howto_stacked_analysis
    howto_model_handling_python
    howto_advanced_python_fitting
+   howto_scs
    howto_connect_irfs
    howto_connect_models
    howto_xspec

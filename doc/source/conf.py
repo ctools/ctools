@@ -38,6 +38,8 @@ except:
 try:
     import nbsphinx
     extensions += ['nbsphinx','IPython.sphinxext.ipython_console_highlighting']
+    # Disable execution of notebooks at make doc step
+    nbsphinx_execute = 'never'
 except:
     print('WARNING: Python package `nbsphinx` not found.\n'
           'WARNING: Please install it to get fully-functional Sphinx docs.\n'

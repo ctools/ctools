@@ -21,10 +21,10 @@ this page.
 * :download:`How to handle models from Python? <howto/howto_model_handling_python.ipynb>`
 * :download:`How to do advanced model manipulation and fitting in Python? <howto/howto_advanced_python_fitting.ipynb>`
 * :download:`How to generate likelihood profiles for a fitted spectrum? <howto/howto_likelihood_profiles.ipynb>`
+* :download:`How to perform spectral component separation? <howto/howto_scs.ipynb>`
 * :download:`Data preparation for 1DC How-to <howto/howto_prepare_1dc.ipynb>`
 * :download:`Selecting events for H.E.S.S. public data <hess_dr1/selecting_events.ipynb>`
 * :download:`Generating a sky map and finding sources for H.E.S.S. public data <hess_dr1/skymap.ipynb>`
 * :download:`Generating a background model from H.E.S.S. public data <hess_dr1/bkgmodel.ipynb>`
 * :download:`Performing an unbinned analysis of H.E.S.S. public data <hess_dr1/unbinned.ipynb>`
 * :download:`Classical analysis of H.E.S.S. public data <hess_dr1/classical.ipynb>` 
-  

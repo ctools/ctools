@@ -38,6 +38,7 @@ models = 1dc_howto.xml \
          disk.xml \
          gauss.xml \
          shell.xml \
+         hess1825_26.xml \
          hess_bkg_lookup.fits
 
 # Install models

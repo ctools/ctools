@@ -61,6 +61,7 @@ cscripts
    csresmap --- Generates residual map <csresmap>
    csresspec --- Generates residual spectrum <csresspec>
    csroot2caldb --- Creates a caldb entry from a ROOT file <csroot2caldb>
+   csscs --- Performs spectral component separation <csscs>
    cssens --- Computes CTA sensitivity <cssens>
    csspec --- Computes spectral points <csspec>
    cssrcdetect --- Detects sources in sky map <cssrcdetect>
@@ -87,3 +88,4 @@ Scripts to manage an IACT database
    csiactobs --- Generates observation definition file for IACT data from observation IDs <csiactobs>
    csfindobs --- Generates a list of IACT observation IDs <csfindobs>
    csiactcopy --- Copies IACT data from one location to another <csiactcopy>
+   
