@@ -59,7 +59,6 @@ calc_ulim,     b, h, no,,, "Compute upper limit for each map bin"
 fix_srcs,      b, h, yes,,, "Fix normalisations of other skymodels"
 fix_bkg,       b, h, no,,, "Fix background normalisation"
 
-
 #
 # Standard parameters
 #====================
