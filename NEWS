@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.7.0
 
-17 February 2020
+8 April 2020
 
 
 Introduction
@@ -223,6 +223,10 @@ None
 
 csphagen - Generate On/Off observations
 ---------------------------------------
+The handling of reflected regions in the presence of exclusion regions was
+improved. In the presence of exclusion regions, the number of Off regions is
+slighty shift in position (#2976).
+
 Setting the exclusion map via csphagen.exclusion_map(object=<map>) will now
 actually use the exclusion map even if the "inexclusion" parameter is not set.
 Before, the only exclusion that would be used was the exclusion passed via the
@@ -255,6 +259,13 @@ None
 csroot2caldb - Generates calibration database from ROOT file
 ------------------------------------------------------------
 None
+
+
+csscs - Spectral component separation
+-------------------------------------
+Add new script that performs a spectral component separation analysis. A
+tutorial and reference manual is included that explains how the script
+works (#2961).
 
 
 cssens - Computes sensitivity curve

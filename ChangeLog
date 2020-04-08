@@ -1,4 +1,4 @@
-2020-02-17
+2020-04-08
 
         * Version 1.7.0 released
         ========================
@@ -7,7 +7,9 @@
         Avoid negative squared standard deviations in cssrcdetect
         Fix log file header repetition in some cscripts (#3066)
         Add Moon constraints to csviscube (#3065)
+        Improve handling of reflected regions with exclusion regions (#2976)
         Remove response cache before source testing in cttsmap (#2973)
+        Add csscs script for spectral component separation (#2961)
         Add support for Castro plots to csspec (#2938)
         Enabling running of example scripts from objects in memory (#2925)
         Allow using spectral models without "Prefactor" parameter in cssens

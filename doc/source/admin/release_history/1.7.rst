@@ -10,7 +10,7 @@ ctools 1.7 is a major release that adds significant functionality.
 
 In particular, this release provides:
 
-* ...
+* csscs, a cscript for spectral component separation
 * ...
 
 
@@ -29,6 +29,8 @@ Improvements
 
 * [`3065 <https://cta-redmine.irap.omp.eu/issues/3065>`_] -
   Add Moon constraints to :ref:`csviscube`
+* [`2976 <https://cta-redmine.irap.omp.eu/issues/2976>`_] -
+  Improve handling of reflected regions with exclusion regions
 * [`2973 <https://cta-redmine.irap.omp.eu/issues/2973>`_] -
   Remove response cache before source testing in :ref:`cttsmap`
 * [`2938 <https://cta-redmine.irap.omp.eu/issues/2938>`_] -
@@ -41,6 +43,8 @@ Improvements
 
 New features
 ------------
+* [`2961 <https://cta-redmine.irap.omp.eu/issues/2961>`_] -
+  Add csscs script for spectral component separation
 
 
 
