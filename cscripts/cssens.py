@@ -487,7 +487,7 @@ class cssens(ctools.csobservation):
             # convert into ph/cm2/s/TeV, by "e_mean" to convert into ph/cm2/s,
             # and finally by "erg_mean" to convert to erg/cm2/s.
             # If spatial model is a map cube, specific calculation is needed
-             sensitivity = diff_flux*e_mean*erg_mean*1.0e6
+            sensitivity = diff_flux*e_mean*erg_mean*1.0e6
             if mapcube:
                 sensitivity *= source.spatial().spectrum().eval(energy)
                               
