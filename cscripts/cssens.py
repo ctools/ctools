@@ -382,9 +382,6 @@ class cssens(ctools.csobservation):
         iterations     = 0
         test_crab_flux = 0.1 # Initial test flux in Crab units (100 mCrab)
         
-        # Initialize empty response
-        response       = None
-        
         # Write header for iterations for terse chatter level
         if self._logTerse():
             self._log_header3(gammalib.TERSE, 'Iterations')
@@ -423,18 +420,7 @@ class cssens(ctools.csobservation):
                                debug=self['debug'].boolean(),
                                edisp=self['edisp'].boolean(),
                                stack=self['stack'].boolean(),
-                               response=response,
                                nthreads=1)
-            
-            # Retrieve stacked response if computed and not already done
-            if self['stack'].boolean() and response == None:
-                response = {}
-                response['expcube'] = sim[0].response().exposure().copy()
-                response['psfcube'] = sim[0].response().psf().copy()
-                response['bkgcube'] = sim[0].response().background().copy()
-                response['models']  = sim.models().copy()
-                if self['edisp'].boolean():
-                    response['edispcube'] = sim[0].response().edisp().copy()
             
             # Determine number of events in simulation by summing the events
             # over all observations in the observation container
