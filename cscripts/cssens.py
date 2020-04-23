@@ -369,6 +369,7 @@ class cssens(ctools.csobservation):
 
         # Write initial parameters
         self._log_header3(gammalib.TERSE, 'Initial parameters')
+        self._log_value(gammalib.TERSE, 'Mapcube model', str(mapcube))
         self._log_value(gammalib.TERSE, 'Crab flux', str(crab_flux)+' ph/cm2/s')
         self._log_value(gammalib.TERSE, 'Source model flux', str(src_flux)+' ph/cm2/s')
         self._log_value(gammalib.TERSE, 'Crab unit factor', crab_unit)
@@ -464,12 +465,17 @@ class cssens(ctools.csobservation):
             # Get fitted Crab flux
             prefactor   = modutils.normalisation_parameter(source)
             crab_flux   = prefactor.value() / crab_prefactor
+            
+            # Compute best-fit spectrum value at central energy
+            # That is a differential flux for non-map cube models
+            # ...and a scaling factor otherwise
+            diff_flux = source.spectral().eval(energy)
+            
             # Compute photon and energy fluxes. If spatial model is a map cube, 
             # specific calculation is needed (flux in map scaled by spectral model)
             if mapcube:
-                cube_scale  = source.spectral().eval(energy)
-                photon_flux = cube_scale*source.spatial().spectrum().flux(emin, emax)
-                energy_flux = cube_scale*source.spatial().spectrum().eflux(emin, emax)
+                photon_flux = diff_flux*source.spatial().spectrum().flux(emin, emax)
+                energy_flux = diff_flux*source.spatial().spectrum().eflux(emin, emax)
             else:
                 photon_flux = source.spectral().flux(emin, emax)
                 energy_flux = source.spectral().eflux(emin, emax)
@@ -481,12 +487,10 @@ class cssens(ctools.csobservation):
             # convert into ph/cm2/s/TeV, by "e_mean" to convert into ph/cm2/s,
             # and finally by "erg_mean" to convert to erg/cm2/s.
             # If spatial model is a map cube, specific calculation is needed
+             sensitivity = diff_flux*e_mean*erg_mean*1.0e6
             if mapcube:
-                sensitivity = cube_scale*source.spatial().spectrum().eval(energy) \
-                              *e_mean*erg_mean*1.0e6
-            else:
-                sensitivity = source.spectral().eval(energy)*e_mean*erg_mean*1.0e6
-
+                sensitivity *= source.spatial().spectrum().eval(energy)
+                              
             # Write fit results into logger
             name  = 'Iteration %d' % iterations
             value = ('TS=%10.4f  Sim=%9.4f mCrab  Fit=%9.4f mCrab  '
