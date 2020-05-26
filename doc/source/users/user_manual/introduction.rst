@@ -66,7 +66,7 @@ And here an example for generating a light curve from Python:
 
 .. code-block:: python
 
-   >>> import cslightcrv
+   >>> import cscripts
    >>> lightcrv = cscripts.cslightcrv()
    >>> lightcrv.execute()
 
