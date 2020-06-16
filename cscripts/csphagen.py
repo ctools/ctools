@@ -184,20 +184,34 @@ class csphagen(ctools.csobservation):
         # Get source shape
         self._srcshape = self['srcshape'].string()
 
+        # Query source direction
+        self._query_src_direction()
+
+        # Query minimum number of background regions and number of
+        # background regions to skip next to On region
+        self['bkgregmin'].integer()
+        self['bkgregskip'].integer()
+
         # Set source region (so far only CIRCLE is supported)
         if self._srcshape == 'CIRCLE':
-
-            # Query source direction
-            self._query_src_direction()
-
-            # Query minimum number of background regions and number of
-            # background regions to skip next to On region
-            self['bkgregmin'].integer()
-            self['bkgregskip'].integer()
 
             # Set circular source region
             self._rad = self['rad'].real()
             self._src_reg.append(gammalib.GSkyRegionCircle(self._src_dir, self._rad))
+
+        elif self._srcshape == 'RECT':
+
+            # Set rectangular source region
+            self._reg_width  = self['width'].real()
+            self._reg_height = self['height'].real()
+            self._reg_posang = self['posang'].real()
+            self._src_reg.append(gammalib.GSkyRegionRect(self._src_dir
+                                                        ,self._reg_width
+                                                        ,self._reg_height
+                                                        ,self._reg_posang
+                                                        )
+                                )
+
 
         # Query usage of background model
         self['use_model_bkg'].boolean()
