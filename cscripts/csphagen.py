@@ -385,10 +385,11 @@ class csphagen(ctools.csobservation):
         offset  = pnt_dir.dist_deg(self._src_dir)
 
         # Skip observation if it is too close to source
-        if offset <= self._rad:
-            msg = ' Skip because observation is pointed at %.3f deg <= '\
-                  '"rad=%.3f" from source.' \
-                  % (offset, self._rad)
+        if self._src_reg.contains(pnt_dir):
+            msg = ' Skip because observation is pointed at %.3f deg from source'\
+                  % (offset)
+            if self._srcshape == 'CIRCLE':
+                msg += ' (circle rad=%.3f).' % (self._rad)
             self._log_string(gammalib.NORMAL, msg)
 
         # Skip observation if it is pointed too far from the source
