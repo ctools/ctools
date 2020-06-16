@@ -54,6 +54,9 @@ class csphagen(ctools.csobservation):
         self._has_exclusion = False
         self._srcshape      = ''
         self._rad           = 0.0
+        self._reg_width     = 0.0
+        self._reg_height    = 0.0
+        self._reg_posang    = 0.0
         self._nthreads      = 0
 
         # Return
@@ -82,6 +85,9 @@ class csphagen(ctools.csobservation):
                  'has_exclusion' : self._has_exclusion,
                  'srcshape'      : self._srcshape,
                  'rad'           : self._rad,
+                 'reg_width'     : self._reg_width,
+                 'reg_height'    : self._reg_height,
+                 'reg_posang'    : self._reg_posang,
                  'nthreads'      : self._nthreads}
 
         # Return pickled dictionary
@@ -108,6 +114,9 @@ class csphagen(ctools.csobservation):
         self._has_exclusion = state['has_exclusion']
         self._srcshape      = state['srcshape']
         self._rad           = state['rad']
+        self._reg_width     = state['reg_width']
+        self._reg_height    = state['reg_height']
+        self._reg_posang    = state['reg_posang']
         self._nthreads      = state['nthreads']
 
         # Return
@@ -830,7 +839,7 @@ class csphagen(ctools.csobservation):
         return
 
     def save(self):
-        """ 
+        """
         Save data
         """
         # Write header
