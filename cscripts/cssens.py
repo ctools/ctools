@@ -147,7 +147,6 @@ class cssens(ctools.csobservation):
         self['outfile'].filename()
         self['edisp'].boolean()
         self['debug'].boolean()
-        self['stack'].boolean()
         
         # Derive some parameters
         self._ebounds = gammalib.GEbounds(bins,
@@ -419,7 +418,6 @@ class cssens(ctools.csobservation):
                                log=self._log_clients,
                                debug=self['debug'].boolean(),
                                edisp=self['edisp'].boolean(),
-                               stack=self['stack'].boolean(),
                                nthreads=1)
             
             # Determine number of events in simulation by summing the events
