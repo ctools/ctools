@@ -752,8 +752,8 @@ class csspec(ctools.csobservation):
             # If the source model is a cube then multiply-in the cube
             # spectrum
             if source.spatial().classname() == 'GModelSpatialDiffuseCube':
-                dir          = gammalib.GSkyDir()
-                source.spatial().set_mc_cone(dir, 180.0)
+                region       = gammalib.GSkyRegionCircle(0.0, 0.0, 180.0)
+                source.spatial().mc_cone(region)
                 norm         = source.spatial().spectrum().eval(elogmean)
                 fitted_flux *= norm
                 e_flux      *= norm

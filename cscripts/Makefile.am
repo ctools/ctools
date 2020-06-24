@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for cscripts scripts                                             #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2019 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2020 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -19,10 +19,7 @@
 #                                                                           #
 #############################################################################
 
-
-
 # Scripts to be distributed in $(pyexecdir)/cscripts
-
 pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/csbkgmodel.py \
                 $(srcdir)/cscaldb.py \
@@ -62,10 +59,7 @@ pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/ioutils.py \
                 $(srcdir)/mputils.py 	
 
-
-
 # Parfiles to be distributed in $(prefix)/syspfiles
-
 parfiles = $(srcdir)/csbkgmodel.par \
            $(srcdir)/cscaldb.par \
            $(srcdir)/csebins.par \
@@ -98,10 +92,7 @@ parfiles = $(srcdir)/csbkgmodel.par \
            $(srcdir)/csiactdata.par \
            $(srcdir)/csiactobs.par
 
-
-
 # Scripts for which symbolic links will be created in bindir
-
 linkscripts = csbkgmodel \
               cscaldb \
               csebins \
@@ -135,10 +126,7 @@ linkscripts = csbkgmodel \
               csiactdata \
               csiactobs
 
-
-
 # Test scripts to be distributed in $(pyexecdir)/cscripts/tests
-
 testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/testing.py \
               $(top_srcdir)/test/test_python_cscripts.py \
@@ -178,10 +166,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_csiactdata.py \
               $(top_srcdir)/test/test_csiactobs.py
 
-
-
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data
-
 testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/obs_unbinned.xml \
            $(top_srcdir)/test/data/obs_unbinned_two.xml \
@@ -258,18 +243,12 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/viscube.fits.gz \
            $(top_srcdir)/test/data/hess_bkg_lookup.fits
 
-
-
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data/iactdata
-
 testiactdata = $(top_srcdir)/test/data/iactdata/hdu-index.fits.gz \
                $(top_srcdir)/test/data/iactdata/master.json \
                $(top_srcdir)/test/data/iactdata/obs-index.fits.gz
 
-
-
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data/iactdata/events
-
 testiactevents = $(top_srcdir)/test/data/iactdata/events/irf_file.fits.gz \
                  $(top_srcdir)/test/data/iactdata/events/events_0.fits.gz \
                  $(top_srcdir)/test/data/iactdata/events/events_1.fits.gz \
@@ -281,11 +260,9 @@ testiactevents = $(top_srcdir)/test/data/iactdata/events/irf_file.fits.gz \
                  $(top_srcdir)/test/data/iactdata/events/events_7.fits.gz \
                  $(top_srcdir)/test/data/iactdata/events/events_8.fits.gz
 
-
 # Install scripts, parfiles, test scripts and test data. Note that we don't
 # need to prepend $(DESTDIR) here (not fully clear why, but that's the way
 # it is)
-
 binscriptsdir       = $(bindir)
 binscripts_DATA     = $(binscripts)
 pythonscriptsdir    = $(pyexecdir)/cscripts
@@ -301,18 +278,13 @@ testiactdata_DATA   = $(testiactdata)
 testiacteventsdir   = $(pyexecdir)/cscripts/tests/data/iactdata/events
 testiactevents_DATA = $(testiactevents)
 
-
 # Files to be distributed in the tar file
 EXTRA_DIST = $(binscripts) $(pythonscripts) $(parfiles) \
              $(testscripts) $(testdata) $(testiactdata) \
              $(testiactevents)
 
-
-
 # Add install hook rule to copy cscripts without .py into the bindir
-
 install-data-hook:
-
 	@binlist='$(binscripts)';\
 	for p in $$binlist; do \
 	  chmod +x "$(DESTDIR)$(bindir)/$$p"; \
@@ -325,23 +297,15 @@ install-data-hook:
 		chmod +x "$(DESTDIR)$(bindir)/$$p"; \
 	done
 
-
-
 # Uninstall hook rule to remove the cscripts from the bindir
-
 uninstall-hook:
-
 	@linklist='$(linkscripts)';\
 	for p in $$linklist; do \
 		rm -rf "$(DESTDIR)$(bindir)/$$p"; \
 	done
 
-
-
 # Files to be removed in build directory
-
 clean-local:
-
 	@if ! [ '@top_srcdir@' -ef '@top_builddir@' ]; then \
 		rm -rf $(top_builddir)/cscripts/cs*.py; \
 		rm -rf $(top_builddir)/cscripts/obsutils.py; \
@@ -351,16 +315,11 @@ clean-local:
                 rm -rf $(top_builddir)/cscripts/mputils.py; \
 		rm -rf $(top_builddir)/cscripts/*.par; \
 	fi
-
 	rm -rf $(top_builddir)/cscripts/*.pyc
 	rm -rf $(top_builddir)/cscripts/__pycache__
 
-
-
 # Uninstall the cscripts Python module
-
 uninstall-local:
-
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/*.pyc
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/*.pyc
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/__pycache__

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2019 by Michael Mayer                               *
+ *  copyright (C) 2015-2020 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -769,7 +769,7 @@ void ctulimit::compute_ulimit(void)
 
         // Set MC cone to the entire sky. This method call is needed to
         // set-up the cube spectrum
-        cube->set_mc_cone(GSkyDir(), 180.0);
+        cube->mc_cone(GSkyRegionCircle(0.0, 0.0, 180.0));
 
         // Allocate node function to replace the spectral component
         nodes = new GModelSpectralNodes(cube->spectrum());

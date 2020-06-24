@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2019 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2020 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -1403,7 +1403,7 @@ double ctobssim::get_model_flux(const GModelSky* model,
         if (cube != NULL) {
 
             // Set MC cone
-            cube->set_mc_cone(centre, radius);
+            cube->mc_cone(GSkyRegionCircle(centre, radius));
 
             // Allocate node function to replace the spectral component
             GModelSpectralNodes* nodes =

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctfindvar - Time variability search tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2018-2019 by Simon Bonnefoy                              *
+ *  copyright (C) 2018-2020 by Simon Bonnefoy                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -817,9 +817,9 @@ std::vector<int> ctfindvar::get_pixels(void)
             if (model != NULL) {
 
                 // Get the source position
-                GModelSpatial*    spatial = model->spatial();
-                GSkyRegion*       region  = spatial->region();
-                GSkyRegionCircle* circle  = dynamic_cast<GSkyRegionCircle*>(region);
+                const GModelSpatial*    spatial = model->spatial();
+                const GSkyRegion*       region  = spatial->region();
+                const GSkyRegionCircle* circle  = dynamic_cast<const GSkyRegionCircle*>(region);
 
                 // If region circle is valid then
                 if (circle != NULL) {
@@ -1338,9 +1338,9 @@ void ctfindvar::write_source_histograms(GFits& fits)
             if (model != NULL) {
 
                 // Get the source position
-                GModelSpatial*    spatial = model->spatial();
-                GSkyRegion*       region  = spatial->region();
-                GSkyRegionCircle* circle  = dynamic_cast<GSkyRegionCircle*>(region);
+                const GModelSpatial*    spatial = model->spatial();
+                const GSkyRegion*       region  = spatial->region();
+                const GSkyRegionCircle* circle  = dynamic_cast<const GSkyRegionCircle*>(region);
 
                 // If region circle is valid then extract source name and
                 // sky direction

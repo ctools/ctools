@@ -18,15 +18,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import cscripts
-import gammalib
 import os
+import gammalib
+import cscripts
 from testing import test
 
 
-# ========================= #
+# =========================== #
 # Test class for csscs script #
-# ========================= #
+# =========================== #
 class Test(test):
     """
     Test class for csscs script
@@ -45,11 +45,11 @@ class Test(test):
 
         # Set test datasets and parameters
         self._evs_offaxis = self._datadir + '/crab_offaxis1.fits'
-        self._exclusion = self._datadir + '/crab_exclusion.fits'
-        self._expcube = self._datadir + '/crab_expcube.fits'
-        self._psfcube = self._datadir + '/crab_psfcube.fits'
-        self._bkgcube = self._datadir + '/crab_bkgcube.fits'
-        self._bkgmodel = self._datadir + '/crab_bkgcube.xml'
+        self._exclusion   = self._datadir + '/crab_exclusion.fits'
+        self._expcube     = self._datadir + '/crab_expcube.fits'
+        self._psfcube     = self._datadir + '/crab_psfcube.fits'
+        self._bkgcube     = self._datadir + '/crab_bkgcube.fits'
+        self._bkgmodel    = self._datadir + '/crab_bkgcube.xml'
         self._edispcube   = self._datadir + '/crab_edispcube.fits'
 
         # Return
@@ -168,26 +168,26 @@ class Test(test):
 
         # Set up for same test without TS computation
         script = cscripts.csscs()
-        script['logfile'] = 'csscs_py2.log'
-        script['inobs'] = self._cntcube
-        script['expcube'] = self._expcube
-        script['psfcube'] = self._psfcube
-        script['bkgcube'] = self._bkgcube
-        script['inmodel'] = self._bkgmodel
+        script['logfile']  = 'csscs_py2.log'
+        script['inobs']    = self._cntcube
+        script['expcube']  = self._expcube
+        script['psfcube']  = self._psfcube
+        script['bkgcube']  = self._bkgcube
+        script['inmodel']  = self._bkgmodel
         script['srcnames'] = 'Crab'
-        script['emin'] = 1.
-        script['emax'] = 100.
-        script['nxpix'] = 2
-        script['nypix'] = 2
-        script['binsz'] = 0.1
+        script['emin']     = 1.
+        script['emax']     = 100.
+        script['nxpix']    = 2
+        script['nypix']    = 2
+        script['binsz']    = 0.1
         script['coordsys'] = 'CEL'
-        script['proj'] = 'CAR'
-        script['xref'] = 83.63
-        script['yref'] = 22.01
-        script['rad'] = 0.2
-        script['calc_ts'] = False
-        script['outfile'] = 'csscs_py2.fits'
-        script['chatter'] = 2
+        script['proj']     = 'CAR'
+        script['xref']     = 83.63
+        script['yref']     = 22.01
+        script['rad']      = 0.2
+        script['calc_ts']  = False
+        script['outfile']  = 'csscs_py2.fits'
+        script['chatter']  = 2
 
         # Run csscs script and save results
         script.logFileOpen()
@@ -198,27 +198,27 @@ class Test(test):
 
         # # Set up for same test with upper limit computation
         script = cscripts.csscs()
-        script['logfile'] = 'csscs_py3.log'
-        script['inobs'] = self._cntcube
-        script['expcube'] = self._expcube
-        script['psfcube'] = self._psfcube
-        script['bkgcube'] = self._bkgcube
-        script['inmodel'] = self._bkgmodel
-        script['srcnames'] = 'Crab'
-        script['emin'] = 1.
-        script['emax'] = 100.
-        script['nxpix'] = 2
-        script['nypix'] = 2
-        script['binsz'] = 0.1
-        script['coordsys'] = 'CEL'
-        script['proj'] = 'CAR'
-        script['xref'] = 83.63
-        script['yref'] = 22.01
-        script['rad'] = 0.2
-        script['calc_ts'] = True
+        script['logfile']   = 'csscs_py3.log'
+        script['inobs']     = self._cntcube
+        script['expcube']   = self._expcube
+        script['psfcube']   = self._psfcube
+        script['bkgcube']   = self._bkgcube
+        script['inmodel']   = self._bkgmodel
+        script['srcnames']  = 'Crab'
+        script['emin']      = 1.
+        script['emax']      = 100.
+        script['nxpix']     = 2
+        script['nypix']     = 2
+        script['binsz']     = 0.1
+        script['coordsys']  = 'CEL'
+        script['proj']      = 'CAR'
+        script['xref']      = 83.63
+        script['yref']      = 22.01
+        script['rad']       = 0.2
+        script['calc_ts']   = True
         script['calc_ulim'] = True
-        script['outfile'] = 'csscs_py3.fits'
-        script['chatter'] = 2
+        script['outfile']   = 'csscs_py3.fits'
+        script['chatter']   = 2
 
         # Run csscs script and save results
         script.logFileOpen()
@@ -232,26 +232,26 @@ class Test(test):
 
         # Set up for test without multiprocessing
         script = cscripts.csscs()
-        script['logfile'] = 'csscs_py4.log'
-        script['inobs'] = self._cntcube
-        script['expcube'] = self._expcube
-        script['psfcube'] = self._psfcube
-        script['bkgcube'] = self._bkgcube
-        script['inmodel'] = self._bkgmodel
+        script['logfile']  = 'csscs_py4.log'
+        script['inobs']    = self._cntcube
+        script['expcube']  = self._expcube
+        script['psfcube']  = self._psfcube
+        script['bkgcube']  = self._bkgcube
+        script['inmodel']  = self._bkgmodel
         script['srcnames'] = 'Crab'
-        script['emin'] = 1.
-        script['emax'] = 100.
-        script['nxpix'] = 2
-        script['nypix'] = 2
-        script['binsz'] = 0.1
+        script['emin']     = 1.
+        script['emax']     = 100.
+        script['nxpix']    = 2
+        script['nypix']    = 2
+        script['binsz']    = 0.1
         script['coordsys'] = 'CEL'
-        script['proj'] = 'CAR'
-        script['xref'] = 83.63
-        script['yref'] = 22.01
-        script['rad'] = 0.2
-        script['outfile'] = 'csscs_py4.fits'
+        script['proj']     = 'CAR'
+        script['xref']     = 83.63
+        script['yref']     = 22.01
+        script['rad']      = 0.2
+        script['outfile']  = 'csscs_py4.fits'
         script['nthreads'] = 1
-        script['chatter'] = 2
+        script['chatter']  = 2
 
         # Run csscs script and save results
         script.logFileOpen()
@@ -262,27 +262,27 @@ class Test(test):
 
         # Set up for test with energy dispersion
         script = cscripts.csscs()
-        script['logfile'] = 'csscs_py5.log'
-        script['inobs'] = self._cntcube
-        script['expcube'] = self._expcube
-        script['psfcube'] = self._psfcube
-        script['bkgcube'] = self._bkgcube
-        script['edisp'] = True
+        script['logfile']   = 'csscs_py5.log'
+        script['inobs']     = self._cntcube
+        script['expcube']   = self._expcube
+        script['psfcube']   = self._psfcube
+        script['bkgcube']   = self._bkgcube
+        script['edisp']     = True
         script['edispcube'] = self._edispcube
-        script['inmodel'] = self._bkgmodel
-        script['srcnames'] = 'Crab'
-        script['emin'] = 1.
-        script['emax'] = 100.
-        script['nxpix'] = 2
-        script['nypix'] = 2
-        script['binsz'] = 0.1
-        script['coordsys'] = 'CEL'
-        script['proj'] = 'CAR'
-        script['xref'] = 83.63
-        script['yref'] = 22.01
-        script['rad'] = 0.2
-        script['outfile'] = 'csscs_py5.fits'
-        script['chatter'] = 2
+        script['inmodel']   = self._bkgmodel
+        script['srcnames']  = 'Crab'
+        script['emin']      = 1.
+        script['emax']      = 100.
+        script['nxpix']     = 2
+        script['nypix']     = 2
+        script['binsz']     = 0.1
+        script['coordsys']  = 'CEL'
+        script['proj']      = 'CAR'
+        script['xref']      = 83.63
+        script['yref']      = 22.01
+        script['rad']       = 0.2
+        script['outfile']   = 'csscs_py5.fits'
+        script['chatter']   = 2
 
         # Run csscs script and save results
         script.logFileOpen()
@@ -293,27 +293,27 @@ class Test(test):
 
         # Set up for test in On/Off mode with background model
         script = cscripts.csscs()
-        script['logfile'] = 'csscs_py6.log'
-        script['inobs'] = self._evs_offaxis
-        script['caldb'] = self._caldb
-        script['irf'] = self._irf
-        script['inmodel'] = self._model
-        script['srcnames'] = 'Crab'
-        script['emin'] = 1.
-        script['emax'] = 100.
-        script['nxpix'] = 2
-        script['nypix'] = 2
-        script['binsz'] = 0.1
-        script['coordsys'] = 'CEL'
-        script['proj'] = 'CAR'
-        script['xref'] = 83.63
-        script['yref'] = 22.01
-        script['rad'] = 0.2
-        script['method'] = 'ONOFF'
+        script['logfile']     = 'csscs_py6.log'
+        script['inobs']       = self._evs_offaxis
+        script['caldb']       = self._caldb
+        script['irf']         = self._irf
+        script['inmodel']     = self._model
+        script['srcnames']    = 'Crab'
+        script['emin']        = 1.
+        script['emax']        = 100.
+        script['nxpix']       = 2
+        script['nypix']       = 2
+        script['binsz']       = 0.1
+        script['coordsys']    = 'CEL'
+        script['proj']        = 'CAR'
+        script['xref']        = 83.63
+        script['yref']        = 22.01
+        script['rad']         = 0.2
+        script['method']      = 'ONOFF'
         script['inexclusion'] = self._exclusion
-        script['enumbins'] = 2
-        script['outfile'] = 'csscs_py6.fits'
-        script['chatter'] = 2
+        script['enumbins']    = 2
+        script['outfile']     = 'csscs_py6.fits'
+        script['chatter']     = 2
 
         # Run csscs script and save results
         script.logFileOpen()
@@ -324,26 +324,26 @@ class Test(test):
 
         # Same test with exclusion map piped in memory
         script = cscripts.csscs()
-        script['logfile'] = 'csscs_py7.log'
-        script['inobs'] = self._evs_offaxis
-        script['caldb'] = self._caldb
-        script['irf'] = self._irf
-        script['inmodel'] = self._model
+        script['logfile']  = 'csscs_py7.log'
+        script['inobs']    = self._evs_offaxis
+        script['caldb']    = self._caldb
+        script['irf']      = self._irf
+        script['inmodel']  = self._model
         script['srcnames'] = 'Crab'
-        script['emin'] = 1.
-        script['emax'] = 100.
-        script['nxpix'] = 2
-        script['nypix'] = 2
-        script['binsz'] = 0.1
+        script['emin']     = 1.
+        script['emax']     = 100.
+        script['nxpix']    = 2
+        script['nypix']    = 2
+        script['binsz']    = 0.1
         script['coordsys'] = 'CEL'
-        script['proj'] = 'CAR'
-        script['xref'] = 83.63
-        script['yref'] = 22.01
-        script['rad'] = 0.2
-        script['method'] = 'ONOFF'
+        script['proj']     = 'CAR'
+        script['xref']     = 83.63
+        script['yref']     = 22.01
+        script['rad']      = 0.2
+        script['method']   = 'ONOFF'
         script['enumbins'] = 2
-        script['outfile'] = 'csscs_py7.fits'
-        script['chatter'] = 2
+        script['outfile']  = 'csscs_py7.fits'
+        script['chatter']  = 2
 
         # Set exclusion map
         exclmap = gammalib.GSkyRegionMap(self._exclusion)
@@ -358,28 +358,28 @@ class Test(test):
 
         # Set up for test in On/Off mode without background model
         script = cscripts.csscs()
-        script['logfile'] = 'csscs_py8.log'
-        script['inobs'] = self._evs_offaxis
-        script['caldb'] = self._caldb
-        script['irf'] = self._irf
-        script['inmodel'] = self._model
-        script['srcnames'] = 'Crab'
-        script['emin'] = 1.
-        script['emax'] = 100.
-        script['nxpix'] = 2
-        script['nypix'] = 2
-        script['binsz'] = 0.1
-        script['coordsys'] = 'CEL'
-        script['proj'] = 'CAR'
-        script['xref'] = 83.63
-        script['yref'] = 22.01
-        script['rad'] = 0.2
-        script['method'] = 'ONOFF'
+        script['logfile']       = 'csscs_py8.log'
+        script['inobs']         = self._evs_offaxis
+        script['caldb']         = self._caldb
+        script['irf']           = self._irf
+        script['inmodel']       = self._model
+        script['srcnames']      = 'Crab'
+        script['emin']          = 1.
+        script['emax']          = 100.
+        script['nxpix']         = 2
+        script['nypix']         = 2
+        script['binsz']         = 0.1
+        script['coordsys']      = 'CEL'
+        script['proj']          = 'CAR'
+        script['xref']          = 83.63
+        script['yref']          = 22.01
+        script['rad']           = 0.2
+        script['method']        = 'ONOFF'
         script['use_model_bkg'] = False
-        script['inexclusion'] = self._exclusion
-        script['enumbins'] = 2
-        script['outfile'] = 'csscs_py8.fits'
-        script['chatter'] = 2
+        script['inexclusion']   = self._exclusion
+        script['enumbins']      = 2
+        script['outfile']       = 'csscs_py8.fits'
+        script['chatter']       = 2
 
         # Run csscs script and save results
         script.logFileOpen()
@@ -390,26 +390,26 @@ class Test(test):
 
         # Set up for test in unbinned mode
         script = cscripts.csscs()
-        script['logfile'] = 'csscs_py9.log'
-        script['inobs'] = self._evs_offaxis
-        script['caldb'] = self._caldb
-        script['irf'] = self._irf
-        script['inmodel'] = self._model
+        script['logfile']  = 'csscs_py9.log'
+        script['inobs']    = self._evs_offaxis
+        script['caldb']    = self._caldb
+        script['irf']      = self._irf
+        script['inmodel']  = self._model
         script['srcnames'] = 'Crab'
-        script['emin'] = 1.
-        script['emax'] = 100.
-        script['nxpix'] = 2
-        script['nypix'] = 2
-        script['binsz'] = 0.1
+        script['emin']     = 1.
+        script['emax']     = 100.
+        script['nxpix']    = 2
+        script['nypix']    = 2
+        script['binsz']    = 0.1
         script['coordsys'] = 'CEL'
-        script['proj'] = 'CAR'
-        script['xref'] = 83.63
-        script['yref'] = 22.01
-        script['rad'] = 0.2
-        script['method'] = 'UNBINNED'
+        script['proj']     = 'CAR'
+        script['xref']     = 83.63
+        script['yref']     = 22.01
+        script['rad']      = 0.2
+        script['method']   = 'UNBINNED'
         script['enumbins'] = 2
-        script['outfile'] = 'csscs_py9.fits'
-        script['chatter'] = 2
+        script['outfile']  = 'csscs_py9.fits'
+        script['chatter']  = 2
 
         # Run csscs script and save results
         script.logFileOpen()
@@ -431,25 +431,25 @@ class Test(test):
 
         # Setup script for pickling text
         script = cscripts.csscs()
-        script['logfile'] = 'csscs_py1_pickle.log'
-        script['inobs'] = self._cntcube
-        script['expcube'] = self._expcube
-        script['psfcube'] = self._psfcube
-        script['bkgcube'] = self._bkgcube
-        script['inmodel'] = self._bkgmodel
+        script['logfile']  = 'csscs_py1_pickle.log'
+        script['inobs']    = self._cntcube
+        script['expcube']  = self._expcube
+        script['psfcube']  = self._psfcube
+        script['bkgcube']  = self._bkgcube
+        script['inmodel']  = self._bkgmodel
         script['srcnames'] = 'Crab'
-        script['emin'] = 1.
-        script['emax'] = 100.
-        script['nxpix'] = 2
-        script['nypix'] = 2
-        script['binsz'] = 0.1
+        script['emin']     = 1.
+        script['emax']     = 100.
+        script['nxpix']    = 2
+        script['nypix']    = 2
+        script['binsz']    = 0.1
         script['coordsys'] = 'CEL'
-        script['proj'] = 'CAR'
-        script['xref'] = 83.63
-        script['yref'] = 22.01
-        script['rad'] = 0.2
-        script['outfile'] = 'csscs_py1_pickle.fits'
-        script['chatter'] = 2
+        script['proj']     = 'CAR'
+        script['xref']     = 83.63
+        script['yref']     = 22.01
+        script['rad']      = 0.2
+        script['outfile']  = 'csscs_py1_pickle.fits'
+        script['chatter']  = 2
 
         # Perform pickeling tests of filled class
         obj = self._pickeling(script)
@@ -485,9 +485,9 @@ class Test(test):
         calc_ulim : bool, optional
             Check upper limit HDU
         """
-
         # Check that the entire fits container can be extracted
         fits = script.fits()
+
         # Dump to disk and verify
         fits.saveto('csscs_py3_mem.fits', True)
         self._check_result_file('csscs_py3_mem.fits', srcnames=srcnames, nx=nx, ny=ny,
@@ -534,8 +534,6 @@ class Test(test):
         calc_ulim : bool, optional
             Check upper limit HDU
         """
-
-        print('ho', calc_ts)
         # Loop over source names
         for name in srcnames:
             # Check flux map
@@ -546,7 +544,6 @@ class Test(test):
             self._check_map(skymap, nx=nx, ny=ny)
             # If requested check TS map
             if calc_ts:
-                print('hoho')
                 skymap = gammalib.GSkyMap(filename + '[' + name + ' TS]')
                 self._check_map(skymap, nx=nx, ny=ny)
             # If requested check upper limit map
@@ -571,7 +568,6 @@ class Test(test):
         ny : int, optional
             Number of Y pixels
         """
-
         # Check dimensions
         self.test_value(skymap.nmaps(), 1, 'Check number of maps')
         self.test_value(skymap.nx(), nx, 'Check for number of X pixels')

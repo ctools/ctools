@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for cscripts
 #
-# Copyright (C) 2016-2019 Juergen Knoedlseder
+# Copyright (C) 2016-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,14 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-
 import cscripts
 import gammalib
 import os
 import sys
-
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
 import test_cscript
 import test_cscaldb
 import test_csbkgmodel
@@ -64,11 +61,8 @@ import test_csiactobs
 
 
 # ================== #
-
 # Perform unit tests #
-
 # ================== #
-
 def test(installed=False, debug=False):
     """
     Perform cscripts unit testing.
@@ -101,13 +95,12 @@ def test(installed=False, debug=False):
     # test environment
     else:
         os.environ['CALDB'] = '%s/caldb' % (os.environ['TEST_SRCDIR'])
-    # Create a local "pfiles" directory and set PFILES environment variable
 
+    # Create a local "pfiles" directory and set PFILES environment variable
     try:
         os.mkdir('pfiles')
     except:
         pass
-
     os.environ['PFILES'] = 'pfiles'
 
     # Copy the cscripts parameter files into the "pfiles" directory. For a
@@ -115,7 +108,6 @@ def test(installed=False, debug=False):
     # source directory into the "pfiles" directory, for an installed version
     # we get all parameter files from the "syspfiles" directory. Also make
     # sure that all parameter files are writable.
-
     if not installed:
         os.system('cp -r %s/cscripts/*.par pfiles/' % (os.environ['TEST_SRCDIR']))
         os.system('chmod u+w pfiles/*')
@@ -207,12 +199,8 @@ def test(installed=False, debug=False):
 
 
 # ======================== #
-
 # Main routine entry point #
-
 # ======================== #
-
 if __name__ == '__main__':
     # Run tests
-
     test()
