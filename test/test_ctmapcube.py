@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctmapcube tool.
 #
-# Copyright (C) 2016-2018 Juergen Knoedlseder
+# Copyright (C) 2016-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -247,8 +247,8 @@ class Test(test):
         self.test_value(len(cube.energies()), nmaps, 'Check number of energies')
         
         # Check dimensions
-        self.test_value(cube.maps(), nmaps, 'Check number of maps')
-        self.test_value(cube.pixels(), npixels, 'Check number of pixels')
+        self.test_value(cube.cube().nmaps(), nmaps,   'Check number of maps')
+        self.test_value(cube.cube().npix(),  npixels, 'Check number of pixels')
 
         # Return
         return
