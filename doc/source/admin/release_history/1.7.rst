@@ -37,6 +37,10 @@ Improvements
   Add support for Castro plots to :ref:`csspec`
 * [`2925 <https://cta-redmine.irap.omp.eu/issues/2925>`_] -
   Enabling running of example scripts from objects in memory
+* [`2881 <https://cta-redmine.irap.omp.eu/issues/2881>`_] -
+  Add support for power-law binning to :ref:`ctbin`, :ref:`ctedispcube`,
+  :ref:`ctexpcube`, :ref:`ctmapcube`, :ref:`ctmodel`, :ref:`ctpsfcube`,
+  :ref:`csphagen`, :ref:`csresmap`, :ref:`csresspec`, and :ref:`csspec`
 * [`1889 <https://cta-redmine.irap.omp.eu/issues/1889>`_] -
   Allow using spectral models without ``Prefactor`` parameter in :ref:`cssens` and :ref:`cstsdist`
 

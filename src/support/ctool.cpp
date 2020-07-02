@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2019 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2020 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -688,25 +688,23 @@ GEbounds ctool::create_ebounds(void)
 
     } // endif: ebinalg was "FILE"
 
-    // ... otherwise use a linear or a logarithmically-spaced energy binning
+    // ... otherwise use native energy binning algorithms
     else {
 
         // Get task parameters
-    	double emin     = (*this)["emin"].real();
-    	double emax     = (*this)["emax"].real();
-    	int    enumbins = (*this)["enumbins"].integer();
+    	double emin      = (*this)["emin"].real();
+    	double emax      = (*this)["emax"].real();
+    	int    enumbins  = (*this)["enumbins"].integer();
+        double ebingamma = 1.0;
 
-        // Initialise log mode for ebinning
-        bool log = true;
-
-        // Check if algorithm is linear
-        if (ebinalg == "LIN") {
-            log = false;
+        // Get task parameter for POW method
+        if (ebinalg == "POW") {
+            ebingamma = (*this)["ebingamma"].real();
         }
 
-        // Setup energy bins
-        ebounds = GEbounds(enumbins, GEnergy(emin, "TeV"),
-                                     GEnergy(emax, "TeV"), log);
+        // Setup energy boundaries
+        ebounds = GEbounds(enumbins, GEnergy(emin, "TeV"), GEnergy(emax, "TeV"),
+                           ebinalg, ebingamma);
 
     } // endelse: ebinalg was not "FILE"
 
@@ -854,57 +852,23 @@ GEnergies ctool::create_energies(void)
 
     } // endif: ebinalg was "FILE"
 
-    // ... otherwise, if energy binning algorithm is of type "POW" (case
-    // sensitive), then set the energy binning according to a power-law
-    else if (ebinalg == "POW") {
+    // ... otherwise use native energy binning algorithms
+    else {
 
         // Get task parameters
     	double emin      = (*this)["emin"].real();
     	double emax      = (*this)["emax"].real();
     	int    enumbins  = (*this)["enumbins"].integer();
-        double ebingamma = (*this)["ebingamma"].real();
+        double ebingamma = 1.0;
 
-        // Precomputation
-        double a = 1.0 - ebingamma;
-        double c = (a == 0.0)
-                   ? 1.0 / (std::log(emax) - std::log(emin))
-                   : a   / (std::pow(emax,a) - std::pow(emin,a));
-        double b = double(c*(enumbins-1.0));
-
-        // Initialise first energy
-        double e = emin;
-        energies.append(GEnergy(e, "TeV"));
-
-        // Loop over energy bins
-        for (int i = 0; i < enumbins-1; ++i) {
-            double log_e_next = (a == 0.0)
-                                ? 1.0/b + std::log(e)
-                                : std::log(a/b + std::pow(e,a)) / a;
-            double e_next = std::exp(log_e_next);
-            energies.append(GEnergy(e_next, "TeV"));
-            e = e_next;
-        }
-    }
-
-    // ... otherwise use a linear or a logarithmically-spaced energy binning
-    else {
-
-        // Get task parameters
-    	double emin     = (*this)["emin"].real();
-    	double emax     = (*this)["emax"].real();
-    	int    enumbins = (*this)["enumbins"].integer();
-
-        // Initialise log mode for ebinning
-        bool log = true;
-
-        // Check if algorithm is linear
-        if (ebinalg == "LIN") {
-            log = false;
+        // Get task parameter for POW method
+        if (ebinalg == "POW") {
+            ebingamma = (*this)["ebingamma"].real();
         }
 
         // Setup energy nodes
-        energies = GEnergies(enumbins, GEnergy(emin, "TeV"),
-                                       GEnergy(emax, "TeV"), log);
+        energies = GEnergies(enumbins, GEnergy(emin, "TeV"), GEnergy(emax, "TeV"),
+                             ebinalg, ebingamma);
 
     } // endelse: ebinalg was not "FILE"
 

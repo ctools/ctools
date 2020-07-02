@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctmodel tool.
 #
-# Copyright (C) 2014-2018 Juergen Knoedlseder
+# Copyright (C) 2014-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -242,10 +242,11 @@ class Test(test):
         model['dec']       = 22.01
         model['tmin']      = 0
         model['tmax']      = 1800
-        model['ebinalg']   = 'LOG'
+        model['ebinalg']   = 'POW'
         model['emin']      = 1.0
         model['emax']      = 100.0
         model['enumbins']  = 5
+        model['ebingamma'] = 1.0
         model['nxpix']     = 40
         model['nypix']     = 40
         model['binsz']     = 0.1

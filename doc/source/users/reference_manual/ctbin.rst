@@ -55,11 +55,13 @@ General parameters
 ``(prefix = cntcube_) [string]``
     Prefix for output counts cube in observation definition XML file.
 
-``ebinalg <FILE|LIN|LOG> [string]``
+``ebinalg <FILE|LIN|LOG|POW> [string]``
     Algorithm for defining energy bins. For ``FILE``, the energy bins are defined
     in a FITS file that is specified by the ``ebinfile`` parameter, for ``LIN``
-    and ``LOG`` there will be ``enumbins`` energy bins spaced linearly or
-    logarithmically between ``emin`` and ``emax``, respectively.
+    ``LOG`` and ``POW`` there will be ``enumbins`` energy bins spaced linearly,
+    logarithmically, or following a power law between ``emin`` and ``emax``,
+    respectively. For ``POW``, the parameter ``ebingamma`` specifies the slope
+    of the power law.
 
 ``emin [real]``
     Lower energy value for first energy bin (in TeV) if ``LIN`` or ``LOG``
@@ -76,6 +78,10 @@ General parameters
 ``ebinfile [file]``
     Name of the file containing the energy binning definition if ``ebinalg=FILE``.
     You may use :ref:`csebins` to generate a file with appropriate energy binning.
+
+``ebingamma [real]``
+    Exponent of the power law for ``POW`` energy binning. An exponent of 1.0
+    corresponds to a logarithmic energy binning.
 
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for cube centre instead of xref/yref parameters?

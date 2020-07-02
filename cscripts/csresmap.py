@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a residual map.
 #
-# Copyright (C) 2014-2019 Michael Mayer
+# Copyright (C) 2014-2020 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -111,6 +111,8 @@ class csresmap(ctools.csobservation):
                     self['emin'].real()
                     self['emax'].real()
                     self['enumbins'].integer()
+                    if self['ebinalg'].string() == 'POW':
+                        self['ebingamma'].real()
 
         # Query parameters
         self['edisp'].boolean()

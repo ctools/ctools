@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csspec script.
 #
-# Copyright (C) 2016-2018 Juergen Knoedlseder
+# Copyright (C) 2016-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -194,18 +194,19 @@ class Test(test):
 
         # Set-up On/Off csspec with NODES method
         spec = cscripts.csspec()
-        spec['inobs']    = self._inonoff
-        spec['inmodel']  = self._onoff_model
-        spec['srcname']  = 'Crab'
-        spec['method']   = 'NODES'
-        spec['ebinalg']  = 'LOG'
-        spec['enumbins'] = 2
-        spec['emin']     = 1.0
-        spec['emax']     = 10.0
-        spec['outfile']  = 'csspec_py4.fits'
-        spec['logfile']  = 'csspec_py4.log'
-        spec['chatter']  = 4
-        spec['publish']  = False
+        spec['inobs']     = self._inonoff
+        spec['inmodel']   = self._onoff_model
+        spec['srcname']   = 'Crab'
+        spec['method']    = 'NODES'
+        spec['ebinalg']   = 'POW'
+        spec['enumbins']  = 2
+        spec['emin']      = 1.0
+        spec['emax']      = 10.0
+        spec['ebingamma'] = 1.0
+        spec['outfile']   = 'csspec_py4.fits'
+        spec['logfile']   = 'csspec_py4.log'
+        spec['chatter']   = 4
+        spec['publish']   = False
 
         # Execute csspec script
         spec.execute()

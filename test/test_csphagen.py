@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csphagen script.
 #
-# Copyright (C) 2017-2018 Luigi Tibaldo
+# Copyright (C) 2017-2020 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -210,10 +210,11 @@ class Test(test):
         # Setup csphagen
         phagen = cscripts.csphagen(obs)
         phagen['inmodel']     = 'NONE'
-        phagen['ebinalg']     = 'LOG'
+        phagen['ebinalg']     = 'POW'
         phagen['emin']        = 0.1
         phagen['emax']        = 100.0
         phagen['enumbins']    = self._nbins
+        phagen['ebingamma']   = 1.0
         phagen['coordsys']    = 'CEL'
         phagen['ra']          = 83.633
         phagen['dec']         = 22.0145

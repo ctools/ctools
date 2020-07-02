@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csresmap script.
 #
-# Copyright (C) 2016-2018 Juergen Knoedlseder
+# Copyright (C) 2016-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -119,9 +119,11 @@ class Test(test):
         resmap['inmodel']   = self._model
         resmap['caldb']     = self._caldb
         resmap['irf']       = self._irf
+        resmap['ebinalg']   = 'POW'
         resmap['emin']      = 1.0
         resmap['emax']      = 100.0
         resmap['enumbins']  = 5
+        resmap['ebingamma'] = 1.0
         resmap['nxpix']     = 20
         resmap['nypix']     = 20
         resmap['binsz']     = 0.2

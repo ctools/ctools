@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.7.0
 
-8 April 2020
+2 July 2020
 
 
 Introduction
@@ -41,7 +41,7 @@ be called for that. And the header is only written once in the log file (#3066).
 
 ctbin - CTA event binning
 -------------------------
-None
+Add ebingamma parameter and support for POW binning (#2881).
 
 
 ctbkgcube - CTA background cube generation
@@ -61,7 +61,7 @@ None
 
 ctedispcube - CTA energy dispersion cube generation
 ---------------------------------------------------
-None
+Add ebingamma parameter and support for POW binning (#2881).
 
 
 cterror - Likelihood profile error computation
@@ -71,7 +71,7 @@ None
 
 ctexpcube - CTA exposure cube generation
 ----------------------------------------
-None
+Add ebingamma parameter and support for POW binning (#2881).
 
 
 ctfindvar - Variability search
@@ -86,12 +86,12 @@ None
 
 ctmapcube - CTA map cube generation
 -----------------------------------
-None
+Add ebingamma parameter and support for POW binning (#2881).
 
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
-None
+Add ebingamma parameter and support for POW binning (#2881).
 
 
 ctobssim - CTA observation simulation
@@ -111,7 +111,7 @@ None
 
 ctpsfcube - CTA point spread function cube generation
 -----------------------------------------------------
-None
+Add ebingamma parameter and support for POW binning (#2881).
 
 
 ctselect - CTA event selection
@@ -235,6 +235,8 @@ parameter after setting the map with csphagen.exclusion_map() you should first
 call csphagen.exclusion_map(object=gammalib.GSkyRegionMap()). This makes the
 map empty and csphagen then checks the "inexclusion" "parameter (#2925).
 
+Add ebingamma parameter and support for POW binning (#2881).
+
 
 csphasecrv - Generate phase curve
 ---------------------------------
@@ -248,12 +250,12 @@ None
 
 csresmap - Generate residual map
 --------------------------------
-None
+Add ebingamma parameter and support for POW binning (#2881).
 
 
 csresspec - Generate residual spectrum
 --------------------------------------
-None
+Add ebingamma parameter and support for POW binning (#2881).
 
 
 csroot2caldb - Generates calibration database from ROOT file
@@ -278,6 +280,8 @@ csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
 Support to generate Castro plots was added and the relevant information is
 now sorted in the output FITS file (#2938).
+
+Add ebingamma parameter and support for POW binning (#2881).
 
 
 cssrcdetect - Detects sources in sky map

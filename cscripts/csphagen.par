@@ -29,11 +29,12 @@ prefix,      s, h, onoff,,, "Prefix for output files"
 #
 # Script parameters
 #==================
-ebinalg,       s, a, LOG,FILE|LIN|LOG,, "Algorithm for defining energy bins"
+ebinalg,       s, a, LOG,FILE|LIN|LOG|POW,, "Algorithm for defining energy bins"
 emin,          r, a, 0.1,,, "Start value for first energy bin in TeV"
 emax,          r, a, 100.0,,, "Stop value for last energy bin in TeV"
 enumbins,      i, a, 120,,, "Number of energy bins"
 ebinfile,      f, a, NONE,,, "Name of the file containing the energy bin definition"
+ebingamma,     r, a, 1.0,,, "Exponent for POW energy node definition"
 srcshape,      s, h, CIRCLE,CIRCLE,, "Shape of the source region"
 coordsys,      s, a, CEL,CEL|GAL,, "Coordinate system (CEL - celestial, GAL - galactic)"
 ra,            r, a, 83.63,0,360, "Right Ascension of source region centre (deg)"

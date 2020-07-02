@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a residual spectrum.
 #
-# Copyright (C) 2017-2019 Luigi Tibaldo
+# Copyright (C) 2017-2020 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -95,6 +95,8 @@ class csresspec(ctools.csobservation):
                 self['emin'].real()
                 self['emax'].real()
                 self['enumbins'].integer()
+                if self['ebinalg'].string() == 'POW':
+                    self['ebingamma'].real()
             if n_cta > n_unbinned:
                 n_notunbin = n_cta - n_unbinned
 
@@ -218,9 +220,11 @@ class csresspec(ctools.csobservation):
         if self['ebinalg'].string() == 'FILE':
             cntcube['ebinfile'] = self['ebinfile'].filename()
         else:
-            cntcube['enumbins'] = self['enumbins'].integer()
-            cntcube['emin']     = self['emin'].real()
-            cntcube['emax']     = self['emax'].real()
+            cntcube['enumbins']  = self['enumbins'].integer()
+            cntcube['emin']      = self['emin'].real()
+            cntcube['emax']      = self['emax'].real()
+            if self['ebinalg'].string() == 'POW':
+                cntcube['ebingamma'] = self['ebingamma'].real()
         cntcube.run()
 
         # Retrieve the binned observation container

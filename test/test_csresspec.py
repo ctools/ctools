@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csresspec script.
 #
-# Copyright (C) 2017-2018 Luigi Tibaldo
+# Copyright (C) 2017-2020 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -144,10 +144,11 @@ class Test(test):
         resspec['inmodel']    = self._model
         resspec['caldb']      = self._caldb
         resspec['irf']        = self._irf
-        resspec['ebinalg']   = 'LOG'
+        resspec['ebinalg']   = 'POW'
         resspec['emin']       = 1.0
         resspec['emax']       = 100.0
         resspec['enumbins']   = 2
+        resspec['ebingamma']  = 1.0
         resspec['mask']       = False
         resspec['algorithm']  = 'SUBDIV'
         resspec['components'] = True

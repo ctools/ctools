@@ -126,21 +126,22 @@ class Test(test):
         mapcube.clear()
 
         # Now set ctmapcube parameters
-        mapcube['inmodel']  = self._model
-        mapcube['ebinalg']  = 'LOG'
-        mapcube['emin']     = 1.0
-        mapcube['emax']     = 100.0
-        mapcube['enumbins'] = 5
-        mapcube['nxpix']    = 20
-        mapcube['nypix']    = 20
-        mapcube['binsz']    = 0.2
-        mapcube['coordsys'] = 'CEL'
-        mapcube['proj']     = 'CAR'
-        mapcube['xref']     = 83.63
-        mapcube['yref']     = 22.01
-        mapcube['outcube']  = 'ctmapcube_py1.fits'
-        mapcube['logfile']  = 'ctmapcube_py1.log'
-        mapcube['chatter']  = 2
+        mapcube['inmodel']   = self._model
+        mapcube['ebinalg']   = 'POW'
+        mapcube['emin']      = 1.0
+        mapcube['emax']      = 100.0
+        mapcube['enumbins']  = 5
+        mapcube['ebingamma'] = 1.0
+        mapcube['nxpix']     = 20
+        mapcube['nypix']     = 20
+        mapcube['binsz']     = 0.2
+        mapcube['coordsys']  = 'CEL'
+        mapcube['proj']      = 'CAR'
+        mapcube['xref']      = 83.63
+        mapcube['yref']      = 22.01
+        mapcube['outcube']   = 'ctmapcube_py1.fits'
+        mapcube['logfile']   = 'ctmapcube_py1.log'
+        mapcube['chatter']   = 2
 
         # Run ctmapcube tool
         mapcube.logFileOpen()   # Make sure we get a log file

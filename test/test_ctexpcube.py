@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctexpcube tool.
 #
-# Copyright (C) 2014-2018 Juergen Knoedlseder
+# Copyright (C) 2014-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -185,23 +185,24 @@ class Test(test):
 
         # Set-up ctexpcube from observation container
         expcube = ctools.ctexpcube(obs)
-        expcube['incube']   = 'NONE'
-        expcube['caldb']    = self._caldb
-        expcube['irf']      = self._irf
-        expcube['ebinalg']  = 'LOG'
-        expcube['emin']     = 1.0
-        expcube['emax']     = 100.0
-        expcube['enumbins'] = 5
-        expcube['nxpix']    = 20
-        expcube['nypix']    = 20
-        expcube['binsz']    = 0.2
-        expcube['coordsys'] = 'CEL'
-        expcube['proj']     = 'CAR'
-        expcube['xref']     = 83.63
-        expcube['yref']     = 22.01
-        expcube['logfile']  = 'ctexpcube_py3.log'
-        expcube['outcube']  = 'ctexpcube_py3.fits'
-        expcube['chatter']  = 4
+        expcube['incube']    = 'NONE'
+        expcube['caldb']     = self._caldb
+        expcube['irf']       = self._irf
+        expcube['ebinalg']   = 'POW'
+        expcube['emin']      = 1.0
+        expcube['emax']      = 100.0
+        expcube['enumbins']  = 5
+        expcube['ebingamma'] = 1.0
+        expcube['nxpix']     = 20
+        expcube['nypix']     = 20
+        expcube['binsz']     = 0.2
+        expcube['coordsys']  = 'CEL'
+        expcube['proj']      = 'CAR'
+        expcube['xref']      = 83.63
+        expcube['yref']      = 22.01
+        expcube['logfile']   = 'ctexpcube_py3.log'
+        expcube['outcube']   = 'ctexpcube_py3.fits'
+        expcube['chatter']   = 4
 
         # Execute ctexpcube tool
         expcube.logFileOpen()  # Needed to get a new log file

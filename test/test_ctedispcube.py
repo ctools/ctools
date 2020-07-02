@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctedispcube tool.
 #
-# Copyright (C) 2016-2018 Maria Haupt
+# Copyright (C) 2016-2020 Maria Haupt
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -192,10 +192,11 @@ class Test(test):
         edispcube['incube']    = 'NONE'
         edispcube['caldb']     = self._caldb
         edispcube['irf']       = self._irf
-        edispcube['ebinalg']   = 'LOG'
+        edispcube['ebinalg']   = 'POW'
         edispcube['emin']      = 1.0
         edispcube['emax']      = 100.0
         edispcube['enumbins']  = 5
+        edispcube['ebingamma'] = 1.0
         edispcube['nxpix']     = 10
         edispcube['nypix']     = 10
         edispcube['binsz']     = 0.4

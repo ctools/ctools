@@ -1,7 +1,7 @@
 # ==========================================================================
 # Utility functions for observation handling
 #
-# Copyright (C) 2011-2019 Juergen Knoedlseder
+# Copyright (C) 2011-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1007,6 +1007,8 @@ def create_counts_cube(cls, obs):
         ctbin['enumbins'] = cls['enumbins'].integer()
         ctbin['emin']     = cls['emin'].real()
         ctbin['emax']     = cls['emax'].real()
+        if cls['ebinalg'].string() == 'POW':
+            ctbin['ebingamma'] = cls['ebingamma'].real()
     ctbin['chatter']  = cls['chatter'].integer()
     ctbin['clobber']  = cls['clobber'].boolean()
     ctbin['debug']    = cls['debug'].boolean()
