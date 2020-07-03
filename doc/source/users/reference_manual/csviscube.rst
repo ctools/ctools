@@ -15,6 +15,7 @@ that a given position on the sky is observable under a given zenith angle
 by an IACT array during a given time period.
 
 For the moment, the script takes into account:
+
 - a Sun constraint, specified as a minimum zenith angle of the Sun (hidden
   parameter ``sunzenith``). If the Sun is higher in the sky than this zenith
   angle the corresponding times are excluded

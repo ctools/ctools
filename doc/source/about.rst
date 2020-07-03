@@ -15,12 +15,13 @@ Creation of shell or Python scripts and pipelines is supported as well.
 
 ctools are based on GammaLib, a versatile toolbox for the scientific
 analysis of astronomical gamma-ray data. 
-Besides CTA, GammaLib supports also the analysis of Fermi/LAT and COMPTEL 
-data, and extensions to support further gamma-ray instruments are planned. 
+Besides CTA, GammaLib supports also the analysis of Fermi/LAT, INTEGRAL/SPI
+and COMPTEL data, and extensions to support further gamma-ray instruments are
+planned.
 An interface to virtual observatory ressources does also exist.
 By making use of the GammaLib multi-instrument capabilities, ctools 
-supports the joint analysis of CTA, H.E.S.S., MAGIC, VERITAS, Fermi/LAT and
-COMPTEL data.
+supports the joint analysis of CTA, H.E.S.S., MAGIC, VERITAS, Fermi/LAT,
+INTEGRAL/SPI and COMPTEL data.
 
 ctools are developed by a team of enthousiastic gamma-ray astronomers with
 support from engineers. We regularily organise

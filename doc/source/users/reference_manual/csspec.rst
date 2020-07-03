@@ -158,7 +158,7 @@ General parameters
 ``(dll_sigmax = 5.0) [real]``
     Maximum number of standard deviations for log-like profiles. The final number
     of bins generated in the likelihood profile will be:
-       2*(dll_sigmax/dll_sigstep) + 1
+    ``2*(dll_sigmax/dll_sigstep) + 1``
     ensuring that the central flux will always be evaluated.
 
 ``(dll_freenodes = no) [boolean]``
