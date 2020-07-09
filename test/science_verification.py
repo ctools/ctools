@@ -11,7 +11,7 @@
 #
 # --------------------------------------------------------------------------
 #
-# Copyright (C) 2015-2018 Juergen Knoedlseder
+# Copyright (C) 2015-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -251,11 +251,13 @@ class sciver(gammalib.GPythonTestSuite):
         self.append(self.spec_gauss, 'Test Gaussian model')
         self.append(self.spec_filefct, 'Test file function model')
         self.append(self.spec_nodes, 'Test nodes model')
+        self.append(self.spec_table, 'Test table model')
         self.append(self.spec_exponential, 'Test exponential model')
 
         # Append spatial tests
         self.append(self.spat_ptsrc, 'Test point source model')
         self.append(self.spat_rdisk, 'Test radial disk model')
+        self.append(self.spat_rring, 'Test radial ring model')
         self.append(self.spat_rgauss, 'Test radial Gaussian model')
         self.append(self.spat_rshell, 'Test radial shell model')
         self.append(self.spat_edisk, 'Test elliptical disk model')
@@ -530,6 +532,19 @@ class sciver(gammalib.GPythonTestSuite):
         self.test('Pull_Background_Index')
         return
 
+    # Test table model
+    def spec_table(self):
+        """
+        Test table model
+        """
+        self.pull('data/sciver/crab_table')
+        self.test('Pull_Crab_Normalization')
+        self.test('Pull_Crab_Index')
+        self.test('Pull_Crab_Cutoff')
+        self.test('Pull_Background_Prefactor')
+        self.test('Pull_Background_Index')
+        return
+
     # Test exponential model
     def spec_exponential(self):
         """
@@ -568,6 +583,22 @@ class sciver(gammalib.GPythonTestSuite):
         self.test('Pull_Crab_RA')
         self.test('Pull_Crab_DEC')
         self.test('Pull_Crab_Radius')
+        self.test('Pull_Background_Prefactor')
+        self.test('Pull_Background_Index')
+        return
+
+    # Test radial ring model
+    def spat_rring(self):
+        """
+        Test radial ring model
+        """
+        self.pull('data/sciver/crab_rring')
+        self.test('Pull_Crab_Prefactor', lim_mean=0.45) # Accept a small bias
+        self.test('Pull_Crab_Index')
+        self.test('Pull_Crab_RA')
+        self.test('Pull_Crab_DEC')
+        self.test('Pull_Crab_Radius')
+        self.test('Pull_Crab_Width')
         self.test('Pull_Background_Prefactor')
         self.test('Pull_Background_Index')
         return
