@@ -202,12 +202,13 @@ def plot_dloglike(spec):
 
     # Plot the likelihood profiles
     plt.pcolormesh(np.array(spec['engs_scan']), y_bounds,
-                   np.array(dll_hist), vmin=-10.0, vmax=0.0, 
+                   np.array(dll_hist), vmin=-10.0, vmax=0.0,
                    cmap='Reds', alpha=0.9)
     cbar = plt.colorbar()
     cbar.set_label(r'$\Delta$ log-likelihood')
     plt.grid()
 
+    # Return
     return
 
 
