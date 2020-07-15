@@ -12,6 +12,13 @@ If you encounter any problems, please read the :ref:`sec_help` section.
 And you should read the :ref:`sec_develop` section if you would like to
 contribute to the ctools developments.
 
+The ctools software package is based on `GammaLib <http://cta.irap.omp.eu/gammalib/index.html>`_,
+a C++ API and Python module that provides support for the scientific analysis of
+astronomical gamma-ray data. For more information on
+`GammaLib <http://cta.irap.omp.eu/gammalib/index.html>`_
+please read the `GammaLib User documentation <http://cta.irap.omp.eu/gammalib/users/index.html>`_.
+
+
 Running ctools
 --------------
 
