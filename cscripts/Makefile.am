@@ -205,6 +205,7 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/sensitivity_integral.dat \
            $(top_srcdir)/test/data/skymap.fits \
            $(top_srcdir)/test/data/spectrum.fits \
+           $(top_srcdir)/test/data/spectrum_castro.fits \
            $(top_srcdir)/test/data/residual.fits \
            $(top_srcdir)/test/data/residual_onoff.fits \
            $(top_srcdir)/test/data/lightcurve.fits \

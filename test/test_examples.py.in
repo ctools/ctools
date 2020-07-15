@@ -418,6 +418,12 @@ class Test(gammalib.GPythonTestSuite):
         # Execute script
         self._execute_python('show_spectrum', args=args)
 
+        # Set arguments
+        args = '-p example_show_spectrum_castro.eps %s/spectrum_castro.fits' % self._datadir
+
+        # Execute script
+        self._execute_python('show_spectrum', args=args)
+
         # Return
         return
 

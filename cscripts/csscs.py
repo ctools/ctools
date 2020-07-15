@@ -70,13 +70,13 @@ class csscs(ctools.csobservation):
             Pickled instance
         """
         # Set pickled dictionary
-        state = {'base': ctools.csobservation.__getstate__(self),
-                 'nthreads':       self._nthreads,
-                 'srcnames':       self._srcnames,
-                 'method':         self._method,
-                 'fits':           self._fits,
-                 'excl_reg_map':   self._excl_reg_map,
-                 'excl_reg_name' : self._excl_reg_name}
+        state = {'base':          ctools.csobservation.__getstate__(self),
+                 'nthreads':      self._nthreads,
+                 'srcnames':      self._srcnames,
+                 'method':        self._method,
+                 'fits':          self._fits,
+                 'excl_reg_map':  self._excl_reg_map,
+                 'excl_reg_name': self._excl_reg_name}
 
         # Return pickled dictionary
         return state
@@ -107,7 +107,7 @@ class csscs(ctools.csobservation):
         """
         Get On/Off analysis parameters.
 
-        This is done here rather then in ctools.is_onoff because the exclusion
+        This is done here rather than in ctools.is_onoff because the exclusion
         map needs to be handled differently as an automatic parameter but
         queried only if not already set and we need to verify is not empty.
         Also many parameters are already queried for all methods
@@ -470,8 +470,8 @@ class csscs(ctools.csobservation):
         new_obs : `~gammalib.GObservations`
             Observations in circular ROI
         """
-        # Determine type of masking according
-        # to observation type and analysis method
+        # Determine type of masking according to observation type and analysis
+        # method
         if self._method == 'UNBINNED':
             new_obs = self._mask_evlist(self.obs(), ra, dec, rad)
         elif self._method == 'BINNED':
@@ -570,7 +570,7 @@ class csscs(ctools.csobservation):
                     # Calculate correction factor
                     # Spatial model flux over ROI divided by ROI solid angle
                     corr_factor  = source.spatial().flux(roi)
-                    corr_factor /= gammalib.twopi * (1 - math.cos(math.radians(self['rad'].real())))
+                    corr_factor /= gammalib.twopi * (1.0 - math.cos(math.radians(self['rad'].real())))
 
                     # Multiply flux by correction factor
                     flux                *= corr_factor
