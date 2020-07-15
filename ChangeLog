@@ -3,10 +3,10 @@
         * Version 1.7.0 released
         ========================
 
+        Avoid negative squared standard deviations in cssrcdetect (#3261)
         Add Interface Manual to User documentation (#3163)
         Adapt show_pull_histogram.py to matplotlib > 3.1.0 (#3156)
         Add On/Off analysis to ctlike reference manual (#3154)
-        Avoid negative squared standard deviations in cssrcdetect
         Update user manual for latest CTA IRF (#3075)
         Fix log file header repetition in some cscripts (#3066)
         Add Moon constraints to csviscube (#3065)

@@ -292,9 +292,11 @@ Add ebingamma parameter and support for POW binning (#2881).
 cssrcdetect - Detects sources in sky map
 ----------------------------------------
 The using of a smoothing kernel in the _map_moments() method can lead to
-negative squared standard deviations that lead to an exception when the
-square root is taken. A filter was introduced that sets all small values
-of mean and std to zero, avoiding thus the exception.
+negative squared standard deviations that lead to an exception when the square
+root is taken. To avoid negative values, the minimum pixel values for the
+standard deviation map is computed and, if the minimum value is negative,
+subtracted from the standard deviation map. Therefore, by definition, the
+standard deviation map is non negative for all pixels (#3261).
 
 
 cstsdist - Computes Test Statistic distribution
