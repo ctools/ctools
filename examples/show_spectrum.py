@@ -240,11 +240,14 @@ def plot_spectrum(filename, plotfile):
     plt.errorbar(spec['energies'], spec['flux'], 
                  yerr=spec['e_flux'], xerr=[spec['ed_engs'], spec['eu_engs']],
                  fmt='ro')
-    # Plot upper limits
-    plt.errorbar(spec['ul_energies'], spec['ul_flux'], 
-                 yerr=spec['yerr'], xerr=[spec['ul_ed_engs'], spec['ul_eu_engs']],
-                 uplims=True, fmt='ro')
 
+    # Plot upper limits
+    if len(spec['ul_energies'])	> 0:
+        plt.errorbar(spec['ul_energies'], spec['ul_flux'], yerr=spec['yerr'],
+                     xerr=[spec['ul_ed_engs'], spec['ul_eu_engs']],
+                     uplims=True, fmt='ro')
+
+    # Plot log-likelihood profiles
     if len(spec['dll_scan']) > 0:
         plot_dloglike(spec)
 
