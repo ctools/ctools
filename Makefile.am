@@ -161,6 +161,8 @@ dynamic-analysis: coverage valgrind
 cppcheck:
 	@if type cppcheck >/dev/null 2>&1; then \
 		cppcheck -v --enable=all --xml --xml-version=2 \
+        --suppress=missingIncludeSystem --check-config \
+        -Isrc/support -I$(INCDIR_GAMMALIB) \
 		src 2> cppcheck-result.xml; \
 	else \
 		echo "cppcheck not found in PATH."; \
