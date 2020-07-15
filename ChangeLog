@@ -15,7 +15,8 @@
         Add csscs script for spectral component separation (#2961)
         Add support for Castro plots to csspec (#2938)
         Enabling running of example scripts from objects in memory (#2925)
-        Add support for power-law binning to several tools (#2881)        
+        Add support for power-law binning to several tools (#2881)
+        Fix numerical glitch in residual computation (#2765)
         Allow using spectral models without "Prefactor" parameter in cssens
           and cstsdist (#1889)
 

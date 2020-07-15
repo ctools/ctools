@@ -897,8 +897,6 @@ def residuals(cls, counts, model):
         Residuals
     """
     # Find type of objects we are manipulating and set size to iterate later
-
-    # If GNdarray
     if counts.classname() == 'GNdarray':
         nelem = counts.size()
     elif counts.classname() == 'GSkyMap':
@@ -947,6 +945,8 @@ def residuals(cls, counts, model):
                 if data_val > 0.0:
                     log_val      = math.log(data_val / model_val)
                     residuals[i] = (data_val * log_val) + model_val - data_val
+                    if residuals[i] < 0.0:   # See glitch issue #2765
+                        residuals[i] = 0.0
 
                 # ... otherwise compute the reduced value of the above
                 # expression. This is necessary to avoid computing log(0).

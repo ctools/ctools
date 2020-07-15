@@ -357,7 +357,7 @@ None
 
 obsutils - Observation utilities
 --------------------------------
-None
+Fix numerical glitch in residual computation in residuals() function (#2765).
 
 
 Examples
