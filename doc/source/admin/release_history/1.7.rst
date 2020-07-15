@@ -29,6 +29,8 @@ Improvements
 
 * [`3163 <https://cta-redmine.irap.omp.eu/issues/3163>`_] -
   Add Interface Manual to User documentation
+* [`3154 <https://cta-redmine.irap.omp.eu/issues/3154>`_] -
+  Add On/Off analysis to ctlike reference manual
 * [`3075 <https://cta-redmine.irap.omp.eu/issues/3075>`_] -
   Update user manual for latest CTA IRF
 * [`3065 <https://cta-redmine.irap.omp.eu/issues/3065>`_] -
