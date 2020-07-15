@@ -16,6 +16,9 @@ None
 
 Documentation
 -------------
+Add Interface Manual to User documentation that provides links to the
+ctools and GammaLib Doxygen documentation (#3163).
+
 Update user manual to indicate where to get the latest CTA IRF (#3075).
 
 

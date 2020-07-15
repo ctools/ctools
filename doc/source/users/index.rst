@@ -11,6 +11,7 @@ This documentation will guide you in the process of using ctools.
    user_manual/index
    tutorials/index
    reference_manual/index
+   doxygen
    tips/index
    user_contributed/index
    glossary
