@@ -1,10 +1,11 @@
-2020-07-02
+2020-07-15
 
         * Version 1.7.0 released
         ========================
 
         Adapt show_pull_histogram.py to matplotlib > 3.1.0 (#3156)
         Avoid negative squared standard deviations in cssrcdetect
+        Update user manual for latest CTA IRF (#3075)
         Fix log file header repetition in some cscripts (#3066)
         Add Moon constraints to csviscube (#3065)
         Improve handling of reflected regions with exclusion regions (#2976)

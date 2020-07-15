@@ -88,21 +88,24 @@ In total, the following six instrument response functions are available:
    *This research has made use of the CTA instrument response functions
    provided by the CTA Consortium and Observatory.*
 
-   The latest CTA reponse function (prod3b-v1) can be downloaded from
-   `this link <http://www.cta-observatory.org/wp-content/uploads/2017/12/CTA-Performance-prod3b-v1-FITS1.tar.gz>`_. To install the response function, type
+   The latest CTA reponse functions can be downloaded from
+   `this link (get the FITS tarball under "Source Files") <https://www.cta-observatory.org/science/cta-performance/>`_. Assuming that the name of the FITS tarball is
+   ``CTA-Performance-prod3b-v2-FITS.tar.gz`` (which corresponds to the
+   prod3b-v2 response functions), you install the response functions by
+   typing
 
    .. code-block:: bash
 
-      $ tar xvfz CTA-Performance-prod3b-v1-FITS1.tar.gz -C $CTOOLS/share
+      $ tar xvfz CTA-Performance-prod3b-v2-FITS.tar.gz -C $CTOOLS/share
 
    or
 
    .. code-block:: bash
 
-      $ sudo tar xvfz CTA-Performance-prod3b-v1-FITS1.tar.gz -C $CTOOLS/share
+      $ sudo tar xvfz CTA-Performance-prod3b-v2-FITS.tar.gz -C $CTOOLS/share
 
    if you need root priviledges to install in your ``$CTOOLS`` directory.
-   To use the prod3b-v1 response functions, specify ``prod3b-v1`` if a tool
+   To use the prod3b-v2 response functions, specify ``prod3b-v2`` if a tool
    or script queries for the calibration database.
 
 

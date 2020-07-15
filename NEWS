@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.7.0
 
-2 July 2020
+15 July 2020
 
 
 Introduction
@@ -16,7 +16,7 @@ None
 
 Documentation
 -------------
-None
+Update user manual to indicate where to get the latest CTA IRF (#3075).
 
 
 Python interface

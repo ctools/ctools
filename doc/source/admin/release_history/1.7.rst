@@ -11,7 +11,7 @@ ctools 1.7 is a major release that adds significant functionality.
 In particular, this release provides:
 
 * csscs, a cscript for spectral component separation
-* ...
+* support for INTEGRAL/SPI telescope data analysis
 
 
 Bug fixes
@@ -27,6 +27,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`3075 <https://cta-redmine.irap.omp.eu/issues/3075>`_] -
+  Update user manual for latest CTA IRF
 * [`3065 <https://cta-redmine.irap.omp.eu/issues/3065>`_] -
   Add Moon constraints to :ref:`csviscube`
 * [`2976 <https://cta-redmine.irap.omp.eu/issues/2976>`_] -
