@@ -165,6 +165,9 @@ def get_spectrum_fits(fits):
     return spec
 
 
+# ========================= #
+# Plot delta log-likelihood #
+# ========================= #
 def plot_dloglike(spec):
     """
     Plot delta log-likelihood
@@ -198,7 +201,8 @@ def plot_dloglike(spec):
     dll_hist = [[row[i] for row in dll_hist] for i in range(steps)]
 
     # Plot the likelihood profiles
-    plt.pcolormesh(spec['engs_scan'], y_bounds, dll_hist, vmin=-10.0, vmax=0.0, 
+    plt.pcolormesh(np.array(spec['engs_scan']), y_bounds,
+                   np.array(dll_hist), vmin=-10.0, vmax=0.0, 
                    cmap='Reds', alpha=0.9)
     cbar = plt.colorbar()
     cbar.set_label(r'$\Delta$ log-likelihood')
