@@ -10,3 +10,4 @@ Instrument Response Functions
    irf_cta
    irf_lat
    irf_comptel
+   irf_spi
