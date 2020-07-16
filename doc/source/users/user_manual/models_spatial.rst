@@ -1,4 +1,4 @@
-.. _um_models_spatial_src:
+.. _um_models_spatial:
 
 Spatial source model components
 -------------------------------
@@ -7,9 +7,8 @@ The following sections present the spatial model components that are available
 in ctools for gamma-ray sources.
 
 .. note::
-   Except of the ``DiffuseMapCube`` model, all spatial models are normalized
-   so that when integrated over the sphere the result is unity. For clarify,
-   the spatial normalisation is omitted in the formulae below.
+   Except of the ``DiffuseMapCube`` model, all spatial models are normalised
+   so that when integrated over the sphere the result is unity.
 
 Point source
 ^^^^^^^^^^^^
@@ -33,8 +32,8 @@ Point source
   * ``RA`` is the Right Ascension (degrees)
   * ``DEC`` is the Declination (degrees)
 
-  The ``RA`` and ``DEC`` parameters can be remplaced by ``GLON`` and ``GLAT``
-  for Galactic coordinates
+  Instead of ``RA`` and ``DEC`` one may use ``GLON`` and ``GLAT`` to give the
+  position in Galactic coordinates
 
   .. code-block:: xml
 
@@ -52,6 +51,14 @@ Point source
 
   * ``GLON`` is the Galactic longitude (degrees)
   * ``GLAT`` is the Galactic latitude (degrees)
+
+  .. note::
+     Galactic coordinates using the ``GLON`` and ``GLAT`` parameters can be
+     specified for all spatial models that require a sky coordinate. Galactic
+     coordinates are transformed internally into celestial coordinates, and
+     in case that a model is written into an XML file, the corresponding
+     parameters will be replaced by the celestial coordinates ``RA`` and
+     ``DEC``.
 
   .. note::
      For compatibility with the Fermi/LAT ScienceTools the model type
@@ -82,9 +89,42 @@ RadialDisk
 
   where
 
-  * ``RA`` is the Right Ascension (degrees)
-  * ``DEC`` is the Declination (degrees)
+  * ``RA`` is the Right Ascension of the disk centre (degrees)
+  * ``DEC`` is the Declination of the disk centre (degrees)
   * ``Radius`` is the disk radius (degrees)
+
+RadialRing
+~~~~~~~~~~
+
+  The ``RadialRing`` model specifies a uniform intensity distribution within
+  a circular ring
+
+  .. code-block:: xml
+
+     <source name="Crab" type="ExtendedSource">
+       <spatialModel type="RadialRing">
+         <parameter name="RA"     scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
+         <parameter name="DEC"    scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
+         <parameter name="Radius" scale="1.0" value="0.20"    min="0.01" max="10"  free="1"/>
+         <parameter name="Width"  scale="1.0" value="0.15"    min="0.01" max="10"  free="1"/>
+       </spatialModel>
+       <spectrum type="...">
+         ...
+       </spectrum>
+     </source>
+
+  where
+
+  * ``RA`` is the Right Ascension of the ring centre (degrees)
+  * ``DEC`` is the Declination of the ring centre (degrees)
+  * ``Radius`` is the inner ring radius (degrees)
+  * ``Width`` is the ring width radius (degrees)
+
+  .. note::
+     Specifying the inner ring radius and ring width guarantees that both
+     parameters are well defined. The ring outer radius is given by
+     ``Radius+Width``.
+
 
 RadialGaussian
 ~~~~~~~~~~~~~~
@@ -112,8 +152,8 @@ RadialGaussian
 
   where
 
-  * ``RA`` is the Right Ascension (degrees)
-  * ``DEC`` is the Declination (degrees)
+  * ``RA`` is the Right Ascension of the Gaussian centre (degrees)
+  * ``DEC`` is the Declination of the Gaussian centre (degrees)
   * :math:`\sigma` = ``Sigma`` (degrees)
 
 RadialShell
@@ -155,14 +195,10 @@ RadialShell
 
   where
 
-  * ``RA`` is the Right Ascension (degrees)
-  * ``DEC`` is the Declination (degrees)
+  * ``RA`` is the Right Ascension of the shell centre (degrees)
+  * ``DEC`` is the Declination of the shell centre (degrees)
   * :math:`\theta_{\rm out}` = ``Radius`` + ``Width`` (degrees)
   * :math:`\theta_{\rm in}` = ``Radius`` (degrees)
-
-  .. note::
-     For all radial source models the ``RA`` and ``DEC`` parameters can be
-     remplaced by ``GLON`` and ``GLAT`` for Galactic coordinates.
 
 
 Elliptical source
@@ -238,10 +274,6 @@ EllipticalGaussian
   * :math:`\phi_0` is the position angle of the ellipse, counted counterclockwise
     from North
   * :math:`\phi` is the azimuth angle with respect to North.
-
-  .. note::
-     For all elliptical source models the ``RA`` and ``DEC`` parameters can be
-     remplaced by ``GLON`` and ``GLAT`` for Galactic coordinates.
 
 
 Diffuse source

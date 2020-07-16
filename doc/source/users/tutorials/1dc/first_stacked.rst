@@ -30,7 +30,7 @@ a counts cube. You do this using the :ref:`ctbin` tool:
    Image scale (in degrees/pixel) [0.02]
    Size of the X axis in pixels [200] 300
    Size of the Y axis in pixels [200] 300
-   Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
+   Algorithm for defining energy bins (FILE|LIN|LOG|POW) [LOG]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
    Number of energy bins (1-200) [20] 30
@@ -93,7 +93,7 @@ You run :ref:`ctpsfcube` as follows:
    Image scale (in degrees/pixel) [1.0]
    Size of the X axis in pixels [10]
    Size of the Y axis in pixels [10]
-   Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
+   Algorithm for defining energy bins (FILE|LIN|LOG|POW) [LOG]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
    Number of energy bins (1-1000) [20] 30

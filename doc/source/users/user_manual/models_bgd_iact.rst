@@ -1,11 +1,30 @@
-.. _um_models_spatial_bgd:
+.. _um_models_bgd_iact:
 
-Spatial background model components
------------------------------------
+IACT background models
+----------------------
 
-The following sections present the spatial model components that are available 
-in ctools for instrumental background modelling for Imaging Air Cherenkov
-Telescopes (IACTs) such as H.E.S.S., VERITAS, MAGIC and CTA.
+The following sections present the model components that are available in
+ctools for the modelling of instrumental background in data from Imaging Air
+Cherenkov Telescopes (IACTs) such as CTA, H.E.S.S., VERITAS, and MAGIC.
+
+IACT background models are factorised into an optional spatial tag
+(tags ``<spatialModel>`` or ``<radialModel>``) and a spectral tag
+(tag ``<spectrum>``) using
+
+.. math::
+   M(p',E') = M_{\rm spatial}(p'|E') \times M_{\rm spectral}(E')
+
+where :math:`M(p',E')` is given in units of
+:math:`{\rm events} \,\, {\rm s}^{-1} {\rm MeV}^{-1} {\rm sr}^{-1}`.
+
+For the spectral components, all spectra described in
+:ref:`um_models_spectral`
+may be used.
+
+.. note::
+   Spatial directions :math:`p'` and energies :math:`E'` are now the
+   reconstructed quantities, hence no convolution of the model with the
+   :ref:`Instrument Response Functions <um_irf>` is performed.
 
 
 General IACT background
@@ -26,11 +45,38 @@ General IACT background
        </spectrum>
      </source>
 
-  .. note::
-     Please speficy the ``instrument`` label in the XML file that corresponds
-     to the ``instrument`` label of the data. Otherwise the model will not be used
-     for your data. Valid ``instrument`` labels are ``HESS``, ``VERITAS``,
-     ``MAGIC`` and ``CTA``.
+  .. warning::
+     You need to specify the ``instrument`` label in the ``source`` tag
+     that corresponds to the ``instrument`` label of the observation to which
+     the model should apply. Supported ``instrument`` labels are ``CTA``,
+     ``HESS``, ``VERITAS`` and ``MAGIC``.
+
+     For example, if you analyse a H.E.S.S. observation you need to specify
+     ``instrument="HESS"`` in the ``source`` tag, while the model type is
+     still ``CTABackground``. So don't get confused!
+
+     .. code-block:: xml
+
+        <source name="Background" type="CTABackground" instrument="HESS">
+
+     The same logic applies to the radial acceptance, IRF, effective area and
+     cube background models.
+
+  .. warning::
+     In case that a background model should be used for the analysis of
+     On/Off data, the corresponding ``OnOff`` ``instrument`` label needs to
+     be selected. Supported ``OnOff`` ``instrument`` labels are ``CTAOnOff``,
+     ``HESSOnOff``, ``VERITASOnOff`` and ``MAGICOnOff``.
+
+     For example, if you analyse a H.E.S.S. On/Off observation you need to
+     specify
+
+     .. code-block:: xml
+
+        <source name="Background" type="CTABackground" instrument="HESSOnOff">
+
+     The same logic applies to the radial acceptance, IRF, effective area and
+     cube background models.
 
   The following sections describe the spatial model components that are
   available.
@@ -238,13 +284,15 @@ Radial acceptance background
 
   These models require a ``<radialModel>`` tag as the spatial component and
   accept all spatial model types that take the offset angle :math:`\theta`
-  as variable, such as ``Gaussian``, ``Profile`` and ``Polynom``. The use
-  of the radial acceptance model is deprecated, and the ``CTABackground``
-  model should be used instead.
+  as variable, such as ``Gaussian``, ``Profile`` and ``Polynom``.
+
+  .. warning::
+     The use of the radial acceptance model is deprecated, and the
+     ``CTABackground`` model should be used instead.
 
 
-CTA IRF background
-^^^^^^^^^^^^^^^^^^
+IRF background
+^^^^^^^^^^^^^^
 
   The :ref:`Instrument Response Functions (IRFs) <um_irf>` contain a template
   that predicts the background rate as function of position in the field of view
@@ -252,7 +300,10 @@ CTA IRF background
   :math:`{\rm events} \, {\rm s}^{-1} {\rm MeV}^{-1} {\rm sr}^{-1}`. This template
   can be used by specifying a model of type ``CTAIrfBackground``. No spatial component
   will be specified explicitly since the spatial (and spectral) information is
-  already contained in the template. The model will be multiplied by a spectral law.
+  already contained in the template.
+
+  The model will be multiplied by a spectral component to allow for the adjustment
+  of the energy distribution of the background rate.
 
   .. code-block:: xml
 
@@ -274,12 +325,13 @@ CTA IRF background
      </source>
 
 
-CTA effective area background
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Effective area background
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
   Instead of using the background template the effective area for gamma rays can
   also be used to model the instrumental background. Note that in this case the
-  effective area has to be scaled to a reasonable background rate.
+  effective area has to be scaled to a reasonable background rate by selecting
+  appropriate values for the spectral model component.
 
   .. code-block:: xml
 
@@ -290,13 +342,18 @@ CTA effective area background
      </source>
 
 
-CTA cube background
-^^^^^^^^^^^^^^^^^^^
+Cube background
+^^^^^^^^^^^^^^^
 
-  For a stacked analysis, the background rate is predicted by a so called
-  background cube. The background cube is used by specifying a model of type
+  For a stacked analysis, the background rates are predicted by a so called
+  background cube. The FITS file name of the background cube is specified
+  either as ctools task parameter, or using the ``BkgCube`` parameter in the
+  the observation definition XML file.
+
+  The background cube model is used by specifying a model of type
   ``CTACubeBackground``. Similar to the ``CTAIrfBackground`` model, the
-  background cube is multplied by a spectral model.
+  background cube is multplied with a spectral model to allow for the adjustment
+  of the energy distribution of the background rate.
 
   .. code-block:: xml
 

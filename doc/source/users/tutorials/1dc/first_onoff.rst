@@ -200,7 +200,7 @@ follows:
    $ csphagen
    Input event list or observation definition XML file [obs.xml]
    Input model definition XML file (if NONE, use point source) [NONE]
-   Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
+   Algorithm for defining energy bins (FILE|LIN|LOG|POW) [LOG]
    Start value for first energy bin in TeV [0.1]
    Stop value for last energy bin in TeV [100.0] 50.0
    Number of energy bins [120] 30
@@ -387,7 +387,7 @@ The fit result can be inspected by peeking the log file:
       Input event list or observation definition XML file [obs.xml]
       Input model definition XML file (if NONE, use point source) [NONE] CasA_model.xml
       Source name [Crab] Cassiopeia A
-      Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
+      Algorithm for defining energy bins (FILE|LIN|LOG|POW) [LOG]
       Start value for first energy bin in TeV [0.1]
       Stop value for last energy bin in TeV [50.0]
       Number of energy bins [30]
@@ -467,7 +467,7 @@ and the SED by typing
    Input model definition XML file [$CTOOLS/share/models/crab.xml] CasA_results.xml
    Source name [Crab] Cassiopeia A
    Spectrum generation method (SLICE|NODES|AUTO) [AUTO]
-   Binning algorithm (LIN|LOG|FILE) [LOG]
+   Binning algorithm (FILE|LIN|LOG|POW) [LOG]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0] 50.0
    Number of energy bins [20] 30

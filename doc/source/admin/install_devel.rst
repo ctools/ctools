@@ -7,7 +7,7 @@ The current development version of the code can be downloaded as source
 tarballs, Mac OS X binaries, or directly from the `Git <https://git-scm.com/>`_
 repository.
 
-The current ctools development release is ``ctools-1.7.0.dev``.
+The current ctools development release is ``ctools-1.8.0.dev``.
 
 
 Source tarballs
@@ -15,8 +15,8 @@ Source tarballs
 
 Download the source tarballs from the following links
 
-- `ctools <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.7.0.dev.tar.gz>`_
-- `GammaLib <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.7.0.dev.tar.gz>`_
+- `ctools <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.8.0.dev.tar.gz>`_
+- `GammaLib <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.8.0.dev.tar.gz>`_
 
 and follow the instructions on :ref:`sec_install_source`.
 
@@ -26,7 +26,7 @@ Binary packages
 
 Download the installer image from the following link
 
-- `Mac OS X (10.7+) <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.7.0.dev-macosx10.7.dmg>`_
+- `Mac OS X (10.7+) <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.8.0.dev-macosx10.7.dmg>`_
 
 and follow the instructions on :ref:`sec_install_binary`.
 
@@ -131,7 +131,7 @@ version as follows:
 
    $ conda create -n ctools-devel python=3.6
    $ source activate ctools-devel
-   $ conda install --use-local ctools=1.7.0.dev
+   $ conda install --use-local ctools=1.8.0.dev
 
 Note that you can choose between Python 2.7, 3.5, 3.6 and 3.7 for your
 conda environment.

@@ -1,22 +1,23 @@
-.. _um_models_implementation:
+.. _um_models_source:
 
-Implementation
---------------
+Source models
+-------------
 
 The general model is describe in ctools using a
 :ref:`model definition XML file <glossary_moddef>`.
 Below is a simple example of such a file comprising one source and one 
-background model.
-Each model is factorised into
-a spectral (tag ``<spectrum>``),
-a spatial (tags ``<spatialModel>`` or ``<radialModel>``), and
-a temporal component (tag ``<temporal>``).
+background model (see :ref:`um_models_bgd` for the implementation of the
+background models).
+
+Each source model is factorised into a spatial (tags ``<spatialModel>``, a
+spectral (tag ``<spectrum>``), and a temporal component (tag ``<temporal>``)
+using
 
 .. math::
    M(p,E,t) = M_{\rm spatial}(p|E) \times M_{\rm spectral}(E) \times M_{\rm temporal}(t)
 
 where :math:`M(p,E,t)` is given in units of
-:math:`photons \,\, cm^{-2} s^{-1} MeV^{-1} sr^{-1}`.
+:math:`photons \,\, {\rm cm}^{-1} {\rm s}^{-1} {\rm MeV}^{-1} {\rm sr}^{-1}`.
 
 The spatial model component describes the energy dependent morphology of the
 source.

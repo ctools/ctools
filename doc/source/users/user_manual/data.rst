@@ -1,9 +1,10 @@
 .. _um_data:
 
-The data
---------
+IACT data
+---------
 
-ctools operates on event lists. An event list is a table where each row
+For Imaging Air Cherenkov Telescopes (IACTs), such as CTA, H.E.S.S., MAGIC or
+VERITAS, ctools operates on event lists. An event list is a table where each row
 corresponds to a registered event and each column corresponds to a property
 of the event. Required properties are the event identifier, the reconstructed
 event direction, the reconstructed event energy and the trigger time. Event
@@ -36,7 +37,7 @@ of the H.E.S.S. event lists comprising a single GTI is shown below.
 
 Note that times are given in so-called Mission-Elapsed Time (MET) in seconds,
 and that the zero-point of the MET is specified by the ``MJDREFI`` and
-``MJDREFF`` keywords as the integer and fraction part of a Modified Julian Date
+``MJDREFF`` keywords as the integer and fractional part of a Modified Julian Date
 (MJD) in the header of the GTI. The same holds also for the trigger times in
 the event list.
 

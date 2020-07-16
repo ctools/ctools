@@ -34,7 +34,7 @@ bins between 100 GeV and 100 TeV:
    Input model definition XML file [$CTOOLS/share/models/crab.xml] crab_results.xml
    Source name [Crab]
    Spectrum generation method (SLICE|NODES|AUTO) [AUTO]
-   Binning algorithm (LIN|LOG|FILE) [LOG]
+   Binning algorithm (FILE|LIN|LOG|POW) [LOG]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
    Number of energy bins [20] 10

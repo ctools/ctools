@@ -47,7 +47,7 @@ To derive On/Off observations from the ``events_edisp.fits`` event list, type:
    Instrument response function [South_0.5h]
    Input model definition XML file (if NONE, use point source) [NONE] $CTOOLS/share/models/crab.xml
    Source name [Crab]
-   Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
+   Algorithm for defining energy bins (FILE|LIN|LOG|POW) [LOG]
    Start value for first energy bin in TeV [0.1]
    Stop value for last energy bin in TeV [100.0]
    Number of energy bins [120] 30

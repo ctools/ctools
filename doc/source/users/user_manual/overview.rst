@@ -11,7 +11,7 @@ executables, and tools starting with the letters ``cs`` are implemented as
 Python scripts.
 
 .. figure:: overview.jpg
-   :width: 60%
+   :width: 65%
    :align: center
 
 The scripts :ref:`csiactdata`, :ref:`csiactobs`, :ref:`csfindobs` and
@@ -46,6 +46,7 @@ tools.
 :ref:`csbkgmodel` prepares a standard background model for the analysis of
 IACT data that was validated on H.E.S.S. data. :ref:`csmodelinfo`
 inspects any given :ref:`model definition file <glossary_moddef>`,
+:ref:`csmodelselect` selects sources from a :ref:`model definition file <glossary_moddef>`,
 :ref:`csmodelmerge` merges several :ref:`model definition files <glossary_moddef>`
 into a single one, and :ref:`csmodelsois` extracts sources of interest from a
 :ref:`model definition file <glossary_moddef>` and replaces the remaining sources
@@ -54,6 +55,7 @@ by a diffuse map cube.
 :ref:`ctskymap` generates sky maps from the data and :ref:`cssrcdetect`
 detects sources in the sky map and writes them into a
 :ref:`model definition file <glossary_moddef>`.
+:ref:`csscs` spatially separates source components based on their spectra.
 
 :ref:`csspec` generates a spectrum and :ref:`ctbutterfly` computes a butterfly
 diagram for a given gamma-ray source.

@@ -51,7 +51,7 @@ Then bin the selected observations into a counts cube
    Image scale (in degrees/pixel) [0.02]
    Size of the X axis in pixels [200]
    Size of the Y axis in pixels [200]
-   Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
+   Algorithm for defining energy bins (FILE|LIN|LOG|POW) [LOG]
    Lower energy limit (TeV) [0.1] 0.03
    Upper energy limit (TeV) [100.0] 150.0
    Number of energy bins (1-200) [20] 40
@@ -78,7 +78,7 @@ Then compute the response cubes as follows
    Image scale (in degrees/pixel) [1.0]
    Size of the X axis in pixels [10]
    Size of the Y axis in pixels [10]
-   Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
+   Algorithm for defining energy bins (FILE|LIN|LOG|POW) [LOG]
    Lower energy limit (TeV) [0.1] 0.03
    Upper energy limit (TeV) [100.0] 150.0
    Number of energy bins (1-200) [20] 40
@@ -194,7 +194,7 @@ combined data set. You do this using the :ref:`csspec` script as follows
    Input model definition XML file [$CTOOLS/share/models/crab.xml] models.xml
    Source name [Crab] Vela
    Spectrum generation method (SLICE|NODES|AUTO) [AUTO]
-   Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
+   Algorithm for defining energy bins (FILE|LIN|LOG|POW) [LOG]
    Start value for first energy bin in TeV [0.1] 0.0001
    Stop value for last energy bin in TeV [100.0] 150.0
    Number of energy bins (1-200) [20]

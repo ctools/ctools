@@ -18,7 +18,7 @@ script. To do this, type
    Input model definition XML file [$CTOOLS/share/models/crab.xml] vela_results.xml
    Source name [Crab] Vela
    Spectrum generation method (SLICE|NODES|AUTO) [AUTO]
-   Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
+   Algorithm for defining energy bins (FILE|LIN|LOG|POW) [LOG]
    Start value for first energy bin in TeV [0.1] 0.0001
    Stop value for last energy bin in TeV [100.0] 0.1
    Number of energy bins (1-200) [20] 10

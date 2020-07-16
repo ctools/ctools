@@ -77,37 +77,37 @@ The model that will be used in this analysis is shown below:
 
 .. code-block:: xml
 
-  <?xml version="1.0" standalone="no"?>
-  <source_library title="source library">
-    <source type="PointSource" name="Crab">
-      <spectrum type="LogParabola">
-        <parameter name="Prefactor"   scale="1e-17" value="3.23"   min="1e-07" max="10000.0" free="1"/>
-        <parameter name="Index"       scale="-1"    value="2.47" min="0.5"   max="+5.0"   free="1"/>
-        <parameter name="Curvature"   scale="-1"    value="0.24"   min="-5.0"  max="+5.0"   free="1"/>
-        <parameter name="PivotEnergy" scale="1e6"   value="1.0"     min="0.01"  max="1000.0" free="0"/>
-      </spectrum>
-      <spatialModel type="PointSource">
-        <parameter name="RA"  scale="1.0" value="83.633" min="-360" max="360" free="0"/>
-        <parameter name="DEC" scale="1.0" value="22.015" min="-90"  max="90"  free="0"/>
-      </spatialModel>
-    </source>
-    <source type="DiffuseSource" name="Galactic_diffuse" instrument="LAT">
-      <spectrum type="Constant">
-        <parameter name="Normalization" scale="1.0" value="1.0" min="0.1" max="10.0" free="1"/>
-      </spectrum>
-      <spatialModel type="DiffuseMapCube" file="gll_iem_v07.fits">
-        <parameter name="Normalization" scale="1.0" value="1.0" min="0.1" max="10.0" free="0"/>
-      </spatialModel>
-    </source>
-    <source type="DiffuseSource" name="Isotropic_diffuse"  instrument="LAT">
-      <spectrum type="FileFunction" file="iso_P8R2_SOURCE_V2_v1.txt">
-        <parameter name="Normalization" scale="1.0" value="1.0" min="0.0" max="1000.0" free="0"/>
-      </spectrum>
-      <spatialModel type="DiffuseIsotropic">
-        <parameter name="Value" scale="1.0" value="1.0" min="0.0" max="10.0" free="0"/>
-      </spatialModel>
-    </source>
-  </source_library>
+   <?xml version="1.0" standalone="no"?>
+   <source_library title="source library">
+     <source type="PointSource" name="Crab">
+       <spectrum type="LogParabola">
+         <parameter name="Prefactor"   scale="1e-17" value="3.23"   min="1e-07" max="10000.0" free="1"/>
+         <parameter name="Index"       scale="-1"    value="2.47" min="0.5"   max="+5.0"   free="1"/>
+         <parameter name="Curvature"   scale="-1"    value="0.24"   min="-5.0"  max="+5.0"   free="1"/>
+         <parameter name="PivotEnergy" scale="1e6"   value="1.0"     min="0.01"  max="1000.0" free="0"/>
+       </spectrum>
+       <spatialModel type="PointSource">
+         <parameter name="RA"  scale="1.0" value="83.633" min="-360" max="360" free="0"/>
+         <parameter name="DEC" scale="1.0" value="22.015" min="-90"  max="90"  free="0"/>
+       </spatialModel>
+     </source>
+     <source type="DiffuseSource" name="Galactic_diffuse" instrument="LAT">
+       <spectrum type="Constant">
+         <parameter name="Normalization" scale="1.0" value="1.0" min="0.1" max="10.0" free="1"/>
+       </spectrum>
+       <spatialModel type="DiffuseMapCube" file="gll_iem_v07.fits">
+         <parameter name="Normalization" scale="1.0" value="1.0" min="0.1" max="10.0" free="0"/>
+       </spatialModel>
+     </source>
+     <source type="DiffuseSource" name="Isotropic_diffuse"  instrument="LAT">
+       <spectrum type="FileFunction" file="iso_P8R2_SOURCE_V2_v1.txt">
+         <parameter name="Normalization" scale="1.0" value="1.0" min="0.0" max="1000.0" free="0"/>
+       </spectrum>
+       <spatialModel type="DiffuseIsotropic">
+         <parameter name="Value" scale="1.0" value="1.0" min="0.0" max="10.0" free="0"/>
+       </spatialModel>
+     </source>
+   </source_library>
 
 The model contains a point source located at the position of the Crab
 with a log-parabola spectrum. It does not have any ``instrument`` attribute, which means that it applies to all instruments.  In addition, the model contains two ``DiffuseSource``
@@ -119,10 +119,10 @@ Now you can fit the model to the data using  :ref:`ctlike`:
 
 .. code-block:: bash
 
-		$ ctlike 
-		Input event list, counts cube or observation definition XML file [] joint_observations.xml
-		Input model definition XML file [] joint_models.xml
-		Output model definition XML file [] joint_results.xml
+   $ ctlike
+   Input event list, counts cube or observation definition XML file [] joint_observations.xml
+   Input model definition XML file [] joint_models.xml
+   Output model definition XML file [] joint_results.xml
 
 The results are: prefactor (for 1 TeV pivot energy) (4.5±0.2)×10−11
 photons cm−2 s−1 TeV−1, spectral index 2.42±0.04, and curvature
@@ -140,28 +140,28 @@ We can now generate the butterfly
 
 .. code-block:: bash
 		
-		$ ctbutterfly
-		Input event list, counts cube or observation definition XML file [events.fits] joint_observations.xml 
-		Source of interest [Crab] 
-		Input model definition XML file [$CTOOLS/share/models/crab.xml] joint_results.xml 
-		Lower energy limit (TeV) [0.1] 0.05
-		Upper energy limit (TeV) [100.0] 
-		Output ASCII file [butterfly.txt]
+   $ ctbutterfly
+   Input event list, counts cube or observation definition XML file [events.fits] joint_observations.xml
+   Source of interest [Crab]
+   Input model definition XML file [$CTOOLS/share/models/crab.xml] joint_results.xml
+   Lower energy limit (TeV) [0.1] 0.05
+   Upper energy limit (TeV) [100.0]
+   Output ASCII file [butterfly.txt]
 
 and spectral energy distribution (SED)
 
 .. code-block:: bash
 
-		$ csspec 
-		Input event list, counts cube, or observation definition XML file [joint_observations.xml] 
-		Input model definition XML file [joint_results.xml] 
-		Source name [Crab] 
-		Spectrum generation method (SLICE|NODES|AUTO) [AUTO] 
-		Algorithm for defining energy bins (FILE|LIN|LOG) [LOG] 
-		Start value for first energy bin in TeV [0.1] 0.05
-		Stop value for last energy bin in TeV [100.0] 
-		Number of energy bins (1-200) [10] 15
-		Output spectrum file [spectrum.fits]
+   $ csspec
+   Input event list, counts cube, or observation definition XML file [joint_observations.xml]
+   Input model definition XML file [joint_results.xml]
+   Source name [Crab]
+   Spectrum generation method (SLICE|NODES|AUTO) [AUTO]
+   Algorithm for defining energy bins (FILE|LIN|LOG|POW) [LOG]
+   Start value for first energy bin in TeV [0.1] 0.05
+   Stop value for last energy bin in TeV [100.0]
+   Number of energy bins (1-200) [10] 15
+   Output spectrum file [spectrum.fits]
 
 Below you can see the resulting butterfly and SED.
 
@@ -180,9 +180,8 @@ Below you can see the resulting butterfly and SED.
 
    .. code-block:: bash
 
-	$ $CTOOLS/share/examples/python/show_butterfly.py butterfly.txt
-
-        $ $CTOOLS/share/examples/python/show_spectrum.py spectrum.fits
+      $ $CTOOLS/share/examples/python/show_butterfly.py butterfly.txt
+      $ $CTOOLS/share/examples/python/show_spectrum.py spectrum.fits
 
 The SED is not shown above 40 TeV because the low counting statistics
 make the results uninteresting.

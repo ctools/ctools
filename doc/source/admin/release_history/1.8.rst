@@ -1,0 +1,42 @@
+.. _1.8:
+
+ctools 1.8 release
+==================
+
+Overview
+--------
+
+ctools 1.8 is a major release that adds significant functionality.
+
+In particular, this release provides:
+
+* ...
+* ...
+
+
+Bug fixes
+---------
+
+* [`2883 <https://cta-redmine.irap.omp.eu/issues/2883>`_] -
+  ...
+
+
+Improvements
+------------
+
+* [`2883 <https://cta-redmine.irap.omp.eu/issues/2883>`_] -
+  ...
+
+
+New features
+------------
+
+* [`2883 <https://cta-redmine.irap.omp.eu/issues/2883>`_] -
+  ...
+
+
+Clean up
+--------
+
+* [`2883 <https://cta-redmine.irap.omp.eu/issues/2883>`_] -
+  ...

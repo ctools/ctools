@@ -162,7 +162,7 @@ You create the spectrum for ``Src001`` using
    Input model definition XML file [$CTOOLS/share/models/crab.xml] results_stacked.xml
    Source name [Crab] Src001
    Spectrum generation method (SLICE|NODES|AUTO) [AUTO]
-   Binning algorithm (LIN|LOG|FILE) [LOG]
+   Binning algorithm (FILE|LIN|LOG|POW) [LOG]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
    Number of energy bins [20] 10
@@ -180,7 +180,7 @@ and for ``Src003`` using
    Input model definition XML file [results_stacked.xml]
    Source name [Src001] Src003
    Spectrum generation method (SLICE|NODES|AUTO) [AUTO] 
-   Binning algorithm (LIN|LOG|FILE) [LOG]
+   Binning algorithm (FILE|LIN|LOG|POW) [LOG]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
    Number of energy bins [10]

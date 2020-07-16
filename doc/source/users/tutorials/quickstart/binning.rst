@@ -27,7 +27,7 @@ using the :ref:`ctbin` tool as follows:
    Image scale (in degrees/pixel) [0.02]
    Size of the X axis in pixels [200]
    Size of the Y axis in pixels [200]
-   Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
+   Algorithm for defining energy bins (FILE|LIN|LOG|POW) [LOG]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
    Number of energy bins (1-200) [20]

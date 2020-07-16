@@ -1,7 +1,7 @@
 .. _1.7:
 
-ctools 1.7 release
-==================
+ctools 1.7 release (16 July 2020)
+=================================
 
 Overview
 --------
@@ -57,9 +57,4 @@ New features
 ------------
 * [`2961 <https://cta-redmine.irap.omp.eu/issues/2961>`_] -
   Add csscs script for spectral component separation
-
-
-
-Clean up
---------
 
