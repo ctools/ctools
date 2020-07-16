@@ -6,7 +6,8 @@ Source models
 The general model is describe in ctools using a
 :ref:`model definition XML file <glossary_moddef>`.
 Below is a simple example of such a file comprising one source and one 
-background model (see :ref:`um_models_bgd` for the implementation of the
+background model (see :ref:`um_models_bgd_iact`, :ref:`um_models_bgd_comptel`
+and :ref:`um_models_bgd_spi` for the implementation of the
 background models).
 
 Each source model is factorised into a spatial (tags ``<spatialModel>``, a
