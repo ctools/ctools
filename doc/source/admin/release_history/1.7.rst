@@ -1,6 +1,6 @@
 .. _1.7:
 
-ctools 1.7 release (16 July 2020)
+ctools 1.7 release (17 July 2020)
 =================================
 
 Overview

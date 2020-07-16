@@ -3,7 +3,7 @@
 Download
 ========
 
-The latest ctools release is ``ctools-1.7.0`` (16 July 2020).
+The latest ctools release is ``ctools-1.7.0`` (17 July 2020).
 
 Below a table of ctools releases. Please read the :ref:`sec_release` to
 learn more about new features and corrected bugs in a given release.
