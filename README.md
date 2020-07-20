@@ -1,7 +1,7 @@
 ctools information
 ==================
-* Version:             1.7.0 (29 May 2019)
-* GammaLib dependency: 1.7.0
+* Version:             1.7.1 (29 May 2019)
+* GammaLib dependency: 1.7.1
 
 [![Build Status](https://cta-jenkins.irap.omp.eu/buildStatus/icon?job=ctools-integrate-os)](https://cta-jenkins.irap.omp.eu/job/ctools-integrate-os/)
 
