@@ -1,0 +1,19 @@
+.. _1.7.1:
+
+ctools 1.7.1 release (20 July 2020)
+===================================
+
+Overview
+--------
+
+ctools 1.7.1 is a bug fix release for ctools release 1.7.
+
+The following bugs were fixed:
+
+* ...
+
+
+The following improvements were done:
+
+* [`3275 <https://cta-redmine.irap.omp.eu/issues/3275>`_] -
+  Speed-up ctbin for stacked event binning
