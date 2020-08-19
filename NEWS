@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.7.1
 
-20 July 2020
+19 August 2020
 
 
 Introduction
@@ -16,7 +16,7 @@ None
 
 Documentation
 -------------
-None
+The units of the response cubes were added to the reference manual (#3321).
 
 
 Python interface

@@ -38,10 +38,11 @@ well sampled (in particular at low energies).
 
 :ref:`ctexpcube` generates an exposure cube FITS file comprising three extensions.
 The primary extension contains a 3-dimensional image that contains the 
-exposure values. The next extension named ``ENERGIES`` contains a binary table
-that defines the energies of the exposure cube. The last extension named ``GTI``
-contains a binary table that provides the Good Time Intervals of all
-observations that have been used for the computation of the exposure cube.
+exposure values. The values are in units of cm**2 s. The next extension named
+``ENERGIES`` contains a binary table that defines the energies of the exposure
+cube. The last extension named ``GTI`` contains a binary table that provides the
+Good Time Intervals of all observations that have been used for the computation
+of the exposure cube.
 
 
 General parameters
