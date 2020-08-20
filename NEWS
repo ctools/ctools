@@ -1,6 +1,6 @@
-New Features and Important Changes in ctools 1.7.0
+New Features and Important Changes in ctools 1.8.0
 
-15 July 2020
+20 August 2020
 
 
 Introduction
@@ -16,12 +16,7 @@ None
 
 Documentation
 -------------
-Add Interface Manual to User documentation that provides links to the
-ctools and GammaLib Doxygen documentation (#3163).
-
-Add On/Off analysis to ctlike reference manual (#3154).
-
-Update user manual to indicate where to get the latest CTA IRF (#3075).
+None
 
 
 Python interface
@@ -36,17 +31,12 @@ None
 
 Base classes
 ------------
-The headers in the log files created by cscripts that were derived from the
-ctools.cscript base class were repeated. This repetition was not present in
-the other base classes due to a reopening of the log file in those classes.
-The logic was changed so that the cscripts now behave like the ctools. A log
-file is not written by default in Python, the logFileOpen() method needs to
-be called for that. And the header is only written once in the log file (#3066).
+None
 
 
 ctbin - CTA event binning
 -------------------------
-Add ebingamma parameter and support for POW binning (#2881).
+None
 
 
 ctbkgcube - CTA background cube generation
@@ -66,7 +56,7 @@ None
 
 ctedispcube - CTA energy dispersion cube generation
 ---------------------------------------------------
-Add ebingamma parameter and support for POW binning (#2881).
+None
 
 
 cterror - Likelihood profile error computation
@@ -76,7 +66,7 @@ None
 
 ctexpcube - CTA exposure cube generation
 ----------------------------------------
-Add ebingamma parameter and support for POW binning (#2881).
+None
 
 
 ctfindvar - Variability search
@@ -91,12 +81,12 @@ None
 
 ctmapcube - CTA map cube generation
 -----------------------------------
-Add ebingamma parameter and support for POW binning (#2881).
+None
 
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
-Add ebingamma parameter and support for POW binning (#2881).
+None
 
 
 ctobssim - CTA observation simulation
@@ -116,7 +106,7 @@ None
 
 ctpsfcube - CTA point spread function cube generation
 -----------------------------------------------------
-Add ebingamma parameter and support for POW binning (#2881).
+None
 
 
 ctselect - CTA event selection
@@ -126,14 +116,12 @@ None
 
 ctskymap - CTA sky mapping
 --------------------------
-Added ctskymap::fits() method to allow access of FITS file object before
-saving the object to disk. This allows manipulation of ctskymap results without
-writing a FITS file (#2925).
+None
 
 
 cttsmap - Generation of Test Statistic map
 ------------------------------------------
-Remove response cache for test source before fitting the source (#2973).
+None
 
 
 ctulimit - Compute upper limit
@@ -228,19 +216,7 @@ None
 
 csphagen - Generate On/Off observations
 ---------------------------------------
-The handling of reflected regions in the presence of exclusion regions was
-improved. In the presence of exclusion regions, the number of Off regions is
-slighty shift in position (#2976).
-
-Setting the exclusion map via csphagen.exclusion_map(object=<map>) will now
-actually use the exclusion map even if the "inexclusion" parameter is not set.
-Before, the only exclusion that would be used was the exclusion passed via the
-"inexclusion" "parameter. If re-running csphagen using the "inexclusion"
-parameter after setting the map with csphagen.exclusion_map() you should first
-call csphagen.exclusion_map(object=gammalib.GSkyRegionMap()). This makes the
-map empty and csphagen then checks the "inexclusion" "parameter (#2925).
-
-Add ebingamma parameter and support for POW binning (#2881).
+None
 
 
 csphasecrv - Generate phase curve
@@ -255,12 +231,12 @@ None
 
 csresmap - Generate residual map
 --------------------------------
-Add ebingamma parameter and support for POW binning (#2881).
+None
 
 
 csresspec - Generate residual spectrum
 --------------------------------------
-Add ebingamma parameter and support for POW binning (#2881).
+None
 
 
 csroot2caldb - Generates calibration database from ROOT file
@@ -270,39 +246,27 @@ None
 
 csscs - Spectral component separation
 -------------------------------------
-Add new script that performs a spectral component separation analysis. A
-tutorial and reference manual is included that explains how the script
-works (#2961).
+None
 
 
 cssens - Computes sensitivity curve
 -----------------------------------
-Allow using spectral models without "Prefactor" parameter for sensitivity
-computation (#1889).
+None
 
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-Support to generate Castro plots was added and the relevant information is
-now sorted in the output FITS file (#2938).
-
-Add ebingamma parameter and support for POW binning (#2881).
+None
 
 
 cssrcdetect - Detects sources in sky map
 ----------------------------------------
-The using of a smoothing kernel in the _map_moments() method can lead to
-negative squared standard deviations that lead to an exception when the square
-root is taken. To avoid negative values, the minimum pixel values for the
-standard deviation map is computed and, if the minimum value is negative,
-subtracted from the standard deviation map. Therefore, by definition, the
-standard deviation map is non negative for all pixels (#3261).
+None
 
 
 cstsdist - Computes Test Statistic distribution
 -----------------------------------------------
-Allow using spectral models without "Prefactor" parameter for computation of
-TS distribution (#1889).
+None
 
 
 cstsmapmerge - Merge Test Statistic maps
@@ -317,15 +281,7 @@ None
 
 csviscube - Generate visibility cube
 ------------------------------------
-Moon contraints were added to compute a more accurate visibility cube. So far
-there are two constraints:
-- moonzenith, which specifies a minimum allow zenith angle for the Moon. In
-  other words, if the Moon is higher in the sky than the specified zenith
-  angle, the corresponding times are excluded from the visibility cube.
-- maxfli, which specifies the maximum fraction of lunar illumination. If the
-  Moon has an illumination that is equal or larger than this fraction, the
-  corresponding times are excluded from the visibility cube.
-(#3065).
+None
 
 
 csworkflow - Execute workflow
@@ -345,9 +301,7 @@ None
 
 modutils - Model utilities
 --------------------------
-Allow using spectral models without "Prefactor" parameter as test source in
-test_source() function. Add normalisation_parameter() function to retrieve
-spectral normalisation parameter from any model (#1889).
+None
 
 
 mputils - Multiprocessing utilities
@@ -357,20 +311,12 @@ None
 
 obsutils - Observation utilities
 --------------------------------
-Fix numerical glitch in residual computation in residuals() function (#2765).
+None
 
 
 Examples
 --------
-In show_pull_histogram.py relpaced the call to mlab.normpdf() by a direct
-computation of the normalisation, so that the code also works for matplotlib
-> 3.1.0 (#3156).
-
-The show_viscube.py script was added to display a visibility cube (#3065).
-
-The example scripts show_butterfly.py, show_spectrum.py, show_residuals.py
-and show_significance_distribution.py can now be run using objects that only
-exist in memory (#2925).
+None
 
 
 caldb
