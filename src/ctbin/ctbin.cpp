@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2020 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -87,7 +87,6 @@ ctbin::ctbin(const GObservations& obs) :
     // Return
     return;
 }
-
 
 
 /***********************************************************************//**
@@ -221,9 +220,9 @@ void ctbin::clear(void)
  * @brief Run the event binning tool
  *
  * Gets the user parameters and loops over all CTA observations in the
- * observation container to bin the events into a single counts cube. All
- * observations in the observation container that do not contain CTA event
- * lists will be skipped.
+ * observation container to bin the events into either a single or a set of
+ * counts cube. All observations in the observation container that do not
+ * contain CTA event lists will be skipped.
  ***************************************************************************/
 void ctbin::run(void)
 {
@@ -281,9 +280,15 @@ void ctbin::run(void)
 
     // Initialise arrays
     if (nobs > 0) {
-        m_counts  = std::vector<GSkyMap>(nobs);
-        m_weights = std::vector<GSkyMap>(nobs);
-        m_cubes   = std::vector<GCTAEventCube>(nobs);
+
+        // Determine number of cubes
+        int ncubes = (m_stack) ? 1 : nobs;
+
+        // Allocate cubes
+        m_counts  = std::vector<GSkyMap>(ncubes);
+        m_weights = std::vector<GSkyMap>(ncubes);
+        m_cubes   = std::vector<GCTAEventCube>(ncubes);
+
     }
     else {
         m_counts.clear();
@@ -316,45 +321,24 @@ void ctbin::run(void)
         // Get pointer to observation
         GCTAObservation* obs = obs_list[i];
 
-        // Fill the cube
-        GSkyMap counts = fill_cube(obs);
+        // Determine counts cube slot
+        int islot = (m_stack) ? 0 : i;
+
+        // If slot is empty then allocate cubes
+        #pragma omp critical(ctbin_run)
+        if (m_counts[islot].is_empty()) {
+            m_counts[islot]  = create_cube(obs);
+            m_weights[islot] = create_cube(obs);
+        }
+        
+        // Fill counts cube
+        fill_cube(obs, m_counts[islot]);
 
         // Set the counts cube weights
-        GSkyMap weights = set_weights(obs);
+        set_weights(obs, m_weights[islot]);
 
         // Dispose events to free memory
         obs->dispose_events();
-
-        // Post process cubes
-        #pragma omp critical(ctbin_fill_cube)
-        {
-            // If stacking of cubes is requested then add up counts cube
-            // and set weights in the first slot of the m_counts and
-            // m_weights arrays
-            if (m_stack) {
-                if (m_counts[0].is_empty()) {
-                    m_counts[0]  = counts;
-                    m_weights[0] = weights;
-                }
-                else {
-                    for (int iebin = 0; iebin < m_ebounds.size(); ++iebin) {
-                        for (int pixel = 0; pixel < counts.npix(); ++pixel) {
-                            m_counts[0](pixel, iebin) += counts(pixel, iebin);
-                            if (weights(pixel, iebin) == 1.0) {
-                                m_weights[0](pixel, iebin) = 1.0;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // ... otherwise store counts and weights
-        	else {
-                m_counts[i]  = counts;
-                m_weights[i] = weights;
-            }
-
-        } // end: omp critical section
 
     } // endfor: looped over observations
 
@@ -369,16 +353,16 @@ void ctbin::run(void)
 
         // If resulting GTI is not filled then copy over the reference from
         // the observation and use it for the resulting GTI
-	    if (m_gti.is_empty()) {
+        if (m_gti.is_empty()) {
             m_gti.reference(gti.reference());
-	    }
+        }
 
-	    // Append GTIs
-	    m_gti.extend(gti);
+        // Append GTIs
+        m_gti.extend(gti);
 
-	    // Update ontime and livetime
-	    m_ontime   += obs->ontime();
-	    m_livetime += obs->livetime();
+        // Update ontime and livetime
+        m_ontime   += obs->ontime();
+        m_livetime += obs->livetime();
 
     } // endfor: looped over all observations
 
@@ -842,13 +826,14 @@ GSkyMap ctbin::create_cube(const GCTAObservation* obs)
  * @brief Fill events into counts cube
  *
  * @param[in] obs CTA observation.
+ * @param[in,out] counts Counts cube
  *
  * @exception GException::invalid_value
  *            No event list or valid RoI found in observation.
  *
  * Fills the events from an event list into the counts cube.
  ***************************************************************************/
-GSkyMap ctbin::fill_cube(const GCTAObservation* obs)
+void ctbin::fill_cube(const GCTAObservation* obs, GSkyMap& counts)
 {
     // Make sure that the observation holds a CTA event list. If this is
     // not the case then throw an exception.
@@ -882,9 +867,6 @@ GSkyMap ctbin::fill_cube(const GCTAObservation* obs)
     int num_outside_map  = 0;
     int num_outside_ebds = 0;
     int num_in_map       = 0;
-
-    // Create counts cube
-    GSkyMap counts = create_cube(obs);
 
     // Extract counts cube boundaries
     double pixel_x_max = counts.nx() - 0.5;
@@ -936,6 +918,7 @@ GSkyMap ctbin::fill_cube(const GCTAObservation* obs)
         }
 
         // Fill event in skymap
+        #pragma omp atomic
         counts(pixel, iebin) += 1.0;
 
         // Increment number of maps
@@ -956,7 +939,7 @@ GSkyMap ctbin::fill_cube(const GCTAObservation* obs)
     }
 
     // Return
-    return counts;
+    return;
 }
 
 
@@ -964,6 +947,7 @@ GSkyMap ctbin::fill_cube(const GCTAObservation* obs)
  * @brief Set counts cube weights for a given observation
  *
  * @param[in] obs CTA observation.
+ * @param[in,out] weights Counts cube weights.
  *
  * @exception GException::invalid_value
  *            No event list or valid RoI found in observation.
@@ -971,7 +955,7 @@ GSkyMap ctbin::fill_cube(const GCTAObservation* obs)
  * Sets the counts cube weights for all bins that are considered for the
  * specific observation to unity.
  ***************************************************************************/
-GSkyMap ctbin::set_weights(const GCTAObservation* obs)
+void ctbin::set_weights(const GCTAObservation* obs, GSkyMap& weights)
 {
     // Get the RoI
     const GCTARoi& roi = obs->roi();
@@ -991,9 +975,6 @@ GSkyMap ctbin::set_weights(const GCTAObservation* obs)
 
     // Get counts cube usage flags
     std::vector<bool> usage = cube_layer_usage(m_ebounds, obs->ebounds());
-
-    // Create weights cube
-    GSkyMap weights = create_cube(obs);
 
     // Set sky direction cache availability flag
     bool cache = (m_stack && m_dirs.size() == weights.npix());
@@ -1029,7 +1010,7 @@ GSkyMap ctbin::set_weights(const GCTAObservation* obs)
     } // endfor: looped over pixels of counts cube
 
     // Return
-    return weights;
+    return;
 }
 
 

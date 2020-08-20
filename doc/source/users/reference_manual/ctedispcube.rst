@@ -30,11 +30,11 @@ value of ``binsz=1.0``).
 
 :ref:`ctedispcube` generates an energy dispersion cube FITS file comprising three
 extensions. The primary extension contains a 4-dimensional image that contains
-the energy disperison values. The next extension named ``ENERGIES`` contains
-a binary table that defines the energies of the energy dispersion cube. The
-last extension named ``MIGRAS`` contains a binary table that defines the
-migration values of the cube which is the ratio between reconstructed and true
-photon energy.
+the energy disperison values. The values are in units of MeV**(-1). The next
+extension named ``ENERGIES`` contains a binary table that defines the energies of
+the energy dispersion cube. The last extension named ``MIGRAS`` contains a binary
+table that defines the migration values of the cube which is the ratio between
+reconstructed and true photon energy.
 
 
 General parameters

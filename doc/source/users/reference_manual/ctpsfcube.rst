@@ -30,10 +30,11 @@ manageable (with a typical value of ``binsz=1.0``).
 
 :ref:`ctpsfcube` generates a point spread function cube FITS file comprising three
 extensions. The primary extension contains a 4-dimensional image that contains
-the point spread function values. The next extension named ``ENERGIES`` contains
-a binary table that defines the energies of the point spread function cube.
-The last extension named ``DELTAS`` contains a binary table that defines the
-offset angles between true and measured arrival direction of the photon.
+the point spread function values. The values are in units of sr**(-1). The next
+extension named ``ENERGIES`` contains a binary table that defines the energies of
+the point spread function cube. The last extension named ``DELTAS`` contains a
+binary table that defines the offset angles between true and measured arrival
+direction of the photon.
 
 
 General parameters

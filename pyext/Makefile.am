@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools Python extension module                               #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2017 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2020 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -160,6 +160,11 @@ if IS_ELCAPITAN
 		install_name_tool -add_rpath ${GAMMALIB}/lib $$f; \
 	done
 endif
+	-for f in build/ctools/ctools/_*.so; do \
+		dst=`echo $$f | sed 's/build\/ctools\///g'`; \
+		cp $$f $$dst; \
+		echo "Copied "$$f" -> "$$dst; \
+	done
 
 # Install the ctools Python module
 install-exec-local:
