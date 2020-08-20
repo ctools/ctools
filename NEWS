@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.7.1
 
-19 August 2020
+20 August 2020
 
 
 Introduction
@@ -11,7 +11,9 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-None
+The Python module is now copied from pyext/build/ctools/ctools into
+pyext/ctools since code generated using recent swig versions needs the module
+in that place (#3322).
 
 
 Documentation

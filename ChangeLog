@@ -1,8 +1,9 @@
-2020-08-19
+2020-08-20
 
         * Bug fix version 1.7.1 released
         ================================
 
+        Copy Python module into pyext/ctools folder (#3322)
         Add units to reference manual of response cube tools (#3321)
         Speed-up ctbin for stacked event binning (#3275)
 
