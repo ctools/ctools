@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.7.1
 
-20 August 2020
+21 August 2020
 
 
 Introduction
@@ -11,9 +11,7 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-The Python module is now copied from pyext/build/ctools/ctools into
-pyext/ctools since code generated using recent swig versions needs the module
-in that place (#3322).
+None
 
 
 Documentation
@@ -23,7 +21,12 @@ The units of the response cubes were added to the reference manual (#3321).
 
 Python interface
 ----------------
-None
+The configuration now checks for Big Sur and later so that the path names in
+the Python modules are adapted as needed (#3326).
+
+The Python module is now copied from pyext/build/ctools/ctools into
+pyext/ctools since code generated using recent swig versions needs the module
+in that place (#3322).
 
 
 Support model
