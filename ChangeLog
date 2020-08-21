@@ -4,11 +4,12 @@
         ========================
 
 
-2020-08-20
+2020-08-21
 
         * Bug fix version 1.7.1 released
         ================================
 
+        Test for Big Sur in configuration step (#3326)
         Copy Python module into pyext/ctools folder (#3322)
         Add units to reference manual of response cube tools (#3321)
         Speed-up ctbin for stacked event binning (#3275)
