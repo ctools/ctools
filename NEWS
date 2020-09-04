@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.7.1
 
-21 August 2020
+4 September 2020
 
 
 Introduction
@@ -11,7 +11,9 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-None
+The Python include path was added in the Python.h header check in configure.ac
+since due to a bug introduced in Python 3.8 the cpython/initconfig.h header was
+not found (#3329).
 
 
 Documentation
