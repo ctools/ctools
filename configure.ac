@@ -1,7 +1,7 @@
 #############################################################################
 # Configuration for ctools - tools for science analysis of CTA data         #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2019 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2020 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
