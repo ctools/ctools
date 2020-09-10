@@ -197,7 +197,7 @@ clean-local:
 	rm -rf $(top_builddir)/pyext/ctools/c*.py
 	rm -rf $(top_builddir)/pyext/ctools/*.pyc
 	rm -rf $(top_builddir)/pyext/ctools/*_wrap.cpp
-	rm -rf $(top_builddir)/pyext/ctools/_tools.*.so
+	rm -rf $(top_builddir)/pyext/ctools/_tools*.so
 	rm -rf $(top_builddir)/pyext/ctools/__pycache__
 
 endif # WITH_PYTHON
