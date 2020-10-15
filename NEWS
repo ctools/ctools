@@ -1,6 +1,6 @@
-New Features and Important Changes in ctools 1.7.1
+New Features and Important Changes in ctools 1.7.2
 
-7 September 2020
+15 October 2020
 
 
 Introduction
@@ -11,24 +11,17 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-The Python include path was added in the Python.h header check in configure.ac
-since due to a bug introduced in Python 3.8 the cpython/initconfig.h header was
-not found (#3329).
+None
 
 
 Documentation
 -------------
-The units of the response cubes were added to the reference manual (#3321).
+None
 
 
 Python interface
 ----------------
-The configuration now checks for Big Sur and later so that the path names in
-the Python modules are adapted as needed (#3326).
-
-The Python module is now copied from pyext/build/ctools/ctools into
-pyext/ctools since code generated using recent swig versions needs the module
-in that place (#3322).
+None
 
 
 Support model
@@ -43,8 +36,7 @@ None
 
 ctbin - CTA event binning
 -------------------------
-The code was refactored so that parallel processing using OpenMP is now
-considerably faster when data are stacked (#3275).
+None
 
 
 ctbkgcube - CTA background cube generation
