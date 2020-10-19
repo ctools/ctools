@@ -1,12 +1,12 @@
-.. _1.8:
+.. _2.0:
 
-ctools 1.8 release
-==================
+ctools 2.0 release (19 October 2020)
+====================================
 
 Overview
 --------
 
-ctools 1.8 is a major release that adds significant functionality.
+ctools 2.0 is a major release that adds significant functionality.
 
 In particular, this release provides:
 

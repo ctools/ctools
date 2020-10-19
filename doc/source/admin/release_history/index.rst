@@ -6,7 +6,7 @@ Release History
 .. toctree::
    :maxdepth: 1
 
-   ctools 1.8 <1.8>
+   ctools 2.0 <2.0>
    ctools 1.7.1 <1.7.1>
    ctools 1.7 <1.7>
    ctools 1.6.3 <1.6.3>
