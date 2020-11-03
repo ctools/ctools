@@ -76,6 +76,9 @@ None
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
+The model fitting results, such as log-likelihood value, number of iterations
+etc. are now added to the output XML file (#3431).
+
 A bug was fixed in the implementation of the fix_spat_for_ts parameter that
 only fixed the spatial parameters for the first of the sky models but left
 the spatial parameters free for all additional sky models. Now the parameters

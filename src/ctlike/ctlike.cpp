@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2019 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2020 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -236,10 +236,10 @@ void ctlike::run(void)
     // Store copy of curvature matrix
     GMatrixSparse curvature =
         *(const_cast<GObservations::likelihood&>(m_obs.function()).curvature());
-    
+
     // Store Npred
-    double npred = m_obs.npred();
-    
+    m_npred = m_obs.npred();
+
     // Store models for which TS should be computed
     std::vector<std::string> ts_srcs;
     GModels models_orig = m_obs.models();
@@ -308,11 +308,11 @@ void ctlike::run(void)
     } // endif: requested TS computation
 
     // Compute number of observed events in all observations
-    double num_events = 0.0;
+    m_nobs = 0.0;
     for (int i = 0; i < m_obs.size(); ++i) {
         double data = m_obs[i]->nobserved();
         if (data >= 0.0) {
-            num_events += data;
+            m_nobs += data;
         }
     }
 
@@ -320,9 +320,9 @@ void ctlike::run(void)
     log_header1(NORMAL, "Maximum likelihood optimisation results");
     log_string(NORMAL, m_opt.print(m_chatter));
     log_value(NORMAL, "Maximum log likelihood", gammalib::str(m_logL,3));
-    log_value(NORMAL, "Observed events  (Nobs)", gammalib::str(num_events,3));
-    log_value(NORMAL, "Predicted events (Npred)", gammalib::str(npred,3)+
-              " (Nobs - Npred = "+gammalib::str(num_events-npred)+")");
+    log_value(NORMAL, "Observed events  (Nobs)", gammalib::str(m_nobs,3));
+    log_value(NORMAL, "Predicted events (Npred)", gammalib::str(m_npred,3)+
+              " (Nobs - Npred = "+gammalib::str(m_nobs-m_npred)+")");
     log_string(NORMAL, m_obs.models().print(m_chatter));
 
     // Restore energy dispersion flags of all CTA observations
@@ -356,6 +356,9 @@ void ctlike::save(void)
     // Save model only if filename is valid
     if ((*this)["outmodel"].is_valid()) {
 
+        // Generate XML instance
+        GXml xml = xml_result();
+
         // Get output filename
         m_outmodel = (*this)["outmodel"].filename();
 
@@ -363,9 +366,9 @@ void ctlike::save(void)
         log_value(NORMAL, "Model definition file", m_outmodel.url());
 
         // Write results out as XML model
-        m_obs.models().save(m_outmodel);
+        xml.save(m_outmodel);
 
-    }
+    } // endif: filename was valid
 
     // ... otherwise signal that file was not saved
     else {
@@ -391,6 +394,69 @@ void ctlike::save(void)
         log_value(NORMAL, "Covariance matrix file", "NONE");
     }
 
+    // Return
+    return;
+}
+
+
+/*==========================================================================
+ =                                                                         =
+ =                             Private methods                             =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Initialise class members
+ ***************************************************************************/
+void ctlike::init_members(void)
+{
+    // Initialise members
+    m_outmodel.clear();
+    m_outcovmat.clear();
+    m_refit           = false;
+    m_apply_edisp     = false;
+    m_fix_spat_for_ts = false;
+    m_chatter         = static_cast<GChatter>(2);
+    m_logL            = 0.0;
+    m_nobs            = 0.0;
+    m_npred           = 0.0;
+
+    // Set logger properties
+    log.date(true);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Copy class members
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+void ctlike::copy_members(const ctlike& app)
+{
+    // Copy attributes
+    m_refit           = app.m_refit;
+    m_outmodel        = app.m_outmodel;
+    m_outcovmat       = app.m_outcovmat;
+    m_apply_edisp     = app.m_apply_edisp;
+    m_fix_spat_for_ts = app.m_fix_spat_for_ts;
+    m_chatter         = app.m_chatter;
+    m_logL            = app.m_logL;
+    m_nobs            = app.m_nobs;
+    m_npred           = app.m_npred;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Delete class members
+ ***************************************************************************/
+void ctlike::free_members(void)
+{
     // Return
     return;
 }
@@ -562,60 +628,70 @@ double ctlike::reoptimize_lm(void)
 }
 
 
-/*==========================================================================
- =                                                                         =
- =                             Private methods                             =
- =                                                                         =
- ==========================================================================*/
-
 /***********************************************************************//**
- * @brief Initialise class members
- ***************************************************************************/
-void ctlike::init_members(void)
-{
-    // Initialise members
-    m_outmodel.clear();
-    m_outcovmat.clear();
-    m_refit           = false;
-    m_logL            = 0.0;
-    m_apply_edisp     = false;
-    m_fix_spat_for_ts = false;
-    m_chatter         = static_cast<GChatter>(2);
-
-    // Set logger properties
-    log.date(true);
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Copy class members
+ * @brief Generate XML result
  *
- * @param[in] app Application.
+ * @return XML result
+ *
+ * Generates the XML result composed of the ctlike results and the model
+ * fitting results.
  ***************************************************************************/
-void ctlike::copy_members(const ctlike& app)
+GXml ctlike::xml_result(void) const
 {
-    // Copy attributes
-    m_refit           = app.m_refit;
-    m_outmodel        = app.m_outmodel;
-    m_outcovmat       = app.m_outcovmat;
-    m_logL            = app.m_logL;
-    m_apply_edisp     = app.m_apply_edisp;
-    m_fix_spat_for_ts = app.m_fix_spat_for_ts;
-    m_chatter         = app.m_chatter;
+    // Initialise XML result
+    GXml xml;
 
-    // Return
-    return;
-}
+    // Set fit status
+    std::string status;
+    switch (m_opt.status()) {
+    case G_LM_CONVERGED:
+        status.append("converged");
+        break;
+    case G_LM_STALLED:
+        status.append("stalled");
+        break;
+    case G_LM_SINGULAR:
+        status.append("singular curvature matrix encountered");
+        break;
+    case G_LM_NOT_POSTIVE_DEFINITE:
+        status.append("curvature matrix not positive definite");
+        break;
+    case G_LM_BAD_ERRORS:
+        status.append("errors are inaccurate");
+        break;
+    default:
+        status.append("unknown");
+        break;
+    }
 
+    // Set flag strings
+    std::string refit           = (m_refit) ? "yes" : "no";
+    std::string edisp     = (m_apply_edisp) ? "yes" : "no";
+    std::string fix_spat_for_ts = (m_fix_spat_for_ts) ? "yes" : "no";
 
-/***********************************************************************//**
- * @brief Delete class members
- ***************************************************************************/
-void ctlike::free_members(void)
-{
-    // Return
-    return;
+    // Write ctlike results into XML instance
+    if (xml.elements("ctlike_results") == 0) {
+        xml.append(GXmlElement("ctlike_results title=\"ctlike fit results\""));
+    }
+    GXmlElement* result = xml.element("ctlike_results", 0);
+    result->append(GXmlElement("status", status));
+    result->append(GXmlElement("log-likelihood", m_logL));
+    result->append(GXmlElement("precision", m_opt.eps()));
+    result->append(GXmlElement("iterations", m_opt.iter()));
+    result->append(GXmlElement("lambda", m_opt.lambda()));
+    result->append(GXmlElement("total_parameters", m_opt.npars()));
+    result->append(GXmlElement("fitted_parameters", m_opt.nfree()));
+    result->append(GXmlElement("observed-events", m_nobs));
+    result->append(GXmlElement("predicted-events", m_npred));
+    result->append(GXmlElement("refit", refit));
+    result->append(GXmlElement("edisp", edisp));
+    result->append(GXmlElement("fix-spatial-for-ts", fix_spat_for_ts));
+    result->append(GXmlElement("elapsed-time", this->telapse()));
+    result->append(GXmlElement("cpu-seconds", this->celapse()));
+
+    // Write model results into XML instance
+    m_obs.models().write(xml);
+
+    // Return XML result
+    return xml;
 }

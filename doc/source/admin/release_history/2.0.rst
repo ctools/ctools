@@ -24,6 +24,9 @@ Bug fixes
 Improvements
 ------------
 
+* [`3431 <https://cta-redmine.irap.omp.eu/issues/3431>`_] -
+  Add :ref:`ctlike` results to XML file
+
 
 New features
 ------------

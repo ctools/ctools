@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2020 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -65,17 +65,20 @@ protected:
     void   get_parameters(void);
     void   optimize_lm(void);
     double reoptimize_lm(void);
+    GXml   xml_result(void) const;
 
     // User parameters
-    bool      m_refit;           //!< Refitting
     GFilename m_outmodel;        //!< Source model output XML file name
     GFilename m_outcovmat;       //!< Covariance matrix output file name
+    bool      m_refit;           //!< Refitting
     bool      m_apply_edisp;     //!< Apply energy dispersion?
     bool      m_fix_spat_for_ts; //!< Fix spatial parameters for TS computation?
     GChatter  m_chatter;         //!< Chattiness
 
     // Members
     double    m_logL;            //!< Maximum log likelihood
+    double    m_nobs;            //!< Number of observed events
+    double    m_npred;           //!< Number of predicted events
 };
 
 #endif /* CTLIKE_HPP */
