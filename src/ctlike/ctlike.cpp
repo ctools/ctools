@@ -281,17 +281,31 @@ void ctlike::run(void)
 
         // Loop over stored models, remove source and refit
         for (int i = 0; i < ts_srcs.size(); ++i) {
-            models.remove(ts_srcs[i]);
-            m_obs.models(models);    
+
+            // Create copy of models
+            GModels models_copy = models;
+
+            // Remove source of interest
+            models_copy.remove(ts_srcs[i]);
+
+            // Set models for fitting
+            m_obs.models(models_copy);
+
+            // Re-optimise log-likelihood for the source removed
             double logL_nosrc = reoptimize_lm();
-            double ts         = 2.0 * (logL_src-logL_nosrc);
+
+            // Compute source TS value
+            double ts = 2.0 * (logL_src-logL_nosrc);
+
+            // Store TS value in original model
             models_orig[ts_srcs[i]]->ts(ts);
-            models = models_orig;
-        }
+
+        } // endfor: looped over sources
 
         // Restore best fit values
         m_obs.models(models_orig);
-    }
+
+    } // endif: requested TS computation
 
     // Compute number of observed events in all observations
     double num_events = 0.0;

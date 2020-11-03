@@ -1,6 +1,6 @@
 .. _2.0:
 
-ctools 2.0 release (19 October 2020)
+ctools 2.0 release (3 November 2020)
 ====================================
 
 Overview
@@ -17,26 +17,17 @@ In particular, this release provides:
 Bug fixes
 ---------
 
-* [`2883 <https://cta-redmine.irap.omp.eu/issues/2883>`_] -
-  ...
+* [`3426 <https://cta-redmine.irap.omp.eu/issues/3426>`_] -
+  Fix implementation of ``fix_spat_for_ts`` parameter in :ref:`ctlike`
 
 
 Improvements
 ------------
 
-* [`2883 <https://cta-redmine.irap.omp.eu/issues/2883>`_] -
-  ...
-
 
 New features
 ------------
 
-* [`2883 <https://cta-redmine.irap.omp.eu/issues/2883>`_] -
-  ...
-
 
 Clean up
 --------
-
-* [`2883 <https://cta-redmine.irap.omp.eu/issues/2883>`_] -
-  ...
