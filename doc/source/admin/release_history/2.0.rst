@@ -1,6 +1,6 @@
 .. _2.0:
 
-ctools 2.0 release (3 November 2020)
+ctools 2.0 release (7 November 2020)
 ====================================
 
 Overview
@@ -24,6 +24,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`3441 <https://cta-redmine.irap.omp.eu/issues/3441>`_] -
+  Add ``models()`` method to :ref:`ctobssim`
 * [`3431 <https://cta-redmine.irap.omp.eu/issues/3431>`_] -
   Add :ref:`ctlike` results to XML file
 

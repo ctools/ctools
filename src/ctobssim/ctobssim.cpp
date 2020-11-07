@@ -551,6 +551,7 @@ void ctobssim::init_members(void)
     m_max_rate    = 1.0e6;
 
     // Initialise protected members
+    m_models.clear();
     m_rans.clear();
     m_save_and_dispose = false;
 
@@ -582,9 +583,10 @@ void ctobssim::copy_members(const ctobssim& app)
     m_max_rate    = app.m_max_rate;
 
     // Copy protected members
+    m_models           = app.m_models;
+    m_save_and_dispose = app.m_save_and_dispose;
     m_max_photons      = app.m_max_photons;
     m_rans             = app.m_rans;
-    m_save_and_dispose = app.m_save_and_dispose;
     m_event_id         = app.m_event_id;
 
     // Return
@@ -632,6 +634,13 @@ void ctobssim::get_parameters(void)
     // that they are missing
     else {
         setup_observations(m_obs);
+    }
+
+    // If models have been specified using the models() method then use
+    // these models instead of any models that may already exist in the
+    // observations.
+    if (m_models.size() > 0) {
+        m_obs.models(m_models);
     }
 
     // Set observation boundaries

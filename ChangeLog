@@ -1,8 +1,9 @@
-2020-11-03
+2020-11-07
 
         * Version 2.0.0 released
         ========================
 
+        Add models() method to ctobssim (#3441)
         Add ctlike results to XML file (#3431)
         Fix implementation of fix_spat_for_ts parameter in ctlike (#3426)
 

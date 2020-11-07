@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctobssim tool
 #
-# Copyright (C) 2014-2018 Juergen Knoedlseder
+# Copyright (C) 2014-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -218,6 +218,29 @@ class Test(test):
         # Retrieve observation and check content
         self._test_list(obs[0].events(), 3630)
         self._test_list(obs[1].events(), 3594)
+
+        # Set ctobssim parameters
+        sim = ctools.ctobssim()
+        sim['caldb']   = self._caldb
+        sim['irf']     = self._irf
+        sim['ra']      = 83.63
+        sim['dec']     = 22.01
+        sim['rad']     = 2.0
+        sim['tmin']    = '2020-01-01T00:00:00'
+        sim['tmax']    = '2020-01-01T00:05:00'
+        sim['emin']    = 1.0
+        sim['emax']    = 100.0
+        sim['logfile'] = 'ctobssim_py4.log'
+        sim['chatter'] = 2
+
+        # Run tool
+        sim.models(gammalib.GModels(self._model))
+        sim.logFileOpen()
+        sim.run()
+
+        # Check content of observation
+        self._test_observation(sim)
+        self._test_list(sim.obs()[0].events(), 261)
 
         # Return
         return

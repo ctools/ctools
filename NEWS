@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-3 November 2020
+7 November 2020
 
 
 Introduction
@@ -97,7 +97,8 @@ None
 
 ctobssim - CTA observation simulation
 -------------------------------------
-None
+Added models() method allowing for a setting of the model container without
+using the "inmodels" parameter (#3441).
 
 
 ctphase - Event phase computation
