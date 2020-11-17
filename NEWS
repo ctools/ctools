@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-7 November 2020
+17 November 2020
 
 
 Introduction
@@ -118,7 +118,7 @@ None
 
 ctselect - CTA event selection
 ------------------------------
-None
+Replaced std::tmpnam() by gammalib::tmpnam() function in ctselect (#3324).
 
 
 ctskymap - CTA sky mapping

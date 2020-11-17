@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctselect - Data selection tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2020 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -42,7 +42,6 @@
 /* __ Debug definitions __________________________________________________ */
 
 /* __ Coding definitions _________________________________________________ */
-//#define G_USE_MKSTEMP               //!< Use mkstemp for temporary filename
 
 
 /*==========================================================================
@@ -297,13 +296,7 @@ void ctselect::run(void)
         }
 
         // Get temporary file name
-        #if G_USE_MKSTEMP
-        char tpl[]  = "ctselectXXXXXX";
-        int  fileid = mkstemp(tpl);
-        std::string filename(tpl);
-        #else
-        std::string filename = std::tmpnam(NULL);
-        #endif
+        std::string filename = gammalib::tmpnam();
 
         // Save observation in temporary file. We add here the events and
         // GTI extension name so that the GCTAObservation::save method can
@@ -329,11 +322,6 @@ void ctselect::run(void)
 
         // Load observation from temporary file, including event selection
         select_events(obs, filename, m_evtname[i], m_gtiname[i]);
-
-        // Close temporary file
-        #if G_USE_MKSTEMP
-        close(fileid);
-        #endif
 
         // Remove temporary file
         std::remove(filename.c_str());
