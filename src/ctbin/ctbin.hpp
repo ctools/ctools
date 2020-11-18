@@ -129,7 +129,7 @@ protected:
 inline
 int ctbin::cubes(void) const
 {
-    return m_cubes.size();
+    return ((int)m_cubes.size());
 }
 
 #endif /* CTBIN_HPP */

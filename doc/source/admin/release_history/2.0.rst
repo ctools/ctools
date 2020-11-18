@@ -1,6 +1,6 @@
 .. _2.0:
 
-ctools 2.0 release (17 November 2020)
+ctools 2.0 release (18 November 2020)
 =====================================
 
 Overview
@@ -30,6 +30,8 @@ Improvements
   Add :ref:`ctlike` results to XML file
 * [`3324 <https://cta-redmine.irap.omp.eu/issues/3324>`_] -
   Replace ``std::tmpnam()`` by ``gammalib::tmpnam()`` function in :ref:`ctselect`
+* [`3324 <https://cta-redmine.irap.omp.eu/issues/3324>`_] -
+  Remove implicit conversion warnings
 
 
 New features

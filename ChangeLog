@@ -1,4 +1,4 @@
-2020-11-17
+2020-11-18
 
         * Version 2.0.0 released
         ========================
@@ -7,6 +7,7 @@
         Add ctlike results to XML file (#3431)
         Fix implementation of fix_spat_for_ts parameter in ctlike (#3426)
         Replace std::tmpnam() by gammalib::tmpnam() function in ctselect (#3324)
+        Remove implicit conversion warnings (#3324)
 
 
 2020-09-04

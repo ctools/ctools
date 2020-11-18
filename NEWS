@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-17 November 2020
+18 November 2020
 
 
 Introduction
@@ -36,7 +36,7 @@ None
 
 ctbin - CTA event binning
 -------------------------
-None
+Removed implicit conversion warning during C++ compilation (#3324).
 
 
 ctbkgcube - CTA background cube generation
