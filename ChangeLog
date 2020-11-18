@@ -10,6 +10,14 @@
         Remove implicit conversion warnings (#3324)
 
 
+2020-10-15
+
+        * Bug fix version 1.7.2 released
+        ================================
+
+        Only for compliance with GammaLib 1.7.2
+
+
 2020-09-04
 
         * Bug fix version 1.7.1 released
