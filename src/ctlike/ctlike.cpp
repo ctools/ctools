@@ -230,6 +230,15 @@ void ctlike::run(void)
     // Write input observation container into logger
     log_observations(NORMAL, m_obs, "Input observation");
 
+    // Compute number of observed events in all observations
+    m_nobs = 0.0;
+    for (int i = 0; i < m_obs.size(); ++i) {
+        double data = m_obs[i]->nobserved();
+        if (data >= 0.0) {
+            m_nobs += data;
+        }
+    }
+
     // Optimize model parameters using LM optimizer
     optimize_lm();
 
@@ -252,6 +261,16 @@ void ctlike::run(void)
 
     // Compute TS values if requested
     if (!ts_srcs.empty()) {
+
+        // Write general fit results in logger (will be repeated at the
+        // end)
+        log_header1(EXPLICIT, "Maximum likelihood optimisation results");
+        log_string(EXPLICIT, m_opt.print(m_chatter));
+        log_value(EXPLICIT, "Maximum log likelihood", gammalib::str(m_logL,3));
+        log_value(EXPLICIT, "Observed events  (Nobs)", gammalib::str(m_nobs,3));
+        log_value(EXPLICIT, "Predicted events (Npred)", gammalib::str(m_npred,3)+
+                  " (Nobs - Npred = "+gammalib::str(m_nobs-m_npred)+")");
+        log_string(VERBOSE, m_obs.models().print(m_chatter));
 
         // Store original maximum likelihood and models
         double  logL_src = m_logL;
@@ -306,15 +325,6 @@ void ctlike::run(void)
         m_obs.models(models_orig);
 
     } // endif: requested TS computation
-
-    // Compute number of observed events in all observations
-    m_nobs = 0.0;
-    for (int i = 0; i < m_obs.size(); ++i) {
-        double data = m_obs[i]->nobserved();
-        if (data >= 0.0) {
-            m_nobs += data;
-        }
-    }
 
     // Write results into logger
     log_header1(NORMAL, "Maximum likelihood optimisation results");
@@ -620,8 +630,13 @@ double ctlike::reoptimize_lm(void)
 
     // Write optimization results
     log.indent(0);
-    log_header1(NORMAL, "Maximum likelihood re-optimisation results");
-    log_string(NORMAL, opt->print(m_chatter));
+    log_header1(EXPLICIT, "Maximum likelihood re-optimisation results");
+    log_string(EXPLICIT, opt->print(m_chatter));
+    log_value(EXPLICIT, "Maximum log likelihood", gammalib::str(logL,3));
+    log_value(EXPLICIT, "Observed events  (Nobs)", gammalib::str(m_nobs,3));
+    log_value(EXPLICIT, "Predicted events (Npred)", gammalib::str(m_obs.npred(),3)+
+              " (Nobs - Npred = "+gammalib::str(m_nobs-m_obs.npred())+")");
+    log_string(VERBOSE, m_obs.models().print(m_chatter));
 
     // Return
     return (logL);
