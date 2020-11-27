@@ -329,6 +329,7 @@ void ctlike::run(void)
     // Write results into logger
     log_header1(NORMAL, "Maximum likelihood optimisation results");
     log_string(NORMAL, m_opt.print(m_chatter));
+    log_value(NORMAL, "Total number of iterations", m_iter);
     log_value(NORMAL, "Maximum log likelihood", gammalib::str(m_logL,3));
     log_value(NORMAL, "Observed events  (Nobs)", gammalib::str(m_nobs,3));
     log_value(NORMAL, "Predicted events (Npred)", gammalib::str(m_npred,3)+
@@ -634,15 +635,27 @@ double ctlike::reoptimize_lm(void)
     log_header1(TERSE, "Maximum likelihood re-optimisation");
     log.indent(1);
 
+    // Initialise number of iterations
+    int iter = 0;
+
     // Create a clone of the optimizer for the re-optimisation
     GOptimizer* opt = m_opt.clone();
 
     // Perform LM optimization
     m_obs.optimize(*opt);
 
+    // Add number of iterations
+    iter += opt->iter();
+
     // Optionally refit
     if (refit(opt)) {
+
+        // Refit
         m_obs.optimize(*opt);
+
+        // Add number of iterations
+        iter += opt->iter();
+
     }
 
     // Store maximum log likelihood value
@@ -652,6 +665,7 @@ double ctlike::reoptimize_lm(void)
     log.indent(0);
     log_header1(EXPLICIT, "Maximum likelihood re-optimisation results");
     log_string(EXPLICIT, opt->print(m_chatter));
+    log_value(EXPLICIT, "Total number of iterations", iter);
     log_value(EXPLICIT, "Maximum log likelihood", gammalib::str(logL,3));
     log_value(EXPLICIT, "Observed events  (Nobs)", gammalib::str(m_nobs,3));
     log_value(EXPLICIT, "Predicted events (Npred)", gammalib::str(m_obs.npred(),3)+
