@@ -80,6 +80,7 @@ protected:
     GChatter  m_chatter;         //!< Chattiness
 
     // Members
+    int       m_iter;            //!< Number of iterations
     double    m_logL;            //!< Maximum log likelihood
     double    m_nobs;            //!< Number of observed events
     double    m_npred;           //!< Number of predicted events

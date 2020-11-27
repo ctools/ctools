@@ -430,6 +430,7 @@ void ctlike::init_members(void)
     m_apply_edisp     = false;
     m_fix_spat_for_ts = false;
     m_chatter         = static_cast<GChatter>(2);
+    m_iter            = 0;
     m_logL            = 0.0;
     m_nobs            = 0.0;
     m_npred           = 0.0;
@@ -459,6 +460,7 @@ void ctlike::copy_members(const ctlike& app)
     m_apply_edisp     = app.m_apply_edisp;
     m_fix_spat_for_ts = app.m_fix_spat_for_ts;
     m_chatter         = app.m_chatter;
+    m_iter            = app.m_iter;
     m_logL            = app.m_logL;
     m_nobs            = app.m_nobs;
     m_npred           = app.m_npred;
@@ -557,6 +559,9 @@ void ctlike::optimize_lm(void)
     log_header1(TERSE, "Maximum likelihood optimisation");
     log.indent(1);
 
+    // Initialise number of iterations
+    m_iter = 0;
+
     // Compute number of fitted parameters
     int nfit = 0;
     for (int i = 0; i < m_obs.models().size(); ++i) {
@@ -578,6 +583,9 @@ void ctlike::optimize_lm(void)
     // Perform LM optimization
     m_obs.optimize(m_opt);
 
+    // Add number of iterations
+    m_iter += m_opt.iter();
+
     // Optionally refit
     if (refit(&m_opt)) {
 
@@ -588,6 +596,9 @@ void ctlike::optimize_lm(void)
 
         // Optimise again
         m_obs.optimize(m_opt);
+
+        // Add number of iterations
+        m_iter += m_opt.iter();
 
     }
 
@@ -701,7 +712,7 @@ GXml ctlike::xml_result(void) const
     result->append(GXmlElement("status", status));
     result->append(GXmlElement("log-likelihood", m_logL));
     result->append(GXmlElement("precision", m_opt.eps()));
-    result->append(GXmlElement("iterations", m_opt.iter()));
+    result->append(GXmlElement("iterations", m_iter));
     result->append(GXmlElement("lambda", m_opt.lambda()));
     result->append(GXmlElement("total_parameters", m_opt.npars()));
     result->append(GXmlElement("fitted_parameters", m_opt.nfree()));
@@ -748,11 +759,47 @@ bool ctlike::refit(const GOptimizer* opt)
         }
 
         // ... otherwise were the number of fit iterations exhausted?
-        else if (opt->iter() >= 1) {
+        else if (opt->iter() >= m_max_iter) {
             refit = true;
             log_value(NORMAL, "Refit requested",
                               "Number of fit iterations exhausted");
         }
+
+        // ... otherwise check if there is a significant difference between
+        // the number of observed and predicted events
+        else {
+            double npred      = m_obs.npred();
+            double difference = m_nobs - npred;
+            if (m_nobs > 0.0) {
+                double fraction   = difference / m_nobs;
+                if (std::abs(fraction) > 1.0e-4) {
+                    refit = true;
+                    log_value(NORMAL, "Refit requested",
+                              "Difference "+
+                              gammalib::str(difference)+
+                              " between number of observed events "+
+                              gammalib::str(m_nobs)+
+                              " and predicted events "+
+                              gammalib::str(npred)+
+                              " is larger than +/- 1.0e-4 times the number of"+
+                              " observed events ("+
+                              gammalib::str(fraction)+").");
+                }
+            }
+            else {
+                if (std::abs(difference) > 10.0) {
+                    refit = true;
+                    log_value(NORMAL, "Refit requested",
+                              "Difference "+
+                              gammalib::str(difference)+
+                              " between number of observed events "+
+                              gammalib::str(m_nobs)+
+                              " and predicted events "+
+                              gammalib::str(npred)+
+                              " is larger than +/- 10.");
+                }
+            }
+        } // endelse: check number of events
 
     }
 
