@@ -785,33 +785,31 @@ bool ctlike::refit(const GOptimizer* opt)
             double npred      = m_obs.npred();
             double difference = m_nobs - npred;
             if (m_nobs > 0.0) {
-                double fraction   = difference / m_nobs;
-                if (std::abs(fraction) > 1.0e-4) {
+                double fraction = difference / m_nobs;
+                if (std::abs(fraction) > 1.0e-5) {
                     refit = true;
                     log_value(NORMAL, "Refit requested",
                               "Difference "+
-                              gammalib::str(difference)+
+                              gammalib::str(difference,3)+
                               " between number of observed events "+
-                              gammalib::str(m_nobs)+
+                              gammalib::str(m_nobs,3)+
                               " and predicted events "+
-                              gammalib::str(npred)+
-                              " is larger than +/- 1.0e-4 times the number of"+
+                              gammalib::str(npred,3)+
+                              " is larger than +/- 1.0e-5 times the number of"+
                               " observed events ("+
                               gammalib::str(fraction)+").");
                 }
             }
-            else {
-                if (std::abs(difference) > 10.0) {
-                    refit = true;
-                    log_value(NORMAL, "Refit requested",
-                              "Difference "+
-                              gammalib::str(difference)+
-                              " between number of observed events "+
-                              gammalib::str(m_nobs)+
-                              " and predicted events "+
-                              gammalib::str(npred)+
-                              " is larger than +/- 10.");
-                }
+            if (!refit && std::abs(difference) > 5.0) {
+                refit = true;
+                log_value(NORMAL, "Refit requested",
+                          "Difference "+
+                          gammalib::str(difference,3)+
+                          " between number of observed events "+
+                          gammalib::str(m_nobs,3)+
+                          " and predicted events "+
+                          gammalib::str(npred,3)+
+                          " is larger than +/- 5.");
             }
         } // endelse: check number of events
 
