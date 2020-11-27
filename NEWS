@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-18 November 2020
+27 November 2020
 
 
 Introduction
@@ -76,10 +76,18 @@ None
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
+Added the "refit_if_failed" parameter that instructs ctlike to do a refit in
+case that the initial fit failed. Failures considered are a stalled fit, an
+exhaustion of the maximum number of fit iterations, or a significant difference
+between the number of observed and predicted events.
+
+Added to the log file the "Total number of iterations" which is the sum of the
+iterations in the initial fit and a potential refit.
+
 The model fitting results, such as log-likelihood value, number of iterations
 etc. are now added to the output XML file (#3431).
 
-A bug was fixed in the implementation of the fix_spat_for_ts parameter that
+A bug was fixed in the implementation of the "fix_spat_for_ts" parameter that
 only fixed the spatial parameters for the first of the sky models but left
 the spatial parameters free for all additional sky models. Now the parameters
 are fixed for all sky models (#3426).

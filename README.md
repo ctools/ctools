@@ -1,6 +1,6 @@
 ctools information
 ==================
-* Version:             2.0.0.dev (18 November 2020)
+* Version:             2.0.0.dev (27 November 2020)
 * GammaLib dependency: 2.0.0.dev
 
 [![Build Status](https://cta-jenkins.irap.omp.eu/buildStatus/icon?job=ctools-integrate-os)](https://cta-jenkins.irap.omp.eu/job/ctools-integrate-os/)

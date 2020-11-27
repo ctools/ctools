@@ -1,8 +1,9 @@
-2020-11-18
+2020-11-27
 
         * Version 2.0.0 released
         ========================
 
+        Add "refit_if_failed" parameter to ctlike
         Add models() method to ctobssim (#3441)
         Add ctlike results to XML file (#3431)
         Fix implementation of fix_spat_for_ts parameter in ctlike (#3426)

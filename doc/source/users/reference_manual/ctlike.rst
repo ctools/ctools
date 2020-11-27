@@ -116,6 +116,12 @@ General parameters
 ``(refit = no) [boolean]``
     Perform refitting of solution after initial fit.
 
+``(refit_if_failed = yes) [boolean]``
+    Perform refitting of solution in case that the initial fit failed. Failures
+    considered are a stalled fit, an exhaustion of the maximum number of fit
+    iterations, or a significant difference between the number of observed and
+    predicted events.
+
 ``(like_accuracy = 0.005) [real]``
     Absolute accuracy of maximum likelihood value. Reducing this value will
     increase the number of iterations and provide a more accurate maximum
