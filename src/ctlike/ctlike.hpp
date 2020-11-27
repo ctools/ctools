@@ -66,11 +66,15 @@ protected:
     void   optimize_lm(void);
     double reoptimize_lm(void);
     GXml   xml_result(void) const;
+    bool   refit(const GOptimizer* opt);
 
     // User parameters
     GFilename m_outmodel;        //!< Source model output XML file name
     GFilename m_outcovmat;       //!< Covariance matrix output file name
-    bool      m_refit;           //!< Refitting
+    int       m_max_iter;        //!< Maximum number of iterations
+    double    m_like_accuracy;   //!< Log-likelihood accuracy
+    bool      m_refit;           //!< Refitting?
+    bool      m_refit_if_failed; //!< Refitting in case of failure?
     bool      m_apply_edisp;     //!< Apply energy dispersion?
     bool      m_fix_spat_for_ts; //!< Fix spatial parameters for TS computation?
     GChatter  m_chatter;         //!< Chattiness

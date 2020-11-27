@@ -423,7 +423,10 @@ void ctlike::init_members(void)
     // Initialise members
     m_outmodel.clear();
     m_outcovmat.clear();
+    m_max_iter        = 50;
+    m_like_accuracy   = 0.005;
     m_refit           = false;
+    m_refit_if_failed = true;
     m_apply_edisp     = false;
     m_fix_spat_for_ts = false;
     m_chatter         = static_cast<GChatter>(2);
@@ -447,9 +450,12 @@ void ctlike::init_members(void)
 void ctlike::copy_members(const ctlike& app)
 {
     // Copy attributes
-    m_refit           = app.m_refit;
     m_outmodel        = app.m_outmodel;
     m_outcovmat       = app.m_outcovmat;
+    m_max_iter        = app.m_max_iter;
+    m_like_accuracy   = app.m_like_accuracy;
+    m_refit           = app.m_refit;
+    m_refit_if_failed = app.m_refit_if_failed;
     m_apply_edisp     = app.m_apply_edisp;
     m_fix_spat_for_ts = app.m_fix_spat_for_ts;
     m_chatter         = app.m_chatter;
@@ -498,11 +504,14 @@ void ctlike::get_parameters(void)
     } // endif: no models were associated with observations
 
     // Set optimizer characteristics from user parameters
-    m_opt.eps((*this)["like_accuracy"].real());
-    m_opt.max_iter((*this)["max_iter"].integer());
+    m_max_iter      = (*this)["max_iter"].integer();
+    m_like_accuracy = (*this)["like_accuracy"].real();
+    m_opt.eps(m_like_accuracy);
+    m_opt.max_iter(m_max_iter);
 
     // Get other parameters
     m_refit           = (*this)["refit"].boolean();
+    m_refit_if_failed = (*this)["refit_if_failed"].boolean();
     m_apply_edisp     = (*this)["edisp"].boolean();
     m_fix_spat_for_ts = (*this)["fix_spat_for_ts"].boolean();
     m_chatter         = static_cast<GChatter>((*this)["chatter"].integer());
@@ -570,7 +579,7 @@ void ctlike::optimize_lm(void)
     m_obs.optimize(m_opt);
 
     // Optionally refit
-    if (m_refit) {
+    if (refit(&m_opt)) {
 
         // Dump new header
         log.indent(0);
@@ -621,7 +630,7 @@ double ctlike::reoptimize_lm(void)
     m_obs.optimize(*opt);
 
     // Optionally refit
-    if (m_refit) {
+    if (refit(opt)) {
         m_obs.optimize(*opt);
     }
 
@@ -709,4 +718,44 @@ GXml ctlike::xml_result(void) const
 
     // Return XML result
     return xml;
+}
+
+
+/***********************************************************************//**
+ * @brief Refit needed?
+ *
+ * @param[in] opt Pointer to optimiser.
+ * @return True if refit is needed, false otherwise.
+ *
+ * This method returns true if either the "refit" parameter is set to yes
+ * or the "refit_if_failed" parameter is set to yes and the fit has failed.
+ * The fit is considered as failed if it either has stalled or the number
+ * of fit iterations is exhausted.
+ ***************************************************************************/
+bool ctlike::refit(const GOptimizer* opt)
+{
+    // Initialise refit flag
+    bool refit = m_refit;
+
+    // If flag is false and "refit_if_failed" is true then examine optimiser
+    // result to determine whether the fit has failed
+    if (!refit && m_refit_if_failed) {
+
+        // Has the fit stalled?
+        if (opt->status() == G_LM_STALLED) {
+            refit = true;
+            log_value(NORMAL, "Refit requested", "Fit has stalled");
+        }
+
+        // ... otherwise were the number of fit iterations exhausted?
+        else if (opt->iter() >= 1) {
+            refit = true;
+            log_value(NORMAL, "Refit requested",
+                              "Number of fit iterations exhausted");
+        }
+
+    }
+
+    // Return refit flag
+    return refit;
 }

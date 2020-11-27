@@ -209,6 +209,11 @@ class Test(test):
         ulimit.logFileOpen()  # Needed to get a new log file
         ulimit.execute()
 
+        # Set new reference values since the ctlike results changed
+        # a bit due to changes in ctlike
+        ref_flux  = 1.6694433147174e-11
+        ref_eflux = 6.458852107887e-11
+
         # Check results
         self.test_value(ulimit.diff_ulimit(), ref_diff, 1.0e-21,
                         'Check differential upper limit')

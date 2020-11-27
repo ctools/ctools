@@ -709,11 +709,6 @@ void ctulimit::ulimit_bisection(const double& parmin, const double& parmax)
         if (std::abs(eval_mid) < m_tol) {
             break;
         }
-        /*
-        if (std::abs(wrk_max-wrk_min) < m_tol) {
-            break;
-        }
-        */
 
         // Change boundaries for further iteration
         if (eval_mid > 0.0) {

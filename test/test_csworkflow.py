@@ -142,7 +142,8 @@ class Test(test):
         prefactor        = 3.63152145731529e-16
         index            = 2.39100016863397
         pre_background   = 1.30910556742873
-        index_background = 0.252909973473968
+        #index_background = 0.252909973473968
+        index_background = 0.252938308459647
 
         # Check fit result values
         self.test_value(models['Crab'][2].value(),
