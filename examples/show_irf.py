@@ -2,7 +2,7 @@
 # ==========================================================================
 # Display Instrument Response Function
 #
-# Copyright (C) 2017-2018 Juergen Knoedlseder
+# Copyright (C) 2017-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 # ==========================================================================
 import sys
 import math
-import gammalib
-import cscripts
 try:
     import matplotlib.pyplot as plt
     from matplotlib import ticker
@@ -31,6 +29,8 @@ try:
 except (ImportError, RuntimeError):
     print('This script needs the "matplotlib" module')
     sys.exit()
+import gammalib
+import cscripts
 
 
 # ========= #
