@@ -8,5 +8,7 @@ Overview
 
 ctools 1.7.3 is a bug fix release for ctools release 1.7.
 
-No changes were made to the code base. The bug fix release is made for
-compliance reasons with the GammaLib 1.7.3 bug fix release.
+The following bugs were fixed:
+
+* [`3423 <https://cta-redmine.irap.omp.eu/issues/3423>`_] -
+  Import matplotlib first in example scripts

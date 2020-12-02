@@ -2,7 +2,7 @@
 # ==========================================================================
 # Shows the distribution of significances in a given significance map.
 #
-# Copyright (C) 2018-2019 Andreas Specovius
+# Copyright (C) 2018-2020 Andreas Specovius
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,8 +46,6 @@
 # ==========================================================================
 import sys
 import math
-import gammalib
-import cscripts
 try:
     import matplotlib.pyplot as plt
     plt.figure()
@@ -60,6 +58,8 @@ try:
 except ImportError:
     print('This script needs the "numpy" module')
     sys.exit()
+import gammalib
+import cscripts
 
 
 # ======================= #
