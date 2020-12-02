@@ -1,0 +1,12 @@
+.. _1.7.3:
+
+ctools 1.7.3 release (2 December 2020)
+======================================
+
+Overview
+--------
+
+ctools 1.7.3 is a bug fix release for ctools release 1.7.
+
+No changes were made to the code base. The bug fix release is made for
+compliance reasons with the GammaLib 1.7.3 bug fix release.
