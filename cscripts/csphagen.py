@@ -149,6 +149,34 @@ class csphagen(ctools.csobservation):
         # Return
         return
 
+    def _compute_posang(self, pnt_dir, a, b):
+        """
+        Compute the difference in position angle wrt the pointing in degrees
+
+        Parameters
+        ----------
+        pnt_dir : `~gammalib.GSkyDir`
+            Pointing direction
+        a : `~gammalib.GSkyDir`
+            First sky direction
+        a : `~gammalib.GSkyDir`
+            Second sky direction
+
+        Returns
+        -------
+        posang : float
+            Position angle (degrees)
+        """
+        # Compute position angles
+        posang_a = pnt_dir.posang_deg(a) % 360
+        posang_b = pnt_dir.posang_deg(b) % 360
+
+        # Compute difference
+        posang = abs(posang_a - posang_b)
+
+        # Return position angle
+        return posang
+
     def _get_regions(self, filename):
         """
         Get regions from DS9 file or FITS file
@@ -192,26 +220,24 @@ class csphagen(ctools.csobservation):
         self['bkgregmin'].integer()
         self['bkgregskip'].integer()
 
-        # Set source region (so far only CIRCLE is supported)
+        # If source shape is a circle the append GSkyRegionCircle
         if self._srcshape == 'CIRCLE':
 
             # Set circular source region
             self._rad = self['rad'].real()
             self._src_reg.append(gammalib.GSkyRegionCircle(self._src_dir, self._rad))
 
+        # ... otherwise if source shape is a rectangle then append GSkyRegionRect
         elif self._srcshape == 'RECT':
 
             # Set rectangular source region
             self._reg_width  = self['width'].real()
             self._reg_height = self['height'].real()
             self._reg_posang = self['posang'].real()
-            self._src_reg.append(gammalib.GSkyRegionRect(self._src_dir
-                                                        ,self._reg_width
-                                                        ,self._reg_height
-                                                        ,self._reg_posang
-                                                        )
-                                )
-
+            self._src_reg.append(gammalib.GSkyRegionRect(self._src_dir,
+                                                         self._reg_width,
+                                                         self._reg_height,
+                                                         self._reg_posang))
 
         # Query usage of background model
         self['use_model_bkg'].boolean()
@@ -357,118 +383,49 @@ class csphagen(ctools.csobservation):
             model    = gammalib.GModelSky(spatial, spectral)
             model.name('Dummy')
             self._models.append(model)
-            self._srcname       = 'Dummy'
+            self._srcname = 'Dummy'
             self['use_model_bkg'].boolean(False)
 
         # Return
         return
 
     def _compute_region_separation(self, pnt_dir):
-        """ Compute the separation angle for reflected off regions in radians.
+        """
+        Compute the separation angle for reflected off regions in radians
 
         Returns
         -------
-        angle : `float`
-            Separation angle of two off regions (rad)
+        angle : float
+            Separation angle of two off regions (radians)
         """
         # Initialise the result
-        separation = -1
+        separation = -1.0
 
         # Compute offset of reflected regions to pointing position
         offset = pnt_dir.dist_deg(self._src_dir)
 
+        # If shape is a circle then compute apparent diameter of the circle
+        # as separation
         if self._srcshape == 'CIRCLE':
-
-            # Compute apparent diameter of the circle
             separation = 2.0 * self._rad / offset
 
+        # ... otherwise if shape is a rectangle then compute the opening angle
+        # towards combinations of rectangle corners. This method overestimates
+        # the real need of space between the ectangles, so the method may be
+        # optimised to gain more off regions! Anyway, it is assured that the
+        # off regions will never overlap.
         elif self._srcshape == 'RECT':
 
-            # Compute the opening angle towards combinations of rectangle corners.
-            # This method overestimates the real need of space between the
-            # rectangles, so the method may be optimised to gain more off regions!
-            # Anyway, it is assured that the off regions will never overlap.
-
-            # Get the corners
+            # Get the sky directions of the corners of the rectangle
             cs = [self._src_reg[0].get_corner(icorner) for icorner in range(4)]
-
-            # Auxillary, local method for opening angle computation
-            def __compute_posang(pnt_dir,a,b):
-                """ Compute the difference in position angle to the pointing in
-                    degrees.
-                """
-                posang_a = pnt_dir.posang_deg(a) %360
-                posang_b = pnt_dir.posang_deg(b) %360
-                posang = abs(posang_a - posang_b)
-                return posang
 
             # Compute the 6 opening angles
             combinations = [[0,1], [0,2], [0,3], [1,2], [1,3], [2,3]]
-            angles = [__compute_posang(pnt_dir, cs[i], cs[j]) for i,j in combinations]
+            angles       = [self._compute_posang(pnt_dir, cs[i], cs[j]) \
+                            for i,j in combinations]
 
             # The desired separation is the maximum opening angle
-            separation = max(angles) *gammalib.deg2rad
-
-
-            ## Different approach:
-            ## Find the separation angle for which two rectangles to not overlap
-            ## Issue: Scanning not optimal.
-            # posang    = pnt_dir.posang_deg(self._src_dir)
-            # dphi_incr = 0.1
-            # dphi      = dphi_incr
-            # print("Src ctr direction: ra={} dec={}".format(self._src_dir.ra_deg(), self._src_dir.dec_deg()))
-            # print(self._src_reg)
-            # while dphi<360:
-
-            #     ctr_dir = pnt_dir.clone()
-            #     ctr_dir.rotate_deg(posang + dphi, offset)
-            #     print("Query ctr direction: ra={} dec={}".format(ctr_dir.ra_deg(), ctr_dir.dec_deg()))
-
-            #     # Create test rectangle
-            #     reg = gammalib.GSkyRegionRect(ctr_dir
-            #                                  ,self._reg_width
-            #                                  ,self._reg_height
-            #                                  ,self._reg_posang + dphi
-            #                                  )
-            #     print(reg)
-
-            #     # Check test rectangle corner containment in reference rectangle
-            #     is_corner_contained = self._src_reg.overlaps(reg)
-            #     # is_corner_contained = False
-            #     # for icorner in range(4):
-            #     #     corner_dir = reg.get_corner(icorner)
-            #     #     is_corner_contained |= self._src_reg.contains(corner_dir)
-
-            #     # Check if any corner was contained
-            #     if not is_corner_contained:
-            #         diameter = dphi
-            #         break
-
-            #     # Increment dphi
-            #     dphi += dphi_incr
-
-
-            ## Very different approach: Compute the width along the circular
-            ## region placement path.
-            ## Issue: Long regions will overlap in the inner part.
-            # def l(w,h,phi):
-            #     """ Super complicated method to compute the height along dec-axis
-            #         of a rotated rectangle.
-            #     """
-            #     phi = np.deg2rad(phi) % (2*np.pi)
-            #     phi_c = np.arctan2(w,h)
-            #     if phi>=(0.5*np.pi) and (phi<np.pi):
-            #         phi = np.pi-phi
-            #     elif (phi>=np.pi) and (phi<(1.5*np.pi)):
-            #         phi -=np.pi
-            #     elif (phi>=(1.5*np.pi)) and (phi<(2*np.pi)):
-            #         phi = 2*np.pi - phi
-
-            #     if (0<=phi) and (phi<phi_c):
-            #         result = h/2/np.cos(phi)
-            #     else:
-            #         result = w/2/np.sin(phi)
-            #     return 2*result
+            separation = max(angles) * gammalib.deg2rad
 
         # Return
         return separation
@@ -551,11 +508,10 @@ class csphagen(ctools.csobservation):
                             region = gammalib.GSkyRegionCircle(ctr_dir, self._rad)
                         elif self._srcshape == 'RECT':
                             # Adjust the posang of the rectangle correspondingly
-                            region = gammalib.GSkyRegionRect(ctr_dir
-                                                            ,self._reg_width
-                                                            ,self._reg_height
-                                                            ,self._reg_posang + dphi
-                                                            )
+                            region = gammalib.GSkyRegionRect(ctr_dir,
+                                                             self._reg_width,
+                                                             self._reg_height,
+                                                             self._reg_posang + dphi)
                         if self._has_exclusion:
                             if self._excl_reg.overlaps(region):
 
