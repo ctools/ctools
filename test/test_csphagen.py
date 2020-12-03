@@ -88,7 +88,7 @@ class Test(test):
                          '" ebinalg="LOG" emin=0.1 emax=100. enumbins=' + \
                          str(self._nbins) + \
                          ' etruemin=0.05 etruemax=150 etruebins=5'+ \
-                         ' coordsys="CEL" ra=83.633 dec=22.0145' + \
+                         ' srcshape="CIRCLE" coordsys="CEL" ra=83.633 dec=22.0145' + \
                          ' rad=0.2 stack="no" inexclusion="' + \
                          self._exclusion + \
                          '" bkgmethod="REFLECTED" '+ \
@@ -111,7 +111,7 @@ class Test(test):
                          '" ebinalg="LOG" emin=0.1 emax=100. enumbins=' + \
                          str(self._nbins) + \
                          ' etruemin=0.05 etruemax=150 etruebins=5'+ \
-                         ' coordsys="CEL" ra=83.633 dec=22.0145' + \
+                         ' srcshape="CIRCLE" coordsys="CEL" ra=83.633 dec=22.0145' + \
                          ' rad=0.2 stack="no" inexclusion="' + \
                          self._exclusion + \
                          '" bkgmethod="REFLECTED" '+ \
@@ -143,6 +143,7 @@ class Test(test):
         phagen['emin']        = 0.1
         phagen['emax']        = 100.0
         phagen['enumbins']    = self._nbins
+        phagen['srcshape']    = 'CIRCLE'
         phagen['coordsys']    = 'CEL'
         phagen['ra']          = 83.633
         phagen['dec']         = 22.0145
@@ -176,6 +177,7 @@ class Test(test):
         phagen['emin']      = 0.1
         phagen['emax']      = 100.0
         phagen['enumbins']  = self._nbins
+        phagen['srcshape']  = 'CIRCLE'
         phagen['coordsys']  = 'CEL'
         phagen['ra']        = 83.633
         phagen['dec']       = 22.0145
@@ -215,6 +217,7 @@ class Test(test):
         phagen['emax']        = 100.0
         phagen['enumbins']    = self._nbins
         phagen['ebingamma']   = 1.0
+        phagen['srcshape']    = 'CIRCLE'
         phagen['coordsys']    = 'CEL'
         phagen['ra']          = 83.633
         phagen['dec']         = 22.0145
@@ -247,6 +250,7 @@ class Test(test):
         phagen['emin']        = 0.1
         phagen['emax']        = 100.0
         phagen['enumbins']    = self._nbins
+        phagen['srcshape']    = 'CIRCLE'
         phagen['coordsys']    = 'CEL'
         phagen['ra']          = 83.633
         phagen['dec']         = 22.0145
@@ -346,6 +350,7 @@ class Test(test):
         phagen['emin']        = 0.1
         phagen['emax']        = 100.0
         phagen['enumbins']    = self._nbins
+        phagen['srcshape']    = 'CIRCLE'
         phagen['coordsys']    = 'CEL'
         phagen['ra']          = 83.633
         phagen['dec']         = 22.0145
@@ -372,6 +377,43 @@ class Test(test):
         self._check_output('csphagen_py7', self._nbins, self._nreg_with_excl)
         self._check_outobs('csphagen_py7_obs.xml', 1)
 
+        # Test with rectangular region
+        phagen = cscripts.csphagen()
+        phagen['inobs']       = self._myevents1
+        phagen['inmodel']     = 'NONE'
+        phagen['caldb']       = self._caldb
+        phagen['irf']         = self._irf
+        phagen['ebinalg']     = 'LOG'
+        phagen['emin']        = 0.1
+        phagen['emax']        = 100.0
+        phagen['enumbins']    = self._nbins
+        phagen['srcshape']    = 'RECT'
+        phagen['width']       = 0.15
+        phagen['height']      = 0.25
+        phagen['posang']      = 45.0
+        phagen['coordsys']    = 'CEL'
+        phagen['ra']          = 83.633
+        phagen['dec']         = 22.0145
+        phagen['rad']         = 0.2
+        phagen['stack']       = False
+        phagen['inexclusion'] = self._exclusion
+        phagen['bkgmethod']   = 'REFLECTED'
+        phagen['etruemin']    = 0.05
+        phagen['etruemax']    = 150.0
+        phagen['etruebins']   = 5
+        phagen['outobs']      = 'csphagen_py8_obs.xml'
+        phagen['outmodel']    = 'csphagen_py8_model.xml'
+        phagen['prefix']      = 'csphagen_py8'
+        phagen['logfile']     = 'csphagen_py8.log'
+        phagen['chatter']     = 2
+
+        # Execute script
+        phagen.execute()
+
+        # Check output
+        self._check_output('csphagen_py8', self._nbins, self._nreg_with_excl)
+        self._check_outobs('csphagen_py8_obs.xml', 1)
+
         # Return
         return
 
@@ -393,6 +435,7 @@ class Test(test):
         phagen['emin']        = 0.1
         phagen['emax']        = 100.0
         phagen['enumbins']    = self._nbins
+        phagen['srcshape']    = 'CIRCLE'
         phagen['coordsys']    = 'CEL'
         phagen['ra']          = 83.633
         phagen['dec']         = 22.0145

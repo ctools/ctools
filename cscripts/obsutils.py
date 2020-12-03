@@ -129,6 +129,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
             phagen['emin']        = emin
             phagen['emax']        = emax
             phagen['enumbins']    = nbins
+            phagen['srcshape']    = 'CIRCLE'
             phagen['coordsys']    = 'CEL'
             phagen['ra']          = ra
             phagen['dec']         = dec
@@ -798,8 +799,8 @@ def get_onoff_obs(cls, obs, nthreads=0, ra = None, dec = None, srcname = ''):
     # User has specified custom centre for the source region
     if ra != None and dec != None:
         phagen['coordsys'] = 'CEL'
-        phagen['ra'] = ra
-        phagen['dec'] = dec
+        phagen['ra']       = ra
+        phagen['dec']      = dec
     # Otherwise use default in class
     else:
         phagen['coordsys']    = cls['coordsys'].string()
@@ -811,6 +812,10 @@ def get_onoff_obs(cls, obs, nthreads=0, ra = None, dec = None, srcname = ''):
             phagen['glat'] = cls['yref'].real()
     if cls['srcshape'].string() == 'CIRCLE':
         phagen['rad'] = cls['rad'].real()
+    elif cls['srcshape'].string() == 'RECT':
+        phagen['width']  = cls['width'].real()
+        phagen['height'] = cls['height'].real()
+        phagen['posang'] = cls['posang'].real()
     phagen['bkgmethod'] = cls['bkgmethod'].string()
     if cls['bkgmethod'].string() == 'REFLECTED':
         phagen['bkgregmin'] = cls['bkgregmin'].integer()

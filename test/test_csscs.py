@@ -299,8 +299,8 @@ class Test(test):
         script['irf']         = self._irf
         script['inmodel']     = self._model
         script['srcnames']    = 'Crab'
-        script['emin']        = 1.
-        script['emax']        = 100.
+        script['emin']        =   1.0
+        script['emax']        = 100.0
         script['nxpix']       = 2
         script['nypix']       = 2
         script['binsz']       = 0.1
@@ -310,6 +310,7 @@ class Test(test):
         script['yref']        = 22.01
         script['rad']         = 0.2
         script['method']      = 'ONOFF'
+        script['srcshape']    = 'CIRCLE'
         script['inexclusion'] = self._exclusion
         script['enumbins']    = 2
         script['outfile']     = 'csscs_py6.fits'
@@ -330,8 +331,8 @@ class Test(test):
         script['irf']      = self._irf
         script['inmodel']  = self._model
         script['srcnames'] = 'Crab'
-        script['emin']     = 1.
-        script['emax']     = 100.
+        script['emin']     =   1.0
+        script['emax']     = 100.0
         script['nxpix']    = 2
         script['nypix']    = 2
         script['binsz']    = 0.1
@@ -341,6 +342,7 @@ class Test(test):
         script['yref']     = 22.01
         script['rad']      = 0.2
         script['method']   = 'ONOFF'
+        script['srcshape'] = 'CIRCLE'
         script['enumbins'] = 2
         script['outfile']  = 'csscs_py7.fits'
         script['chatter']  = 2
@@ -375,6 +377,7 @@ class Test(test):
         script['yref']          = 22.01
         script['rad']           = 0.2
         script['method']        = 'ONOFF'
+        script['srcshape']      = 'CIRCLE'
         script['use_model_bkg'] = False
         script['inexclusion']   = self._exclusion
         script['enumbins']      = 2

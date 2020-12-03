@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csphasecrv script.
 #
-# Copyright (C) 2017-2018 Juergen Knoedlseder
+# Copyright (C) 2017-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -247,6 +247,7 @@ class Test(test):
         pcrv['phbinalg']  = 'LIN'
         pcrv['phbins']    = 2
         pcrv['method']    = 'ONOFF'
+        pcrv['srcshape']  = 'CIRCLE'
         pcrv['statistic'] = 'WSTAT'
         pcrv['emin']      = 1.0
         pcrv['emax']      = 100.0

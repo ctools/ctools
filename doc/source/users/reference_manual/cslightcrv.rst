@@ -129,12 +129,22 @@ General parameters
 ``binsz [real]``
     Pixel size for ``3D`` analysis (in degrees/pixel).
 
-``(srcshape = CIRCLE) [string]``
-    Shape of the source region for On/Off analysis.
-    ``CIRCLE``: circular region around given position.
+``srcshape <CIRCLE|RECT> [string]``
+    Shape of the source region. ``CIRCLE`` defines a circular region around given
+    position, ``RECT`` defines a rectangle centred on a given position.
 
 ``rad [real]``
     Radius of source region circle for On/Off analysis (deg)
+
+``width [real]``
+    Width of source region rectangle for On/Off analysis (deg).
+
+``height [real]``
+    Height of source region rectangle for On/Off analysis (deg).
+
+``posang [real]``
+    Position angle of source region rectangle for On/Off analysis, counted
+    counterclockwise from celestial North (deg).
 
 ``(bkgmethod = REFLECTED) [string]``
     Method for background estimation in On/Off analysis.

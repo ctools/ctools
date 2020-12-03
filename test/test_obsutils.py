@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the obsutils module
 #
-# Copyright (C) 2017-2018 Juergen Knoedlseder
+# Copyright (C) 2017-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -670,6 +670,7 @@ class Test(test):
         lcrv['tmax']     = '2020-01-01T00:05:00'
         lcrv['tbins']    = 2
         lcrv['method']   = 'ONOFF'
+        lcrv['srcshape'] = 'CIRCLE'
         lcrv['emin']     = 1.0
         lcrv['emax']     = 100.0
         lcrv['enumbins'] = 2

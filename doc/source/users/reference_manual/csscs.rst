@@ -159,9 +159,19 @@ On/Off parameters
     with the same shape as source region reflected w.r.t. pointing direction for
     each observation.
 
-``(srcshape = CIRCLE) [string]``
-    Shape of the source region.
-    ``CIRCLE``: circular region around given position.
+``srcshape <CIRCLE|RECT> [string]``
+    Shape of the source region. ``CIRCLE`` defines a circular region around given
+    position, ``RECT`` defines a rectangle centred on a given position.
+
+``width [real]``
+    Width of source region rectangle for On/Off analysis (deg).
+
+``height [real]``
+    Height of source region rectangle for On/Off analysis (deg).
+
+``posang [real]``
+    Position angle of source region rectangle for On/Off analysis, counted
+    counterclockwise from celestial North (deg).
 
 ``(bkgregmin = 2) [integer]``
     Minimum number of background regions that are required for an
