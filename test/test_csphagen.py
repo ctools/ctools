@@ -411,7 +411,7 @@ class Test(test):
         phagen.execute()
 
         # Check output
-        self._check_output('csphagen_py8', self._nbins, self._nreg_with_excl)
+        self._check_output('csphagen_py8', self._nbins, 9)
         self._check_outobs('csphagen_py8_obs.xml', 1)
 
         # Return
@@ -621,7 +621,7 @@ class Test(test):
 
             # Check for Off region
             offregion = filenameroot + '_off.reg'
-            reg = gammalib.GSkyRegions(offregion)
+            reg       = gammalib.GSkyRegions(offregion)
             self.test_value(reg.size(), nreg, 'Check for ' + str(nreg) +
                             ' region in background region file')
 

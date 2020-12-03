@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-27 November 2020
+3 December 2020
 
 
 Introduction
@@ -186,7 +186,10 @@ None
 
 cslightcrv - Generate light curve
 ---------------------------------
-None
+Added support for rectangular On/Off regions. The "srcshape" parameter now
+can now be set to "RECT" to use rectangular sky regions. The parameter is now
+automatic. The parameters "width", "height", and "posang" were added to specify
+the width, height and position angle of the rectangular sky regions (#3248).
 
 
 csmodelinfo - Return model information
@@ -231,12 +234,18 @@ None
 
 csphagen - Generate On/Off observations
 ---------------------------------------
-None
+Added support for rectangular On/Off regions. The "srcshape" parameter now
+can now be set to "RECT" to use rectangular sky regions. The parameter is now
+automatic. The parameters "width", "height", and "posang" were added to specify
+the width, height and position angle of the rectangular sky regions (#3248).
 
 
 csphasecrv - Generate phase curve
 ---------------------------------
-None
+Added support for rectangular On/Off regions. The "srcshape" parameter now
+can now be set to "RECT" to use rectangular sky regions. The parameter is now
+automatic. The parameters "width", "height", and "posang" were added to specify
+the width, height and position angle of the rectangular sky regions (#3248).
 
 
 cspull - Generate pull distributions
@@ -261,7 +270,10 @@ None
 
 csscs - Spectral component separation
 -------------------------------------
-None
+Added support for rectangular On/Off regions. The "srcshape" parameter now
+can now be set to "RECT" to use rectangular sky regions. The parameter is now
+automatic. The parameters "width", "height", and "posang" were added to specify
+the width, height and position angle of the rectangular sky regions (#3248).
 
 
 cssens - Computes sensitivity curve
@@ -326,7 +338,11 @@ None
 
 obsutils - Observation utilities
 --------------------------------
-None
+Added support for rectangular On/Off regions in get_onoff_obs(). The "srcshape"
+parameter now can now be set to "RECT" to use rectangular sky regions. The
+parameter is now automatic. The parameters "width", "height", and "posang" were
+added to specify the width, height and position angle of the rectangular sky
+regions (#3248).
 
 
 Examples
