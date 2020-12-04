@@ -227,17 +227,18 @@ class csphagen(ctools.csobservation):
             self._rad = self['rad'].real()
             self._src_reg.append(gammalib.GSkyRegionCircle(self._src_dir, self._rad))
 
-        # ... otherwise if source shape is a rectangle then append GSkyRegionRect
+        # ... otherwise if source shape is a rectangle then append
+        # GSkyRegionRectangle
         elif self._srcshape == 'RECT':
 
             # Set rectangular source region
             self._reg_width  = self['width'].real()
             self._reg_height = self['height'].real()
             self._reg_posang = self['posang'].real()
-            self._src_reg.append(gammalib.GSkyRegionRect(self._src_dir,
-                                                         self._reg_width,
-                                                         self._reg_height,
-                                                         self._reg_posang))
+            self._src_reg.append(gammalib.GSkyRegionRectangle(self._src_dir,
+                                                              self._reg_width,
+                                                              self._reg_height,
+                                                              self._reg_posang))
 
         # Query usage of background model
         self['use_model_bkg'].boolean()
@@ -417,7 +418,7 @@ class csphagen(ctools.csobservation):
         elif self._srcshape == 'RECT':
 
             # Get the sky directions of the corners of the rectangle
-            cs = [self._src_reg[0].get_corner(icorner) for icorner in range(4)]
+            cs = [self._src_reg[0].corner(icorner) for icorner in range(4)]
 
             # Compute the 6 opening angles
             combinations = [[0,1], [0,2], [0,3], [1,2], [1,3], [2,3]]
@@ -508,10 +509,10 @@ class csphagen(ctools.csobservation):
                             region = gammalib.GSkyRegionCircle(ctr_dir, self._rad)
                         elif self._srcshape == 'RECT':
                             # Adjust the posang of the rectangle correspondingly
-                            region = gammalib.GSkyRegionRect(ctr_dir,
-                                                             self._reg_width,
-                                                             self._reg_height,
-                                                             self._reg_posang + dphi)
+                            region = gammalib.GSkyRegionRectangle(ctr_dir,
+                                                                  self._reg_width,
+                                                                  self._reg_height,
+                                                                  self._reg_posang +          dphi)
                         if self._has_exclusion:
                             if self._excl_reg.overlaps(region):
 
