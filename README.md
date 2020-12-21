@@ -133,7 +133,14 @@ To build and install ctools, simply type the following:
 
      $ ./configure
      $ make
+     $ make check
      $ make install
+
+If the folder does not contain any `configure` file, please run
+
+     $ ./autogen.sh 
+
+before invoking `configure`.
 
 By default ctools installs itself in /usr/local/gamma.  If you need to
 install ctools in a different location or in your home directory, use
@@ -141,11 +148,15 @@ the --prefix option to ./configure.  For example:
 
      $ ./configure --prefix=/home/yourname/projects
      $ make
+     $ make check
      $ make install
 
 The file INSTALL details more about using configure. Also try
 
      $ ./configure --help.
+
+The `make check` command will run an extensive unit test to verify that
+ctools was correctly built.  Make sure that all tests were successful. 
 
 
 Macintosh OS X Installation
