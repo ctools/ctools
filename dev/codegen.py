@@ -2,7 +2,7 @@
 # ==========================================================================
 # ctools code generator
 #
-# Copyright (C) 2018 Juergen Knoedlseder
+# Copyright (C) 2018-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,8 +23,13 @@ import os
 import sys
 import fileinput
 from datetime import date
-from builtins import input
 import gammalib
+
+# Fix Python 2.x.
+try:
+    input = raw_input
+except NameError:
+    pass
 
 
 # ================= #
