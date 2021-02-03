@@ -1,8 +1,9 @@
-2020-12-03
+2020-02-03
 
         * Version 2.0.0 released
         ========================
 
+        Add Sphinx tutorials test script (#3510)
         Add "refit_if_failed" parameter to ctlike
         Add models() method to ctobssim (#3441)
         Add ctlike results to XML file (#3431)

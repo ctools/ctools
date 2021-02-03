@@ -208,6 +208,7 @@ follows:
    Output observation definition XML file [onoff_obs.xml]
    Output model definition XML file [onoff_model.xml]
    Method for background estimation (REFLECTED|CUSTOM) [REFLECTED]
+   Shape of the source region (CIRCLE|RECT) [CIRCLE]
    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Right Ascension of source region centre (deg) (0-360) [83.63] 350.85
    Declination of source region centre (deg) (-90-90) [22.01] 58.815
@@ -355,29 +356,8 @@ The fit result can be inspected by peeking the log file:
    provided as input model to :ref:`csphagen`. Here an example for an
    input model:
 
-   .. code-block:: xml
-
-      <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-      <source_library title="source library">
-        <source name="Cassiopeia A" type="PointSource">
-          <spectrum type="PowerLaw">
-            <parameter name="Prefactor"   value="1.45" scale="1e-18" min="0"            free="1"/>
-            <parameter name="Index"       value="2.75" scale="-1"    min="-10" max="10" free="1"/>
-            <parameter name="PivotEnergy" value="1"    scale="1e6"                      free="0"/>
-          </spectrum>
-          <spatialModel type="PointSource">
-            <parameter name="RA"  value="350.8500" scale="1" free="0"/>
-            <parameter name="DEC" value="58.8150"  scale="1" free="0"/>
-          </spatialModel>
-        </source>
-        <source name="Background model" type="CTAIrfBackground" instrument="CTA">
-          <spectrum type="PowerLaw">
-            <parameter name="Prefactor" value="1" scale="1"   min="0.001" max="1000" free="1"/>
-            <parameter name="Index"     value="0" scale="1"   min="-5"    max="5"    free="1"/>
-            <parameter name="Scale"     value="1" scale="1e6" min="0.01"  max="1000" free="0"/>
-          </spectrum>
-        </source>
-      </source_library>
+   .. literalinclude:: CasA_model.xml
+      :language: xml
 
    Now rerun :ref:`csphagen` as follows:
 
@@ -395,6 +375,7 @@ The fit result can be inspected by peeking the log file:
       Output observation definition XML file [onoff_obs.xml] onoff_obs_cstat.xml
       Output model definition XML file [onoff_model.xml] onoff_model_cstat.xml
       Method for background estimation (REFLECTED|CUSTOM) [REFLECTED]
+      Shape of the source region (CIRCLE|RECT) [CIRCLE]
       Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
       Right Ascension of source region centre (deg) (0-360) [350.85]
       Declination of source region centre (deg) (-90-90) [58.815]
@@ -452,7 +433,7 @@ Like for a binned or unbinned analysis, you can create a butterfly diagram by ty
 
    $ ctbutterfly
    Input event list, counts cube or observation definition XML file [events.fits] onoff_obs.xml
-   Source of interest [Crab] Cassiopeia A
+   Source of interest [Crab] Dummy
    Input model definition XML file [$CTOOLS/share/models/crab.xml] CasA_results.xml
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0] 50.0
@@ -465,7 +446,7 @@ and the SED by typing
    $ csspec
    Input event list, counts cube, or observation definition XML file [events.fits] onoff_obs.xml
    Input model definition XML file [$CTOOLS/share/models/crab.xml] CasA_results.xml
-   Source name [Crab] Cassiopeia A
+   Source name [Crab] Dummy
    Spectrum generation method (SLICE|NODES|AUTO) [AUTO]
    Binning algorithm (FILE|LIN|LOG|POW) [LOG]
    Lower energy limit (TeV) [0.1]

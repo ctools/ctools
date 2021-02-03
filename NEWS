@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-3 December 2020
+3 February 2021
 
 
 Introduction
@@ -16,7 +16,8 @@ None
 
 Documentation
 -------------
-None
+Add test/tutorials.py script and check-tutorial target to test the code in the
+Sphinx tutorials (#3510).
 
 
 Python interface

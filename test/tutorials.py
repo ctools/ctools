@@ -46,47 +46,128 @@ class tutorials(gammalib.GPythonTestSuite):
         # Call base class constructor
         gammalib.GPythonTestSuite.__init__(self)
 
-        # Initialise results
-        self.results = None
+        # Initialise private members
+        self._rst_step = 0     # Step counter
+        self._rst_path = ''    # Path where the tested RST file resides
 
         # Return
         return
 
-    # Set test functions
-    def set(self):
+    # Clean pfiles directory
+    def _clean_pfiles(self):
         """
-        Set all test functions
+        Clean pfiles directory
         """
-        # Set test name
-        self.name('Tutorials Verification')
-
-        # Append tutorials
-        self.append(self.tutorials_1dc, 'Test 1DC tutorial')
+        # Remove all files from pfiles directory
+        os.system('rm -rf %s/*.par' % os.environ['PFILES'])
 
         # Return
         return
 
-    # Test line execution
-    def _execute_cmd(self, cmd, args):
+    # Set result directory
+    def _set_result_dir(self, path):
         """
-        Execute command
+        Set result directory
+
+        Parameters
+        ----------
+        path : str
+            Result directory path
         """
-        # Create subprocess for tool
-        p = subprocess.Popen(cmd.split(' '), stdout=subprocess.PIPE,
-                                             stdin=subprocess.PIPE,
-                                             stderr=subprocess.PIPE)
+        # Create result directory
+        try:
+            os.makedirs(path)
+        except:
+            pass
 
-        # Write command arguments parameters
-        if len(args) > 0:
-            p.stdin.write(b'%s' % args)
-            p.stdin.close()
+        # Clear result directory
+        os.system('rm -rf %s/*' % path)
 
-        # Get results
-        res = p.communicate()
+        # Step in result directory
+        os.chdir(path)
 
-        # Set error flag and text
-        name = 'Test execution of command %s.' % cmd
-        self.test_assert((len(res[1]) == 0), name, res[1])
+        # Return
+        return
+
+    # Test command execution
+    def _test_execute_cmd(self, cmd, args):
+        """
+        Test command execution
+
+        Tests the execution of a command. Currently supported commands are:
+        - cd
+        - mkdir
+        - nano
+        - ./xxxxxx (any command xxxxxx that resides in the directory of the RST file)
+
+        Parameters
+        ----------
+        cmd : str
+            Command line
+        args : list of str
+            Additional lines following the command line
+        """
+        # Split command line
+        cmdline = cmd.split(' ')
+
+        # Check command line
+        self.test_assert((len(cmdline) > 0), 'Test command.', cmd)
+
+        # Continue only if valid
+        if len(cmdline) > 0:
+
+            # Extract command
+            command = gammalib.strip_whitespace(cmdline[0])
+
+            # Handle commands
+            if command == 'mkdir':
+                self.test_value(len(cmdline), 2, 'Test command "mkdir".')
+                self.test_value(len(args), 0, 'Test that no lines follow "mkdir".')
+                if len(cmdline) > 1:
+                    dirname = gammalib.strip_whitespace(cmdline[1])
+                    os.system('mkdir -p %s' % dirname)
+
+            elif command == 'cd':
+                self.test_value(len(cmdline), 2, 'Test command "cd".')
+                self.test_value(len(args), 0, 'Test that no lines follow "cd".')
+                if len(cmdline) > 1:
+                    dirname = gammalib.strip_whitespace(cmdline[1])
+                    os.chdir(dirname)
+
+            elif command == 'nano':
+                self.test_value(len(cmdline), 2, 'Test command "nano".')
+                self.test_assert((len(args) > 0), 'Test that lines follow "nano".')
+                if len(cmdline) > 1:
+                    fname = gammalib.strip_whitespace(cmdline[1])
+                    f = open(fname, 'wb')
+                    for arg in args:
+                        f.write(arg)
+                    f.close()
+
+            elif command[0:2] == './':
+                scriptname = command[2:]
+                self.test_assert((len(args) == 0), 'Test script "%s".' % scriptname)
+                tool = '%s/%s' % (self._rst_path, scriptname)
+
+                # Debug: show tool
+                #print tool.split(' '),
+
+                # Create subprocess for tool
+                p = subprocess.Popen(tool.split(' '), stdout=subprocess.PIPE,
+                                                      stdin=subprocess.PIPE,
+                                                      stderr=subprocess.PIPE)
+
+                # Get results
+                res = p.communicate()
+
+                # Set error flag and text
+                name = 'Test execution of %s.' % tool
+                self.test_assert((len(res[1]) == 0), name, res[1])
+
+            else:
+                name = 'Test command "%s".'   % command
+                msg  = 'Unknown command "%s"' % command
+                self.test_assert(False, name, msg)
 
         # Return
         return
@@ -113,8 +194,7 @@ class tutorials(gammalib.GPythonTestSuite):
 
                 # If we have a command then execute it
                 if cmd != '':
-                    print(cmd, args)
-                    self._execute_cmd(cmd, args)
+                    self._test_execute_cmd(cmd, args)
                 
                 # Set new command
                 cmd  = line[2:]
@@ -126,8 +206,7 @@ class tutorials(gammalib.GPythonTestSuite):
 
         # If there is a pending command then execute it
         if cmd != '':
-            print(cmd, args)
-            self._execute_cmd(cmd, args)
+            self._test_execute_cmd(cmd, args)
 
         # Return
         return
@@ -149,23 +228,32 @@ class tutorials(gammalib.GPythonTestSuite):
         lines : list of str
             Command lines
         """
-        # Initialise command
-        cmd = ''
+        # Increment step counter
+        self._rst_step += 1
+        
+        # Initialise arguments
+        args = ''
+
+        # Set command
+        cmd = tool.split(' ')
 
         # Append lines
         for line in lines:
             pos = line.find(']')
             if pos != -1:
                 arg  = gammalib.strip_whitespace(line[pos+1:])
-                cmd += '%s\n' % arg
+                args += '%s\n' % arg
+
+        # Debug: show tool
+        #print cmd,
 
         # Create subprocess for tool
-        p = subprocess.Popen([tool], stdout=subprocess.PIPE,
-                                     stdin=subprocess.PIPE,
-                                     stderr=subprocess.PIPE)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                                   stdin=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
 
         # Write command line parameters
-        p.stdin.write(b'%s' % cmd)
+        p.stdin.write(b'%s' % args)
 
         # Get results
         res = p.communicate()
@@ -177,13 +265,20 @@ class tutorials(gammalib.GPythonTestSuite):
         name = 'Test execution of %s.' % tool
         self.test_assert((len(res[1]) == 0), name, res[1])
 
+        # Preprend step counter to logfile
+        logfile = gammalib.GFilename('%s.log' % (cmd[0]))
+        if logfile.exists():
+            src = logfile.url()
+            dst = '%2.2d_%s' % (self._rst_step, src)
+            os.system('mv %s %s' % (src, dst))
+
         # Return
         return
 
-    # Add workflow step
-    def _add_workflow_step(self, tool, lines):
+    # Test workflow step
+    def _test_step(self, tool, lines):
         """
-        Add workflow step
+        Test workflow step
 
         Parameters
         ----------
@@ -191,18 +286,12 @@ class tutorials(gammalib.GPythonTestSuite):
             Tool name
         lines : list of str
             Command lines
-
-        Returns
-        -------
-        cmd : str
-            Workflow command
         """
-        # If tool is a ctool or cscript then add a ctool or cscript workflow
-        # step
+        # If tool is a ctool or cscript then test ctool or cscript execution
         if tool[0:2] == 'ct' or tool[0:2] == 'cs':
             self._test_ctool_execution(tool, lines)
 
-        # ... otherwise execute lines
+        # ... otherwise test line execution
         else:
             all_lines = ['$ %s' % tool]
             all_lines.extend(lines)
@@ -211,21 +300,33 @@ class tutorials(gammalib.GPythonTestSuite):
         # Return
         return
 
-    # Extract workflow
-    def _get_workflow(self, filename):
+    # Copy file
+    def _copy_file(self, filename):
         """
-        Extract workflow from Sphinx rst file
+        Copy file from rst directory into working directory
+        """
+        # Set source filename
+        src = self._rst_path + '/' + filename
+
+        # Copy file
+        os.system('cp %s %s' % (src, filename))
+
+        # Return
+        return
+
+    # Test Sphinx rst file
+    def _test_rst_file(self, filename):
+        """
+        Test Sphinx rst file
 
         Parameters
         ----------
         filename : str
-            RST filename
-
-        Returns
-        -------
-        workflow : `~gammalib.GXml`
-            Workflow XML file
+            Sphinx rst filename
         """
+        # Set RST path
+        self._rst_path = os.path.abspath(os.path.dirname(filename))
+
         # Open RST file
         f = open(filename, 'r')
 
@@ -238,12 +339,22 @@ class tutorials(gammalib.GPythonTestSuite):
             # If we are not in a code block then check whether a code block
             # starts
             if not code:
+
+                # Check for start of a code block
                 pos = line.find('code-block:: bash')
                 if pos != -1:
                     code  = True
                     start = -1
                     tool  = ''
                     lines = []
+                    continue
+
+                # ... otherwise check for literalinclude, and if found, copy
+                # relevant file
+                pos = line.find('literalinclude::')
+                if pos != -1:
+                    filename = gammalib.strip_whitespace(line[pos+16:-1])
+                    self._copy_file(filename)
                     continue
 
             # ... otherwise
@@ -257,7 +368,7 @@ class tutorials(gammalib.GPythonTestSuite):
                         tool  = line[pos+3:-1]
                         continue
 
-                # ... otherwise append lines or add workflow step
+                # ... otherwise append lines or test step
                 else:
                     blank = gammalib.strip_whitespace(line[0:start])
                     cmd   = line[start:-1]
@@ -265,13 +376,27 @@ class tutorials(gammalib.GPythonTestSuite):
                         lines.append(cmd)
                         continue
                     else:
-                        self._add_workflow_step(tool, lines)
+                        self._test_step(tool, lines)
                         code = False
                         continue
 
-        # Add step if some code is pending
+        # Test step if some code is pending
         if code:
-            self._add_workflow_step(tool, lines)
+            self._test_step(tool, lines)
+
+        # Return
+        return
+
+    # Set test functions
+    def set(self):
+        """
+        Set all test functions
+        """
+        # Set test name
+        self.name('Tutorials Verification')
+
+        # Append tutorials
+        self.append(self.tutorials_1dc, 'Test 1DC tutorial')
 
         # Return
         return
@@ -281,15 +406,49 @@ class tutorials(gammalib.GPythonTestSuite):
         """
         Test 1DC tutorials
         """
-        # Set environment variables
-        os.environ['CTADATA'] = '/project-data/cta/data/1dc'
-        os.environ['CALDB']   = '/project-data/cta/data/1dc/caldb'
+        # Continue only if CTADATA1DC environment variable is set
+        if 'CTADATA1DC' in os.environ:
+        
+            # Set environment variables
+            os.environ['CTADATA'] = os.environ['CTADATA1DC']
+            os.environ['CALDB']   = os.environ['CTADATA1DC']+'/caldb'
 
-        # Extract workflow
-        #workflow = self._get_workflow('../doc/source/users/tutorials/1dc/first_onoff.rst')
-        workflow = self._get_workflow('first_onoff.rst')
+            # Set Sphinx rst file path
+            path = os.path.abspath('../doc/source/users/tutorials/1dc')
 
-        # Run workflow
+            # Set result directory
+            self._set_result_dir('tutorials/1dc')
+
+            # Get current working directory
+            cwd = os.getcwd()
+
+            # Clean pfiles
+            self._clean_pfiles()
+
+            # Initialise step counter
+            self._rst_step = 0
+
+            # Test Sphinx rst files
+            self._test_rst_file('%s/first_select_obs.rst' % path)
+            self._test_rst_file('%s/first_select_events.rst' % path)
+            self._test_rst_file('%s/first_skymap.rst' % path)
+            self._test_rst_file('%s/first_detect.rst' % path)
+            self._test_rst_file('%s/first_stacked.rst' % path)
+            self._test_rst_file('%s/first_fitting.rst' % path)
+            self._test_rst_file('%s/first_improving.rst' % path)
+            self._test_rst_file('%s/first_unbinned.rst' % path)
+
+            # Reset working directory
+            os.chdir(cwd)
+
+            # Clean pfiles
+            self._clean_pfiles()
+
+            # Initialise step counter
+            self._rst_step = 0
+
+            # Test Sphinx rst file for On/Off analysis
+            self._test_rst_file('%s/first_onoff.rst' % path)
 
         # Return
         return
@@ -318,14 +477,17 @@ if __name__ == '__main__':
     except:
         pass
 
-    # Copy ctools parameter files into pfiles directory
-    os.system('cp -r ../src/*/*.par pfiles/')
-
     # Set PFILES environment variable
-    os.environ['PFILES'] = 'pfiles'
+    os.environ['PFILES'] = os.path.abspath('pfiles')
+
+    # Get current working directory
+    cwd = os.getcwd()
 
     # Run test suite
     success = suites.run()
+
+    # Reset working directory
+    os.chdir(cwd)
 
     # Save test results
     suites.save('reports/tutorials.xml')

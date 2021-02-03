@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a spectrum.
 #
-# Copyright (C) 2014-2020 Michael Mayer
+# Copyright (C) 2014-2021 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1071,7 +1071,7 @@ class csspec(ctools.csobservation):
         energy_high  = gammalib.GFitsTableDoubleCol('e_max', nrows)
         norm         = gammalib.GFitsTableDoubleCol('norm', nrows)
         norm_err     = gammalib.GFitsTableDoubleCol('norm_err', nrows)
-        ulim_values  = gammalib.GFitsTableDoubleCol('norm_ul', nrows)
+        norm_ul      = gammalib.GFitsTableDoubleCol('norm_ul', nrows)
         e2dnde       = gammalib.GFitsTableDoubleCol('ref_e2dnde', nrows)
         dnde         = gammalib.GFitsTableDoubleCol('ref_dnde', nrows)
         Npred_values = gammalib.GFitsTableDoubleCol('ref_npred', nrows)
@@ -1084,7 +1084,7 @@ class csspec(ctools.csobservation):
         energy_high.unit('TeV')
         norm.unit('')
         norm_err.unit('')
-        ulim_values.unit('')
+        norm_ul.unit('')
         e2dnde.unit('erg/cm2/s')
         dnde.unit('counts/MeV/cm2/s')
         Npred_values.unit('counts')
@@ -1098,8 +1098,12 @@ class csspec(ctools.csobservation):
             energy_low[i]   = result['energy_low']
             energy_high[i]  = result['energy_high']
             norm[i]         = 1.0
-            norm_err[i]     = result['flux_err'] / result['flux']
-            ulim_values[i]  = result['ulimit'] / result['flux']
+            if result['flux'] != 0.0:
+                norm_err[i] = result['flux_err'] / result['flux']
+                norm_ul[i]  = result['ulimit']   / result['flux']
+            else:
+                norm_err[i] = 0.0
+                norm_ul[i]  = 0.0
             e2dnde[i]       = result['e2dnde']
             dnde[i]         = result['flux']
             Npred_values[i] = result['Npred']
@@ -1109,7 +1113,10 @@ class csspec(ctools.csobservation):
             # Add likelihood scan values
             for fbin in range(ncols):
                 dloglike_scan[i,fbin] = result['dloglike'][fbin]
-                norm_scan[i,fbin]     = result['norm_scan'][fbin] / result['flux']
+                if result['flux'] != 0.0:
+                    norm_scan[i,fbin] = result['norm_scan'][fbin] / result['flux']
+                else:
+                    norm_scan[i,fbin] = 0.0
 
         # Initialise FITS Table with extension "SPECTRUM"
         table = gammalib.GFitsBinTable(nrows)
@@ -1125,7 +1132,7 @@ class csspec(ctools.csobservation):
         table.append(energy_high)
         table.append(norm)
         table.append(norm_err)
-        table.append(ulim_values)
+        table.append(norm_ul)
         table.append(e2dnde)
         table.append(dnde)
         table.append(TSvalues)

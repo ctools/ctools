@@ -39,7 +39,7 @@ You run the :ref:`ctlike` tool as follows:
    Input model definition XML file [$CTOOLS/share/models/crab.xml] bkgcube.xml
    Output model definition XML file [crab_results.xml] results_stacked.xml
 
-The tool will take a few minutes (on Mac OS X) to perform the model fitting,
+The tool will take a few minutes (on Mac OS) to perform the model fitting,
 and will write the results into an updated
 :ref:`model definition file <glossary_moddef>`
 containing the fitted model parameters and their statistical uncertainties.
@@ -124,7 +124,7 @@ You create the butterfly diagram for ``Src001`` using
    Stop value for last energy bin in TeV [100.0]
    Output ASCII file [butterfly.txt] butterfly_src001.txt
 
-and for `Src003`` using
+and for ``Src003`` using
 
 .. code-block:: bash
 
@@ -192,28 +192,14 @@ a maximum likelihood model fit.
 
 Obviously, ``Src001`` has a spectral cut-off (red flux points) and hence is not
 adequately described by a power law model. You should therefore replace the
-power law in the
-:ref:`model definition file <glossary_moddef>`
-by an exponentially cutoff power law, as shown below:
+power law spectrum in the :ref:`model definition file <glossary_moddef>`
+by an exponentially cutoff power law spectrum, as shown below (only the first
+lines of the :ref:`model definition file <glossary_moddef>` are shown for
+illustration):
 
-.. code-block:: xml
-
-   <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-   <source_library title="source library">
-     <source name="Src001" type="PointSource">
-       <spectrum type="ExponentialCutoffPowerLaw">
-         <parameter name="Prefactor"    scale="1e-18" value="5.7"  min="1e-07" max="1000.0" free="1"/>
-         <parameter name="Index"        scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
-         <parameter name="CutoffEnergy" scale="1e7"   value="1.0"  min="0.01"  max="1000.0" free="1"/>
-         <parameter name="PivotEnergy"  scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
-       </spectrum>
-       <spatialModel type="PointSource">
-         <parameter name="RA"  value="266.424004498437"  scale="1" free="1" />
-         <parameter name="DEC" value="-29.0049010253548" scale="1" free="1" />
-       </spatialModel>
-     </source>
-     ...
-   </source_library>
+.. literalinclude:: results_stacked_eplaw.xml
+   :language: xml
+   :lines: 1-16
 
 Fitting this model to the data improves the fit and the resulting butterfly
 diagram follows now reasonably well the spectral points:

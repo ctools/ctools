@@ -99,6 +99,7 @@ test/butterfly.txt
 test/.coverage
 test/test_python_ctools.sh
 test/test_python_cscripts.sh
+test/tutorials
 examples/*.fits
 examples/*.xml
 examples/*.dat
