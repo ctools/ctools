@@ -12,6 +12,14 @@
         Add support of rectangular On/Off regions (#3248)
 
 
+2020-12-02
+
+        * Bug fix version 1.7.3 released
+        ================================
+
+        Import matplotlib first in example scripts (#3423)
+
+
 2020-10-15
 
         * Bug fix version 1.7.2 released

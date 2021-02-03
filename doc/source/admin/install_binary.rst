@@ -3,15 +3,15 @@
 Installing as binary package
 ============================
 
-Mac OS X
---------
+Mac OS
+------
 
-After :ref:`downloading the Mac OS X binary disk image <sec_download>`
+After :ref:`downloading the Mac OS binary disk image <sec_download>`
 double-click on the image to mount the disk
 
 .. image:: macosx-disk-image.jpg
    :height: 300px
-   :alt: Mac OS X binary disk image
+   :alt: Mac OS binary disk image
    :align: center
 
 Now open the installer package by right-clicking (ctrl-click) on the installer
