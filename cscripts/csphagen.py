@@ -304,6 +304,8 @@ class csphagen(ctools.csobservation):
         ------
         RuntimeError
             On and Off observations must have same size
+        RuntimeError
+            Off observations must be event lists
         """
 
         # Set up Off observations
@@ -318,7 +320,7 @@ class csphagen(ctools.csobservation):
                 self._obs_off.load(filename)
 
         # Check that size of On and Off observations are the same, otherwise throw error
-        if self.obs().size() != self._obs_off.size():
+        if self.obs().size() != self.obs_off().size():
             raise RuntimeError('On and Off observations must have the same size')
 
         # Loop through observations
