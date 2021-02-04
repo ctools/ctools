@@ -43,6 +43,7 @@ class csphagen(ctools.csobservation):
         self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise other variables
+        self._obs_off       = gammalib.GObservations()
         self._ebounds       = gammalib.GEbounds()
         self._etruebounds   = gammalib.GEbounds()
         self._src_dir       = gammalib.GSkyDir()
@@ -74,6 +75,7 @@ class csphagen(ctools.csobservation):
         """
         # Set pickled dictionary
         state = {'base'          : ctools.csobservation.__getstate__(self),
+                 'obs_off'       : self._obs_off,
                  'ebounds'       : self._ebounds,
                  'etruebounds'   : self._etruebounds,
                  'src_dir'       : self._src_dir,
@@ -103,6 +105,7 @@ class csphagen(ctools.csobservation):
             Pickled instance
         """
         ctools.csobservation.__setstate__(self, state['base'])
+        self._obs_off       = state['obs_off']
         self._ebounds       = state['ebounds']
         self._etruebounds   = state['etruebounds']
         self._src_dir       = state['src_dir']
@@ -205,20 +208,16 @@ class csphagen(ctools.csobservation):
         # Return region container
         return regs
 
-    def _get_parameters_bkgmethod_reflected(self):
+    def _get_source_parameters(self):
         """
-        Get parameters for REFLECTED background method
+        Get parameters to define source/On region
         """
+
         # Get source shape
         self._srcshape = self['srcshape'].string()
 
         # Query source direction
         self._query_src_direction()
-
-        # Query minimum number of background regions and number of
-        # background regions to skip next to On region
-        self['bkgregmin'].integer()
-        self['bkgregskip'].integer()
 
         # If source shape is a circle the append GSkyRegionCircle
         if self._srcshape == 'CIRCLE':
@@ -240,8 +239,21 @@ class csphagen(ctools.csobservation):
                                                               self._reg_height,
                                                               self._reg_posang))
 
-        # Query usage of background model
-        self['use_model_bkg'].boolean()
+        # Return
+        return
+
+    def _get_parameters_bkgmethod_reflected(self):
+        """
+        Get parameters for REFLECTED background method
+        """
+
+        # Query parameters for source/On region definition
+        self._get_source_parameters()
+
+        # Query minimum number of background regions and
+        # number of background regions to skip next to On region
+        self['bkgregmin'].integer()
+        self['bkgregskip'].integer()
 
         # Return
         return
@@ -284,6 +296,58 @@ class csphagen(ctools.csobservation):
         # Return
         return
 
+    def _get_parameters_bkgmethod_off(self):
+        """
+        Get parameters for OFF background method
+
+        Raises
+        ------
+        RuntimeError
+            On and Off observations must have same size
+        """
+
+        # Set up Off observations
+        # If there are no Off observations in container then load them via user parameters
+        if self.obs_off().is_empty():
+            filename = self['inobsoff'].filename()
+            # If it is a FITS file load into observation and append to container
+            if gammalib.GFilename(filename).is_fits():
+                self._obs_off.append(gammalib.GCTAObservation(filename))
+            # Otherwise load file into container
+            else:
+                self._obs_off.load(filename)
+
+        # Check that size of On and Off observations are the same, otherwise throw error
+        if self.obs().size() != self._obs_off.size():
+            raise RuntimeError('On and Off observations must have the same size')
+
+        # Loop through observations
+        for obs in self.obs_off():
+            # Check that observation is event list, otherwise throw error
+            if obs.eventtype() != "EventList":
+                raise RuntimeError('Off observations must be event lists')
+            # Check that they have response, otherwise assign based on user parameter
+            if obs.has_response() == False:
+                database = self["caldb"].string()
+                irf = self["irf"].string()
+                # xml element for response
+                response_xml = "parameter name=\"Calibration\"" +\
+                               " database=\"" + database + "\"" +\
+                               " response=\"" + irf + "\""
+                print(response_xml)
+                xml = gammalib.GXmlElement()
+                xml.append(response_xml)
+                print(xml)
+                # define response and assign to observation
+                response = gammalib.GCTAResponseIrf(xml)
+                obs.response(response)
+
+        # Query parameters for source/On region definition
+        self._get_source_parameters()
+
+        # Return
+        return
+
     def _get_parameters_bkgmethod(self):
         """
         Get background method parameters
@@ -296,9 +360,12 @@ class csphagen(ctools.csobservation):
             self._get_parameters_bkgmethod_reflected()
         elif bkgmethod == 'CUSTOM':
             self._get_parameters_bkgmethod_custom()
+        elif bkgmethod == 'OFF':
+            self._get_parameters_bkgmethod_off()
 
         # Query parameters that are needed for all background methods
         self['maxoffset'].real()
+        self['use_model_bkg'].boolean()
 
         # Return
         return
@@ -351,20 +418,15 @@ class csphagen(ctools.csobservation):
         else:
             self._has_exclusion = False
 
-        # Query remaining parameters
-        self['use_model_bkg'].boolean()
-        self['stack'].boolean()
+        # If there are multiple observations query whether to stack them
+        if self.obs().size() > 1:
+            self['stack'].boolean()
 
         # Query ahead output parameters
         if (self._read_ahead()):
             self['outobs'].filename()
             self['outmodel'].filename()
             self['prefix'].string()
-
-        # If there are no observations in container then get them from the
-        # parameter file
-        if self.obs().is_empty():
-            self.obs(self._get_observations(False))
 
         # Get background method parameters (have to come after setting up of
         # observations)
@@ -459,14 +521,6 @@ class csphagen(ctools.csobservation):
             if self._srcshape == 'CIRCLE':
                 msg += ' (circle rad=%.3f).' % (self._rad)
             self._log_string(gammalib.NORMAL, msg)
-
-        # Skip observation if it is pointed too far from the source
-        elif offset >= self['maxoffset'].real():
-            msg = ' Skip because observation is pointed at %.3f deg >= '\
-                  '"maxoffset=%.3f" from source.' \
-                  % (offset, self['maxoffset'].real())
-            self._log_string(gammalib.NORMAL, msg)
-
         # ... otherwise
         else:
             posang = pnt_dir.posang_deg(self._src_dir)
@@ -474,7 +528,6 @@ class csphagen(ctools.csobservation):
 
                 # Determine number of background regions to skip
                 N_skip  = self['bkgregskip'].integer()
-                N_start = 1 + N_skip
                 N_lim   = 1 + 2 * N_skip
 
                 # Compute the angular separation of reflected regions wrt
@@ -532,11 +585,76 @@ class csphagen(ctools.csobservation):
                             regions.append(region)
                             dphi += alpha
 
-                    # Log number of reflected regions
-                    msg = ' Use %d reflected regions.' % (regions.size())
-                    self._log_string(gammalib.NORMAL, msg)
+                    # Check again that we have enough background regions
+                    # now that we have checked for overlap with exclusion region
+                    if regions.size() >= self['bkgregmin'].integer():
+                        # Log number of reflected regions
+                        msg = ' Use %d reflected regions.' % (regions.size())
+                        self._log_string(gammalib.NORMAL, msg)
+                    # Otherwise log observation skipped and return empty region container
+                    else:
+                        msg = ' Skip because the number %d of regions' \
+                              'for background estimation not overlapping ' \
+                              'with the exclusion region is smaller than ' \
+                              '"bkgregmin"=%d.' % (bkg_reg.size(), self['bkgregmin'].integer())
+                        self._log_string(gammalib.NORMAL, msg)
+                        regions = gammalib.GSkyRegions()
 
         # Return reflected regions
+        return regions
+
+    def _instrument_regions(self, obs, obs_off):
+        """
+        Calculate background region in Off observation that corresponds to the source region
+        in the On observation in instrument coordinates
+
+        Parameters
+        ----------
+        obs : `~gammalib.GCTAObservation()`
+            On CTA observation
+        obs_off : `~gammalib.GCTAObservation()`
+            Off CTA observation
+
+        Returns
+        -------
+        regions : `~gammalib.GSkyRegions`
+            Container with background region
+        """
+        # Initialise region container
+        regions = gammalib.GSkyRegions()
+
+        # Convert source position in On observation to instrument coordinates
+        instdir = obs.pointing().instdir(self._src_dir)
+
+        # Convert instrument position to sky direction for Off observation
+        off_dir = obs_off.pointing().skydir(instdir)
+
+        # Build region according to shape specified by user
+        # If circle
+        if self._srcshape == 'CIRCLE':
+            region = gammalib.GSkyRegionCircle(off_dir, self._rad)
+        # ... otherwise if rectangle
+        elif self._srcshape == 'RECT':
+            # Instrument coordinates take sky direction as reference
+            # so no need to change the position angle
+            region = gammalib.GSkyRegionRectangle(off_dir,
+                                                  self._reg_width,
+                                                  self._reg_height,
+                                                  self._reg_posang)
+
+        # Check if background region overlaps with exclusion region
+        is_valid = True
+        if self._has_exclusion:
+            if self._excl_reg.overlaps(region):
+                # Signal region overlap
+                msg = ' Background region overlaps with ' \
+                      'exclusion region.'
+                self._log_string(gammalib.EXPLICIT, msg)
+                is_valid = False
+        # ... otherwise store region in container
+        regions.append(region)
+
+        # Return
         return regions
 
     def _set_models(self, results):
@@ -587,7 +705,7 @@ class csphagen(ctools.csobservation):
                 # observations
                 for result in results:
                     if model.is_valid(result['instrument'], result['id']):
-                        if result['bkg_reg'].size() >= self['bkgregmin'].integer():
+                        if result['bkg_reg'].size() > 0:
                             use_model = True
                         break
 
@@ -699,7 +817,7 @@ class csphagen(ctools.csobservation):
         # Return energy boundaries
         return ebounds
 
-    def _set_background_regions(self, obs):
+    def _set_background_regions(self, obs, obs_off=None):
         """
         Set background regions for an observation
 
@@ -716,7 +834,7 @@ class csphagen(ctools.csobservation):
         # Initialise empty background regions for this observation
         bkg_reg = gammalib.GSkyRegions()
 
-        # If reflected background is requested then created reflected
+        # If reflected background is requested then create reflected
         # background regions
         if self['bkgmethod'].string() == 'REFLECTED':
             bkg_reg = self._reflected_regions(obs)
@@ -727,6 +845,11 @@ class csphagen(ctools.csobservation):
         # are replaced by the On/Off observations.
         elif self['bkgmethod'].string() == 'CUSTOM':
             bkg_reg = obs.off_regions().copy()
+
+        # ... otherwise if dedicated Off runs are use then
+        # use background region that correspond to the same instrument coordinates
+        if self['bkgmethod'].string() == 'OFF':
+            bkg_reg = self._instrument_regions(obs,obs_off)
 
         # Return background regions
         return bkg_reg
@@ -750,6 +873,13 @@ class csphagen(ctools.csobservation):
         bkg_reg = None
         obs     = self.obs()[i]
 
+        # Retrieve dedicated Off observation if it exists
+        if not self.obs_off().is_empty():
+            obs_off = self.obs_off()[i]
+        # Otherwise use the same as On
+        else:
+            obs_off = self.obs()[i]
+
         # Log header
         self._log_header3(gammalib.NORMAL,'%s observation "%s"' % \
                           (obs.instrument(), obs.id()))
@@ -768,32 +898,43 @@ class csphagen(ctools.csobservation):
                 msg = ' Background model not used, assume constant backround rate.'
             self._log_string(gammalib.NORMAL, msg)
 
-            # Set background regions for this observation
-            bkg_reg = self._set_background_regions(obs)
+            # Get offset angle of source
+            pnt_dir = obs.pointing().dir()
+            offset = pnt_dir.dist_deg(self._src_dir)
 
-            # If there are background regions then create On/Off observation
-            # and append it to the output container
-            if bkg_reg.size() >= self['bkgregmin'].integer():
-
-                # Create On/Off observation
-                onoff = gammalib.GCTAOnOffObservation(obs,
-                                                      self._models,
-                                                      self._srcname,
-                                                      self._etruebounds,
-                                                      self._ebounds,
-                                                      self._src_reg,
-                                                      bkg_reg,
-                                                      use_model_bkg)
-
-                # Set On/Off observation ID
-                onoff.id(obs.id())
-
-            # Otherwise log observation skipped
-            else:
-                msg = ' Skip because the number %d of regions ' \
-                      'for background estimation is smaller than ' \
-                      '"bkgregmin"=%d.' % (bkg_reg.size(), self['bkgregmin'].integer())
+            # Skip observation if it is pointed too far from the source
+            if offset >= self['maxoffset'].real():
+                msg = ' Skip because observation is pointed at %.3f deg >= ' \
+                      '"maxoffset=%.3f" from source.' \
+                      % (offset, self['maxoffset'].real())
                 self._log_string(gammalib.NORMAL, msg)
+            # ... otherwise continue to process
+            else:
+
+                # Set background regions for this observation
+                bkg_reg = self._set_background_regions(obs,obs_off)
+
+                # If there are any background regions then create On/Off observation
+                # and append it to the output container
+                if bkg_reg.size() >= 0:
+
+                    # Create On/Off observation
+                    onoff = gammalib.GCTAOnOffObservation(obs, obs_off,
+                                                          self._models,
+                                                          self._srcname,
+                                                          self._etruebounds,
+                                                          self._ebounds,
+                                                          self._src_reg,
+                                                          bkg_reg,
+                                                          use_model_bkg)
+
+                    # Set On/Off observation ID
+                    onoff.id(obs.id())
+
+                # Otherwise log observation skipped
+                else:
+                    msg = ' Skip because no valid Off regions could be determined'
+                    self._log_string(gammalib.NORMAL, msg)
 
         # Construct dictionary with results
         result = {'onoff'     : onoff,
@@ -854,6 +995,8 @@ class csphagen(ctools.csobservation):
 
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
+        if not self.obs_off().is_empty():
+            self._log_observations(gammalib.NORMAL, self._obs_off, 'Off Observation')
 
         # Set true energy bins
         self._etruebounds = self._etrue_ebounds()
@@ -1031,6 +1174,27 @@ class csphagen(ctools.csobservation):
 
         # Return
         return self._excl_reg
+
+    def obs_off(self, obs=None):
+        """
+        Return and optionally set the Off observations
+
+        Parameters
+        ----------
+        obs : `~gammalib.GCTAObservations`
+            Off observations container
+
+        Returns
+        -------
+        observation container : `~gammalib.GCTAObservations`
+            Off observations container
+        """
+        # If an observation container is provided then set the Off observations ...
+        if obs is not None:
+            self._obs_off = obs
+
+        # Return
+        return self._obs_off
 
 
 # ======================== #

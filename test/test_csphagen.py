@@ -46,6 +46,7 @@ class Test(test):
         self._myevents1      = self._datadir + '/crab_offaxis1.fits'
         self._myevents2      = self._datadir + '/crab_offaxis2.fits'
         self._exclusion      = self._datadir + '/crab_exclusion.fits'
+        self._offevents      = self._datadir + '/background_events.fits'
         self._nreg_with_excl = 5
         self._nreg_wo_excl   = 8
         self._nreg_bkg_reg   = 5
@@ -413,6 +414,101 @@ class Test(test):
         # Check output
         self._check_output('csphagen_py8', self._nbins, 9)
         self._check_outobs('csphagen_py8_obs.xml', 1)
+
+        # Setup csphagen for test with dedicated Off observations
+        phagen = cscripts.csphagen()
+        phagen['inobs']      = self._myevents1
+        phagen['inobsoff']   = self._offevents
+        phagen['inmodel']    = 'NONE'
+        phagen['caldb']      = self._caldb
+        phagen['irf']        = self._irf
+        phagen['ebinalg']    = 'LOG'
+        phagen['emin']       = 0.1
+        phagen['emax']       = 100.0
+        phagen['enumbins']   = self._nbins
+        phagen['bkgmethod']  = 'OFF'
+        phagen['etruemin']   = 0.05
+        phagen['etruemax']   = 150.0
+        phagen['etruebins']  = 5
+        phagen['stack']      = False
+        phagen['outobs']     = 'csphagen_py9_obs.xml'
+        phagen['outmodel']   = 'csphagen_py9_model.xml'
+        phagen['prefix']     = 'csphagen_py9'
+        phagen['logfile']    = 'csphagen_py9.log'
+        phagen['chatter']    = 2
+
+        # Execute script
+        phagen.execute()
+
+        # Check output
+        self._check_output('csphagen_py9', self._nbins, 1)
+        self._check_outobs('csphagen_py9_obs.xml', 1)
+
+        # Setup csphagen for test with dedicated Off observations
+        # and exclusion region
+        phagen = cscripts.csphagen()
+        phagen['inobs']       = self._myevents1
+        phagen['inobsoff']    = self._offevents
+        phagen['inmodel']     = 'NONE'
+        phagen['caldb']       = self._caldb
+        phagen['irf']         = self._irf
+        phagen['ebinalg']     = 'LOG'
+        phagen['emin']        = 0.1
+        phagen['emax']        = 100.0
+        phagen['enumbins']    = self._nbins
+        phagen['inexclusion'] = self._exclusion
+        phagen['bkgmethod']   = 'OFF'
+        phagen['etruemin']    = 0.05
+        phagen['etruemax']    = 150.0
+        phagen['etruebins']   = 5
+        phagen['stack']       = False
+        phagen['outobs']      = 'csphagen_py10_obs.xml'
+        phagen['outmodel']    = 'csphagen_py10_model.xml'
+        phagen['prefix']      = 'csphagen_py10'
+        phagen['logfile']     = 'csphagen_py10.log'
+        phagen['chatter']     = 2
+
+        # Execute script
+        phagen.execute()
+
+        # Check output
+        self._check_output('csphagen_py10', self._nbins, 1)
+        self._check_outobs('csphagen_py10_obs.xml', 1)
+
+        # Test with multiple input observations and dedicated Off runs
+        # Create Off observation container
+        obs_off = gammalib.GObservations()
+        for s, events in enumerate([self._offevents, self._offevents]):
+            run = gammalib.GCTAObservation(events)
+            run.id(str(s + 1))
+            run.response(self._irf, gammalib.GCaldb('cta', self._caldb))
+            obs_off.append(run)
+
+        # Setup csphagen
+        phagen = cscripts.csphagen(obs)
+        phagen.obs_off(obs_off)
+        phagen['inmodel']    = 'NONE'
+        phagen['ebinalg']    = 'LOG'
+        phagen['emin']       = 0.1
+        phagen['emax']       = 100.0
+        phagen['enumbins']   = self._nbins
+        phagen['bkgmethod']  = 'OFF'
+        phagen['etruemin']   = 0.05
+        phagen['etruemax']   = 150.0
+        phagen['etruebins']  = 5
+        phagen['stack']      = False
+        phagen['outobs']     = 'csphagen_py11_obs.xml'
+        phagen['outmodel']   = 'csphagen_py11_model.xml'
+        phagen['prefix']     = 'csphagen_py11'
+        phagen['logfile']    = 'csphagen_py11.log'
+        phagen['chatter']    = 2
+
+        # Execute script
+        phagen.execute()
+
+        # Check output
+        self._check_output('csphagen_py11', self._nbins, 1)
+        self._check_outobs('csphagen_py11_obs.xml', 1)
 
         # Return
         return
