@@ -334,13 +334,15 @@ class csphagen(ctools.csobservation):
                 response_xml = "parameter name=\"Calibration\"" +\
                                " database=\"" + database + "\"" +\
                                " response=\"" + irf + "\""
-                print(response_xml)
                 xml = gammalib.GXmlElement()
                 xml.append(response_xml)
-                print(xml)
                 # define response and assign to observation
                 response = gammalib.GCTAResponseIrf(xml)
                 obs.response(response)
+
+        # Add models from Off observations to model container
+        for model in self.obs_off().models():
+            self._models.append(model)
 
         # Query parameters for source/On region definition
         self._get_source_parameters()
@@ -429,7 +431,7 @@ class csphagen(ctools.csobservation):
             self['prefix'].string()
 
         # Get background method parameters (have to come after setting up of
-        # observations)
+        # observations and models)
         self._get_parameters_bkgmethod()
 
         # Write input parameters into logger
