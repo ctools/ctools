@@ -154,16 +154,18 @@ def show_spectrum_butterfly():
     plt.grid()
 
     # Set usage string
-    usage = 'show_onoff_spectrum.py [-t title] [specfile] [butterfile]'
+    usage = 'show_onoff_spectrum.py [-p plotfile] [-t title] [specfile] [butterfile]'
 
     # Set default options
-    options = [{'option': '-t', 'value': 'Cassiopeia A'}]
+    options = [{'option': '-p', 'value': ''},
+               {'option': '-t', 'value': 'Cassiopeia A'}]
 
     # Get arguments and options from command line arguments
     args, options = cscripts.ioutils.get_args_options(options, usage)
 
     # Extract script parameters from options
-    title = options[0]['value']
+    plotfile = options[0]['value']
+    title    = options[1]['value']
 
     # Set filenames
     specfile   = 'spectrum.fits'
@@ -184,7 +186,10 @@ def show_spectrum_butterfly():
     plt.title(title)
 
     # Show figure
-    plt.show()
+    if len(plotfile) > 0:
+        plt.savefig(plotfile)
+    else:
+        plt.show()
 
     # Return
     return

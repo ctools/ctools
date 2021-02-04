@@ -119,7 +119,7 @@ class tutorials(gammalib.GPythonTestSuite):
             # Extract command
             command = gammalib.strip_whitespace(cmdline[0])
 
-            # Handle commands
+            # Handle "mkdir" command
             if command == 'mkdir':
                 self.test_value(len(cmdline), 2, 'Test command "mkdir".')
                 self.test_value(len(args), 0, 'Test that no lines follow "mkdir".')
@@ -127,6 +127,7 @@ class tutorials(gammalib.GPythonTestSuite):
                     dirname = gammalib.strip_whitespace(cmdline[1])
                     os.system('mkdir -p %s' % dirname)
 
+            # Handle "cd" command
             elif command == 'cd':
                 self.test_value(len(cmdline), 2, 'Test command "cd".')
                 self.test_value(len(args), 0, 'Test that no lines follow "cd".')
@@ -134,6 +135,7 @@ class tutorials(gammalib.GPythonTestSuite):
                     dirname = gammalib.strip_whitespace(cmdline[1])
                     os.chdir(dirname)
 
+            # Handle "nano" command
             elif command == 'nano':
                 self.test_value(len(cmdline), 2, 'Test command "nano".')
                 self.test_assert((len(args) > 0), 'Test that lines follow "nano".')
@@ -144,26 +146,68 @@ class tutorials(gammalib.GPythonTestSuite):
                         f.write(arg)
                     f.close()
 
+            # Handle special plotting scripts
             elif command[0:2] == './':
-                scriptname = command[2:]
-                self.test_assert((len(args) == 0), 'Test script "%s".' % scriptname)
-                tool = '%s/%s' % (self._rst_path, scriptname)
 
-                # Debug: show tool
-                #print tool.split(' '),
+                # Build command line
+                script      = '%s/%s' % (self._rst_path, command[2:])
+                plotname, _ = os.path.splitext(command[2:])
+                cmd         = '%s -p %s.png' % (script, plotname)
+                self.test_assert((len(args) == 0), 'Test script "%s".' % command[2:])
 
-                # Create subprocess for tool
-                p = subprocess.Popen(tool.split(' '), stdout=subprocess.PIPE,
-                                                      stdin=subprocess.PIPE,
-                                                      stderr=subprocess.PIPE)
+                # Execute command, make sure we catch any exception
+                try:
+                    rc = os.system(cmd+' > tutorials_test_output.dmp 2>&1')
+                except:
+                    rc = -1
 
-                # Get results
-                res = p.communicate()
+                # If an exception occured then put output on screen
+                msg = ''
+                if rc != 0:
+                    f = open('tutorials_test_output.dmp', 'r')
+                    for line in f:
+                        msg += line
+                    f.close()
+
+                # Remove test output
+                os.remove('tutorials_test_output.dmp')
 
                 # Set error flag and text
-                name = 'Test execution of %s.' % tool
-                self.test_assert((len(res[1]) == 0), name, res[1])
+                name = 'Test execution of %s.' % command[2:]
+                self.test_value(rc, 0, name, msg)
 
+            # Handle plotting scripts
+            elif command[0:7] == '$CTOOLS':
+
+                # Build command line
+                script      = gammalib.expand_env(cmdline[0])
+                filename    = cmdline[1]
+                plotname, _ = os.path.splitext(filename)
+                cmd = '%s -p %s.png %s' % (script, plotname, filename)
+                self.test_assert((len(args) == 0), 'Test script "%s".' % command)
+
+                # Execute command, make sure we catch any exception
+                try:
+                    rc = os.system(cmd+' > tutorials_test_output.dmp 2>&1')
+                except:
+                    rc = -1
+
+                # If an exception occured then put output on screen
+                msg = ''
+                if rc != 0:
+                    f = open('tutorials_test_output.dmp', 'r')
+                    for line in f:
+                        msg += line
+                    f.close()
+
+                # Remove test output
+                os.remove('tutorials_test_output.dmp')
+
+                # Set error flag and text
+                name = 'Test execution of %s.' % script
+                self.test_value(rc, 0, name, msg)
+
+            # Signal that the command was not known
             else:
                 name = 'Test command "%s".'   % command
                 msg  = 'Unknown command "%s"' % command
@@ -185,7 +229,7 @@ class tutorials(gammalib.GPythonTestSuite):
         # Initialise commands and arguments
         cmd  = ''
         args = ''
-        
+
         # Loop over all lines
         for line in lines:
 
@@ -195,7 +239,7 @@ class tutorials(gammalib.GPythonTestSuite):
                 # If we have a command then execute it
                 if cmd != '':
                     self._test_execute_cmd(cmd, args)
-                
+
                 # Set new command
                 cmd  = line[2:]
                 args = ''
@@ -230,7 +274,7 @@ class tutorials(gammalib.GPythonTestSuite):
         """
         # Increment step counter
         self._rst_step += 1
-        
+
         # Initialise arguments
         args = ''
 
@@ -396,7 +440,49 @@ class tutorials(gammalib.GPythonTestSuite):
         self.name('Tutorials Verification')
 
         # Append tutorials
-        self.append(self.tutorials_1dc, 'Test 1DC tutorial')
+        self.append(self.tutorials_quickstart, 'Test quickstart tutorial')
+        self.append(self.tutorials_1dc,        'Test 1DC tutorial')
+
+        # Return
+        return
+
+    # Test quickstart tutorials
+    def tutorials_quickstart(self):
+        """
+        Test quickstart tutorials
+        """
+        # Set Sphinx rst file path
+        path = os.path.abspath('../doc/source/users/tutorials/quickstart')
+
+        # Set result directory
+        self._set_result_dir('tutorials/quickstart')
+
+        # Get current working directory
+        cwd = os.getcwd()
+
+        # Clean pfiles
+        self._clean_pfiles()
+
+        # Initialise step counter
+        self._rst_step = 0
+
+        # Test Sphinx rst files
+        self._test_rst_file('%s/simulating.rst' % path)
+        self._test_rst_file('%s/selecting.rst' % path)
+        self._test_rst_file('%s/skymap.rst' % path)
+        self._test_rst_file('%s/binning.rst' % path)
+        self._test_rst_file('%s/response.rst' % path)
+        self._test_rst_file('%s/fitting.rst' % path)
+        self._test_rst_file('%s/residual_map.rst' % path)
+        self._test_rst_file('%s/residual_spectrum.rst' % path)
+        self._test_rst_file('%s/butterfly.rst' % path)
+        self._test_rst_file('%s/spectrum.rst' % path)
+        self._test_rst_file('%s/unbinned.rst' % path)
+        self._test_rst_file('%s/energy_dispersion.rst' % path)
+        self._test_rst_file('%s/onoff.rst' % path)
+
+        # Reset working directory
+        os.chdir(cwd)
 
         # Return
         return
@@ -408,7 +494,7 @@ class tutorials(gammalib.GPythonTestSuite):
         """
         # Continue only if CTADATA1DC environment variable is set
         if 'CTADATA1DC' in os.environ:
-        
+
             # Set environment variables
             os.environ['CTADATA'] = os.environ['CTADATA1DC']
             os.environ['CALDB']   = os.environ['CTADATA1DC']+'/caldb'
