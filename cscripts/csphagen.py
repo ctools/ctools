@@ -420,6 +420,10 @@ class csphagen(ctools.csobservation):
         else:
             self._has_exclusion = False
 
+        # Get background method parameters (have to come after setting up of
+        # observations and models)
+        self._get_parameters_bkgmethod()
+
         # If there are multiple observations query whether to stack them
         if self.obs().size() > 1:
             self['stack'].boolean()
@@ -429,10 +433,6 @@ class csphagen(ctools.csobservation):
             self['outobs'].filename()
             self['outmodel'].filename()
             self['prefix'].string()
-
-        # Get background method parameters (have to come after setting up of
-        # observations and models)
-        self._get_parameters_bkgmethod()
 
         # Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
