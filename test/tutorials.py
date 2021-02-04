@@ -471,14 +471,14 @@ if __name__ == '__main__':
     # Append test suite to container
     suites.append(suite_tutorials)
 
-    # Create pfiles directory
+    # Create tutorials/pfiles directory
     try:
-        os.mkdir('pfiles')
+        os.makedirs('tutorials/pfiles')
     except:
         pass
 
     # Set PFILES environment variable
-    os.environ['PFILES'] = os.path.abspath('pfiles')
+    os.environ['PFILES'] = os.path.abspath('tutorials/pfiles')
 
     # Get current working directory
     cwd = os.getcwd()
