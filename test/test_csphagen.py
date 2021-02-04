@@ -422,6 +422,11 @@ class Test(test):
         phagen['inmodel']    = 'NONE'
         phagen['caldb']      = self._caldb
         phagen['irf']        = self._irf
+        phagen['srcshape']    = 'CIRCLE'
+        phagen['coordsys']    = 'CEL'
+        phagen['ra']          = 83.633
+        phagen['dec']         = 22.0145
+        phagen['rad']         = 0.2
         phagen['ebinalg']    = 'LOG'
         phagen['emin']       = 0.1
         phagen['emax']       = 100.0
@@ -452,6 +457,11 @@ class Test(test):
         phagen['inmodel']     = 'NONE'
         phagen['caldb']       = self._caldb
         phagen['irf']         = self._irf
+        phagen['srcshape']    = 'CIRCLE'
+        phagen['coordsys']    = 'CEL'
+        phagen['ra']          = 83.633
+        phagen['dec']         = 22.0145
+        phagen['rad']         = 0.2
         phagen['ebinalg']     = 'LOG'
         phagen['emin']        = 0.1
         phagen['emax']        = 100.0
@@ -488,6 +498,11 @@ class Test(test):
         phagen = cscripts.csphagen(obs)
         phagen.obs_off(obs_off)
         phagen['inmodel']    = 'NONE'
+        phagen['srcshape']    = 'CIRCLE'
+        phagen['coordsys']    = 'CEL'
+        phagen['ra']          = 83.633
+        phagen['dec']         = 22.0145
+        phagen['rad']         = 0.2
         phagen['ebinalg']    = 'LOG'
         phagen['emin']       = 0.1
         phagen['emax']       = 100.0
@@ -507,8 +522,9 @@ class Test(test):
         phagen.execute()
 
         # Check output
-        self._check_output('csphagen_py11', self._nbins, 1)
-        self._check_outobs('csphagen_py11_obs.xml', 1)
+        self._check_output('csphagen_py11_1', self._nbins, 1)
+        self._check_output('csphagen_py11_2', self._nbins, 1)
+        self._check_outobs('csphagen_py11_obs.xml', 2)
 
         # Return
         return
