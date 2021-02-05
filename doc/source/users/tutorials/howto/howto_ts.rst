@@ -19,28 +19,13 @@ Copy the 1DC :ref:`model definition <glossary_moddef>` file
    $ cp $CTOOLS/share/models/1dc_howto.xml ts_model.xml
 
 and modify the file by adding ``tscalc="1"`` to the ``<source>`` tag for
-source ``Src1``. Your
+source ``Src1``. The first lines of the :download:`ts_model.xml <ts_model.xml>`
 :ref:`model definition XML file <glossary_moddef>`
 should then look like this:
 
-.. code-block:: xml
-
-   <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-   <source_library title="source library">
-     <source name="Src001" type="PointSource" tscalc="1">
-       <spectrum type="ExponentialCutoffPowerLaw">
-         <parameter name="Prefactor"    scale="1e-18" value="5.7"  min="1e-07" max="1000.0" free="1"/>
-         <parameter name="Index"        scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
-         <parameter name="CutoffEnergy" scale="1e7"   value="1.0"  min="0.01"  max="1000.0" free="1"/>
-         <parameter name="PivotEnergy"  scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
-       </spectrum>
-       <spatialModel type="PointSource">
-         <parameter name="RA"  scale="1" value="266.424" free="1" />
-         <parameter name="DEC" scale="1" value="-29.005" free="1" />
-       </spatialModel>
-     </source>
-     ...
-   </source_library>
+.. literalinclude:: ts_model.xml
+   :language: xml
+   :lines: 1-14
 
 Then run :ref:`ctlike` to compute the so-called Test Statistic, which is twice
 the difference between the log-likelihood value obtained for a fit that includes

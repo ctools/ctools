@@ -1,0 +1,12 @@
+<?xml version="1.0" standalone="no"?>
+<observation_list title="observation library">
+  <observation name="Crab" id="00001" instrument="CTA">
+    <parameter name="EventList" file="north.fits"/>
+    <parameter name="Calibration" database="prod2" response="North_0.5h"/>
+  </observation>
+  <observation name="Crab" id="00002" instrument="CTA">
+    <parameter name="EventList" file="south.fits"/>
+    <parameter name="Calibration" database="prod2" response="South_0.5h"/>
+  </observation>
+</observation_list>
+

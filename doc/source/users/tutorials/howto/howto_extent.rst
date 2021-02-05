@@ -33,22 +33,12 @@ To do this, copy the 1DC :ref:`model definition <glossary_moddef>` file
 
    $ cp $CTOOLS/share/models/1dc_howto.xml extended_model.xml
 
-and add the following source to it
+to :download:`extended_model.xml <extended_model.xml>` and add the following
+source to it:
 
-.. code-block:: xml
-
-   <source name="Src003" type="ExtendedSource" tscalc="1">
-     <spectrum type="PowerLaw">
-       <parameter name="Prefactor"   scale="5.7e-18" value="1.0" min="0"    max="1000.0" free="1"/>
-       <parameter name="Index"       scale="-2.48"   value="1.0" min="-4.0" max="4.0"    free="1"/>
-       <parameter name="PivotEnergy" scale="300000"  value="1.0" free="0" />
-     </spectrum>
-     <spatialModel type="RadialDisk">
-       <parameter name="RA"     scale="1.0" value="266.3070" min="-360"  max="360" free="1"/>
-       <parameter name="DEC"    scale="1.0" value="-30.1876" min="-90"   max="90"  free="1"/>
-       <parameter name="Radius" scale="1.0" value="0.3"      min="0.001" max="10"  free="1"/>
-     </spatialModel>
-   </source>
+.. literalinclude:: extended_model.xml
+   :language: xml
+   :lines: 26-37
 
 Then run :ref:`ctlike` to fit the parameters of ``Src003`` together with the
 other source parameters

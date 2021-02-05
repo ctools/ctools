@@ -52,21 +52,11 @@ array:
    Output event data file or observation definition XML file [north.fits] south.fits
 
 You now need to combine the information about these two observations in an
-observation definition XML file:
+observation definition XML file. Let's put the following content in in the
+``obs_irf.xml``:
 
-.. code-block:: xml
-
-   <?xml version="1.0" standalone="no"?>
-   <observation_list title="observation library">
-     <observation name="Crab" id="00001" instrument="CTA">
-       <parameter name="EventList" file="north.fits"/>
-       <parameter name="Calibration" database="prod2" response="North_0.5h"/>
-     </observation>
-     <observation name="Crab" id="00002" instrument="CTA">
-       <parameter name="EventList" file="south.fits"/>
-       <parameter name="Calibration" database="prod2" response="South_0.5h"/>
-     </observation>
-   </observation_list>
+.. literalinclude:: obs_irf.xml
+   :language: xml
 
 Each observation now has a ``Calibration`` parameter with the attributes
 ``database`` and ``response``.

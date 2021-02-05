@@ -25,6 +25,7 @@
 # ==========================================================================
 import os
 import sys
+import stat
 import subprocess
 import gammalib
 import ctools
@@ -49,6 +50,7 @@ class tutorials(gammalib.GPythonTestSuite):
         # Initialise private members
         self._rst_step = 0     # Step counter
         self._rst_path = ''    # Path where the tested RST file resides
+        self._cwd      = '.'   # Current working directory
 
         # Return
         return
@@ -74,6 +76,9 @@ class tutorials(gammalib.GPythonTestSuite):
         path : str
             Result directory path
         """
+        # Set default working directory
+        os.chdir(self._cwd)
+
         # Create result directory
         try:
             os.makedirs(path)
@@ -111,7 +116,7 @@ class tutorials(gammalib.GPythonTestSuite):
         cmdline = cmd.split(' ')
 
         # Check command line
-        self.test_assert((len(cmdline) > 0), 'Test command.', cmd)
+        self.test_assert((len(cmdline) > 0), 'Test that command line is not empty.', cmd)
 
         # Continue only if valid
         if len(cmdline) > 0:
@@ -121,7 +126,7 @@ class tutorials(gammalib.GPythonTestSuite):
 
             # Handle "mkdir" command
             if command == 'mkdir':
-                self.test_value(len(cmdline), 2, 'Test command "mkdir".')
+                self.test_value(len(cmdline), 2, 'Test number of arguments for "mkdir".')
                 self.test_value(len(args), 0, 'Test that no lines follow "mkdir".')
                 if len(cmdline) > 1:
                     dirname = gammalib.strip_whitespace(cmdline[1])
@@ -129,15 +134,24 @@ class tutorials(gammalib.GPythonTestSuite):
 
             # Handle "cd" command
             elif command == 'cd':
-                self.test_value(len(cmdline), 2, 'Test command "cd".')
+                self.test_value(len(cmdline), 2, 'Test number of arguments for "cd".')
                 self.test_value(len(args), 0, 'Test that no lines follow "cd".')
                 if len(cmdline) > 1:
                     dirname = gammalib.strip_whitespace(cmdline[1])
                     os.chdir(dirname)
 
+            # Handle "cp" command
+            elif command == 'cp':
+                self.test_value(len(cmdline), 3, 'Test number of arguments for "cp".')
+                self.test_value(len(args), 0, 'Test that no lines follow "cp".')
+                if len(cmdline) > 2:
+                    src = gammalib.expand_env(gammalib.strip_whitespace(cmdline[1]))
+                    dst = gammalib.expand_env(gammalib.strip_whitespace(cmdline[2]))
+                    os.system('cp %s %s' % (src, dst))
+
             # Handle "nano" command
             elif command == 'nano':
-                self.test_value(len(cmdline), 2, 'Test command "nano".')
+                self.test_value(len(cmdline), 2, 'Test number of arguments for "nano".')
                 self.test_assert((len(args) > 0), 'Test that lines follow "nano".')
                 if len(cmdline) > 1:
                     fname = gammalib.strip_whitespace(cmdline[1])
@@ -146,11 +160,22 @@ class tutorials(gammalib.GPythonTestSuite):
                         f.write(arg)
                     f.close()
 
-            # Handle special plotting scripts
+            # Handle script execution
             elif command[0:2] == './':
 
+                # Set script name. If the script does not exist in result
+                # directory then assume it exists in Sphinx rst directory
+                if os.path.isfile(command[2:]):
+                    script = './%s' % (command[2:])
+                else:
+                    script = '%s/%s' % (self._rst_path, command[2:])
+
+                # Make sure that script is executable
+                mode  = os.stat(script).st_mode
+                mode |= (mode & 0o444) >> 2
+                os.chmod(script, mode)
+
                 # Build command line
-                script      = '%s/%s' % (self._rst_path, command[2:])
                 plotname, _ = os.path.splitext(command[2:])
                 cmd         = '%s -p %s.png' % (script, plotname)
                 self.test_assert((len(args) == 0), 'Test script "%s".' % command[2:])
@@ -173,7 +198,7 @@ class tutorials(gammalib.GPythonTestSuite):
                 os.remove('tutorials_test_output.dmp')
 
                 # Set error flag and text
-                name = 'Test execution of %s.' % command[2:]
+                name = 'Test execution of "%s".' % command[2:]
                 self.test_value(rc, 0, name, msg)
 
             # Handle plotting scripts
@@ -204,8 +229,12 @@ class tutorials(gammalib.GPythonTestSuite):
                 os.remove('tutorials_test_output.dmp')
 
                 # Set error flag and text
-                name = 'Test execution of %s.' % script
+                name = 'Test execution of "%s".' % script
                 self.test_value(rc, 0, name, msg)
+
+            # Handle unsupported Xspec commands
+            elif command[0:5] == 'xspec':
+                pass
 
             # Signal that the command was not known
             else:
@@ -288,13 +317,10 @@ class tutorials(gammalib.GPythonTestSuite):
                 arg  = gammalib.strip_whitespace(line[pos+1:])
                 args += '%s\n' % arg
 
-        # Debug: show tool
-        #print cmd,
-
         # Create subprocess for tool
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                                   stdin=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
+                                  stdin=subprocess.PIPE,
+                                  stderr=subprocess.PIPE)
 
         # Write command line parameters
         p.stdin.write(b'%s' % args)
@@ -305,9 +331,18 @@ class tutorials(gammalib.GPythonTestSuite):
         # Close pipeline
         p.stdin.close()
 
-        # Set error flag and text
-        name = 'Test execution of %s.' % tool
-        self.test_assert((len(res[1]) == 0), name, res[1])
+        # Set error flag and message
+        if '*** ERROR' in res[0]:
+            success = False
+            msg     = res[0]
+        elif len(res[1]) > 0:
+            success = False
+            msg     = res[1]
+        else:
+            success = True
+            msg     = ''
+        name = 'Test execution of "%s".' % tool
+        self.test_assert(success, name, msg)
 
         # Preprend step counter to logfile
         logfile = gammalib.GFilename('%s.log' % (cmd[0]))
@@ -436,11 +471,15 @@ class tutorials(gammalib.GPythonTestSuite):
         """
         Set all test functions
         """
+        # Set current working directory
+        self._cwd = os.path.abspath(os.getcwd())
+
         # Set test name
         self.name('Tutorials Verification')
 
         # Append tutorials
         self.append(self.tutorials_quickstart, 'Test quickstart tutorial')
+        self.append(self.tutorials_howto,      'Test howto tutorial')
         self.append(self.tutorials_1dc,        'Test 1DC tutorial')
 
         # Return
@@ -452,13 +491,11 @@ class tutorials(gammalib.GPythonTestSuite):
         Test quickstart tutorials
         """
         # Set Sphinx rst file path
+        os.chdir(self._cwd)
         path = os.path.abspath('../doc/source/users/tutorials/quickstart')
 
         # Set result directory
         self._set_result_dir('tutorials/quickstart')
-
-        # Get current working directory
-        cwd = os.getcwd()
 
         # Clean pfiles
         self._clean_pfiles()
@@ -467,22 +504,22 @@ class tutorials(gammalib.GPythonTestSuite):
         self._rst_step = 0
 
         # Test Sphinx rst files
-        self._test_rst_file('%s/simulating.rst' % path)
-        self._test_rst_file('%s/selecting.rst' % path)
-        self._test_rst_file('%s/skymap.rst' % path)
-        self._test_rst_file('%s/binning.rst' % path)
-        self._test_rst_file('%s/response.rst' % path)
-        self._test_rst_file('%s/fitting.rst' % path)
-        self._test_rst_file('%s/residual_map.rst' % path)
+        self._test_rst_file('%s/simulating.rst'        % path)
+        self._test_rst_file('%s/selecting.rst'         % path)
+        self._test_rst_file('%s/skymap.rst'            % path)
+        self._test_rst_file('%s/binning.rst'           % path)
+        self._test_rst_file('%s/response.rst'          % path)
+        self._test_rst_file('%s/fitting.rst'           % path)
+        self._test_rst_file('%s/residual_map.rst'      % path)
         self._test_rst_file('%s/residual_spectrum.rst' % path)
-        self._test_rst_file('%s/butterfly.rst' % path)
-        self._test_rst_file('%s/spectrum.rst' % path)
-        self._test_rst_file('%s/unbinned.rst' % path)
+        self._test_rst_file('%s/butterfly.rst'         % path)
+        self._test_rst_file('%s/spectrum.rst'          % path)
+        self._test_rst_file('%s/unbinned.rst'          % path)
         self._test_rst_file('%s/energy_dispersion.rst' % path)
-        self._test_rst_file('%s/onoff.rst' % path)
+        self._test_rst_file('%s/onoff.rst'             % path)
 
         # Reset working directory
-        os.chdir(cwd)
+        os.chdir(self._cwd)
 
         # Return
         return
@@ -499,14 +536,13 @@ class tutorials(gammalib.GPythonTestSuite):
             os.environ['CTADATA'] = os.environ['CTADATA1DC']
             os.environ['CALDB']   = os.environ['CTADATA1DC']+'/caldb'
 
-            # Set Sphinx rst file path
-            path = os.path.abspath('../doc/source/users/tutorials/1dc')
+            # Set Sphinx rst file paths
+            os.chdir(self._cwd)
+            path_1dc   = os.path.abspath('../doc/source/users/tutorials/1dc')
+            path_howto = os.path.abspath('../doc/source/users/tutorials/howto')
 
             # Set result directory
             self._set_result_dir('tutorials/1dc')
-
-            # Get current working directory
-            cwd = os.getcwd()
 
             # Clean pfiles
             self._clean_pfiles()
@@ -515,17 +551,26 @@ class tutorials(gammalib.GPythonTestSuite):
             self._rst_step = 0
 
             # Test Sphinx rst files
-            self._test_rst_file('%s/first_select_obs.rst' % path)
-            self._test_rst_file('%s/first_select_events.rst' % path)
-            self._test_rst_file('%s/first_skymap.rst' % path)
-            self._test_rst_file('%s/first_detect.rst' % path)
-            self._test_rst_file('%s/first_stacked.rst' % path)
-            self._test_rst_file('%s/first_fitting.rst' % path)
-            self._test_rst_file('%s/first_improving.rst' % path)
-            self._test_rst_file('%s/first_unbinned.rst' % path)
+            self._test_rst_file('%s/first_select_obs.rst'    % path_1dc)
+            self._test_rst_file('%s/first_select_events.rst' % path_1dc)
+            self._test_rst_file('%s/first_skymap.rst'        % path_1dc)
+            self._test_rst_file('%s/first_detect.rst'        % path_1dc)
+            self._test_rst_file('%s/first_stacked.rst'       % path_1dc)
+            self._test_rst_file('%s/first_fitting.rst'       % path_1dc)
+            self._test_rst_file('%s/first_improving.rst'     % path_1dc)
+            self._test_rst_file('%s/first_unbinned.rst'      % path_1dc)
+
+            # Test Sphinx rst files
+            self._test_rst_file('%s/howto_ts.rst'           % path_howto)
+            self._test_rst_file('%s/howto_tsmap.rst'        % path_howto)
+            self._test_rst_file('%s/howto_extent.rst'       % path_howto)
+            self._test_rst_file('%s/howto_ulimit.rst'       % path_howto)
+            self._test_rst_file('%s/howto_lightcurve.rst'   % path_howto)
+            self._test_rst_file('%s/howto_phasecurve.rst'   % path_howto)
+            self._test_rst_file('%s/howto_exclude.rst'      % path_howto)
 
             # Reset working directory
-            os.chdir(cwd)
+            os.chdir(self._cwd)
 
             # Clean pfiles
             self._clean_pfiles()
@@ -534,10 +579,41 @@ class tutorials(gammalib.GPythonTestSuite):
             self._rst_step = 0
 
             # Test Sphinx rst file for On/Off analysis
-            self._test_rst_file('%s/first_onoff.rst' % path)
+            self._test_rst_file('%s/first_onoff.rst' % path_1dc)
+
+            # Reset working directory
+            os.chdir(self._cwd)
 
         # Return
         return
+
+    # Test howto tutorials
+    def tutorials_howto(self):
+        """
+        Test howto tutorials
+        """
+        # Set Sphinx rst file path
+        os.chdir(self._cwd)
+        path = os.path.abspath('../doc/source/users/tutorials/howto')
+
+        # Set result directory
+        self._set_result_dir('tutorials/howto')
+
+        # Initialise step counter
+        self._rst_step = 0
+
+        # Test Sphinx rst files
+        self._clean_pfiles()
+        self._test_rst_file('%s/howto_connect_irfs.rst' % path)
+        self._clean_pfiles()
+        self._test_rst_file('%s/howto_xspec.rst'        % path)
+
+        # Reset working directory
+        os.chdir(self._cwd)
+
+        # Return
+        return
+
 
 
 # ======================== #
