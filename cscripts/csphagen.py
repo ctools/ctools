@@ -656,7 +656,8 @@ class csphagen(ctools.csobservation):
                 self._log_string(gammalib.EXPLICIT, msg)
                 is_valid = False
         # ... otherwise store region in container
-        regions.append(region)
+        if is_valid:
+            regions.append(region)
 
         # Return
         return regions
