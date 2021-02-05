@@ -100,12 +100,13 @@ The figure below shows the resulting Test Statistic map.
       cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 logL0=-447785.5939102234 binmin=70 binmax=80 outmap=tsmap_split_7.fits logfile=tsmap_split_7.log &
       cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 logL0=-447785.5939102234 binmin=80 binmax=90 outmap=tsmap_split_8.fits logfile=tsmap_split_8.log &
       cttsmap inobs=cntcube.fits inmodel=$CTOOLS/share/models/test_cube.xml srcname=Test expcube=expcube.fits psfcube=psfcube.fits bkgcube=bkgcube.fits nxpix=10 nypix=10 binsz=0.05 coordsys=GAL proj=CAR xref=0.0 yref=0.0 logL0=-447785.5939102234 binmin=90 binmax=100 outmap=tsmap_split_9.fits logfile=tsmap_split_9.log &
+      wait
 
    Now run the ASCII file by typing
 
    .. code-block:: bash
 
-      ./tsmap_commands.dat
+      $ ./tsmap_commands.dat
 
    This will execute 10 :ref:`cttsmap` jobs in parallel. Each of the jobs will
    compute 10 pixels of the Test Statistic map. You combine the resulting 10

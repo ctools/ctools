@@ -22,21 +22,12 @@ To do this, copy the 1DC :ref:`model definition <glossary_moddef>` file
 
    $ cp $CTOOLS/share/models/1dc_howto.xml ulimit_model.xml
 
-and add the following source to it
+to :download:`ulimit_model.xml <ulimit_model.xml>` and add the following
+source to it:
 
-.. code-block:: xml
-
-   <source name="Test" type="PointSource">
-     <spectrum type="PowerLaw">
-       <parameter name="Prefactor"   value="1" scale="1.0e-20" min="0"          free="1"/>
-       <parameter name="Index"       value="1" scale="-2.48"   min="-5" max="5" free="0"/>
-       <parameter name="PivotEnergy" value="1" scale="300000"                   free="0"/>
-     </spectrum>
-     <spatialModel type="PointSource">
-       <parameter name="GLON" value="0.1" scale="1" free="0"/>
-       <parameter name="GLAT" value="0.4" scale="1" free="0"/>
-     </spatialModel>
-   </source>
+.. literalinclude:: ulimit_model.xml
+   :language: xml
+   :lines: 3-13
 
 Now run the :ref:`ctulimit` tool as follows:
 

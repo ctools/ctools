@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools package                                               #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2021 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -211,11 +211,21 @@ valgrind:
 # Add science verification rule
 science-verification:
 	@if type test/science_verification.py >/dev/null 2>&1; then \
-	    cd test; \
-	    ./science_verification.py; \
-	    cd ..; \
+		cd test; \
+		./science_verification.py; \
+		cd ..; \
 	else \
 		echo "science_verification.py not found in test."; \
+	fi
+
+# Add tutorials verification rule
+check-tutorials:
+	@if type test/tutorials.py >/dev/null 2>&1; then \
+		cd test; \
+		./tutorials.py; \
+		cd ..; \
+	else \
+		echo "tutorials.py not found in test."; \
 	fi
 
 # Add Sphinx rule
