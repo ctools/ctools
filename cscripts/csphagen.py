@@ -3,7 +3,7 @@
 # Computes the PHA spectra for source/background and ARF/RMF files using the
 # reflected region method
 #
-# Copyright (C) 2017-2020 Luigi Tibaldo
+# Copyright (C) 2017-2021 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -308,38 +308,52 @@ class csphagen(ctools.csobservation):
             Off observations must be event lists
         """
 
-        # Set up Off observations
-        # If there are no Off observations in container then load them via user parameters
+        # Set up Off observations. If there are no Off observations in the
+        # container then load them via user parameters
         if self.obs_off().is_empty():
+
+            # Get Off observation file name
             filename = self['inobsoff'].filename()
-            # If it is a FITS file load into observation and append to container
+
+            # If Off observation is a FITS file then load observation and
+            # append it to the Off observation container
             if gammalib.GFilename(filename).is_fits():
                 self._obs_off.append(gammalib.GCTAObservation(filename))
-            # Otherwise load file into container
+
+            # ... otherwise load XML file into Off observation container
             else:
                 self._obs_off.load(filename)
 
-        # Check that size of On and Off observations are the same, otherwise throw error
+        # Check that size of On and Off observations are the same, otherwise
+        # raise error
         if self.obs().size() != self.obs_off().size():
             raise RuntimeError('On and Off observations must have the same size')
 
         # Loop through observations
         for obs in self.obs_off():
+
             # Check that observation is event list, otherwise throw error
             if obs.eventtype() != "EventList":
                 raise RuntimeError('Off observations must be event lists')
+
             # Check that they have response, otherwise assign based on user parameter
             if obs.has_response() == False:
+
+                # Get database and IRF
                 database = self["caldb"].string()
-                irf = self["irf"].string()
-                # xml element for response
-                response_xml = "parameter name=\"Calibration\"" +\
+                irf      = self["irf"].string()
+
+                # Create an XML element for response
+                parameter = "parameter name=\"Calibration\"" +\
                                " database=\"" + database + "\"" +\
                                " response=\"" + irf + "\""
                 xml = gammalib.GXmlElement()
-                xml.append(response_xml)
-                # define response and assign to observation
+                xml.append(parameter)
+
+                # Create CTA response
                 response = gammalib.GCTAResponseIrf(xml)
+
+                # Attach response to observation
                 obs.response(response)
 
         # Add models from Off observations to model container
@@ -609,8 +623,10 @@ class csphagen(ctools.csobservation):
 
     def _instrument_regions(self, obs, obs_off):
         """
-        Calculate background region in Off observation that corresponds to the source region
-        in the On observation in instrument coordinates
+        Compute background regions for Off observation
+        
+        Calculate background region in Off observation that corresponds to the
+        source region in the On observation in instrument coordinates
 
         Parameters
         ----------
@@ -637,6 +653,7 @@ class csphagen(ctools.csobservation):
         # If circle
         if self._srcshape == 'CIRCLE':
             region = gammalib.GSkyRegionCircle(off_dir, self._rad)
+
         # ... otherwise if rectangle
         elif self._srcshape == 'RECT':
             # Instrument coordinates take sky direction as reference
@@ -651,11 +668,11 @@ class csphagen(ctools.csobservation):
         if self._has_exclusion:
             if self._excl_reg.overlaps(region):
                 # Signal region overlap
-                msg = ' Background region overlaps with ' \
-                      'exclusion region.'
+                msg = ' Background region overlaps with exclusion region.'
                 self._log_string(gammalib.EXPLICIT, msg)
                 is_valid = False
-        # ... otherwise store region in container
+
+        # If region is valid then append it to container
         if is_valid:
             regions.append(region)
 

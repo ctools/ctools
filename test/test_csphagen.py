@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csphagen script.
 #
-# Copyright (C) 2017-2020 Luigi Tibaldo
+# Copyright (C) 2017-2021 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -422,11 +422,11 @@ class Test(test):
         phagen['inmodel']    = 'NONE'
         phagen['caldb']      = self._caldb
         phagen['irf']        = self._irf
-        phagen['srcshape']    = 'CIRCLE'
-        phagen['coordsys']    = 'CEL'
-        phagen['ra']          = 83.633
-        phagen['dec']         = 22.0145
-        phagen['rad']         = 0.2
+        phagen['srcshape']   = 'CIRCLE'
+        phagen['coordsys']   = 'CEL'
+        phagen['ra']         = 83.633
+        phagen['dec']        = 22.0145
+        phagen['rad']        = 0.2
         phagen['ebinalg']    = 'LOG'
         phagen['emin']       = 0.1
         phagen['emax']       = 100.0
@@ -449,8 +449,8 @@ class Test(test):
         self._check_output('csphagen_py9', self._nbins, 1)
         self._check_outobs('csphagen_py9_obs.xml', 1)
 
-        # Setup csphagen for test with dedicated Off observations
-        # and exclusion region
+        # Setup csphagen for test with dedicated Off observations and
+        # exclusion region
         phagen = cscripts.csphagen()
         phagen['inobs']       = self._myevents1
         phagen['inobsoff']    = self._offevents
@@ -498,11 +498,11 @@ class Test(test):
         phagen = cscripts.csphagen(obs)
         phagen.obs_off(obs_off)
         phagen['inmodel']    = 'NONE'
-        phagen['srcshape']    = 'CIRCLE'
-        phagen['coordsys']    = 'CEL'
-        phagen['ra']          = 83.633
-        phagen['dec']         = 22.0145
-        phagen['rad']         = 0.2
+        phagen['srcshape']   = 'CIRCLE'
+        phagen['coordsys']   = 'CEL'
+        phagen['ra']         = 83.633
+        phagen['dec']        = 22.0145
+        phagen['rad']        = 0.2
         phagen['ebinalg']    = 'LOG'
         phagen['emin']       = 0.1
         phagen['emax']       = 100.0

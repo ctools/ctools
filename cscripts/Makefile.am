@@ -182,6 +182,7 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/crab_offaxis1.fits.gz \
            $(top_srcdir)/test/data/crab_offaxis2.fits.gz \
            $(top_srcdir)/test/data/crab_exclusion.fits.gz \
+           $(top_srcdir)/test/data/background_events.fits.gz \
            $(top_srcdir)/test/data/crab_src_reg.reg \
            $(top_srcdir)/test/data/crab_bkg_reg.reg \
            $(top_srcdir)/test/data/tsmap_0.fits \
