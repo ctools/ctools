@@ -17,17 +17,16 @@ the OGIP format normally used in X-ray astronomy (PHA, ARF, RMF),
 If the ``bkgmethod`` parameter is ``REFLECTED``, the script will use an On region
 shape defined by the ``srcshape`` parameter and generate reflected regions by
 placing regions of the same shape that are reflected with respect to the
-pointing direction. So far circular and rectangular regions are supported.
-Circular regions are defined by a center that is specified by the ``ra`` and
-``dec`` parameters if ``coordsys=CEL`` or the ``glon`` and ``glat`` parameters if
+pointing direction within the same observation. So far circular and
+rectangular regions are supported. Circular regions are defined by a
+center that is specified by the ``ra`` and ``dec`` parameters if
+``coordsys=CEL`` or the ``glon`` and ``glat`` parameters if
 ``coordsys=GAL``, and a radius that is specified by the ``rad`` parameter.
 Rectangular regions are defined by a center, again specified by either the
 ``ra`` and ``dec`` or the ``glon`` and ``glat`` parameters, a ``width`` parameter,
 a ``height`` parameter and a ``posang`` parameter that specified the position
 angle measured counter clockwise from celestial North. Note that the ``height``
-axis is pointing in the direction of the position angle. Reflected regions are
-only generated for offset angles with respect to the pointing direction that are
-smaller than the value specified by the ``maxoffset`` parameter. If less than
+axis is pointing in the direction of the position angle. If less than
 ``bkgregmin`` reflected regions can be found because the offset angle between
 source and pointing direction is too small, the observation will be skipped.
 Regions to be excluded for background determination can be specified using a
@@ -44,7 +43,7 @@ respectively. Both parameters accept either a ds9 region file or a sky map where
 all non-zero pixel values define a region. In case that an observation definition
 XML file is specified as input using the ``inobs``, background region files can
 be specified separately for each observation using the ``OffRegions`` parameter
-in the format
+in the format.
 
 .. code-block:: xml
 
@@ -52,6 +51,16 @@ in the format
      <parameter name="OffRegions" file="ds9.reg"/>
      ...
    </observation>
+
+Finally,  if ``bkgmethod=OFF`` is specified, the background regions
+will be taken from independent Off observations given by the
+``inobsoff`` parameter. The On region can be defined in the same way
+as for ``bkgmethod=REFLECTED``, and the Off regions are the
+corresponding regions in instrument coordinates from the Off observations.
+
+For all background estimation methods only observations with a
+pointing direction at an offset smaller than ``maxoffset`` from the
+source are used. 
 
 :ref:`csphagen` supports multiprocessing. By default each event list will be treated
 in parallel over as many processes as the number of CPUs available on your
@@ -77,6 +86,11 @@ General parameters
 
 ``inobs [file]``
     Input event list or observation definition XML file.
+
+``inobsoff [file]``
+    Input event list or observation definition XML file for dedicated
+    Off observations. The number of observations must be the same as
+    for ``inobs``.
 
 ``inmodel [file]``
     Input model XML file (if ``NONE`` a point source at the centre of the
@@ -172,7 +186,7 @@ General parameters
 ``srcregfile [file]``
     Source region file (ds9 or FITS WCS map).
 
-``bkgmethod <REFLECTED|CUSTOM> [string]``
+``bkgmethod <REFLECTED|CUSTOM|OFF> [string]``
     Method for background estimation:
 
     - ``REFLECTED``: background is evaluated in regions with the same shape as
@@ -184,18 +198,25 @@ General parameters
       observations specified in the observation definition XML file the name of
       the region file will be extracted from the ``OffRegions`` parameter that
       needs to be specified for each observation in the observation definition
-      XML file. Off region files can be either ds9 region files or FITS WCS maps.
+      XML file. Off region files can be either ds9 region files or
+      FITS WCS maps.
+
+      - ``OFF``: background is evaluated from dedicated Off
+	observations in regions that correspond to the source region
+	in the On observations in instrument coordinates.
 
 ``bkgregfile [file]``
     Background regions file (ds9 or FITS WCS map).
 
 ``(bkgregmin = 2) [integer]``
-    Minimum number of background regions that are required for an observation.
+    Minimum number of background regions that are required for an
+    observation when the ``REFLECTED`` background estimation is used.
     If this number of background regions is not available the observation is
     skipped.
 
 ``(bkgregskip = 1) [integer]``
-    Number of background regions that should be skipped next to the On regions.
+    Number of background regions that should be skipped next to the On
+    region when the ``REFLECTED`` background estimation is used.
     Typically, one region is skipped so that the Off regions are taken sufficiently
     distant from the On region, but in some cases it may be useful to keep the
     background regions next to the On region.
