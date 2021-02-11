@@ -33,9 +33,9 @@ To simulate events taking the energy dispersion into account you run the
    Dec of pointing (degrees) (-90-90) [22.51]
    Radius of FOV (degrees) (0-180) [5.0]
    Start time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:00:00]
-   Stop time (UTC string, JD, MJD or MET in seconds) [2020-01-01T01:00:00]
-   Lower energy limit (TeV) [0.03]
-   Upper energy limit (TeV) [150.0]
+   Stop time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:30:00] 2020-01-01T01:00:00
+   Lower energy limit (TeV) [0.1] 0.03
+   Upper energy limit (TeV) [100.0] 150.0
    Calibration database [prod2]
    Instrument response function [South_0.5h]
    Input model definition XML file [$CTOOLS/share/models/crab.xml]
@@ -49,8 +49,8 @@ You then select events from the simulated data as before using the
    $ ctselect
    Input event list or observation definition XML file [events.fits] events_edisp.fits
    Radius of ROI around pointing or specified RA/DEC (degrees) (0-180) [3.0]
-   Start time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:10:00]
-   Stop time (UTC string, JD, MJD or MET in seconds) [2020-01-01T00:40:00]
+   Start time (UTC string, JD, MJD or MET in seconds) [NONE] 2020-01-01T00:10:00
+   Stop time (UTC string, JD, MJD or MET in seconds) [NONE] 2020-01-01T00:40:00
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
    Output event list or observation definition XML file [selected_events.fits] selected_events_edisp.fits
@@ -61,7 +61,7 @@ Then you bin as before the selected events into a counts cube using the
 .. code-block:: bash
 
    $ ctbin
-   Input event list or observation definition XML file [selected_events.fits] selected_events_edisp.fits
+   Input event list or observation definition XML file [events.fits] selected_events_edisp.fits
    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
    Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63]
@@ -107,10 +107,10 @@ energy dispersion cube:
 .. code-block:: bash
 
    $ ctlike edisp=yes
-   Input event list, counts cube or observation definition XML file [selected_events.fits] cntcube_edisp.fits
-   Input exposure cube file [expcube.fits]
-   Input PSF cube file [psfcube.fits]
-   Input background cube file [bkgcube.fits]
+   Input event list, counts cube or observation definition XML file [events.fits] cntcube_edisp.fits
+   Input exposure cube file [NONE] expcube.fits
+   Input PSF cube file [NONE] psfcube.fits
+   Input background cube file [NONE] bkgcube.fits
    Input energy dispersion cube file [NONE] edispcube.fits
    Input model definition XML file [$CTOOLS/share/models/crab.xml] models.xml
    Output model definition XML file [crab_results.xml] crab_results_edisp.xml
@@ -247,5 +247,3 @@ Here the output in the log file:
    2019-04-02T14:27:05:   PivotEnergy ..............: 1000000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
    2019-04-02T14:27:05:  Number of temporal par's ..: 1
    2019-04-02T14:27:05:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-
-
