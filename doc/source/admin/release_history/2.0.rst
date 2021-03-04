@@ -1,7 +1,7 @@
 .. _2.0:
 
-ctools 2.0 release (27 November 2020)
-=====================================
+ctools 2.0 release (4 March 2021)
+=================================
 
 Overview
 --------
@@ -24,6 +24,7 @@ Bug fixes
 Improvements
 ------------
 
+* Add optimizer setter to ``ctlikelihood`` base class.
 * Add ``refit_if_failed`` parameter to :ref:`ctlike`
 * [`3441 <https://cta-redmine.irap.omp.eu/issues/3441>`_] -
   Add ``models()`` method to :ref:`ctobssim`

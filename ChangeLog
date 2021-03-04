@@ -1,8 +1,9 @@
-2020-02-03
+2020-03-04
 
         * Version 2.0.0 released
         ========================
 
+        Add optimizer setter to ctlikelihood base class
         Add Sphinx tutorials test script (#3510)
         Add "refit_if_failed" parameter to ctlike
         Add models() method to ctobssim (#3441)

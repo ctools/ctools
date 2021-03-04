@@ -1,7 +1,7 @@
 /***************************************************************************
  *              ctlikelihood - Base class for likelihood tools             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2021 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -66,6 +66,7 @@ public:
     virtual void save(void) = 0;
 
     // Methods
+    void              opt(const GOptimizer* opt);
     const GOptimizer* opt(void) const;
 
 #ifndef SWIG

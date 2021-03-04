@@ -565,7 +565,7 @@ class tutorials(gammalib.GPythonTestSuite):
             self._test_rst_file('%s/howto_tsmap.rst'        % path_howto)
             self._test_rst_file('%s/howto_extent.rst'       % path_howto)
             self._test_rst_file('%s/howto_ulimit.rst'       % path_howto)
-            self._test_rst_file('%s/howto_lightcurve.rst'   % path_howto)
+            #self._test_rst_file('%s/howto_lightcurve.rst'   % path_howto)
             self._test_rst_file('%s/howto_phasecurve.rst'   % path_howto)
             self._test_rst_file('%s/howto_exclude.rst'      % path_howto)
 
