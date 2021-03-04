@@ -28,6 +28,8 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+#include <string>
+#include <typeinfo>
 #include "ctlikelihood.hpp"
 
 /* __ Method name definitions ____________________________________________ */
