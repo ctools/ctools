@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-4 March 2021
+5 March 2021
 
 
 Introduction
@@ -137,7 +137,8 @@ None
 
 cttsmap - Generation of Test Statistic map
 ------------------------------------------
-None
+Added hidden "fix_spat" parameter that instructs the tool to fix all spatial
+model parameters (#3562).
 
 
 ctulimit - Compute upper limit

@@ -1,8 +1,9 @@
-2020-03-04
+2021-03-05
 
         * Version 2.0.0 released
         ========================
 
+        Add hidden "fix_spat" parameter to cttsmap (#3562)
         Add optimizer setter to ctlikelihood base class
         Add Sphinx tutorials test script (#3510)
         Add "refit_if_failed" parameter to ctlike

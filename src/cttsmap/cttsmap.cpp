@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    cttsmap - TS map calculation tool                    *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2019 by Michael Mayer                               *
+ *  copyright (C) 2014-2021 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -247,6 +247,28 @@ void cttsmap::run(void)
 
     // Remove test source
     models.remove(m_srcname);
+
+    // Fix spatial parameters if requested
+    if ((*this)["fix_spat"].boolean()) {
+
+        // Loop over all models
+        for (int i = 0; i < models.size(); ++i) {
+
+            // Continue only if model is skymodel
+            GModelSky* sky= dynamic_cast<GModelSky*>(models[i]);
+            if (sky != NULL) {
+
+                // Fix all spatial parameters
+                GModelSpatial* spatial = sky->spatial();
+                for (int j = 0; j < spatial->size(); j++) {
+                    (*spatial)[j].fix();
+                }
+
+            } // endif: there was a sky model
+
+        } // endfor: looped over models
+
+    } // endif: spatial parameter should be fixed
 
     // Get likelihood of null hypothesis if not given before
     if (m_logL0 == 0.0) {
@@ -580,6 +602,9 @@ void cttsmap::get_parameters(void)
     m_binmax  = (*this)["binmax"].integer();
     m_logL0   = (*this)["logL0"].real();
     m_publish = (*this)["publish"].boolean();
+
+    // Query other parameters
+    (*this)["fix_spat"].boolean();
 
     // If needed later, query output filename now
     if (read_ahead()) {

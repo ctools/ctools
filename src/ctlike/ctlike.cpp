@@ -715,7 +715,7 @@ GXml ctlike::xml_result(void) const
 
     // Set flag strings
     std::string refit           = (m_refit) ? "yes" : "no";
-    std::string edisp     = (m_apply_edisp) ? "yes" : "no";
+    std::string edisp           = (m_apply_edisp) ? "yes" : "no";
     std::string fix_spat_for_ts = (m_fix_spat_for_ts) ? "yes" : "no";
 
     // Write ctlike results into XML instance

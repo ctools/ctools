@@ -35,6 +35,7 @@ errors,        b, h, no,,, "Compute and store parameter errors?"
 statistic,     s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statistic"
 like_accuracy, r, h, 0.005,1.0e-30,1.0, "Absolute accuracy of maximum likelihood value"
 max_iter,      i, h, 50,1,1000, "Maximum number of fit iterations"
+fix_spat,      b, h, no,,, "Fix spatial parameters for TS map computation?"
 
 #
 # Spatial binning parameters
