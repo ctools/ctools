@@ -163,7 +163,7 @@ class cssens(ctools.csobservation):
         # Return
         return
 
-    def _set_obs(self, emin, emax, lpnt=0.0, bpnt=0.0):
+    def _set_obs(self, emin, emax, lpnt=None, bpnt=None):
         """
         Set an observation container
 
@@ -189,6 +189,16 @@ class cssens(ctools.csobservation):
 
         # ... otherwise allocate a single observation
         else:
+            # set the coordinates of the test source model
+            if lpnt is None and bpnt is None:
+                container = gammalib.GModels(self['inmodel'].filename())
+                src_model = container[self['srcname'].string()]
+
+                pntdir = gammalib.GSkyDir()
+                pntdir.radec_deg(src_model['RA'].value(), src_model['DEC'].value())
+
+                lpnt = pntdir.l_deg()
+                bpnt = pntdir.b_deg()
 
             # Read relevant user parameters
             caldb    = self['caldb'].string()
