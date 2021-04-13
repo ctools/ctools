@@ -231,7 +231,7 @@ def plot_spectrum(filename, plotfile):
     spec = get_spectrum_file(filename)
 
     # Set energy scale of spectrum
-    if max(spec['energies']) < 1.0e-3:
+    if max(spec['energies']+spec['ul_energies']) < 1.0e-3:
         xlabel = 'Energy (MeV)'
         conv   = 1.0e6
     elif max(spec['energies']) < 1.0:
