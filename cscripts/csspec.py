@@ -1000,7 +1000,7 @@ class csspec(ctools.csobservation):
 
                 # Set intensity of node to tiny value by scaling the value
                 # by a factor 1e-8.
-                par = obs.models()[self['srcname'].string()].spectral()[i*2+1]
+                par = obs.models()[self['srcname'].string()].spectral()[parname]
                 par.autoscale()
                 par.factor_min(1.0e-8)
                 par.factor_value(1.0e-8)
