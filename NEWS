@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-5 March 2021
+13 April 2021
 
 
 Introduction
@@ -285,7 +285,9 @@ None
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-None
+Added BINS method that replaces the spectral model by a bin function that is
+implemented by the GammaLib class GModelSpectralBins. Using a bin function
+assures that spectral points are statistically independent (#3606).
 
 
 cssrcdetect - Detects sources in sky map

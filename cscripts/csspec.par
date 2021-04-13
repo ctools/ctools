@@ -31,7 +31,7 @@ outfile,   f, a, spectrum.fits,,, "Output spectrum file"
 #
 # Script parameters
 #==================
-method,        s, a, AUTO,SLICE|NODES|AUTO,, "Spectrum generation method"
+method,        s, a, AUTO,SLICE|NODES|BINS|AUTO,, "Spectrum generation method"
 ebinalg,       s, a, LOG,FILE|LIN|LOG|POW,, "Algorithm for defining energy bins"
 emin,          r, a, 0.1,,, "Start value for first energy bin in TeV"
 emax,          r, a, 100.0,,, "Stop value for last energy bin in TeV"
@@ -43,6 +43,7 @@ calc_ts,       b, h, yes,,, "Compute TS value in each bin"
 calc_ulim,     b, h, yes,,, "Compute upper limit in each bin"
 fix_srcs,      b, h, yes,,, "Fix other skymodel parameters"
 fix_bkg,       b, h, no,,, "Fix background parameters"
+bingamma,      r, h, -2.0,,, "Spectral index for BINS method"
 dll_sigstep,   r, h, 0.0,0.0,100.0, "Step size in standard deviations for log-like profiles"
 dll_sigmax,    r, h, 5.0,1.0,100.0, "Maximum number of standard deviations for log-like profiles"
 dll_freenodes, b, h, no,,, "Free nodes not being fit when computing log-like profiles"
