@@ -614,7 +614,8 @@ class csphagen(ctools.csobservation):
                         msg = ' Skip because the number %d of regions' \
                               'for background estimation not overlapping ' \
                               'with the exclusion region is smaller than ' \
-                              '"bkgregmin"=%d.' % (bkg_reg.size(), self['bkgregmin'].integer())
+                              '"bkgregmin"=%d.' % \
+                              (regions.size(), self['bkgregmin'].integer())
                         self._log_string(gammalib.NORMAL, msg)
                         regions = gammalib.GSkyRegions()
 
