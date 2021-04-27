@@ -1,0 +1,12 @@
+.. _1.7.4:
+
+ctools 1.7.4 release (28 April 2021)
+====================================
+
+Overview
+--------
+
+ctools 1.7.4 is a bug fix release for ctools release 1.7.
+
+The following bugs were fixed:
+
