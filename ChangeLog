@@ -3,6 +3,8 @@
         * Bug fix version 1.7.4 released
         ================================
 
+        Replace spectral model by file function in csspec (#3624)
+
 
 2020-12-02
 

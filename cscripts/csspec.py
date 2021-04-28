@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a spectrum.
 #
-# Copyright (C) 2014-2020 Michael Mayer
+# Copyright (C) 2014-2021 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 # ==========================================================================
 import sys
 import math
+import tempfile    # Kludge for file function generation
 import gammalib
 import ctools
 from cscripts import mputils
@@ -365,6 +366,24 @@ class csspec(ctools.csobservation):
                         self._log_string(gammalib.EXPLICIT,
                                          ' Fixing "'+par.name()+'"')
                     par.fix()
+
+                # Kludge: convert spectral model into a file function
+                nbins       = self._ebounds.size()
+                num         = nbins * 20
+                energies    = gammalib.GEnergies(num, self._ebounds.emin(0),
+                                                      self._ebounds.emax(nbins-1))
+                _, filename = tempfile.mkstemp()
+                f = open(filename, 'wb')
+                spectral    = model.spectral()
+                for energy in energies:
+                    value = spectral.eval(energy)
+                    f.write('%20.6f  %20e\n' % (energy.MeV(), value))
+                f.close()
+                spectral = gammalib.GModelSpectralFunc(filename, 1.0)
+                model.spectral(spectral)
+                self._log_string(gammalib.EXPLICIT, ' Converting spectral model '
+                                 'into file function via temporary file "%s"' %
+                                 filename)
 
                 # Free the normalisation parameter which is assumed to be
                 # the first spectral parameter
@@ -895,6 +914,7 @@ class csspec(ctools.csobservation):
                 result['dloglike']  = dlogL
                 result['logL']      = loglike
 
+            # Compute upper flux limit
             if self['calc_ulim'].boolean():
 
                 # Logging information
@@ -1009,7 +1029,7 @@ class csspec(ctools.csobservation):
         if (self._method != 'NODES') or (not self['dll_freenodes'].boolean()):
             for par in spectral:
                 par.fix()
-        
+
         # Re-compute the log-likelihood
         like.run()
         loglike = like.obs().logL()
@@ -1130,7 +1150,7 @@ class csspec(ctools.csobservation):
         table.append(dnde)
         table.append(TSvalues)
         table.append(Npred_values)
-        
+
         # Define the SED type
         table.card('SED_TYPE', 'norm,e2dnde,dnde,npred', 'SED type')
 

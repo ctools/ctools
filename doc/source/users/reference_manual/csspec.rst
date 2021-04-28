@@ -20,14 +20,24 @@ flux limit that is particularly useful in case that the source is not
 significantly detected within a spectral bin (hidden parameter ``calc_ulim``).
 
 There are two fundamental methods to run the script depending on the value of
-the ``method`` parameter. If ``method=SLICE`` the energy interval defined by the
-``emin`` and ``emax`` parameters is divided into a number of energy bins and an
-independent maximum likelihood fit is performed in each of the energy bins,
-while if ``method=NODES`` the spectral model will be replaced by a node function
+the ``method`` parameter, ``SLICE`` and ``NODES``.
+
+If ``method=SLICE`` the energy interval defined by the ``emin`` and ``emax``
+parameters is divided into a number of energy bins and an independent maximum
+likelihood fit is performed in each of the energy bins. In order to cope with
+all kinds of spectral models, including composite spectra, input spectrum will
+be converted into a file function, with the normalisation of the file function
+being the fit parameter for each energy bin. This implies that spectral
+components are merged into a single function using the model parameters that
+are specified in the input model.
+
+If ``method=NODES`` the spectral model will be replaced by a node function
 that will be fit to all data. The latter is particularly useful if non-CTA data
-should be fitted such as data from Fermi/LAT or COMPTEL. By default, ``method`` is
-set to ``AUTO`` which will automatically select the method based on the input data.
-For CTA-only observations ``SLICE`` will be used, otherwise ``NODES`` will be used.
+should be fitted such as data from Fermi/LAT or COMPTEL.
+
+By default, ``method`` is set to ``AUTO`` which will automatically select the
+method based on the input data. For CTA-only observations ``SLICE`` will be used,
+otherwise ``NODES`` will be used.
 
 The spectral binning is either defined by a FITS file containing the energy
 boundaries of each bin (option ``ebinalg=FILE``) or as ``enumbins`` bins spread
@@ -53,9 +63,6 @@ The columns are the mean as well as the boundaries of the spectral bin,
 the fitted flux and flux error, the Test Statistics value (option
 ``calc_ts=yes``), the upper flux limit (option ``calc_ulim=yes``) and the
 predicted number of events (only for unbinned data).
-
-.. warning::
-   The upper limit computation is not yet implemented for the ``NODES`` method.
 
 
 General parameters

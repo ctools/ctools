@@ -256,7 +256,10 @@ None
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-None
+The script now transforms the spectral model of the source of interest into a
+file function, using the model parameters specified in the input model. This
+allows to determine spectral energy distributions for combined spectral models
+(#3624).
 
 
 cssrcdetect - Detects sources in sky map
