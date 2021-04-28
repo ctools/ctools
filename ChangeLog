@@ -3,7 +3,9 @@
         * Bug fix version 1.7.4 released
         ================================
 
+        Add conda activation and deactivation scripts for csh (#3628)
         Replace spectral model by file function in csspec (#3624)
+        Update csinfo script (#3623)
 
 
 2020-12-02

@@ -11,7 +11,8 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-None
+conda activation and deactivation scripts were added for csh so that
+an anaconda installation also works for this shell (#3628).
 
 
 Documentation
@@ -167,6 +168,12 @@ None
 csiactobs - Inspect IACT observation definition XML file
 --------------------------------------------------------
 None
+
+
+csinfo - Check ctools installation
+----------------------------------
+The script was updated to comprise the full list of available tools and scripts
+(#3623).
 
 
 cslightcrv - Generate light curve
