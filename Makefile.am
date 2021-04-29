@@ -57,6 +57,7 @@ EXTRA_DIST = README.md \
              doc/Doxyfile doc/source \
              dev/testreport.py \
              dev/01-ctools-activate.sh dev/00-ctools-deactivate.sh \
+             dev/01-ctools-activate.csh dev/00-ctools-deactivate.csh \
              dev/conda.recipe/build.sh \
              dev/conda.recipe/conda_build_config.yaml \
              dev/conda.recipe/meta.yaml.in
