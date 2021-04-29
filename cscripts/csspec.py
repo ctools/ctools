@@ -373,7 +373,7 @@ class csspec(ctools.csobservation):
                 energies    = gammalib.GEnergies(num, self._ebounds.emin(0),
                                                       self._ebounds.emax(nbins-1))
                 _, filename = tempfile.mkstemp()
-                f = open(filename, 'wb')
+                f = open(filename, 'w')
                 spectral    = model.spectral()
                 for energy in energies:
                     value = spectral.eval(energy)
