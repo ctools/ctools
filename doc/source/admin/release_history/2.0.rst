@@ -1,6 +1,6 @@
 .. _2.0:
 
-ctools 2.0 release (13 April 2021)
+ctools 2.0 release (29 April 2021)
 ==================================
 
 Overview
@@ -24,6 +24,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`3630 <https://cta-redmine.irap.omp.eu/issues/3630>`_] -
+  Add ASCL shields to **About** page
 * [`3606 <https://cta-redmine.irap.omp.eu/issues/3606>`_] -
   Add ``BINS`` method to :ref:`csspec`
 * [`3562 <https://cta-redmine.irap.omp.eu/issues/3562>`_] -

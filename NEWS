@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-13 April 2021
+29 April 2021
 
 
 Introduction
@@ -16,6 +16,8 @@ None
 
 Documentation
 -------------
+Add Astrophysics Source Code Library (ASCL) shields to "About" page (#3630).
+
 Add test/tutorials.py script and check-tutorial target to test the code in the
 Sphinx tutorials (#3510).
 

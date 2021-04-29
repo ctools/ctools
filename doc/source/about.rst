@@ -40,19 +40,28 @@ to include the formal reference
    L. Gerard, A. Schulz, P. Martin, D. Sanchez, S. Ohm, T. Hassan, and
    S. Brau-Nogue, 2016, A&A, 593, A1 <https://www.aanda.org/articles/aa/pdf/2016/09/aa28822-16.pdf>`_
 
-in your paper as well as the identifiers
-`ascl:1601.005 <http://ascl.net/1601.005>`_ and
-`ascl:1110.007 <http://ascl.net/1110.007>`_ of the ctools and GammaLib
-packages in the Astrophysics Source Code Library (ASCL).
-You can also reference ctools via
+in your paper as well as the Astrophysics Source Code Library (ASCL) identifiers
+
+.. image:: https://img.shields.io/badge/ascl-1601.005-blue.svg?colorB=262255
+   :target: http://ascl.net/1601.005
+
+for ctools and
+
+.. image:: https://img.shields.io/badge/ascl-1110.007-blue.svg?colorB=262255
+   :target: http://ascl.net/1110.007
+
+for GammaLib. You may also reference the softwares by their Digital Object
+Identifiers (DOI) on Zenodo, which are
 
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3265423.svg
    :target: https://doi.org/10.5281/zenodo.3265423
 
-and GammaLib via
+for ctools and
 
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3265404.svg
    :target: https://doi.org/10.5281/zenodo.3265404
+
+for GammaLib.
 
 In addition please add the following acknowledgment:
 
