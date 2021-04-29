@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools package                                               #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2021 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -33,9 +33,11 @@ pkgconfig_DATA = ctools.pc
 
 # Conda activate directory
 condaactivatedir = $(sysconfdir)/conda/activate.d
-condaactivate_DATA = dev/01-ctools-activate.sh
+condaactivate_DATA = dev/01-ctools-activate.sh \
+                     dev/01-ctools-activate.csh
 condadeactivatedir = $(sysconfdir)/conda/deactivate.d
-condadeactivate_DATA = dev/00-ctools-deactivate.sh
+condadeactivate_DATA = dev/00-ctools-deactivate.sh \
+                       dev/00-ctools-deactivate.csh
 
 # Manual pages to install
 man_MANS = 
