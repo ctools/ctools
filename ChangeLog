@@ -1,9 +1,10 @@
-2021-04-29
+2021-04-30
 
         * Version 2.0.0 released
         ========================
 
         Add ASCL shields to "About" page (#3630)
+        Use file function constructor in csspec (#3626)
         Add BINS method to csspec (#3606)
         Add hidden "fix_spat" parameter to cttsmap (#3562)
         Add optimizer setter to ctlikelihood base class

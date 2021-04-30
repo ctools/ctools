@@ -1,6 +1,6 @@
 ctools information
 ==================
-* Version:             2.0.0.dev (29 April 2021)
+* Version:             2.0.0.dev (30 April 2021)
 * GammaLib dependency: 2.0.0.dev
 
 [![Build Status](https://cta-jenkins.irap.omp.eu/buildStatus/icon?job=ctools-integrate-os)](https://cta-jenkins.irap.omp.eu/job/ctools-integrate-os/)
@@ -127,8 +127,8 @@ the following:
      $ conda install ctools
 
 
-Unix Installation
-=================
+Linux Installation
+==================
 To build and install ctools, simply type the following:
 
      $ ./configure
@@ -161,14 +161,14 @@ ctools was correctly built.  Make sure that all tests were successful.
 
 Macintosh OS X Installation
 ============================
-ctools is known to work on various flavors of OS X.  To cope with
+ctools is known to work on various flavors of Mac OS.  To cope with
 different system versions and architectures, there are two Mac
 specific configure options:
 
      $ ./configure --enable-universalsdk[=PATH]
 
 creates a universal build of ctools.  The optional argument specifies
-which OSX SDK should be used to perform the build.  This defaults to
+which MacOS SDK should be used to perform the build.  This defaults to
 "/Developer/SDKs/MacOSX.10.4u.sdk".  Specify "/" when building on a 10.5
 system or higher, especially when building 64-bit code.
 
@@ -221,7 +221,8 @@ shared library (see "Known problems" below).
 
 Windows Installation
 ====================
-There have been no efforts so far to compile ctools under Windows.
+On Windows ctools needs to be installed into a virtual machine running
+a Linux distribution.
 
 
 Testing

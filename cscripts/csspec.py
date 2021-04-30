@@ -368,23 +368,17 @@ class csspec(ctools.csobservation):
                                          ' Fixing "'+par.name()+'"')
                     par.fix()
 
-                # Kludge: convert spectral model into a file function
-                nbins       = self._ebounds.size()
-                num         = nbins * 20
-                energies    = gammalib.GEnergies(num, self._ebounds.emin(0),
-                                                      self._ebounds.emax(nbins-1))
-                _, filename = tempfile.mkstemp()
-                f = open(filename, 'w')
-                spectral    = model.spectral()
-                for energy in energies:
-                    value = spectral.eval(energy)
-                    f.write('%20.6f  %20e\n' % (energy.MeV(), value))
-                f.close()
-                spectral = gammalib.GModelSpectralFunc(filename, 1.0)
+                # Convert spectral model into a file function. The file
+                # function is logarithmically sampled in energy, with with
+                # 20 times the number of spectral bins
+                nbins    = self._ebounds.size()
+                num      = nbins * 50
+                energies = gammalib.GEnergies(num, self._ebounds.emin(0),
+                                                   self._ebounds.emax(nbins-1))
+                spectral = gammalib.GModelSpectralFunc(model.spectral(), energies)
                 model.spectral(spectral)
                 self._log_string(gammalib.EXPLICIT, ' Converting spectral model '
-                                 'into file function via temporary file "%s"' %
-                                 filename)
+                                 'into file function')
 
                 # Free the normalisation parameter which is assumed to be
                 # the first spectral parameter

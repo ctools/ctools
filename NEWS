@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-29 April 2021
+30 April 2021
 
 
 Introduction
@@ -287,6 +287,9 @@ None
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
+The GModelSpectralFunc spectral model constructor is now used to convert any
+spectral model into a file function before spectral model fitting (#3626).
+
 Added BINS method that replaces the spectral model by a bin function that is
 implemented by the GammaLib class GModelSpectralBins. Using a bin function
 assures that spectral points are statistically independent (#3606).
