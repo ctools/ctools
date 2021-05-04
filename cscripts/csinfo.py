@@ -2,7 +2,7 @@
 # ==========================================================================
 # Print info about Gammalib / ctools to the console
 #
-# Copyright (C) 2015-2016 Christoph Deil
+# Copyright (C) 2015-2021 Christoph Deil
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,10 +32,13 @@ CTOOL_LIST = """
    ctedispcube   Generates energy dispersion cube
    cterror       Calculates likelihood profile errors
    ctexpcube     Generates exposure cube
+   ctfindvar     Search for source variability
    ctlike        Performs maximum likelihood fitting
    ctmapcube     Generates a map cube
    ctmodel       Computes model counts cube
    ctobssim      Simulate CTA observations
+   ctphase       Computes the phase of each event
+   ctprob        Computes event probability for a given model
    ctpsfcube     Generates point spread function cube
    ctselect      Selects event data
    ctskymap      Generates sky map
@@ -47,20 +50,31 @@ CTOOL_LIST = """
 # `doc/source/users/reference_manual/index.rst`
 # and needs to be manually updated and kept in sync
 CSCRIPT_LIST = """
+   csbkgmodel    Generates background model for 3D analysis
    cscaldb       Lists available instrument response functions
+   csebins       Generates energy boundaries for stacked analysis
    cslightcrv    Computes lightcurve
    csinfo        Checks ctools and GammaLib installations
    csmodelinfo   Shows model container content
    csmodelmerge  Merges several model containers into one file
+   csmodelselect Select models from model definition file
+   csmodelsois   Generate map cube from subset of models
    csobsdef      Generates observation definition file
    csobsinfo     Shows observation container content
+   csobsselect   Select observations from observation definition file
+   csphagen      Generates PHA, ARF, RMF files based on source/background regions
+   csphasecrv    Computes phase curve
    cspull        Generates pull distribution
    csresmap      Generates residual map
+   csresspec     Generates residual spectrum
+   csscs         Performs spectral component separation
    cssens        Computes CTA sensitivity
    csspec        Computes spectral points
+   cssrcdetect   Detects sources in sky map
    cstsdist      Generates TS distribution
+   cstsmapmerge  Merges slices from Test Statistic map computations
    cstsmapsplit  Creates commands to split the Test Statistic map computations
-   cstsmapmerge  Merges slices from Test Statistic map computations\n
+   csviscube     Computes visibility cube\n
    csobs2caldb   Creates a caldb entry from an input observation
    csroot2caldb  Creates a caldb entry from a ROOT performance file
    csiactdata    Shows information about IACT data available on the user machine

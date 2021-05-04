@@ -8,7 +8,7 @@ Description: CTA science analysis tools
 URL: http://cta.irap.omp.eu/ctools
 Version: @VERSION@
 Requires: 
-Requires.private: gammalib == @VERSION@
+Requires.private: gammalib = @VERSION@
 Conflicts: 
 Cflags: -I${includedir}/ctools @OPENMP_CXXFLAGS@
 Libs: -L${libdir} -lctools

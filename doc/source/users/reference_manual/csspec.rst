@@ -19,15 +19,29 @@ significance of the source detection. Optionally, it also computes an upper
 flux limit that is particularly useful in case that the source is not
 significantly detected within a spectral bin (hidden parameter ``calc_ulim``).
 
-There are two fundamental methods to run the script depending on the value of
-the ``method`` parameter. If ``method=SLICE`` the energy interval defined by the
-``emin`` and ``emax`` parameters is divided into a number of energy bins and an
-independent maximum likelihood fit is performed in each of the energy bins,
-while if ``method=NODES`` the spectral model will be replaced by a node function
-that will be fit to all data. The latter is particularly useful if non-CTA data
-should be fitted such as data from Fermi/LAT or COMPTEL. By default, ``method`` is
-set to ``AUTO`` which will automatically select the method based on the input data.
-For CTA-only observations ``SLICE`` will be used, otherwise ``NODES`` will be used.
+There are three fundamental methods to run the script depending on the value of
+the ``method`` parameter, ``SLICE``, ``BINS`` and ``NODES``.
+
+If ``method=SLICE`` the energy interval defined by the ``emin`` and ``emax``
+parameters is divided into a number of energy bins and an independent maximum
+likelihood fit is performed in each of the energy bins. In order to cope with
+all kinds of spectral models, including composite spectra, input spectrum will
+be converted into a file function, with the normalisation of the file function
+being the fit parameter for each energy bin. This implies that spectral
+components are merged into a single function using the model parameters that
+are specified in the input model.
+
+If ``method=BINS`` the spectral model will be replaced by a bin function that
+will be fit to all data, with ``method=NODES`` the spectral model will be replaced
+by a node function. The advantage of ``BINS`` over ``NODES`` is that with ``BINS``
+the spectral flux points are statistically independent, while with ``NODES`` the
+underlying spectral model connects spectral flux points using a piecewise power
+law. Both methods are particularly useful if non-CTA data should be fitted such
+as data from Fermi/LAT, CGRO/COMPTEL or INTEGRAL/SPI.
+
+By default, ``method`` is set to ``AUTO`` which will automatically select the
+method based on the input data. For CTA-only observations ``SLICE`` will be used,
+otherwise ``NODES`` will be used.
 
 The spectral binning is either defined by a FITS file containing the energy
 boundaries of each bin (option ``ebinalg=FILE``) or as ``enumbins`` bins spread
@@ -53,9 +67,6 @@ The columns are the mean as well as the boundaries of the spectral bin,
 the fitted flux and flux error, the Test Statistics value (option
 ``calc_ts=yes``), the upper flux limit (option ``calc_ulim=yes``) and the
 predicted number of events (only for unbinned data).
-
-.. warning::
-   The upper limit computation is not yet implemented for the ``NODES`` method.
 
 
 General parameters
@@ -95,13 +106,17 @@ General parameters
 ``outfile [file]``
     Output spectrum FITS file.
 
-``method <SLICE|NODES|AUTO> [string]``
+``method <SLICE|NODES|BINS|AUTO> [string]``
     Spectrum generation method.
-    ``SLICE`` will slice energy interval into ``enumbins`` independent bins,
-    ``NODES`` will replace spectral model by node function with ``enumbins``
-    nodes, and ``AUTO`` will automatically select the method based on the input
-    data. For CTA-only observations ``SLICE`` will be used, otherwise ``NODES``
-    will be used.
+    ``SLICE`` will slice the energy interval into ``enumbins`` independent
+    bins,
+    ``NODES`` will replace the spectral model by a node function with
+    ``enumbins`` nodes,
+    ``BINS`` will replace the spectral model by a bin function with
+    ``enumbins`` nodes,
+    and ``AUTO`` will automatically select the method based on the input
+    data. If ``AUTO`` is selected and there are only CTA observations
+    then ``SLICE`` will be used, otherwise ``NODES`` will be used.
 
 ``ebinalg <FILE|LIN|LOG|POW> [string]``
     Algorithm for defining energy bins. For ``FILE``, the energy bins are defined
@@ -150,6 +165,10 @@ General parameters
 
 ``(fix_bkg = no) [boolean]``
     Fix background model parameters?
+
+``(bingamma = -2.0) [real]``
+    Spectral index for ``BINS`` method. Within each spectral bin a power law
+    will be assumed with the specified spectral index.
 
 ``(dll_sigstep = 0) [real]``
     Step size in standard deviations for log-like profiles. Note this value 

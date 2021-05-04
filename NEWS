@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-5 March 2021
+30 April 2021
 
 
 Introduction
@@ -16,6 +16,8 @@ None
 
 Documentation
 -------------
+Add Astrophysics Source Code Library (ASCL) shields to "About" page (#3630).
+
 Add test/tutorials.py script and check-tutorial target to test the code in the
 Sphinx tutorials (#3510).
 
@@ -285,7 +287,12 @@ None
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-None
+The GModelSpectralFunc spectral model constructor is now used to convert any
+spectral model into a file function before spectral model fitting (#3626).
+
+Added BINS method that replaces the spectral model by a bin function that is
+implemented by the GammaLib class GModelSpectralBins. Using a bin function
+assures that spectral points are statistically independent (#3606).
 
 
 cssrcdetect - Detects sources in sky map

@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the cttsmap tool
 #
-# Copyright (C) 2014-2018 Juergen Knoedlseder
+# Copyright (C) 2014-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -175,12 +175,13 @@ class Test(test):
 
         # Execute copy of cttsmap tool again, now with a higher chatter
         # level than before
-        cpy_tsmap['binmin']  = 0
-        cpy_tsmap['binmax']  = 1
-        cpy_tsmap['outmap']  = 'cttsmap_py2.fits'
-        cpy_tsmap['logfile'] = 'cttsmap_py2.log'
-        cpy_tsmap['chatter'] = 3
-        cpy_tsmap['publish'] = True
+        cpy_tsmap['binmin']   = 0
+        cpy_tsmap['binmax']   = 1
+        cpy_tsmap['fix_spat'] = True
+        cpy_tsmap['outmap']   = 'cttsmap_py2.fits'
+        cpy_tsmap['logfile']  = 'cttsmap_py2.log'
+        cpy_tsmap['chatter']  = 3
+        cpy_tsmap['publish']  = True
         cpy_tsmap.logFileOpen()  # Needed to get a new log file
         cpy_tsmap.execute()
 

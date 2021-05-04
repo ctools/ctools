@@ -1,8 +1,11 @@
-2021-03-05
+2021-04-30
 
         * Version 2.0.0 released
         ========================
 
+        Add ASCL shields to "About" page (#3630)
+        Use file function constructor in csspec (#3626)
+        Add BINS method to csspec (#3606)
         Add hidden "fix_spat" parameter to cttsmap (#3562)
         Add optimizer setter to ctlikelihood base class
         Add Sphinx tutorials test script (#3510)
@@ -13,6 +16,16 @@
         Replace std::tmpnam() by gammalib::tmpnam() function in ctselect (#3324)
         Remove implicit conversion warnings (#3324)
         Add support of rectangular On/Off regions (#3248)
+
+
+2021-04-28
+
+        * Bug fix version 1.7.4 released
+        ================================
+
+        Add conda activation and deactivation scripts for csh (#3628)
+        Replace spectral model by file function in csspec (#3624)
+        Update csinfo script (#3623)
 
 
 2020-12-02

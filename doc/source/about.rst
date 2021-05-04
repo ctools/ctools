@@ -16,11 +16,11 @@ Creation of shell or Python scripts and pipelines is supported as well.
 ctools are based on GammaLib, a versatile toolbox for the scientific
 analysis of astronomical gamma-ray data. 
 Besides CTA, GammaLib supports the analysis of H.E.S.S., MAGIC, VERITAS,
-Fermi/LAT, COMPTEL and INTEGRAL/SPI data.
+Fermi/LAT, CGRO/COMPTEL and INTEGRAL/SPI data.
 GammaLib supports in particular the combination of data from different instruments
 in a true joint multi-wavelength analysis that consistently handles the response
 of each instrument.
-An interface to virtual observatory ressources does also exist.
+An interface to virtual observatory resources does also exist.
 
 ctools are developed by a team of enthousiastic gamma-ray astronomers with
 support from engineers. We regularily organise
@@ -40,19 +40,28 @@ to include the formal reference
    L. Gerard, A. Schulz, P. Martin, D. Sanchez, S. Ohm, T. Hassan, and
    S. Brau-Nogue, 2016, A&A, 593, A1 <https://www.aanda.org/articles/aa/pdf/2016/09/aa28822-16.pdf>`_
 
-in your paper as well as the identifiers
-`ascl:1601.005 <http://ascl.net/1601.005>`_ and
-`ascl:1110.007 <http://ascl.net/1110.007>`_ of the ctools and GammaLib
-packages in the Astrophysics Source Code Library (ASCL).
-You can also reference ctools via
+in your paper as well as the Astrophysics Source Code Library (ASCL) identifiers
+
+.. image:: https://img.shields.io/badge/ascl-1601.005-blue.svg?colorB=262255
+   :target: http://ascl.net/1601.005
+
+for ctools and
+
+.. image:: https://img.shields.io/badge/ascl-1110.007-blue.svg?colorB=262255
+   :target: http://ascl.net/1110.007
+
+for GammaLib. You may also reference the softwares by their Digital Object
+Identifiers (DOI) on Zenodo, which are
 
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3265423.svg
    :target: https://doi.org/10.5281/zenodo.3265423
 
-and GammaLib via
+for ctools and
 
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3265404.svg
    :target: https://doi.org/10.5281/zenodo.3265404
+
+for GammaLib.
 
 In addition please add the following acknowledgment:
 

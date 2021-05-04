@@ -20,6 +20,7 @@
 # ==========================================================================
 import sys
 import math
+import tempfile    # Kludge for file function generation
 import gammalib
 import ctools
 from cscripts import mputils
@@ -144,9 +145,9 @@ class csspec(ctools.csobservation):
         n_cta   = n_unbinned + n_binned + n_onoff
         n_other = self.obs().size() - n_cta
 
-        # If spectrum method is not "NODES" then set spectrum method and
-        # script mode according to type of observations
-        if self._method != 'NODES':
+        # If spectrum method is not "NODES" or 'BINS" then set spectrum method
+        # and script mode according to type of observations
+        if self._method != 'NODES' and self._method != 'BINS':
             if n_other > 0:
                 self._method = 'NODES'
             else:
@@ -178,6 +179,7 @@ class csspec(ctools.csobservation):
         self['calc_ts'].boolean()
         self['fix_bkg'].boolean()
         self['fix_srcs'].boolean()
+        self['bingamma'].real()
 
         # Setup dlog-likelihood parameters
         self['dll_sigstep'].real()
@@ -213,10 +215,10 @@ class csspec(ctools.csobservation):
         elif n_other > 0:
             if self._method == 'SLICE':
                 msg = 'Selected "SLICE" method but none of the observations ' \
-                      'is a CTA observation. Please select "AUTO" or "NODES" ' \
-                      'if no CTA observation is provided.'
+                      'is a CTA observation. Please select "AUTO", "NODES" ' \
+                      'or "BINS" if no CTA observation is provided.'
                 raise RuntimeError(msg)
-            else:
+            elif self._method == 'AUTO':
                 self._method = 'NODES'
 
         # Log selected spectrum method
@@ -366,6 +368,18 @@ class csspec(ctools.csobservation):
                                          ' Fixing "'+par.name()+'"')
                     par.fix()
 
+                # Convert spectral model into a file function. The file
+                # function is logarithmically sampled in energy, with with
+                # 20 times the number of spectral bins
+                nbins    = self._ebounds.size()
+                num      = nbins * 50
+                energies = gammalib.GEnergies(num, self._ebounds.emin(0),
+                                                   self._ebounds.emax(nbins-1))
+                spectral = gammalib.GModelSpectralFunc(model.spectral(), energies)
+                model.spectral(spectral)
+                self._log_string(gammalib.EXPLICIT, ' Converting spectral model '
+                                 'into file function')
+
                 # Free the normalisation parameter which is assumed to be
                 # the first spectral parameter
                 normpar = model.spectral()[0]
@@ -426,6 +440,64 @@ class csspec(ctools.csobservation):
                 # parameters so that their nominal value is unity.
                 for i in range(spectrum.nodes()):
                     par     = spectrum[i*2+1]
+                    par.autoscale()
+                    value   = par.value()
+                    minimum = 1.0e-20 * value
+                    if minimum <= 0.0:
+                        minimum = 1.0e-20
+                        if minimum < value:
+                            value = minimum
+                    par.value(value)
+                    par.min(minimum)
+
+                # Set spectral component of source model
+                model.spectral(spectrum)
+
+                # Make sure that TS computation is disabled (makes computation
+                # faster)
+                model.tscalc(False)
+
+                # Append model
+                models.append(model)
+
+            # ... otherwise just append model
+            else:
+                models.append(model)
+
+        # Put new model in observation containers
+        self.obs().models(models)
+
+        # Return
+        return
+
+    def _set_replace_src_spectrum_by_bins(self):
+        """
+        Replace source spectrum by bin function
+        """
+        # Initialise model container
+        models = gammalib.GModels()
+
+        # Loop over model containers
+        for model in self.obs().models():
+
+            # If we deal with source model then replace the spectral model
+            # by a bin function
+            if model.name() == self['srcname'].string():
+
+                # Get spectral bins index
+                bingamma = self['bingamma'].real()
+
+                # Setup spectral bin function
+                spectrum = gammalib.GModelSpectralBins(model.spectral(),
+                                                       self._ebounds,
+                                                       bingamma)
+                spectrum.autoscale()
+
+                # Make sure that all bins are positive. Autoscale all
+                # parameters so that their nominal value is unity.
+                for i in range(spectrum.bins()):
+                    name    = 'Intensity%d' % i
+                    par     = spectrum[name]
                     par.autoscale()
                     value   = par.value()
                     minimum = 1.0e-20 * value
@@ -854,8 +926,8 @@ class csspec(ctools.csobservation):
         # Write model results for explicit chatter level
         self._log_string(gammalib.EXPLICIT, str(like.obs().models()))
 
-        # Loop over all nodes
-        for i in range(spectrum.nodes()):
+        # Loop over all nodes or bins
+        for i in range(self._ebounds.size()):
 
             # Get energy boundaries
             emin      = self._ebounds.emin(i)
@@ -878,23 +950,26 @@ class csspec(ctools.csobservation):
 
             # Convert differential flux and flux error to nuFnu
             norm               = elogmean.MeV() * elogmean.MeV()  * gammalib.MeV2erg
-            result['flux']     = spectrum[i*2+1].value()
-            result['e2dnde']   = spectrum[i*2+1].value() * norm
-            result['flux_err'] = spectrum[i*2+1].error()
+            result['flux']     = spectrum.intensity(i)
+            result['e2dnde']   = spectrum.intensity(i) * norm
+            result['flux_err'] = spectrum.error(i)
 
             # Compute upper flux limit
             ulimit_value = -1.0
-            parname = 'Intensity%d' % i
+            parname      = 'Intensity%d' % i
 
             # Compute delta log-likelihood
             if self['dll_sigstep'].real() > 0.0:
 
                 # Extract the normalization scan values
-                (norm_scan, dlogL, loglike) = self._profile_logL(like.copy(), parname, elogmean)
+                (norm_scan, dlogL, loglike) = self._profile_logL(like.copy(),
+                                                                 parname,
+                                                                 elogmean)
                 result['norm_scan'] = norm_scan
                 result['dloglike']  = dlogL
                 result['logL']      = loglike
 
+            # Compute upper flux limit
             if self['calc_ulim'].boolean():
 
                 # Logging information
@@ -938,7 +1013,7 @@ class csspec(ctools.csobservation):
 
                 # Set intensity of node to tiny value by scaling the value
                 # by a factor 1e-8.
-                par = obs.models()[self['srcname'].string()].spectral()[i*2+1]
+                par = obs.models()[self['srcname'].string()].spectral()[parname]
                 par.autoscale()
                 par.factor_min(1.0e-8)
                 par.factor_value(1.0e-8)
@@ -1006,10 +1081,11 @@ class csspec(ctools.csobservation):
         source.tscalc(False)
 
         # Fix all parameters in the spectral model
-        if (self._method != 'NODES') or (not self['dll_freenodes'].boolean()):
+        if (self._method != 'NODES' and self._method != 'BINS') or \
+           (not self['dll_freenodes'].boolean()):
             for par in spectral:
                 par.fix()
-        
+
         # Re-compute the log-likelihood
         like.run()
         loglike = like.obs().logL()
@@ -1137,7 +1213,7 @@ class csspec(ctools.csobservation):
         table.append(dnde)
         table.append(TSvalues)
         table.append(Npred_values)
-        
+
         # Define the SED type
         table.card('SED_TYPE', 'norm,e2dnde,dnde,npred', 'SED type')
 
@@ -1193,6 +1269,15 @@ class csspec(ctools.csobservation):
 
             # Replace source spectrum by nodes function
             self._set_replace_src_spectrum_by_nodes()
+
+            # Fit model
+            results = self._fit_model()
+
+        # Case C: "BINS" method
+        elif self._method == 'BINS':
+
+            # Replace source spectrum by bins function
+            self._set_replace_src_spectrum_by_bins()
 
             # Fit model
             results = self._fit_model()
