@@ -1,7 +1,7 @@
 .. _2.0:
 
-ctools 2.0 release (30 April 2021)
-==================================
+ctools 2.0 release (7 May 2021)
+===============================
 
 Overview
 --------
@@ -24,6 +24,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`3555 <https://cta-redmine.irap.omp.eu/issues/3555>`_] -
+  Use test source position in :ref:`cssens`
 * [`3630 <https://cta-redmine.irap.omp.eu/issues/3630>`_] -
   Add ASCL shields to **About** page
 * [`3626 <https://cta-redmine.irap.omp.eu/issues/3626>`_] -

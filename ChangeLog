@@ -1,8 +1,9 @@
-2021-04-30
+2021-05-07
 
         * Version 2.0.0 released
         ========================
 
+        Use test source position in cssens (#3555)
         Add ASCL shields to "About" page (#3630)
         Use file function constructor in csspec (#3626)
         Add BINS method to csspec (#3606)

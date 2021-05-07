@@ -1,6 +1,6 @@
 ctools information
 ==================
-* Version:             2.0.0.dev (30 April 2021)
+* Version:             2.0.0.dev (7 May 2021)
 * GammaLib dependency: 2.0.0.dev
 
 [![Build Status](https://cta-jenkins.irap.omp.eu/buildStatus/icon?job=ctools-integrate-os)](https://cta-jenkins.irap.omp.eu/job/ctools-integrate-os/)
@@ -63,6 +63,7 @@ The following scripts are available:
     cscaldb       - lists available instrument response functions
     csebins       - generates energy boundaries for stacked analysis
     cslightcrv    - computes light curve
+    csinfo        - checks ctools and GammaLib installations
     csmodelinfo   - shows model container content
     csmodelmerge  - merges several model containers into one file
     csmodelselect - select models from model definition file
@@ -76,6 +77,7 @@ The following scripts are available:
     csresmap      - generates residual map
     csresspec     - generates residual spectrum
     csroot2caldb  - creates a caldb entry from a ROOT file
+    csscs         - Performs spectral component separation
     cssens        - computes CTA sensitivity
     csspec        - computes spectral points
     cssrcdetect   - detects sources in sky map
@@ -159,8 +161,8 @@ The `make check` command will run an extensive unit test to verify that
 ctools was correctly built.  Make sure that all tests were successful. 
 
 
-Macintosh OS X Installation
-============================
+Macintosh OS Installation
+==========================
 ctools is known to work on various flavors of Mac OS.  To cope with
 different system versions and architectures, there are two Mac
 specific configure options:

@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-30 April 2021
+7 May 2021
 
 
 Introduction
@@ -282,7 +282,9 @@ the width, height and position angle of the rectangular sky regions (#3248).
 
 cssens - Computes sensitivity curve
 -----------------------------------
-None
+The test source position is now used as pointing direction, eventually offset
+in galactic latitude by a number of degrees specified using the "offset"
+parameter (#3555).
 
 
 csspec - Generates Spectral Energy Distribution

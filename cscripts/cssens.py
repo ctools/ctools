@@ -2,7 +2,7 @@
 # ==========================================================================
 # Computes the array sensitivity using the Test Statistic for a test source
 #
-# Copyright (C) 2011-2019 Juergen Knoedlseder
+# Copyright (C) 2011-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -189,16 +189,38 @@ class cssens(ctools.csobservation):
 
         # ... otherwise allocate a single observation
         else:
-            # set the coordinates of the test source model
+
+            # If no pointing is specified and if the test source has a position
+            # then set the pointing to the position of the test source
             if lpnt is None and bpnt is None:
-                container = gammalib.GModels(self['inmodel'].filename())
-                src_model = container[self['srcname'].string()]
+                models = gammalib.GModels(self['inmodel'].filename())
+                source = models[self['srcname'].string()]
+                if source.has_par('RA') and source.has_par('DEC'):
+                    pntdir = gammalib.GSkyDir()
+                    pntdir.radec_deg(source['RA'].value(), source['DEC'].value())
+                    lpnt   = pntdir.l_deg()
+                    bpnt   = pntdir.b_deg()
+                elif source.has_par('GLON') and source.has_par('GLAT'):
+                    lpnt = source['GLON'].value()
+                    bpnt = source['GLAT'].value()
+                else:
+                    lpnt = 0.0
+                    bpnt = 0.0
 
-                pntdir = gammalib.GSkyDir()
-                pntdir.radec_deg(src_model['RA'].value(), src_model['DEC'].value())
+            # Set source position
+            srcdir    = gammalib.GSkyDir()
+            srcdir.lb_deg(lpnt, bpnt)
+            self._ra  = srcdir.ra_deg()
+            self._dec = srcdir.dec_deg()
 
-                lpnt = pntdir.l_deg()
-                bpnt = pntdir.b_deg()
+            # Set pointing direction offset in galactic latitude
+            offset  = self['offset'].real()
+            bpnt   += offset
+            if bpnt > 90.0:
+                bpnt  = 180.0 - bpnt
+                lpnt += 180.0
+            pntdir  = gammalib.GSkyDir()
+            pntdir.lb_deg(lpnt, bpnt)
 
             # Read relevant user parameters
             caldb    = self['caldb'].string()
@@ -210,10 +232,6 @@ class cssens(ctools.csobservation):
             # Allocate observation container
             obs = gammalib.GObservations()
 
-            # Set single pointing
-            pntdir = gammalib.GSkyDir()
-            pntdir.lb_deg(lpnt, bpnt)
-
             # Create CTA observation
             run = obsutils.set_obs(pntdir, caldb=caldb, irf=irf,
                                    duration=duration, deadc=deadc,
@@ -221,12 +239,6 @@ class cssens(ctools.csobservation):
 
             # Append observation to container
             obs.append(run)
-
-            # Set source position
-            offset    = self['offset'].real()
-            pntdir.lb_deg(lpnt, bpnt+offset)
-            self._ra  = pntdir.ra_deg()
-            self._dec = pntdir.dec_deg()
 
         # Return observation container
         return obs
@@ -632,7 +644,7 @@ class cssens(ctools.csobservation):
     def _e_bin(self, ieng):
         """
         Determines sensivity in energy bin
-        
+
         Parameters
         ----------
         ieng : int
