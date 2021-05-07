@@ -110,6 +110,7 @@ class cssens(ctools.csobservation):
         # Return
         return
 
+
     # Private methods
     def _get_parameters(self):
         """
@@ -126,8 +127,8 @@ class cssens(ctools.csobservation):
         if self.obs().models().size() == 0:
             self.obs().models(self['inmodel'].filename())
 
-        # Get source name
-        self._srcname = self['srcname'].string()
+        # Set source name and position
+        self._set_source()
 
         # Read further parameters
         emin = self['emin'].real()
@@ -156,14 +157,40 @@ class cssens(ctools.csobservation):
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
 
-
         # Set number of processes for multiprocessing
         self._nthreads = mputils.nthreads(self)
 
         # Return
         return
 
-    def _set_obs(self, emin, emax, lpnt=None, bpnt=None):
+    def _set_source(self):
+        """
+        Set source name and position
+        """
+        # Set source name
+        self._srcname = self['srcname'].string()
+
+        # Set source position. If the test source has no position then set the
+        # source position to (RA,Dec)=(0,0)
+        source = self.obs().models()[self._srcname]
+        if source.has_par('RA') and source.has_par('DEC'):
+            self._ra  = source['RA'].value()
+            self._dec = source['DEC'].value()
+        elif source.has_par('GLON') and source.has_par('GLAT'):
+            glon      = source['GLON'].value()
+            glat      = source['GLAT'].value()
+            srcdir    = gammalib.GSkyDir()
+            srcdir.lb_deg(glon, glat)
+            self._ra  = srcdir.ra_deg()
+            self._dec = srcdir.dec_deg()
+        else:
+            self._ra  = 0.0
+            self._dec = 0.0
+
+        # Return
+        return
+
+    def _set_obs(self, emin, emax):
         """
         Set an observation container
 
@@ -173,10 +200,6 @@ class cssens(ctools.csobservation):
             Minimum energy (TeV)
         emax : float
             Maximum energy (TeV)
-        lpnt : float, optional
-            Galactic longitude of pointing (deg)
-        bpnt : float, optional
-            Galactic latitude of pointing (deg)
 
         Returns
         -------
@@ -187,47 +210,37 @@ class cssens(ctools.csobservation):
         if self['inobs'].is_valid():
             obs = self._get_observations()
 
-        # ... otherwise allocate a single observation
+        # ... otherwise allocate a single observation using the test source
+        # position as pointing direction, optionally offset by a certain
+        # amount
         else:
 
-            # If no pointing is specified and if the test source has a position
-            # then set the pointing to the position of the test source
-            if lpnt is None and bpnt is None:
-                models = gammalib.GModels(self['inmodel'].filename())
-                source = models[self['srcname'].string()]
-                if source.has_par('RA') and source.has_par('DEC'):
-                    pntdir = gammalib.GSkyDir()
-                    pntdir.radec_deg(source['RA'].value(), source['DEC'].value())
-                    lpnt   = pntdir.l_deg()
-                    bpnt   = pntdir.b_deg()
-                elif source.has_par('GLON') and source.has_par('GLAT'):
-                    lpnt = source['GLON'].value()
-                    bpnt = source['GLAT'].value()
-                else:
-                    lpnt = 0.0
-                    bpnt = 0.0
+            # Load models
+            models = gammalib.GModels(self['inmodel'].filename())
 
-            # Set source position
-            srcdir    = gammalib.GSkyDir()
-            srcdir.lb_deg(lpnt, bpnt)
-            self._ra  = srcdir.ra_deg()
-            self._dec = srcdir.dec_deg()
+            # Get test source
+            source = models[self['srcname'].string()]
 
-            # Set pointing direction offset in galactic latitude
-            offset  = self['offset'].real()
-            bpnt   += offset
-            if bpnt > 90.0:
-                bpnt  = 180.0 - bpnt
-                lpnt += 180.0
-            pntdir  = gammalib.GSkyDir()
-            pntdir.lb_deg(lpnt, bpnt)
+            # Set pointing direction to test source position. If test source
+            # has no position then set the pointing to (RA,Dec)=(0,0)
+            pntdir = gammalib.GSkyDir()
+            if source.has_par('RA') and source.has_par('DEC'):
+                pntdir.radec_deg(source['RA'].value(), source['DEC'].value())
+            elif source.has_par('GLON') and source.has_par('GLAT'):
+                pntdir.lb_deg(source['GLON'].value(), source['GLAT'].value())
+            else:
+                pntdir.radec_deg(0.0, 0.0)
 
-            # Read relevant user parameters
+            # Read other relevant user parameters
             caldb    = self['caldb'].string()
             irf      = self['irf'].string()
             deadc    = self['deadc'].real()
             duration = self['duration'].real()
             rad      = self['rad'].real()
+            offset   = self['offset'].real()
+
+            # Add offset to pointing direction
+            pntdir.rotate_deg(0.0, offset)
 
             # Allocate observation container
             obs = gammalib.GObservations()
