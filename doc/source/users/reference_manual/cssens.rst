@@ -13,15 +13,29 @@ This script computes the differential or integrated CTA sensitivity using
 maximum likelihood fitting of a test source. The differential sensitivity is
 determined for a number of energy bins, the integral sensitivity is determined
 for a number of energy thresholds. The test source is fitted to simulated data
-using :doc:`ctlike` to determine it's detection significance as a function of
+using :doc:`ctlike` to determine its detection significance as a function of
 source flux. The source flux is then varied until the source significance
 achieves a given level, specified by the (hidden) significance parameter
-``sigma``.
+``sigma``. As test source, any source in the input model definition XML file
+specified by ``inmodel`` can be used; the test source name is specified by the
+``srcname`` parameter.
 
-The significance is estimated using the Test Statistic value, defined as twice
-the log-likelihood difference that is obtained when fitting the simulated data
-with and without the test source. The simplified assumption is made that the
-significance (in Gaussian sigma) is the square root of the Test Statistic.
+The detection significance is estimated using the Test Statistic value, defined
+as twice the log-likelihood difference that is obtained when fitting the
+simulated data with and without the test source. The simplified assumption is
+made that the significance (in Gaussian sigma) is the square root of the Test
+Statistic.
+
+By default the script simulates a single pointing with an exposure time
+specified by the ``duration`` parameter. The pointing direction will be set to
+the position of the test source, offset by the value specified by the ``offset``
+parameter. If the test source has no position (which is for example the case
+for a test source comprised of a map or map cube), a pointing direction of
+(0,0) will be assumed in Right Ascension and Declination.
+
+Alternatively, an observation definition XML file can be specified using the
+hidden ``inobs`` parameter. In that way the user has full control over the
+pointing sequence that should be simulated for the sensitivity estimation.
 
 :ref:`cssens` supports multiprocessing. By default the analysis for each energy
 bin/threshold will be performed in parallel over as many processes as the number of
@@ -48,7 +62,7 @@ General parameters
     Input event list, counts cube or observation definition XML file.
 
 ``inmodel [file]``
-    Input model XML file.
+    Input model definition XML file.
 
 ``srcname [string]``
     Name of the source in the source model XML file which should be used
