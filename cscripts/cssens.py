@@ -20,6 +20,7 @@
 # ==========================================================================
 import sys
 import math
+import statistics
 import gammalib
 import ctools
 from cscripts import obsutils
@@ -418,15 +419,7 @@ class cssens(ctools.csobservation):
             # Write header for iteration into logger
             self._log_header2(gammalib.EXPLICIT, 'Iteration '+str(iterations))
 
-            # Create a copy of the test models, set the normalisation parameter
-            # of the test source in the models, and append the models to the
-            # observation. "crab_prefactor" is the prefactor that corresponds
-            # to a flux of 1 Crab.
-            models         = test_model.copy()
-            prefactor      = modutils.normalisation_parameter(models[self._srcname])
-            crab_prefactor = prefactor.value() * crab_unit
-            prefactor.value(crab_prefactor * test_crab_flux)
-            self.obs().models(models)
+            crab_prefactor = self._set_src_prefactor(test_model, crab_unit, test_crab_flux)
 
             # Simulate events for the models. "sim" holds an observation
             # container with observations containing the simulated events.
@@ -560,6 +553,31 @@ class cssens(ctools.csobservation):
                                  ' Test ended after %d iterations.' % max_iter)
                 break
 
+        n_bck_evts = None
+        for iterations in range(max_iter):
+            pass_evt_cut, n_bck_evts = self._sim_evt_excess(
+                enumbins=enumbins,
+                binsz=binsz,
+                npix=npix,
+                n_bck_evts=n_bck_evts,
+            )
+            if pass_evt_cut:
+                break
+
+            # increase the test flux if the cuts failed
+            correct     = 1 + ratio_precision
+            crab_flux   = correct * crab_flux
+            photon_flux = correct * photon_flux
+            energy_flux = correct * energy_flux
+            sensitivity = correct * sensitivity
+
+            _ = self._set_src_prefactor(test_model, crab_unit, crab_flux)
+
+            # Write results into logger
+            name  = 'Iteration %d of source count check' % iterations
+            value = 'Fit=%9.4f mCrab  Sens=%e erg/cm2/s' % (crab_flux*1000.0, sensitivity)
+            self._log_value(gammalib.TERSE, name, value)
+
         # Write fit results into logger
         self._log_header3(gammalib.TERSE, 'Fit results')
         self._log_value(gammalib.TERSE, 'Photon flux',
@@ -592,6 +610,181 @@ class cssens(ctools.csobservation):
 
         # Return result
         return result
+
+    # 
+    def _set_src_prefactor(self, test_model, crab_unit, test_crab_flux):
+        """
+        Create a copy of the test models, set the normalisation parameter
+        of the test source in the models, and append the models to the observation.
+
+        Parameters
+        ----------
+        test_model : `~gammalib.GModels`
+            Test source model
+        crab_unit : float
+            Crab unit factor
+        test_crab_flux : float
+            Test flux in Crab units (100 mCrab)
+
+        Returns
+        -------
+        crab_prefactor : float
+            the prefactor that corresponds to a flux of 1 Crab.
+        """
+        
+        models         = test_model.copy()
+        prefactor      = modutils.normalisation_parameter(models[self._srcname])
+        crab_prefactor = prefactor.value() * crab_unit
+
+        val_margin = 0.01
+        min_pref = prefactor.min()
+        max_pref = prefactor.max()
+        
+        val_now = crab_prefactor * test_crab_flux
+        val_now = max(val_now, min_pref * (1 + val_margin))
+        val_now = min(val_now, max_pref * (1 - val_margin))
+        crab_prefactor = val_now / test_crab_flux
+
+        prefactor.value(val_now)
+
+        self.obs().models(models)
+
+        return crab_prefactor
+
+    def _sim_evt_excess(self, enumbins, binsz, npix, n_bck_evts):
+        """
+        Return the number of excess events for the source model, compared
+        to all other models
+
+        Parameters
+        ----------
+        enumbins : int
+            number of bins for the observation simulation
+        binsz : float
+            bin size for the observation simulation
+        npix : int
+            pixel size for the observation simulation
+        n_bck_evts : int
+            number of non-source counts (given to avoid computing the same quantity multiple times)
+
+        Returns
+        -------
+        pass_evt_cut : bool
+            does the source pass the minimal excess criteria
+        n_bck_evts : int
+            number of non-source counts
+        """
+
+        # number of times to simulate the observation
+        n_sims = 15
+
+        # radius of integration for hte non-source background (not necessarily the
+        # same as self['rad'], to match the current standard for non-ctools analyses)
+        rad_deg = self['non_source_uncert_rad'].real()
+        
+        # minimal number of events for the source
+        min_src_events = self['min_src_events'].integer()
+        # threshold by fraction of non-source counts (5 times the assumed uncertainty 
+        # on the background, which is taken as 1% of the non-source counts)
+        non_source_uncert_frac = self['non_source_uncert_frac'].real()
+
+        # end here if no cuts have been spesified
+        if min_src_events <= 0 and non_source_uncert_frac <= 0:
+            return True
+
+        models = self.obs().models()
+
+        src_model = gammalib.GModels()
+        bck_models = gammalib.GModels()
+        for s in range(models.size()):
+            model = models[s]
+            if model.name() == self._srcname:
+                src_model.append(model)
+            else:
+                bck_models.append(model)
+
+        src_obs = self.obs().copy()
+        src_obs.models(src_model)
+
+        bck_obs = self.obs().copy()
+        bck_obs.models(bck_models)
+
+        n_src_evts = 0
+        for is_src in [True, False]:
+            if not is_src:
+                # if the non-source fraction cut is not applied, no need
+                # to calculate the background rate.
+                # n_bck_evts will be None onlu in the firs iteration, where
+                # we only need to compute the non-source counts once, since the
+                # models dont change with the itterations.
+                if non_source_uncert_frac <= 0 or n_bck_evts is not None:
+                    continue
+            
+            obs_now = src_obs if is_src else bck_obs
+            
+            n_sim_evts = []
+            for n_sim in range(n_sims):
+                seed = n_sim
+
+                sim_now = obsutils.sim(
+                    obs_now,
+                    nbins=enumbins,
+                    seed=seed,
+                    binsz=binsz,
+                    npix=npix,
+                    log=self._log_clients,
+                    debug=self['debug'].boolean(),
+                    edisp=self['edisp'].boolean(),
+                    nthreads=1
+                )
+
+                # consider all events in the entire RoI for the minimal cource count cut
+                if is_src:
+                    n_sim_evts += [len(sim_now[0].events())]
+                # consider only background within the thetaSqr cut for the systematic
+                # check, in accordance with the current CTA convention for Li&Ma calculations
+                else:
+                    select = ctools.ctselect(sim_now)
+                    select['rad'] = rad_deg
+                    select['emin'] = 'INDEF'
+                    select['tmin'] = 'INDEF'
+                    select.run()
+                    
+                    obs = select.obs()
+                    n_sim_evts += [len(obs[0].events())]
+
+            if is_src:
+                n_src_evts = statistics.median(n_sim_evts)
+            else:
+                n_bck_evts = statistics.median(n_sim_evts)
+
+            name = 'number of ' + ('source' if is_src else 'non-source') + ' events'
+            value = (
+                ','.join([str(i) for i in n_sim_evts])
+                + ' --> median is: ' + str(n_src_evts if is_src else n_bck_evts)
+            )
+            self._log_value(gammalib.TERSE, name, value)
+
+        if n_bck_evts is None:
+            n_bck_evts = 0
+        
+        has_min_evts = n_src_evts >= min_src_events
+        is_above_bck = n_src_evts >= n_bck_evts * non_source_uncert_frac
+        pass_evt_cut = has_min_evts and is_above_bck
+
+        name = 'minimal excess threshold'
+        value = (
+            'has counts above \"min source counts('
+            + str(min_src_events) + ' events)\": ' + str(has_min_evts)
+            + ' ; pass background uncertainty threshold('
+            + str(max(non_source_uncert_frac, 0) * 100) + '% == '
+            + str(n_bck_evts * non_source_uncert_frac)
+            + ' events): ' + str(is_above_bck)
+            + ' --> pass selection: ' + str(pass_evt_cut)
+        )
+        self._log_value(gammalib.TERSE, name, value)
+
+        return pass_evt_cut, n_bck_evts
 
     def _predict_flux(self, results, ts):
         """
@@ -635,9 +828,15 @@ class cssens(ctools.csobservation):
         mean_xy *= norm
         mean_xx *= norm
         mean_yy *= norm
-        rxy      = (mean_xy - mean_x * mean_y) / \
-                   math.sqrt((mean_xx - mean_x*mean_x) *
-                             (mean_yy - mean_y*mean_y))
+        
+        rxy_norm = (mean_xx - mean_x * mean_x) * (mean_yy - mean_y * mean_y)
+        if rxy_norm < 1e-10:
+            rxy_norm = 1
+        else:
+            rxy_norm = math.sqrt(rxy_norm)
+
+        rxy = (mean_xy - mean_x * mean_y) / rxy_norm
+
         regcoeff = rxy*rxy
 
         # Compute regression line slope
