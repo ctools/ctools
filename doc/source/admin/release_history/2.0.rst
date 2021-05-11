@@ -1,7 +1,7 @@
 .. _2.0:
 
-ctools 2.0 release (7 May 2021)
-===============================
+ctools 2.0 release (11 May 2021)
+================================
 
 Overview
 --------
@@ -44,6 +44,8 @@ Improvements
   Replace ``std::tmpnam()`` by ``gammalib::tmpnam()`` function in :ref:`ctselect`
 * [`3324 <https://cta-redmine.irap.omp.eu/issues/3324>`_] -
   Remove implicit conversion warnings
+* [`1707 <https://cta-redmine.irap.omp.eu/issues/1707>`_] -
+  Replace ASCII output files by FITS files
 
 
 New features

@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-7 May 2021
+11 May 2021
 
 
 Introduction
@@ -286,6 +286,8 @@ The test source position is now used as pointing direction, eventually offset
 in galactic latitude by a number of degrees specified using the "offset"
 parameter (#3555).
 
+The ASCII output file was replaced by a FITS file (#1707).
+
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
@@ -358,7 +360,7 @@ regions (#3248).
 
 Examples
 --------
-None
+The show_sensitivity.py was adapted to deal also with FITS output files (#1707).
 
 
 caldb

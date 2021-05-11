@@ -54,6 +54,7 @@ class cssens(ctools.csobservation):
         # Initialise class members
         self._ebounds     = gammalib.GEbounds()
         self._obs_ebounds = []
+        self._fits        = None
         self._srcname     = ''
         self._ra          = None
         self._dec         = None
@@ -78,6 +79,7 @@ class cssens(ctools.csobservation):
         state = {'base'         : ctools.csobservation.__getstate__(self),
                  'ebounds'      : self._ebounds,
                  'obs_ebounds'  : self._obs_ebounds,
+                 'fits'         : self._fits,
                  'srcname'      : self._srcname,
                  'ra'           : self._ra,
                  'dec'          : self._dec,
@@ -100,6 +102,7 @@ class cssens(ctools.csobservation):
         ctools.csobservation.__setstate__(self, state['base'])
         self._ebounds     = state['ebounds']
         self._obs_ebounds = state['obs_ebounds']
+        self._fits        = state['fits']
         self._srcname     = state['srcname']
         self._ra          = state['ra']
         self._dec         = state['dec']
@@ -145,7 +148,6 @@ class cssens(ctools.csobservation):
         self['sigma'].real()
         self['max_iter'].integer()
         self['type'].string()
-        self['outfile'].filename()
         self['edisp'].boolean()
         self['debug'].boolean()
 
@@ -153,6 +155,10 @@ class cssens(ctools.csobservation):
         self._ebounds = gammalib.GEbounds(bins,
                                           gammalib.GEnergy(emin, 'TeV'),
                                           gammalib.GEnergy(emax, 'TeV'))
+
+        # Read ahead output parameters
+        if self._read_ahead():
+            self['outfile'].filename()
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -690,6 +696,88 @@ class cssens(ctools.csobservation):
         # Return results
         return result
 
+    def _create_fits(self, results):
+        """
+        Create FITS file from results
+
+        Parameters
+        ----------
+        results : list of dict
+            List of result dictionaries
+        """
+        # Create FITS table columns
+        nrows        = len(results)
+        e_mean       = gammalib.GFitsTableDoubleCol('E_MEAN', nrows)
+        e_min        = gammalib.GFitsTableDoubleCol('E_MIN', nrows)
+        e_max        = gammalib.GFitsTableDoubleCol('E_MAX', nrows)
+        flux_crab    = gammalib.GFitsTableDoubleCol('FLUX_CRAB', nrows)
+        flux_photon  = gammalib.GFitsTableDoubleCol('FLUX_PHOTON', nrows)
+        flux_energy  = gammalib.GFitsTableDoubleCol('FLUX_ENERGY', nrows)
+        sensitivity  = gammalib.GFitsTableDoubleCol('SENSITIVITY', nrows)
+        regcoeff     = gammalib.GFitsTableDoubleCol('REGRESSION_COEFF', nrows)
+        nevents      = gammalib.GFitsTableDoubleCol('NEVENTS', nrows)
+        npred        = gammalib.GFitsTableDoubleCol('NPRED', nrows)
+        e_mean.unit('TeV')
+        e_min.unit('TeV')
+        e_max.unit('TeV')
+        flux_crab.unit('')
+        flux_photon.unit('ph/cm2/s')
+        flux_energy.unit('erg/cm2/s')
+        sensitivity.unit('erg/cm2/s')
+        regcoeff.unit('')
+        nevents.unit('counts')
+        npred.unit('counts')
+
+        # Fill FITS table columns
+        for i, result in enumerate(results):
+            e_mean[i]      = math.pow(10.0, result['loge'])
+            e_min[i]       = result['emin']
+            e_max[i]       = result['emax']
+            flux_crab[i]   = result['crab_flux']
+            flux_photon[i] = result['photon_flux']
+            flux_energy[i] = result['energy_flux']
+            sensitivity[i] = result['sensitivity']
+            regcoeff[i]    = result['regcoeff']
+            nevents[i]     = result['nevents']
+            npred[i]       = result['npred']
+
+        # Initialise FITS Table with extension "SENSITIVITY"
+        table = gammalib.GFitsBinTable(nrows)
+        table.extname('SENSITIVITY')
+
+        # Add keywors for compatibility with gammalib.GMWLSpectrum
+        table.card('INSTRUME', 'CTA', 'Name of Instrument')
+        table.card('TELESCOP', 'CTA', 'Name of Telescope')
+
+        # Stamp header
+        self._stamp(table)
+
+        # Add script keywords
+        table.card('OBJECT',   self._srcname, 'Source for which sensitivity was estimated')
+        table.card('TYPE',     self['type'].string(), 'Sensitivity type')
+        table.card('SIGMA',    self['sigma'].real(), '[sigma] Sensitivity threshold')
+        table.card('MAX_ITER', self['max_iter'].integer(), 'Maximum number of iterations')
+        table.card('STAT',     self['statistic'].string(), 'Optimization statistic')
+
+        # Append filled columns to fits table
+        table.append(e_mean)
+        table.append(e_min)
+        table.append(e_max)
+        table.append(flux_crab)
+        table.append(flux_photon)
+        table.append(flux_energy)
+        table.append(sensitivity)
+        table.append(regcoeff)
+        table.append(nevents)
+        table.append(npred)
+
+        # Create the FITS file now
+        self._fits = gammalib.GFits()
+        self._fits.append(table)
+
+        # Return
+        return
+
 
     # Public methods
     def run(self):
@@ -708,10 +796,7 @@ class cssens(ctools.csobservation):
         for obs in self.obs():
             self._obs_ebounds.append(obs.events().ebounds().copy())
 
-        # Initialise script
-        colnames = ['loge', 'emin', 'emax', 'crab_flux', 'photon_flux',
-                    'energy_flux', 'sensitivity', 'regcoeff', 'nevents',
-                    'npred']
+        # Initialise results
         results  = []
 
         # Set test source model for this observation
@@ -745,19 +830,49 @@ class cssens(ctools.csobservation):
         else:
             for ieng in range(self._ebounds.size()):
 
-                #Run analysis in energy bin
+                # Run analysis in energy bin
                 result = self._e_bin(ieng)
 
                 # Append results
                 results.append(result)
 
-        # Write out trial result
-        for ieng, result in enumerate(results):
-            ioutils.write_csv_row(self['outfile'].filename().url(), ieng,
-                                  colnames, result)
+        # Create FITS file
+        self._create_fits(results)
 
         # Return
         return
+
+    def save(self):
+        """
+        Save sensitivity FITS file
+        """
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Save sensitivity curve')
+
+        # Continue only if FITS file is valid
+        if self._fits != None:
+
+            # Get outmap parameter
+            outfile = self['outfile'].filename()
+
+            # Log file name
+            self._log_value(gammalib.NORMAL, 'Sensitivity file', outfile.url())
+
+            # Save sensitivity
+            self._fits.saveto(outfile, self['clobber'].boolean())
+
+        # Return
+        return
+
+    def sensitivity(self):
+        """
+        Return sensitivity FITS file
+
+        Returns:
+            FITS file containing sensitivity curve
+        """
+        # Return
+        return self._fits
 
 
 # ======================== #

@@ -1,4 +1,4 @@
-2021-05-07
+2021-05-11
 
         * Version 2.0.0 released
         ========================
@@ -17,6 +17,7 @@
         Replace std::tmpnam() by gammalib::tmpnam() function in ctselect (#3324)
         Remove implicit conversion warnings (#3324)
         Add support of rectangular On/Off regions (#3248)
+        Replace ASCII output files by FITS files (#1707)
 
 
 2021-04-28

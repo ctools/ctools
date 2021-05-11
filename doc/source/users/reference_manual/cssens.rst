@@ -42,17 +42,11 @@ bin/threshold will be performed in parallel over as many processes as the number
 CPUs available on your machine. The maximum number of parallel processes can be set
 by the user through the ``nthreads`` hidden parameter.
 
-:ref:`cssens` will generate an ASCII file in comma-separated value (CSV) format
-containing the sensitivity as function of energy. The first row is a header row
-providing the column names. The following rows provide the mean logarithmic
-energy and the boundaries of the energy bin for which the sensitivity was
-computed. They also provide the flux within the energy bin in Crab units, in
-photons (ph/cm2/s) and in energy (erg/cm2/s). Finally, the sensitivity is given
-as the test source spectrum evaluated at the mean logarithmic energy multiplied
-by the energy squared (erg/cm2/s).
+:ref:`cssens` will generate a FITS file with a single extension that contains a
+binary table with the sensitivity as function of energy.
 
-The sensitivity can be displayed using the ``show_sensitivity.py`` script in the
-example folder. Matplotlib is required to execute the script.
+The sensitivity FITS file can be displayed using the ``show_sensitivity.py`` script
+in the example folder. Matplotlib is required to execute the script.
 
 
 General parameters
@@ -81,7 +75,7 @@ General parameters
     Average deadtime correction factor.
 
 ``outfile [file]``
-    ASCII file containing the sensitivity values.
+    Output sensitivity FITS file.
 
 ``(offset = 0.0) [real]``
     Offset angle of source in field of view (in degrees).	 

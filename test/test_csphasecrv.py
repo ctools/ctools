@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csphasecrv script.
 #
-# Copyright (C) 2017-2020 Juergen Knoedlseder
+# Copyright (C) 2017-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class Test(test):
     This test class makes unit tests for the csphasecrv script by using it
     from the command line and from Python.
     """
-    
+
     # Constructor
     def __init__(self):
         """
@@ -280,7 +280,7 @@ class Test(test):
         pcrv['phbinalg'] = 'LIN'
         pcrv['phbins']   = 2
         pcrv['method']   = '3D'
-        pcrv['enumbins'] = 0
+        pcrv['enumbins'] = 0     # Unbinned analysis
         pcrv['emin']     = 1.0
         pcrv['emax']     = 100.0
         pcrv['outfile']  = 'csphasecrv_py6.fits'
@@ -378,6 +378,6 @@ class Test(test):
 
         # Close FITS file
         fits.close()
-        
+
         # Return
         return

@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the cssens script
 #
-# Copyright (C) 2016-2018 Juergen Knoedlseder
+# Copyright (C) 2016-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ class Test(test):
                      ' srcname="Crab"'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' duration=180.0 rad=3.0 emin=1.0 emax=10.0 bins=1'+ \
-                     ' outfile="cssens_cmd1.dat"'+ \
+                     ' outfile="cssens_cmd1.fits"'+ \
                      ' logfile="cssens_cmd1.log" chatter=1'
 
         # Check if execution was successful
@@ -85,14 +85,14 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check result file
-        self._check_result_file('cssens_cmd1.dat')
+        self._check_result_file('cssens_cmd1.dat', 1)
 
         # Setup cssens command
         cmd = cssens+' inmodel="model_that_does_not_exist.xml"'+ \
                      ' srcname="Crab"'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' duration=180.0 rad=3.0 emin=1.0 emax=10.0 bins=1'+ \
-                     ' outfile="cssens_cmd2.dat"'+ \
+                     ' outfile="cssens_cmd2.fits"'+ \
                      ' logfile="cssens_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
@@ -118,12 +118,12 @@ class Test(test):
         sens['srcname']  = 'Crab'
         sens['caldb']    = self._caldb
         sens['irf']      = self._irf
-        sens['outfile']  = 'cssens_py1.dat'
         sens['duration'] = 180.0
         sens['rad']      = 3.0
         sens['emin']     = 1.0
         sens['emax']     = 10.0
         sens['bins']     = 2
+        sens['outfile']  = 'cssens_py1.fits'
         sens['logfile']  = 'cssens_py1.log'
         sens['chatter']  = 4
 
@@ -132,8 +132,8 @@ class Test(test):
         sens.run()
         sens.save()
 
-        # Check pull distribution file
-        self._check_result_file('cssens_py1.dat',nrows=3)
+        # Check sensitivity file
+        self._check_result_file('cssens_py1.fits', 2)
 
         # Set-up cssens for integral sensitivity computation without
         # multiprocessing
@@ -143,13 +143,13 @@ class Test(test):
         sens['srcname']  = 'Crab'
         sens['caldb']    = self._caldb
         sens['irf']      = self._irf
-        sens['outfile']  = 'cssens_py2.dat'
         sens['duration'] = 180.0
         sens['rad']      = 3.0
         sens['emin']     = 1.0
         sens['emax']     = 10.0
         sens['bins']     = 1
         sens['type']     = 'Integral'
+        sens['outfile']  = 'cssens_py2.fits'
         sens['logfile']  = 'cssens_py2.log'
         sens['chatter']  = 4
         sens['nthreads'] = 1
@@ -157,8 +157,8 @@ class Test(test):
         # Execute cssens script
         sens.execute()
 
-        # Check pull distribution file
-        self._check_result_file('cssens_py2.dat')
+        # Check sensitivity file
+        self._check_result_file('cssens_py2.fits', 1)
 
         # Return
         return
@@ -178,12 +178,12 @@ class Test(test):
         sens['srcname']  = 'Crab'
         sens['caldb']    = self._caldb
         sens['irf']      = self._irf
-        sens['outfile']  = 'cssens_py1_pickle.dat'
         sens['duration'] = 180.0
         sens['rad']      = 3.0
         sens['emin']     = 1.0
         sens['emax']     = 10.0
         sens['bins']     = 2
+        sens['outfile']  = 'cssens_py1_pickle.fits'
         sens['logfile']  = 'cssens_py1_pickle.log'
         sens['chatter']  = 4
 
@@ -196,23 +196,24 @@ class Test(test):
         obj.save()
 
         # Check result file
-        self._check_result_file('cssens_py1_pickle.dat',nrows=3)
+        self._check_result_file('cssens_py1_pickle.fits', 2)
 
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename, nrows=2):
+    def _check_result_file(self, filename, nrows):
         """
         Check result file
         """
-        # Open result file as CSV file
-        results = gammalib.GCsv(filename, ',')
+        # Open result file as FITS file
+        fits  = gammalib.GFits(filename)
+        table = fits.table('SENSITIVITY')
 
         # Check dimensions
-        self.test_value(results.nrows(), nrows,
+        self.test_value(table.nrows(), nrows,
              'Check number of rows in sensitivity file')
-        self.test_value(results.ncols(), 10,
+        self.test_value(table.ncols(), 10,
              'Check number of columns in sensitivity file')
 
         # Return
