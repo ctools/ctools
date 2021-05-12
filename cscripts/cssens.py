@@ -611,7 +611,6 @@ class cssens(ctools.csobservation):
         # Return result
         return result
 
-    # 
     def _set_src_prefactor(self, test_model, crab_unit, test_crab_flux):
         """
         Create a copy of the test models, set the normalisation parameter
@@ -637,13 +636,24 @@ class cssens(ctools.csobservation):
         crab_prefactor = prefactor.value() * crab_unit
 
         val_margin = 0.01
-        min_pref = prefactor.min()
-        max_pref = prefactor.max()
+        min_pref = prefactor.min() * (1 + val_margin)
+        max_pref = prefactor.max() * (1 - val_margin)
         
         val_now = crab_prefactor * test_crab_flux
-        val_now = max(val_now, min_pref * (1 + val_margin))
-        val_now = min(val_now, max_pref * (1 - val_margin))
-        crab_prefactor = val_now / test_crab_flux
+
+        if val_now < min_pref or val_now > max_pref:
+            log_name = 'test prefactor beyond limits'
+            log_value = (
+                'test prefactor is too low/high, having value '
+                + str(val_now) + ' compared to limits: ['
+                + str(prefactor.min()) + ' , ' + str(prefactor.max()) + ']'
+            )
+            self._log_value(gammalib.TERSE, log_name, log_value)
+
+            val_now = max(val_now, min_pref)
+            val_now = min(val_now, max_pref)
+            
+            crab_prefactor = val_now / test_crab_flux
 
         prefactor.value(val_now)
 
