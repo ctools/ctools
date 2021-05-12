@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctbutterfly - butterfly calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2018 by Michael Mayer                               *
+ *  copyright (C) 2014-2021 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -44,10 +44,10 @@ public:
     virtual ~ctbutterfly(void);
 
     // Methods
-    void        clear(void);
-    void        run(void);
-    void        save(void);
-    const GCsv& butterfly(void) const;
+    void         clear(void);
+    void         run(void);
+    void         save(void);
+    const GFits& butterfly(void) const;
 };
 
 

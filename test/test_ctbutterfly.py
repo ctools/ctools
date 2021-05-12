@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctbutterfly tool.
 #
-# Copyright (C) 2014-2018 Michal Mayer
+# Copyright (C) 2014-2021 Michal Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ class Test(test):
 
         # Setup ctbutterfly command
         cmd = ctbutterfly+' inobs="'+self._events+'"'+\
-                          ' outfile="ctbutterfly_cmd1.dat"'+ \
+                          ' outfile="ctbutterfly_cmd1.fits"'+ \
                           ' inmodel="'+self._model +'" srcname="Crab"'+ \
                           ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                           ' emin=0.1 emax=100.0'+ \
@@ -77,11 +77,11 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check result file
-        self._check_result_file('ctbutterfly_cmd1.dat')
+        self._check_result_file('ctbutterfly_cmd1.fits')
 
         # Setup ctbutterfly command
         cmd = ctbutterfly+' inobs="event_file_that_does_not_exist.fits"'+\
-                          ' outfile="ctbutterfly_cmd2.dat"'+ \
+                          ' outfile="ctbutterfly_cmd2.fits"'+ \
                           ' inmodel="'+self._model +'" srcname="Crab"'+ \
                           ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                           ' emin=0.1 emax=100.0'+ \
@@ -111,7 +111,7 @@ class Test(test):
         butterfly['irf']     = self._irf
         butterfly['emin']    = 0.1
         butterfly['emax']    = 100.0
-        butterfly['outfile'] = 'ctbutterfly_py1.dat'
+        butterfly['outfile'] = 'ctbutterfly_py1.fits'
         butterfly['logfile'] = 'ctbutterfly_py1.log'
         butterfly['chatter'] = 2
 
@@ -121,13 +121,13 @@ class Test(test):
         butterfly.save()
 
         # Check result file
-        self._check_result_file('ctbutterfly_py1.dat')
+        self._check_result_file('ctbutterfly_py1.fits')
 
-        # Check CSV result
-        self.test_value(butterfly.butterfly().nrows(), 100,
-             'Check for 100 rows in CSV file')
-        self.test_value(butterfly.butterfly().ncols(), 4,
-             'Check for 4 columns in CSV file')
+        # Check FITS result
+        self.test_value(butterfly.butterfly().table('BUTTERFLY').nrows(), 100,
+             'Check for 100 rows in FITS table')
+        self.test_value(butterfly.butterfly().table('BUTTERFLY').ncols(), 4,
+             'Check for 4 columns in FITS table')
 
         # Set-up ctbutterfly
         butterfly = ctools.ctbutterfly()
@@ -140,7 +140,7 @@ class Test(test):
         butterfly['emin']    = 0.1
         butterfly['emax']    = 100.0
         butterfly['fit']     = True
-        butterfly['outfile'] = 'ctbutterfly_py2.dat'
+        butterfly['outfile'] = 'ctbutterfly_py2.fits'
         butterfly['logfile'] = 'ctbutterfly_py2.log'
         butterfly['chatter'] = 3
 
@@ -149,7 +149,7 @@ class Test(test):
         butterfly.execute()
 
         # Check result file
-        self._check_result_file('ctbutterfly_py2.dat')
+        self._check_result_file('ctbutterfly_py2.fits')
 
         # Recover observation container
         #obs = butterfly.obs()
@@ -158,7 +158,7 @@ class Test(test):
 
         # Copy ctbkgcube tool and execute copy
         cpy_butterfly = butterfly
-        cpy_butterfly['outfile'] = 'ctbutterfly_py3.dat'
+        cpy_butterfly['outfile'] = 'ctbutterfly_py3.fits'
         cpy_butterfly['logfile'] = 'ctbutterfly_py3.log'
         cpy_butterfly['chatter'] = 4
 
@@ -167,7 +167,7 @@ class Test(test):
         cpy_butterfly.execute()
 
         # Check result file
-        self._check_result_file('ctbutterfly_py3.dat')
+        self._check_result_file('ctbutterfly_py3.fits')
 
         # Clear ctbkgcube tool
         butterfly.clear()
@@ -182,8 +182,9 @@ class Test(test):
         """
         Check result file
         """
-        # Open result file as CSV file
-        results = gammalib.GCsv(filename)
+        # Open result file as FITS file
+        fits    = gammalib.GFits(filename)
+        results = fits.table('BUTTERFLY')
 
         # Check dimensions
         self.test_value(results.nrows(), 100,

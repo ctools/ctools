@@ -27,14 +27,8 @@ maximum likelihood fit.
 adjusted using :doc:`ctlike` to the data, but if this is not the case you 
 can request a maximum likelihood fit by setting the hidden parameter ``fit=yes``.
 
-:ref:`ctbutterfly` writes the butterfly diagram into an ASCII file with 4 columns 
-separated by a whitespace. Each row in the result file corresponds to a specific
-energy. The meaning of the columns are:
-
-- Energy in MeV
-- Fitted intensity for that energy in ph/cm2/s/MeV
-- Minimum intensity for that energy in ph/cm2/s/MeV
-- Maximum intensity for that energy in ph/cm2/s/MeV
+:ref:`ctbutterfly` writes the butterfly diagram into a FITS file with a binary table
+extension.
 
 The butterfly diagram can be displayed using the ``show_butterfly.py`` script
 in the example folder.

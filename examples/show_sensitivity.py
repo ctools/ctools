@@ -36,14 +36,19 @@ import cscripts
 # ===================== #
 def read_sensitivity(filename):
     """
-    Read sensitivity information
+    Read sensitivity data
 
     Parameters
     ----------
     filename : str
         Name of FITS or CSV file
+
+    Returns
+    -------
+    sensitivity : dict
+        Dictionary with sensitivity data
     """
-    # Read sensitivity information dependent on file type
+    # Read sensitivity data dependent on file type
     fname = gammalib.GFilename(filename)
     if fname.is_fits():
         sensitivity = read_sensitivity_fits(filename)
@@ -59,7 +64,7 @@ def read_sensitivity(filename):
 # =================================== #
 def read_sensitivity_csv(filename):
     """
-    Read sensitivity information from CSV file
+    Read sensitivity data from CSV file
 
     Parameters
     ----------
@@ -69,7 +74,7 @@ def read_sensitivity_csv(filename):
     Returns
     -------
     sensitivity : dict
-        Dictionary with sensitivity information
+        Dictionary with sensitivity data
     """
     # Read filename
     csv = gammalib.GCsv(filename,',')
@@ -122,17 +127,17 @@ def read_sensitivity_csv(filename):
 # ==================================== #
 def read_sensitivity_fits(filename):
     """
-    Read sensitivity information from FITS file
+    Read sensitivity data from FITS file
 
     Parameters
     ----------
     filename : str
-        Name of CSV file
+        Name of FITS file
 
     Returns
     -------
     sensitivity : dict
-        Dictionary with sensitivity information
+        Dictionary with sensitivity data
     """
     # Open FITS file
     fits = gammalib.GFits(filename)

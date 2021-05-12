@@ -49,7 +49,8 @@ None
 
 ctbutterfly - Generate butterfly diagrams
 -----------------------------------------
-None
+The ASCII output file was replaced by a FITS file, and the butterfly() method
+now returns a GFits objects instead of a GCsv object (#1707).
 
 
 ctcubemask - CTA cube filtering
@@ -360,7 +361,8 @@ regions (#3248).
 
 Examples
 --------
-The show_sensitivity.py was adapted to deal also with FITS output files (#1707).
+The show_butterfly and show_sensitivity.py scripts were adapted to deal also
+with FITS output files (#1707).
 
 
 caldb

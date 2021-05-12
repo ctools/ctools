@@ -85,7 +85,7 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check result file
-        self._check_result_file('cssens_cmd1.dat', 1)
+        self._check_result_file('cssens_cmd1.fits', 1)
 
         # Setup cssens command
         cmd = cssens+' inmodel="model_that_does_not_exist.xml"'+ \

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctbutterfly - butterfly calculation tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2019 by Michael Mayer                               *
+ *  copyright (C) 2014-2021 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -299,20 +299,26 @@ void ctbutterfly::run(void)
         ellipsoid_boundary(models);
     }
 
-    // Set CSV table
-    set_csv();
+    // Create FITS table
+    create_fits();
 
     // Write header into logger
     log_header1(TERSE, "Results");
 
-    // Show results
+    // Show results by converting from MeV to TeV
     for (int k = 0; k < m_ebounds.size(); ++k) {
 
+        // Write message
+        std::string key   = "Intensity at " +
+                            gammalib::str(m_energies[k]*1.0e-6) +
+                            " TeV";
+        std::string value = gammalib::str(m_intensities[k]*1.0e6) + " (" +
+                            gammalib::str(m_min_intensities[k]*1.0e6) + ", " +
+                            gammalib::str(m_max_intensities[k]*1.0e6) +
+                            ") ph/cm2/s/TeV";
+
         // Write results into logger
-        log_value(NORMAL, "Intensity at "+gammalib::str(m_energies[k])+" MeV",
-                gammalib::str(m_intensities[k])+" ("+
-                gammalib::str(m_min_intensities[k])+", "+
-                gammalib::str(m_max_intensities[k])+") ph/cm2/s/MeV");
+        log_value(NORMAL, key, value);
 
     } // endfor: loop over energy bin
 
@@ -332,8 +338,7 @@ void ctbutterfly::run(void)
 /***********************************************************************//**
  * @brief Save butterfly diagram
  *
- * Saves the butterfly diagram into an ASCII file using a column separated
- * value (CSV) format with blanks as separators.
+ * Saves the butterfly diagram FITS file.
  ***************************************************************************/
 void ctbutterfly::save(void)
 {
@@ -349,8 +354,8 @@ void ctbutterfly::save(void)
         // Log butterfly diagram file name
         log_value(NORMAL, "Butterfly file", m_outfile.url());
 
-        // Save CSV table
-        m_csv.save(m_outfile.url(), " ", clobber());
+        // Save FITS table
+        m_fits.saveto(m_outfile.url(), clobber());
 
     }
 
@@ -386,7 +391,7 @@ void ctbutterfly::init_members(void)
     m_intensities.clear();
     m_min_intensities.clear();
     m_max_intensities.clear();
-    m_csv.clear();
+    m_fits.clear();
 
     // Return
     return;
@@ -417,7 +422,7 @@ void ctbutterfly::copy_members(const ctbutterfly& app)
     m_intensities     = app.m_intensities;
     m_min_intensities = app.m_min_intensities;
     m_max_intensities = app.m_max_intensities;
-    m_csv             = app.m_csv;
+    m_fits            = app.m_fits;
 
     // Return
     return;
@@ -665,20 +670,20 @@ void ctbutterfly::gaussian_error_propagation(GModels& models)
 
     // Confidence scaling
     double scale = gammalib::erfinv(m_confidence) * gammalib::sqrt_two;
-    
+
     // Write confidence level information into logger
     log_value(NORMAL, "Confidence level", m_confidence);
     log_value(NORMAL, "Corresponding scaling", scale);
 
     // Write header into logger
     log_header1(TERSE, "Generate butterfly");
- 
+
     // Initialise result arrays
     m_energies.clear();
     m_intensities.clear();
     m_min_intensities.clear();
     m_max_intensities.clear();
-   
+
     // Initialise dummy time to evaluate spectral model
     GTime time = GTime();
 
@@ -890,22 +895,55 @@ void ctbutterfly::eigenvectors(const double& a,
 
 
 /***********************************************************************//**
- * @brief Set CSV object
+ * @brief Set result FITS file
  *
- * Set CSV object with results.
+ * Set the FITS file with the butterfly results.
  ***************************************************************************/
-void ctbutterfly::set_csv(void)
+void ctbutterfly::create_fits(void)
 {
-    // Create CSV table with 4 columns
-    m_csv = GCsv(m_energies.size(), 4);
+    // Determine the number of energies
+    int nrows = m_energies.size();
 
-    // Fill CSV table
-    for (int i = 0; i < m_energies.size(); ++i) {
-        m_csv.real(i, 0, m_energies[i]);
-        m_csv.real(i, 1, m_intensities[i]);
-        m_csv.real(i, 2, m_min_intensities[i]);
-        m_csv.real(i, 3, m_max_intensities[i]);
+    // Allocate FITS table columns
+    GFitsTableDoubleCol col_energy("ENERGY", nrows);
+    GFitsTableDoubleCol col_intensity("INTENSITY", nrows);
+    GFitsTableDoubleCol col_intensity_min("INTENSITY_MIN", nrows);
+    GFitsTableDoubleCol col_intensity_max("INTENSITY_MAX", nrows);
+
+    // Set units of columns
+    col_energy.unit("TeV");
+    col_intensity.unit("ph/cm2/s/TeV");
+    col_intensity_min.unit("ph/cm2/s/TeV");
+    col_intensity_max.unit("ph/cm2/s/TeV");
+
+    // Fill columns and convert MeV units to TeV units
+    for (int i = 0; i < nrows; ++i) {
+        col_energy(i)        = m_energies[i]        * 1.0e-6;
+        col_intensity(i)     = m_intensities[i]     * 1.0e6;
+        col_intensity_min(i) = m_min_intensities[i] * 1.0e6;
+        col_intensity_max(i) = m_max_intensities[i] * 1.0e6;
     }
+
+    // Create binary table
+    GFitsBinTable table;
+    table.extname("BUTTERFLY");
+
+    // Stamp header
+    stamp(table);
+
+    // Add keywords
+    table.card("INSTRUME", "CTA",  "Name of Instrument");
+    table.card("TELESCOP", "CTA",  "Name of Telescope");
+
+    // Append columns to table
+    table.append(col_energy);
+    table.append(col_intensity);
+    table.append(col_intensity_min);
+    table.append(col_intensity_max);
+
+    // Create the FITS file
+    m_fits.clear();
+    m_fits.append(table);
 
     // Return
     return;

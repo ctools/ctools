@@ -2,7 +2,7 @@
 # ==========================================================================
 # Performs unit tests for the ctools example scripts
 #
-# Copyright (C) 2016-2019 Juergen Knoedlseder
+# Copyright (C) 2016-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -158,7 +158,13 @@ class Test(gammalib.GPythonTestSuite):
         Test show_butterfly
         """
         # Set arguments
-        args = '-p example_show_butterfly.eps %s/butterfly.txt' % self._datadir
+        args = '-p example_show_butterfly_csv.eps %s/butterfly.txt' % self._datadir
+
+        # Execute script
+        self._execute_python('show_butterfly', args=args)
+
+        # Set arguments
+        args = '-p example_show_butterfly_fits.eps %s/butterfly.fits' % self._datadir
 
         # Execute script
         self._execute_python('show_butterfly', args=args)
@@ -375,14 +381,21 @@ class Test(gammalib.GPythonTestSuite):
         Test show_sensitivity
         """
         # Set arguments
-        args = ('-p example_show_sensitivity1.eps %s/sensitivity.dat' %
+        args = ('-p example_show_sensitivity_csv_diff.eps %s/sensitivity.dat' %
                 self._datadir)
 
         # Execute script
         self._execute_python('show_sensitivity', args=args)
 
         # Set arguments
-        args = ('-p example_show_sensitivity2.eps %s/sensitivity_integral.dat' %
+        args = ('-p example_show_sensitivity_csv_int.eps %s/sensitivity_integral.dat' %
+                self._datadir)
+
+        # Execute script
+        self._execute_python('show_sensitivity', args=args)
+
+        # Set arguments
+        args = ('-p example_show_sensitivity_fits_diff.eps %s/sensitivity.fits' %
                 self._datadir)
 
         # Execute script
