@@ -371,6 +371,11 @@ class cssens(ctools.csobservation):
             npix  = 200
             binsz = 0.05
 
+        # keep track of the original value of edisp
+        edisp_orig = self['edisp'].boolean()
+        # set edisp off for the first iterations
+        self['edisp'] = False
+
         # Set flux ratio precision required for convergence to 5%
         ratio_precision = 0.05
 
@@ -539,7 +544,18 @@ class cssens(ctools.csobservation):
                         self._log_value(gammalib.TERSE, 'Converged flux ratio', ratio)
                         self._log_value(gammalib.TERSE, 'Regression coefficient',
                                         regcoeff)
-                        break
+                        
+                        # if the flux has converged, check if the original value of
+                        # edisp was set, and is not what has fo far been used
+                        if edisp_orig and not self['edisp'].boolean():
+                            # set edisp on and continue the calculation
+                            self['edisp'] = True
+
+                            value = 'set edisp on after initial convergence withouth it'
+                            self._log_value(gammalib.TERSE, 'Converged result', value)
+                        else:
+                            # finish the calculation after convergence
+                            break
                 else:
                     self._log_value(gammalib.TERSE, 'Not converged', 'Flux is zero')
                     break
@@ -552,6 +568,10 @@ class cssens(ctools.csobservation):
                 self._log_string(gammalib.TERSE,
                                  ' Test ended after %d iterations.' % max_iter)
                 break
+
+        # make sure edisp is set correctly before the count cuts
+        if edisp_orig and not self['edisp'].boolean():
+            self['edisp'] = True
 
         n_bck_evts = None
         for iterations in range(max_iter):
