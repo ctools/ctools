@@ -44,6 +44,7 @@ statistic,              s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization s
 min_src_events,         i, h, -1,,, "minimal number of source counts"
 non_source_uncert_frac, r, h, -1,,, "fraction of no-source counts serving as minimal threshold for source counts"
 non_source_uncert_rad,  r, h, 0.33,,, "radius for circular region in which to integrate no-source counts for threshold"
+seed,                   i, h, 0,,, "optional seed parameter for generating events"
 
 #
 # Standard parameters

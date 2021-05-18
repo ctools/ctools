@@ -376,6 +376,9 @@ class cssens(ctools.csobservation):
         # set edisp off for the first iterations
         self['edisp'] = False
 
+        # optional seed parameter for generating events
+        seed = self['seed'].integer()
+
         # Set flux ratio precision required for convergence to 5%
         ratio_precision = 0.05
 
@@ -428,7 +431,7 @@ class cssens(ctools.csobservation):
 
             # Simulate events for the models. "sim" holds an observation
             # container with observations containing the simulated events.
-            sim = obsutils.sim(self.obs(), nbins=enumbins, seed=iterations,
+            sim = obsutils.sim(self.obs(), nbins=enumbins, seed=(iterations + seed),
                                binsz=binsz, npix=npix,
                                log=self._log_clients,
                                debug=self['debug'].boolean(),
@@ -718,6 +721,9 @@ class cssens(ctools.csobservation):
         # on the background, which is taken as 1% of the non-source counts)
         non_source_uncert_frac = self['non_source_uncert_frac'].real()
 
+        # optional seed parameter for generating events
+        seed = self['seed'].integer()
+
         # end here if no cuts have been spesified
         if min_src_events <= 0 and non_source_uncert_frac <= 0:
             return True
@@ -754,7 +760,7 @@ class cssens(ctools.csobservation):
             
             n_sim_evts = []
             for n_sim in range(n_sims):
-                seed = n_sim
+                seed = n_sim + seed
 
                 sim_now = obsutils.sim(
                     obs_now,
