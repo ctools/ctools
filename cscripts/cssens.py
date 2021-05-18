@@ -515,11 +515,14 @@ class cssens(ctools.csobservation):
             # the log(TS) and log(crab_flux) values that have so far been
             # computed. If not enough results are available than use a simple
             # TS scaling relation.
+            correct = math.sqrt(ts_thres / ts)
             if len(results) > 1:
-                pred_crab_flux, regcoeff = self._predict_flux(results, ts_thres)
-                correct                  = pred_crab_flux / crab_flux
-            else:
-                correct = math.sqrt(ts_thres/ts)
+                try:
+                    pred_crab_flux, regcoeff = self._predict_flux(results, ts_thres)
+                    correct                  = pred_crab_flux / crab_flux
+                except Exception as e:
+                    # if the regression fails, retain the simple scaling with ts_thres
+                    self._log_value(gammalib.TERSE, 'skipping failed regression with error:', e)
 
             # Compute extrapolated fluxes based on the flux correction factor
             crab_flux   = correct * crab_flux
