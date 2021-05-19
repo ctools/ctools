@@ -11,7 +11,7 @@
 #
 # --------------------------------------------------------------------------
 #
-# Copyright (C) 2015-2020 Juergen Knoedlseder
+# Copyright (C) 2015-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ def generate_pull_distribution(model, obs='NONE', onsrc='NONE', onrad=0.2, \
     # Derive parameters
     _, tail = os.path.split(model)
     inmodel    = model + '.xml'
-    outfile    = 'cspull_' + tail + '.dat'
+    outfile    = 'cspull_' + tail + '.fits'
 
     # Setup pull distribution generation
     pull = cscripts.cspull()
@@ -137,7 +137,7 @@ def generate_pull_distribution(model, obs='NONE', onsrc='NONE', onrad=0.2, \
     pull['chatter']  = chatter
 
     # Generate pull distributions
-    pull.run()
+    pull.execute()
 
     # Return
     return outfile
@@ -165,37 +165,37 @@ def analyse_pull_distribution(filename):
     means    = []
     stds     = []
 
-    # Open reader
-    reader = csv.reader(open(filename, 'r'), delimiter=',')
+    # Open FITS file
+    fits = gammalib.GFits(filename)
 
-    # Read rows
-    first   = True
-    samples = 0.0
-    for row in reader:
+    # Get pull distribution table
+    table    = fits.table('PULL_DISTRIBUTION')
+    nrows    = table.nrows()
+    ncolumns = table.ncols()
 
-        # Get column names if first row
-        if first:
-            for element in row:
-                colnames.append(element)
-                means.append(0.0)
-                stds.append(0.0)
+    # Loop over columns
+    for i in range(ncolumns):
 
-        # Handle data rows
-        else:
-            for i, element in enumerate(row):
-                means[i] += float(element)
-                stds[i]  += float(element)*float(element)
+        # Get table column
+        column = table[i]
+
+        # Get column names and initialise mean and standard deviations
+        colnames.append(column.name())
+
+        # Compute means and standard deciation
+        mean    = 0.0
+        std     = 0.0
+        samples = 0.0
+        for row in range(nrows):
+            mean    += float(column[row])
+            std     += float(column[row])*float(column[row])
             samples += 1.0
+        std   = math.sqrt(std/samples - mean*mean/(samples*samples))
+        mean /= samples
 
-        # Flag that first row has been passed
-        first = False
-
-    # Compute mean and standard deviations
-    for i in range(len(stds)):
-        std       = math.sqrt(stds[i]/samples -
-                              means[i]*means[i]/(samples*samples))
-        stds[i]   = std
-        means[i] /= samples
+        # Store mean and standard deviations
+        means.append(mean)
+        stds.append(std)
 
     # Setup results
     results = {}
@@ -372,8 +372,8 @@ class sciver(gammalib.GPythonTestSuite):
         the model is indeed accurate.
         """
         self.pull('data/sciver/bgd', duration=180000.0)
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test power law model
@@ -382,10 +382,10 @@ class sciver(gammalib.GPythonTestSuite):
         Test power law model
         """
         self.pull('data/sciver/crab_plaw')
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test power law model with energy dispersion
@@ -394,10 +394,10 @@ class sciver(gammalib.GPythonTestSuite):
         Test power law model with energy dispersion
         """
         self.pull('data/sciver/crab_plaw_edisp', edisp=True)
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test power law model with stacked analysis
@@ -408,10 +408,10 @@ class sciver(gammalib.GPythonTestSuite):
         self.pull('data/sciver/crab_plaw_stacked',
                   obs='data/sciver/obs_stacked.xml',
                   emin=0.020, emax=100.0, enumbins=40)
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_BackgroundModel_Prefactor')
-        self.test('Pull_BackgroundModel_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('BACKGROUNDMODEL_PREFACTOR_PULL')
+        self.test('BACKGROUNDMODEL_INDEX_PULL')
         return
 
     # Test power law model with On/Off analysis
@@ -422,10 +422,10 @@ class sciver(gammalib.GPythonTestSuite):
         self.pull('data/sciver/crab_plaw_onoff',
                   obs='data/sciver/obs_onoff.xml', onsrc='Crab',
                   emin=0.1, emax=100.0, enumbins=20)
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test power law 2 model
@@ -434,10 +434,10 @@ class sciver(gammalib.GPythonTestSuite):
         Test power law 2 model
         """
         self.pull('data/sciver/crab_plaw2')
-        self.test('Pull_Crab_PhotonFlux')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PHOTONFLUX_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test smoothly broken power law model
@@ -446,12 +446,12 @@ class sciver(gammalib.GPythonTestSuite):
         Test smoothly broken power law model
         """
         self.pull('data/sciver/crab_smoothbplaw')
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index1')
-        self.test('Pull_Crab_Index2')
-        self.test('Pull_Crab_BreakEnergy')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX1_PULL')
+        self.test('CRAB_INDEX2_PULL')
+        self.test('CRAB_BREAKENERGY_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test exponentially cut off power law model
@@ -460,11 +460,11 @@ class sciver(gammalib.GPythonTestSuite):
         Test exponentially cut off power law model
         """
         self.pull('data/sciver/crab_eplaw')
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Crab_CutoffEnergy')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('CRAB_CUTOFFENERGY_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test super exponentially cut off power law model
@@ -473,12 +473,12 @@ class sciver(gammalib.GPythonTestSuite):
         Test super exponentially cut off power law model
         """
         self.pull('data/sciver/crab_supeplaw')
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index1')
-        self.test('Pull_Crab_Index2')
-        self.test('Pull_Crab_CutoffEnergy')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX1_PULL')
+        self.test('CRAB_INDEX2_PULL')
+        self.test('CRAB_CUTOFFENERGY_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test log parabola model
@@ -487,11 +487,11 @@ class sciver(gammalib.GPythonTestSuite):
         Test log parabola model
         """
         self.pull('data/sciver/crab_logparabola')
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Crab_Curvature')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('CRAB_CURVATURE_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test Gaussian model
@@ -500,11 +500,11 @@ class sciver(gammalib.GPythonTestSuite):
         Test Gaussian model
         """
         self.pull('data/sciver/crab_gauss')
-        self.test('Pull_Crab_Normalization')
-        self.test('Pull_Crab_Mean')
-        self.test('Pull_Crab_Sigma')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_NORMALIZATION_PULL')
+        self.test('CRAB_MEAN_PULL')
+        self.test('CRAB_SIGMA_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test file function model
@@ -513,9 +513,9 @@ class sciver(gammalib.GPythonTestSuite):
         Test file function model
         """
         self.pull('data/sciver/crab_filefct')
-        self.test('Pull_Crab_Normalization')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_NORMALIZATION_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test nodes model
@@ -524,12 +524,12 @@ class sciver(gammalib.GPythonTestSuite):
         Test nodes model
         """
         self.pull('data/sciver/crab_nodes')
-        self.test('Pull_Crab_Intensity0')
-        self.test('Pull_Crab_Intensity1')
-        self.test('Pull_Crab_Intensity2')
-        self.test('Pull_Crab_Intensity3')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_INTENSITY0_PULL')
+        self.test('CRAB_INTENSITY1_PULL')
+        self.test('CRAB_INTENSITY2_PULL')
+        self.test('CRAB_INTENSITY3_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test table model
@@ -538,11 +538,11 @@ class sciver(gammalib.GPythonTestSuite):
         Test table model
         """
         self.pull('data/sciver/crab_table')
-        self.test('Pull_Crab_Normalization')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Crab_Cutoff')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_NORMALIZATION_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('CRAB_CUTOFF_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test exponential model
@@ -551,11 +551,11 @@ class sciver(gammalib.GPythonTestSuite):
         Test exponential model
         """
         self.pull('data/sciver/crab_exponential')
-        self.test('Pull_Crab_1:Prefactor')
-        self.test('Pull_Crab_1:Index')
-        self.test('Pull_Crab_2:Normalization')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_1:PREFACTOR_PULL')
+        self.test('CRAB_1:INDEX_PULL')
+        self.test('CRAB_2:NORMALIZATION_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test point source model
@@ -564,12 +564,12 @@ class sciver(gammalib.GPythonTestSuite):
         Test point source model
         """
         self.pull('data/sciver/crab_ptsrc')
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Crab_RA')
-        self.test('Pull_Crab_DEC')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('CRAB_RA_PULL')
+        self.test('CRAB_DEC_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test radial disk model
@@ -578,13 +578,13 @@ class sciver(gammalib.GPythonTestSuite):
         Test radial disk model
         """
         self.pull('data/sciver/crab_rdisk')
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Crab_RA')
-        self.test('Pull_Crab_DEC')
-        self.test('Pull_Crab_Radius')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('CRAB_RA_PULL')
+        self.test('CRAB_DEC_PULL')
+        self.test('CRAB_RADIUS_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test radial ring model
@@ -593,14 +593,14 @@ class sciver(gammalib.GPythonTestSuite):
         Test radial ring model
         """
         self.pull('data/sciver/crab_rring')
-        self.test('Pull_Crab_Prefactor', lim_mean=0.45) # Accept a small bias
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Crab_RA')
-        self.test('Pull_Crab_DEC')
-        self.test('Pull_Crab_Radius')
-        self.test('Pull_Crab_Width')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL', lim_mean=0.45) # Accept a small bias
+        self.test('CRAB_INDEX_PULL')
+        self.test('CRAB_RA_PULL')
+        self.test('CRAB_DEC_PULL')
+        self.test('CRAB_RADIUS_PULL')
+        self.test('CRAB_WIDTH_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test radial Gaussian model
@@ -609,13 +609,13 @@ class sciver(gammalib.GPythonTestSuite):
         Test radial Gaussian model
         """
         self.pull('data/sciver/crab_rgauss')
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Crab_RA')
-        self.test('Pull_Crab_DEC')
-        self.test('Pull_Crab_Sigma')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('CRAB_RA_PULL')
+        self.test('CRAB_DEC_PULL')
+        self.test('CRAB_SIGMA_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test radial shell model
@@ -624,14 +624,14 @@ class sciver(gammalib.GPythonTestSuite):
         Test radial shell model
         """
         self.pull('data/sciver/crab_rshell')
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Crab_RA')
-        self.test('Pull_Crab_DEC')
-        self.test('Pull_Crab_Radius')
-        self.test('Pull_Crab_Width')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('CRAB_RA_PULL')
+        self.test('CRAB_DEC_PULL')
+        self.test('CRAB_RADIUS_PULL')
+        self.test('CRAB_WIDTH_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test elliptical disk model
@@ -640,15 +640,15 @@ class sciver(gammalib.GPythonTestSuite):
         Test elliptical disk model
         """
         self.pull('data/sciver/crab_edisk')
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Crab_RA')
-        self.test('Pull_Crab_DEC')
-        self.test('Pull_Crab_PA')
-        self.test('Pull_Crab_MinorRadius')
-        self.test('Pull_Crab_MajorRadius')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('CRAB_RA_PULL')
+        self.test('CRAB_DEC_PULL')
+        self.test('CRAB_PA_PULL')
+        self.test('CRAB_MINORRADIUS_PULL')
+        self.test('CRAB_MAJORRADIUS_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test elliptical Gaussian model
@@ -657,15 +657,15 @@ class sciver(gammalib.GPythonTestSuite):
         Test elliptical Gaussian model
         """
         self.pull('data/sciver/crab_egauss')
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Crab_RA')
-        self.test('Pull_Crab_DEC')
-        self.test('Pull_Crab_PA')
-        self.test('Pull_Crab_MinorRadius')
-        self.test('Pull_Crab_MajorRadius')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('CRAB_RA_PULL')
+        self.test('CRAB_DEC_PULL')
+        self.test('CRAB_PA_PULL')
+        self.test('CRAB_MINORRADIUS_PULL')
+        self.test('CRAB_MAJORRADIUS_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test diffuse isotropic model
@@ -674,10 +674,10 @@ class sciver(gammalib.GPythonTestSuite):
         Test diffuse isotropic model
         """
         self.pull('data/sciver/crab_const')
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test diffuse map model
@@ -686,10 +686,10 @@ class sciver(gammalib.GPythonTestSuite):
         Test diffuse map model
         """
         self.pull('data/sciver/crab_map', ra=201.3651, dec=-43.0191)
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test diffuse map model (small ROI)
@@ -702,10 +702,10 @@ class sciver(gammalib.GPythonTestSuite):
         investigated further.
         """
         self.pull('data/sciver/crab_map_roi', ra=201.3651, dec=-43.0191, rad=1.5)
-        self.test('Pull_Crab_Prefactor', lim_mean=0.45) # Accept a small bias
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL', lim_mean=0.45) # Accept a small bias
+        self.test('CRAB_INDEX_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test diffuse map model (not normalized and scaled)
@@ -714,10 +714,10 @@ class sciver(gammalib.GPythonTestSuite):
         Test diffuse map model (not normalized and scaled)
         """
         self.pull('data/sciver/crab_map_nn', ra=201.3651, dec=-43.0191, rad=1.5)
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
     # Test diffuse cube model
@@ -726,10 +726,10 @@ class sciver(gammalib.GPythonTestSuite):
         Test diffuse cube model
         """
         self.pull('data/sciver/crab_cube')
-        self.test('Pull_Crab_Prefactor')
-        self.test('Pull_Crab_Index')
-        self.test('Pull_Background_Prefactor')
-        self.test('Pull_Background_Index')
+        self.test('CRAB_PREFACTOR_PULL')
+        self.test('CRAB_INDEX_PULL')
+        self.test('BACKGROUND_PREFACTOR_PULL')
+        self.test('BACKGROUND_INDEX_PULL')
         return
 
 
