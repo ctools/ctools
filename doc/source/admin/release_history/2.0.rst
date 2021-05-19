@@ -1,6 +1,6 @@
 .. _2.0:
 
-ctools 2.0 release (11 May 2021)
+ctools 2.0 release (19 May 2021)
 ================================
 
 Overview

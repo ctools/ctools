@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for cscripts scripts                                             #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2020 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2021 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -203,6 +203,7 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/pha.fits \
            $(top_srcdir)/test/data/pha_channels.fits \
            $(top_srcdir)/test/data/pull.dat \
+           $(top_srcdir)/test/data/pull.fits \
            $(top_srcdir)/test/data/sensitivity.dat \
            $(top_srcdir)/test/data/sensitivity_integral.dat \
            $(top_srcdir)/test/data/sensitivity.fits \

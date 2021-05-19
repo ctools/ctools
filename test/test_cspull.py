@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the cspull script.
 #
-# Copyright (C) 2016-2018 Juergen Knoedlseder
+# Copyright (C) 2016-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ class Test(test):
 
         # Setup cspull command
         cmd = cspull+' inmodel="'+self._model+'" onsrc="NONE"'+ \
-                     ' outfile="cspull_cmd1.dat"'+ \
+                     ' outfile="cspull_cmd1.fits"'+ \
                      ' ntrials=2'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ra=83.6331 dec=22.0145 emin=1.0 emax=100.0'+ \
@@ -90,11 +90,11 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check pull distribution file
-        self._check_pull_file('cspull_cmd1.dat')
+        self._check_pull_file('cspull_cmd1.fits')
 
         # Setup cspull command
         cmd = cspull+' inmodel="model_that_does_not_exist.xml" onsrc="NONE"'+ \
-                     ' outfile="cspull_cmd1.dat"'+ \
+                     ' outfile="cspull_cmd1.fits"'+ \
                      ' ntrials=2'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ra=83.6331 dec=22.0145 emin=1.0 emax=100.0'+ \
@@ -121,7 +121,7 @@ class Test(test):
         pull = cscripts.cspull()
         pull['inmodel']  = self._model
         pull['onsrc']    = 'NONE'
-        pull['outfile']  = 'cspull_py1.dat'
+        pull['outfile']  = 'cspull_py1.fits'
         pull['ntrials']  = 2
         pull['caldb']    = self._caldb
         pull['irf']      = self._irf
@@ -140,15 +140,16 @@ class Test(test):
         # Run cspull script
         pull.logFileOpen()   # Make sure we get a log file
         pull.run()
+        pull.save()
 
         # Check pull distribution file
-        self._check_pull_file('cspull_py1.dat')
+        self._check_pull_file('cspull_py1.fits')
 
         # Set-up binned cspull
         pull = cscripts.cspull()
         pull['inmodel']  = self._model
         pull['onsrc']    = 'NONE'
-        pull['outfile']  = 'cspull_py2.dat'
+        pull['outfile']  = 'cspull_py2.fits'
         pull['ntrials']  = 1
         pull['caldb']    = self._caldb
         pull['irf']      = self._irf
@@ -172,14 +173,14 @@ class Test(test):
         pull.execute()
 
         # Check pull distribution file
-        self._check_pull_file('cspull_py2.dat', rows=2)
+        self._check_pull_file('cspull_py2.fits', rows=1)
 
         # Set-up cspull from event list
         pull = cscripts.cspull()
         pull['inobs']    = self._events
         pull['onsrc']    = 'NONE'
         pull['inmodel']  = self._model
-        pull['outfile']  = 'cspull_py3.dat'
+        pull['outfile']  = 'cspull_py3.fits'
         pull['ntrials']  = 1
         pull['caldb']    = self._caldb
         pull['irf']      = self._irf
@@ -191,7 +192,7 @@ class Test(test):
         pull.execute()
 
         # Check pull distribution file
-        self._check_pull_file('cspull_py3.dat', rows=2)
+        self._check_pull_file('cspull_py3.fits', rows=1)
 
         # Build observation container with unbinned observation
         cta = gammalib.GCTAObservation(self._events)
@@ -202,7 +203,7 @@ class Test(test):
         pull = cscripts.cspull(obs)
         pull['inmodel']  = self._model
         pull['onsrc']    = 'NONE'
-        pull['outfile']  = 'cspull_py4.dat'
+        pull['outfile']  = 'cspull_py4.fits'
         pull['ntrials']  = 1
         pull['caldb']    = self._caldb
         pull['irf']      = self._irf
@@ -214,7 +215,7 @@ class Test(test):
         pull.execute()
 
         # Check pull distribution file
-        self._check_pull_file('cspull_py4.dat', rows=2)
+        self._check_pull_file('cspull_py4.fits', rows=1)
 
         # Set-up stacked cspull with one observation where response cubes
         # are specified in the input observation
@@ -222,7 +223,7 @@ class Test(test):
         pull['inobs']    = self._inobs
         pull['inmodel']  = self._stacked_model
         pull['onsrc']    = 'NONE'
-        pull['outfile']  = 'cspull_py5.dat'
+        pull['outfile']  = 'cspull_py5.fits'
         pull['ntrials']  = 1
         pull['enumbins'] = 0
         pull['logfile']  = 'cspull_py5.log'
@@ -232,7 +233,7 @@ class Test(test):
         pull.execute()
 
         # Check pull distribution file
-        self._check_pull_file('cspull_py5.dat', rows=2)
+        self._check_pull_file('cspull_py5.fits', rows=1)
 
         # Set-up stacked cspull with two observations from which response
         # cubes will be computed internally. The IRFs are also specified
@@ -242,7 +243,7 @@ class Test(test):
         pull['inobs']    = self._inobs_two
         pull['inmodel']  = self._model
         pull['onsrc']    = 'NONE'
-        pull['outfile']  = 'cspull_py6.dat'
+        pull['outfile']  = 'cspull_py6.fits'
         pull['ntrials']  = 1
         pull['emin']     = 1.0
         pull['emax']     = 100.0
@@ -258,13 +259,13 @@ class Test(test):
         pull.execute()
 
         # Check pull distribution file
-        self._check_pull_file('cspull_py6.dat', rows=2)
+        self._check_pull_file('cspull_py6.fits', rows=1)
 
         # Set-up cspull without multiprocessing
         pull = cscripts.cspull()
         pull['inmodel']  = self._model
         pull['onsrc']    = 'NONE'
-        pull['outfile']  = 'cspull_py7.dat'
+        pull['outfile']  = 'cspull_py7.fits'
         pull['ntrials']  = 2
         pull['caldb']    = self._caldb
         pull['irf']      = self._irf
@@ -284,9 +285,10 @@ class Test(test):
         # Run cspull script
         pull.logFileOpen()   # Make sure we get a log file
         pull.run()
+        pull.save()
 
         # Check pull distribution file
-        self._check_pull_file('cspull_py7.dat')
+        self._check_pull_file('cspull_py7.fits')
 
         # Return
         return
@@ -316,7 +318,7 @@ class Test(test):
         pull['deadc']    = 0.98
         pull['rad']      = 5.0
         pull['logfile']  = 'cspull_py1_pickle.log'
-        pull['outfile']  = 'cspull_py1_pickle.dat'
+        pull['outfile']  = 'cspull_py1_pickle.fits'
         pull['chatter']  = 2
 
         # Perform pickeling tests of filled class
@@ -325,23 +327,25 @@ class Test(test):
         # Run csphasecrv script and save light curve
         obj.logFileOpen()   # Make sure we get a log file
         obj.run()
+        obj.save()
 
         # Check pull distribution file
-        self._check_pull_file('cspull_py1_pickle.dat')
+        self._check_pull_file('cspull_py1_pickle.fits')
 
         # Return
         return
 
     # Check pull file
-    def _check_pull_file(self, filename, rows=3):
+    def _check_pull_file(self, filename, rows=2):
         """
         Check pull file
         """
-        # Open pull file as CSV file
-        pulls = gammalib.GCsv(filename)
+        # Open pull file as FITS file
+        fits  = gammalib.GFits(filename)
+        table = fits.table('PULL_DISTRIBUTION')
 
         # Check dimensions
-        self.test_value(pulls.nrows(), rows,
+        self.test_value(table.nrows(), rows,
                         'Check for number of rows in pull file')
 
         # Return

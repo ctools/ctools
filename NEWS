@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-11 May 2021
+19 May 2021
 
 
 Introduction
@@ -255,7 +255,7 @@ the width, height and position angle of the rectangular sky regions (#3248).
 
 cspull - Generate pull distributions
 ------------------------------------
-None
+The ASCII output file was replaced by a FITS file (#1707).
 
 
 csresmap - Generate residual map
@@ -361,8 +361,9 @@ regions (#3248).
 
 Examples
 --------
-The show_butterfly and show_sensitivity.py scripts were adapted to deal also
-with FITS output files (#1707).
+The show_butterfly, show_pull_evolution.py, show_pull_histogram.py and
+show_sensitivity.py scripts were adapted to deal also with FITS output files
+(#1707).
 
 
 caldb

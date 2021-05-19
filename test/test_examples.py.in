@@ -295,8 +295,15 @@ class Test(gammalib.GPythonTestSuite):
         Test show_pull_evolution
         """
         # Set arguments
-        args = ('-p example_show_pull_evolution.eps %s/pull.dat '
+        args = ('-p example_show_pull_evolution_csv.eps %s/pull.dat '
                 'Pull_Crab_Prefactor' % self._datadir)
+
+        # Execute script
+        self._execute_python('show_pull_evolution', args=args)
+
+        # Set arguments
+        args = ('-p example_show_pull_evolution_fits.eps %s/pull.fits '
+                'CRAB_PREFACTOR_PULL' % self._datadir)
 
         # Execute script
         self._execute_python('show_pull_evolution', args=args)
@@ -310,15 +317,22 @@ class Test(gammalib.GPythonTestSuite):
         Test show_pull_histogram
         """
         # Set arguments
-        args = ('-p example_show_pull_histogram1.eps %s/pull.dat '
+        args = ('-p example_show_pull_histogram_csv1.eps %s/pull.dat '
                 'Pull_Crab_Prefactor' % self._datadir)
 
         # Execute script
         self._execute_python('show_pull_histogram', args=args)
 
         # Set arguments
-        args = ('-n 20 -p example_show_pull_histogram2.eps %s/pull.dat '
+        args = ('-n 20 -p example_show_pull_histogram_csv2.eps %s/pull.dat '
                 'Pull_Crab_Prefactor' % self._datadir)
+
+        # Execute script
+        self._execute_python('show_pull_histogram', args=args)
+
+        # Set arguments
+        args = ('-p example_show_pull_histogram_fits.eps %s/pull.fits '
+                'CRAB_PREFACTOR_PULL' % self._datadir)
 
         # Execute script
         self._execute_python('show_pull_histogram', args=args)
