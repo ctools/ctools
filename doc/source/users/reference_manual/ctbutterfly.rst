@@ -68,7 +68,7 @@ General parameters
     Applies energy dispersion to response computation.
 
 ``outfile [file]``
-    Output butterfly ASCII file name.
+    Output butterfly FITS file.
 
 ``(fit = no) [boolean]``
     Performs maximum likelihood fitting of input model ignoring any provided

@@ -476,7 +476,6 @@ class cspull(ctools.csobservation):
             # If multiprocessing was used then recover results and put them
             # into the log file
             if self._nthreads > 1:
-                #result = poolresults[i][0]
                 results.append(poolresults[i][0])
                 self._log_string(gammalib.TERSE, poolresults[i][1]['log'], False)
 

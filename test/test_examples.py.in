@@ -460,14 +460,21 @@ class Test(gammalib.GPythonTestSuite):
         Test show_ts_distribution
         """
         # Set arguments
-        args = ('-n 100 -p example_show_ts_distribution1.eps %s/ts.dat' %
+        args = ('-n 100 -p example_show_ts_distribution_csv1.eps %s/ts.dat' %
                 self._datadir)
 
         # Execute script
         self._execute_python('show_ts_distribution', args=args)
 
         # Set arguments
-        args = ('-n 100 -t cdf -p example_show_ts_distribution2.eps %s/ts.dat' %
+        args = ('-n 100 -t cdf -p example_show_ts_distribution_csv2.eps %s/ts.dat' %
+                self._datadir)
+
+        # Execute script
+        self._execute_python('show_ts_distribution', args=args)
+
+        # Set arguments
+        args = ('-n 100 -p example_show_ts_distribution_fits.eps %s/ts.fits' %
                 self._datadir)
 
         # Execute script

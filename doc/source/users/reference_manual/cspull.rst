@@ -74,7 +74,7 @@ General parameters
     Average deadtime correction factor.
 
 ``outfile [file]``
-    ASCII file containing the individual pull values.
+    Output pull distribution FITS ASCII file.
 
 ``ntrials [integer]``
     Number of samples for generating the pull distribution.

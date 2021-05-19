@@ -20,11 +20,10 @@ be performed in parallel over as many processes as the number of CPUs available 
 machine. The maximum number of parallel processes can be set by the user through the
 ``nthreads`` hidden parameter.
 
-:ref:`cstsdist` will create an ASCII file in comma-separated value (CSV) format,
-containing one row per TS computation. The first row is a header row providing
-the column names. The following rows give the TS value, the log-likelihood 
-values of the fit with or without the source, the number of observed and 
-fitted events, as well as the values and errors for all fitted parameters.
+:ref:`cstsdist` will create on output a FITS file containing a table with one row
+per TS computation. The columns in the table comprise the TS value, the number
+of observed and fitted events, and the values and errors for all fitted
+parameters.
 
 From the output file, TS distribution plots can be generated using for
 example the ``show_ts_distribution.py`` script in the examples folder. The
@@ -74,7 +73,7 @@ General parameters
     Average deadtime correction factor.
 
 ``outfile [file]``
-    Output ASCII file containing the TS distribution values.
+    Output TS distribution FITS file.
 
 ``ntrials [integer]``
     Number of Monte Carlo samples.

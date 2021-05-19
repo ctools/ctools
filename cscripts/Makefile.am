@@ -214,6 +214,7 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/residual_onoff.fits \
            $(top_srcdir)/test/data/lightcurve.fits \
            $(top_srcdir)/test/data/ts.dat \
+           $(top_srcdir)/test/data/ts.fits \
            $(top_srcdir)/test/data/models_spatial.xml \
            $(top_srcdir)/test/data/models_spectral.xml \
            $(top_srcdir)/test/data/model_filefunction.txt \

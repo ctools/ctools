@@ -51,8 +51,8 @@ def read_pull_distribution(filename, parname):
 
     Returns
     -------
-    pulls : dict
-        Dictionary with pull distribution
+    pulls : list of floats
+        List with pull distribution
     """
     # Read pull distribution dependent on file type
     fname = gammalib.GFilename(filename)
@@ -81,8 +81,8 @@ def read_pull_distribution_fits(filename, parname):
 
     Returns
     -------
-    pulls : dict
-        Dictionary with pull distribution
+    pulls : list of floats
+        List with pull distribution
     """
     # Open FITS file
     fits = gammalib.GFits(filename)
