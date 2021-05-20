@@ -121,7 +121,7 @@ General parameters
     observations, and ``CHI2`` uses the Chi squared statistic for all
     binned or stacked observations.
 
-``(mincounts = 0) [integer]``
+``(mincounts = 10) [integer]``
     Constraint on the minimum number of required source counts. Conventionally,
     a constraint for a minimum number of 10 source counts is applied for CTA
     sensitivity estimates. If ``0`` is specified then no source counts limit
