@@ -121,6 +121,23 @@ General parameters
     observations, and ``CHI2`` uses the Chi squared statistic for all
     binned or stacked observations.
 
+``(mincounts = 0) [integer]``
+    Constraint on the minimum number of required source counts. Conventionally,
+    a constraint for a minimum number of 10 source counts is applied for CTA
+    sensitivity estimates. If ``0`` is specified then no source counts limit
+    will be applied.
+
+``(bkgexcess = 0.0) [real]``
+    Constraint on the minimum number of required source counts with respect to
+    the number of background counts. This value is a fraction that is
+    conventionally set to ``0.05`` (or 5%) which means that the number of source
+    counts needs to exceed 5% of the number of background counts. If ``0.0``is
+    specifie then no constraint will be applied.
+
+``(bkgrad = 0.33) [real]``
+    Radius in degrees used to estimate the number of background counts
+    underlying the source. This radius is only used if ``bkgexcess > 0.0``.
+
 
 Standard parameters
 -------------------

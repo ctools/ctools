@@ -1,13 +1,14 @@
-2021-05-19
+2021-05-20
 
         * Version 2.0.0 released
         ========================
 
-        Use test source position in cssens (#3555)
+        Add source counts constraints to cssens (#3668)
         Add ASCL shields to "About" page (#3630)
         Use file function constructor in csspec (#3626)
         Add BINS method to csspec (#3606)
         Add hidden "fix_spat" parameter to cttsmap (#3562)
+        Use test source position in cssens (#3555)
         Add optimizer setter to ctlikelihood base class
         Add Sphinx tutorials test script (#3510)
         Add "refit_if_failed" parameter to ctlike

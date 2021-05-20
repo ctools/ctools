@@ -24,7 +24,6 @@ import gammalib
 import ctools
 from cscripts import obsutils
 from cscripts import modutils
-from cscripts import ioutils
 from cscripts import mputils
 
 
@@ -46,7 +45,7 @@ class cssens(ctools.csobservation):
     # Constructor
     def __init__(self, *argv):
         """
-        Constructor.
+        Constructor
         """
         # Initialise application by calling the appropriate class constructor
         self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
@@ -154,7 +153,7 @@ class cssens(ctools.csobservation):
         self['edisp'].boolean()
         self['debug'].boolean()
         self['mincounts'].integer()
-        
+
         # Read seed
         self._seed = self['seed'].integer()
 
@@ -417,9 +416,6 @@ class cssens(ctools.csobservation):
         edisp_orig    = self['edisp'].boolean()
         self['edisp'] = False
 
-        # Get seed parameter for generating events
-        seed = self['seed'].integer()
-
         # Set flux ratio precision required for convergence to 5%
         ratio_precision = 0.05
 
@@ -465,6 +461,9 @@ class cssens(ctools.csobservation):
             # Update iteration counter
             iterations += 1
 
+            # Increment the seed value
+            self._seed += 1
+
             # Write header for iteration into logger
             self._log_header2(gammalib.EXPLICIT, 'Iteration '+str(iterations))
 
@@ -472,7 +471,7 @@ class cssens(ctools.csobservation):
 
             # Simulate events for the models. "sim" holds an observation
             # container with observations containing the simulated events.
-            sim = obsutils.sim(self.obs(), nbins=enumbins, seed=(iterations+seed),
+            sim = obsutils.sim(self.obs(), nbins=enumbins, seed=self._seed,
                                binsz=binsz, npix=npix,
                                log=self._log_clients,
                                debug=self['debug'].boolean(),
@@ -589,7 +588,7 @@ class cssens(ctools.csobservation):
                         self._log_value(gammalib.TERSE, 'Converged flux ratio', ratio)
                         self._log_value(gammalib.TERSE, 'Regression coefficient',
                                         regcoeff)
-                        
+
                         # If the flux has converged then check if the original
                         # value of edisp was set, and is not what has fo far
                         # been used
@@ -648,7 +647,7 @@ class cssens(ctools.csobservation):
                 break
 
             # ... otherwise increase the test flux
-            correct     = 1 + ratio_precision
+            correct     = 1.0 + ratio_precision
             crab_flux   = correct * crab_flux
             photon_flux = correct * photon_flux
             energy_flux = correct * energy_flux
@@ -744,7 +743,7 @@ class cssens(ctools.csobservation):
         # Return Prefactor
         return crab_prefactor
 
-    def _simulate_events(self, obs, rad, seed, enumbins, binsz, npix):
+    def _simulate_events(self, obs, rad, enumbins, binsz, npix):
         """
         Simulate events
 
@@ -754,8 +753,6 @@ class cssens(ctools.csobservation):
             Observation container
         rad : float
             Simulation selection radius (degrees)
-        seed : integer
-            Random number generator seed
         enumbins : integer
             Number of energy bins
         binsz : float
@@ -769,19 +766,14 @@ class cssens(ctools.csobservation):
         # Simulate events
         for n_sim in range(15):
 
-            # Increment the seed
-            seed += n_sim
+            # Increment the seed value
+            self._seed += 1
 
             # Simulate observations
-            sim = obsutils.sim(obs,
-                               nbins=enumbins,
-                               seed=seed,
-                               binsz=binsz,
-                               npix=npix,
-                               log=self._log_clients,
+            sim = obsutils.sim(obs, nbins=enumbins, seed=self._seed, binsz=binsz,
+                               npix=npix, log=self._log_clients,
                                debug=self['debug'].boolean(),
-                               edisp=self['edisp'].boolean(),
-                               nthreads=1)
+                               edisp=self['edisp'].boolean(), nthreads=1)
 
             # If a selection radius is given then select only the events within
             # that selection radius
@@ -843,14 +835,11 @@ class cssens(ctools.csobservation):
 
         # Get user parameters
         mincounts = self['mincounts'].integer()
-        bkgcut    = self['bkgcut'].real()
+        bkgexcess = self['bkgexcess'].real()
         bkgrad    = self['bkgrad'].real()
 
         # Continue only if cuts were specified
-        if mincounts > 0 or bkgcut > 0.0:
-
-            # Get seed parameter for generating events
-            seed = self['seed'].integer()
+        if mincounts > 0 or bkgexcess > 0.0:
 
             # Get models and split them into source and background
             models     = self.obs().models()
@@ -869,16 +858,16 @@ class cssens(ctools.csobservation):
             bck_obs.models(bck_models)
 
             # Simulate source events
-            n_src_evts = self._simulate_events(src_obs, 0.0, seed, enumbins, binsz, npix)
+            n_src_evts = self._simulate_events(src_obs, 0.0, enumbins, binsz, npix)
 
             # Simulate background events in case that a background fraction cut
             # is applied and if the number of background events was not yet
             # estimated
-            if bkgcut > 0.0 and n_bck_evts == None:
-                n_bck_evts = self._simulate_events(bck_obs, bkgrad, seed, enumbins, binsz, npix)
+            if bkgexcess > 0.0 and n_bck_evts == None:
+                n_bck_evts = self._simulate_events(bck_obs, bkgrad, enumbins, binsz, npix)
 
             # Set cut results
-            min_bkg_events = n_bck_evts * bkgcut
+            min_bkg_events = n_bck_evts * bkgexcess
             has_min_evts   = n_src_evts >= mincounts
             is_above_bck   = n_src_evts >= min_bkg_events
             pass_evt_cut   = has_min_evts and is_above_bck
@@ -937,7 +926,7 @@ class cssens(ctools.csobservation):
         mean_xy *= norm
         mean_xx *= norm
         mean_yy *= norm
-        
+
         # Compute regression coefficient
         rxy_norm = (mean_xx - mean_x * mean_x) * (mean_yy - mean_y * mean_y)
         if rxy_norm < 1e-10:
@@ -1065,6 +1054,10 @@ class cssens(ctools.csobservation):
         table.card('SIGMA',    self['sigma'].real(), '[sigma] Sensitivity threshold')
         table.card('MAX_ITER', self['max_iter'].integer(), 'Maximum number of iterations')
         table.card('STAT',     self['statistic'].string(), 'Optimization statistic')
+        table.card('MINCOUNT', self['mincounts'].integer(), 'Minimum number of source counts')
+        table.card('BKGEXCES', self['bkgexcess'].real(), 'Background uncertainty fraction')
+        table.card('BKGRAD',   self['bkgrad'].real(), '[deg] Background radius')
+        table.card('SEED',     self['seed'].integer(), 'Seed value for random numbers')
 
         # Append filled columns to fits table
         table.append(e_mean)

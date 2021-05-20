@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-19 May 2021
+20 May 2021
 
 
 Introduction
@@ -283,6 +283,12 @@ the width, height and position angle of the rectangular sky regions (#3248).
 
 cssens - Computes sensitivity curve
 -----------------------------------
+Added constraints on the minimum number of source counts in the sensitivity
+computations. The constraints are specified by the new parameters "mincounts",
+"bkgexcess" and "bkgrad". In addition, a "seed" parameter was added allowing
+to specify the seed value for the random number generators. Changes were also
+made to improve the stability of the sensitivity computation (#3668).
+
 The test source position is now used as pointing direction, eventually offset
 in galactic latitude by a number of degrees specified using the "offset"
 parameter (#3555).

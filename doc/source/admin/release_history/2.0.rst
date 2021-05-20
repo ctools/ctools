@@ -1,6 +1,6 @@
 .. _2.0:
 
-ctools 2.0 release (19 May 2021)
+ctools 2.0 release (20 May 2021)
 ================================
 
 Overview
@@ -24,8 +24,8 @@ Bug fixes
 Improvements
 ------------
 
-* [`3555 <https://cta-redmine.irap.omp.eu/issues/3555>`_] -
-  Use test source position in :ref:`cssens`
+* [`3668 <https://cta-redmine.irap.omp.eu/issues/3668>`_] -
+  Add source counts constraints to :ref:`cssens`
 * [`3630 <https://cta-redmine.irap.omp.eu/issues/3630>`_] -
   Add ASCL shields to **About** page
 * [`3626 <https://cta-redmine.irap.omp.eu/issues/3626>`_] -
@@ -34,6 +34,8 @@ Improvements
   Add ``BINS`` method to :ref:`csspec`
 * [`3562 <https://cta-redmine.irap.omp.eu/issues/3562>`_] -
   Add hidden ``fix_spat`` parameter to :ref:`cttsmap`
+* [`3555 <https://cta-redmine.irap.omp.eu/issues/3555>`_] -
+  Use test source position in :ref:`cssens`
 * Add optimizer setter to ``ctlikelihood`` base class.
 * Add ``refit_if_failed`` parameter to :ref:`ctlike`
 * [`3441 <https://cta-redmine.irap.omp.eu/issues/3441>`_] -
