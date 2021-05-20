@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctfindvar - Time variability search tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2018-2020 by Simon Bonnefoy                              *
+ *  copyright (C) 2018-2021 by Simon Bonnefoy                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -273,6 +273,7 @@ void ctfindvar::save(void)
         // counts cube was saved.
         if (!m_counts.is_empty()) {
             m_counts.save(outcube, (*this)["clobber"].boolean());
+            stamp(outcube);
             log_value(TERSE, "Counts cube file", outcube.url());
         }
         else {
@@ -297,6 +298,9 @@ void ctfindvar::save(void)
 
         // Write source histograms
         write_source_histograms(fits);
+
+        // Stamp FITS file
+        stamp(fits);
 
         // Save significance map
         fits.saveto(outmap, (*this)["clobber"].boolean());

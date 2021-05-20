@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a residual map.
 #
-# Copyright (C) 2014-2020 Michael Mayer
+# Copyright (C) 2014-2021 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -213,7 +213,7 @@ class csresmap(ctools.csobservation):
 
         # Get outmap parameter
         outmap = self['outmap'].filename()
-        
+
         # Continue only filename and residual map are valid
         if self._resmap != None:
 
@@ -222,6 +222,9 @@ class csresmap(ctools.csobservation):
 
             # Save residual map
             self._resmap.save(outmap, self['clobber'].boolean())
+
+            # Stamp residual map
+            self._stamp(outmap)
 
         # Return
         return
@@ -240,7 +243,7 @@ class csresmap(ctools.csobservation):
 
         # Continue only if residual map is valid
         if self._resmap != None:
-        
+
             # Set default name is user name is empty
             if not name:
                 user_name = self._name()

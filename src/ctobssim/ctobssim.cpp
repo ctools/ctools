@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2020 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2021 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -1712,6 +1712,9 @@ void ctobssim::save_fits(void)
         // Save observation into FITS file
         obs->save(m_outevents, clobber());
 
+        // Stamp FITS file
+        stamp(m_outevents);
+
     } // endif: event list has not yet been saved and disposed
 
     // Return
@@ -1763,6 +1766,9 @@ void ctobssim::save_xml(void)
 
                     // Save observation into FITS file
                     obs->save(outfile, clobber());
+
+                    // Stamp FITS file
+                    stamp(outfile);
 
                 }
 

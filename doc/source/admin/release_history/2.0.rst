@@ -24,6 +24,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`3662 <https://cta-redmine.irap.omp.eu/issues/3662>`_] -
+  Stamp all output FITS files
 * [`3668 <https://cta-redmine.irap.omp.eu/issues/3668>`_] -
   Add source counts constraints to :ref:`cssens`
 * [`3630 <https://cta-redmine.irap.omp.eu/issues/3630>`_] -

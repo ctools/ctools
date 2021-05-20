@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctcubemask - Cube filter tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2018 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2021 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -690,7 +690,10 @@ void ctcubemask::save_fits(void)
 
             // Save counts cube
             obs->save(m_outcube, clobber());
-        
+
+            // Stamp counts cube
+            stamp(m_outcube);
+
         } // endif: observation was a CTA observation
 
     }
@@ -736,6 +739,9 @@ void ctcubemask::save_xml(void)
 
             // Save counts cube
             obs->save(outfile, clobber());
+
+            // Stamp counts cube
+            stamp(outfile);
 
         } // endif: observation was a CTA observations
 

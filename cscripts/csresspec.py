@@ -806,6 +806,9 @@ class csresspec(ctools.csobservation):
             table   = self._results2table(results[0])
             self._fits.append(table)
 
+        # Stamp FITS file
+        self._stamp(self._fits)
+
         # Return
         return
 

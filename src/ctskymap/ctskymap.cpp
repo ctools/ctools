@@ -1,7 +1,7 @@
 /***************************************************************************
  *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2019 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2021 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -322,6 +322,10 @@ void ctskymap::construct_fits(void)
 
     } // endif: background subtraction was requested
 
+    // Stamp FITS file
+    stamp(m_fits);
+
+    // Return
     return;
 }
 

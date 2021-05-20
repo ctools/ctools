@@ -318,6 +318,9 @@ class csphasecrv(ctools.csobservation):
         self._fits = gammalib.GFits()
         self._fits.append(table)
 
+        # Stamp FITS file
+        self._stamp(self._fits)
+
         # Return
         return
 

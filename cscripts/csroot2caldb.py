@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generate IRFs in CALDB format from a ROOT offaxis performance file
 #
-# Copyright (C) 2016-2018 Juergen Knoedlseder
+# Copyright (C) 2016-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -405,6 +405,9 @@ class csroot2caldb(ctools.cscript):
             key = 'HDUCLAS%d' % (i+1)
             hdu.card(key, item, 'HDU class')
         hdu.card('HDUVERS', '0.2', 'HDU version')
+
+        # Stamp HDU
+        self._stamp(hdu)
 
         # Return
         return

@@ -2,7 +2,7 @@
 # ==========================================================================
 # Spectral component separation script
 #
-# Copyright (C) 2020 Luigi Tibaldo
+# Copyright (C) 2020-2021 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -833,6 +833,9 @@ class csscs(ctools.csobservation):
 
         # Fill output Fits
         self._fits = self._fill_fits(results)
+
+        # Stamp FITS file
+        self._stamp(self._fits)
 
         # Return
         return

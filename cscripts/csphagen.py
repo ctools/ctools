@@ -1138,6 +1138,12 @@ class csphagen(ctools.csobservation):
             obs.arf().save(arfname, clobber)
             obs.rmf().save(rmfname, clobber)
 
+            # Stamp files
+            self._stamp(onname)
+            self._stamp(offname)
+            self._stamp(arfname)
+            self._stamp(rmfname)
+
             # Log file names
             self._log_value(gammalib.NORMAL, 'PHA on file', onname)
             self._log_value(gammalib.NORMAL, 'PHA off file', offname)

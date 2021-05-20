@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2020 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2021 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -2265,6 +2265,9 @@ void ctool::save_event_list(const GCTAObservation* obs,
 
             // Close input file
             infits.close();
+
+            // Stamp FITS file
+            stamp(outfits);
 
             // Save file to disk and close it (we need both operations)
             outfits.saveto(outname.url(), clobber());

@@ -39,28 +39,31 @@ None
 
 ctbin - CTA event binning
 -------------------------
+Stamp output counts cube (#3662).
+
 Removed implicit conversion warning during C++ compilation (#3324).
 
 
 ctbkgcube - CTA background cube generation
 ------------------------------------------
-None
+Stamp output background cube (#3662).
 
 
 ctbutterfly - Generate butterfly diagrams
 -----------------------------------------
 The ASCII output file was replaced by a FITS file, and the butterfly() method
-now returns a GFits objects instead of a GCsv object (#1707).
+now returns a GFits objects instead of a GCsv object (#1707). The output FITS
+file is also stamped (#3662).
 
 
 ctcubemask - CTA cube filtering
 -------------------------------
-None
+Stamp output masked cube (#3662).
 
 
 ctedispcube - CTA energy dispersion cube generation
 ---------------------------------------------------
-None
+Stamp output energy dispersion cube (#3662).
 
 
 cterror - Likelihood profile error computation
@@ -70,12 +73,12 @@ None
 
 ctexpcube - CTA exposure cube generation
 ----------------------------------------
-None
+Stamp output exposure cube (#3662).
 
 
 ctfindvar - Variability search
 ------------------------------
-None
+Stamp output FITS files (#3662).
 
 
 ctlike - Maximum likelihood fitting
@@ -99,47 +102,53 @@ are fixed for all sky models (#3426).
 
 ctmapcube - CTA map cube generation
 -----------------------------------
-None
+Stamp output map cube (#3662).
 
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
-None
+Stamp output model cube (#3662).
 
 
 ctobssim - CTA observation simulation
 -------------------------------------
+Stamp output event files (#3662).
+
 Added models() method allowing for a setting of the model container without
 using the "inmodels" parameter (#3441).
 
 
 ctphase - Event phase computation
 ---------------------------------
-None
+Stamp output event files (#3662).
 
 
 ctprob - Event probability computation
 --------------------------------------
-None
+Stamp output event files (#3662).
 
 
 ctpsfcube - CTA point spread function cube generation
 -----------------------------------------------------
-None
+Stamp output point spread function cube (#3662).
 
 
 ctselect - CTA event selection
 ------------------------------
+Stamp output event files (#3662).
+
 Replaced std::tmpnam() by gammalib::tmpnam() function in ctselect (#3324).
 
 
 ctskymap - CTA sky mapping
 --------------------------
-None
+Stamp output sky map (#3662).
 
 
 cttsmap - Generation of Test Statistic map
 ------------------------------------------
+Stamp output TS map (#3662).
+
 Added hidden "fix_spat" parameter that instructs the tool to fix all spatial
 model parameters (#3562).
 
@@ -151,7 +160,7 @@ None
 
 support - Support classes
 -------------------------
-None
+Add stamping to ctool::save_event_list() method (#3662).
 
 
 csbkgmodel - Generate background model for 3D analysis
@@ -166,7 +175,7 @@ None
 
 csebins - Generate energy boundaries
 ------------------------------------
-None
+Stamp output energy boundaries file (#3662).
 
 
 csfindobs - Find IACT observations
@@ -191,6 +200,8 @@ None
 
 cslightcrv - Generate light curve
 ---------------------------------
+Stamp output light curve file (#3662).
+
 Added support for rectangular On/Off regions. The "srcshape" parameter now
 can now be set to "RECT" to use rectangular sky regions. The parameter is now
 automatic. The parameters "width", "height", and "posang" were added to specify
@@ -214,12 +225,12 @@ None
 
 csmodelsois - Puts selected sources in diffuse model cube
 ---------------------------------------------------------
-None
+Stamp output diffuse model cube (#3662).
 
 
 csobs2caldb - Generate calibration database entry for an IACT observation
 -------------------------------------------------------------------------
-None
+Stamp output IRF files (#3662).
 
 
 csobsdef - Generate observation definition XML file
@@ -239,6 +250,8 @@ None
 
 csphagen - Generate On/Off observations
 ---------------------------------------
+Stamp output OGIP files (#3662).
+
 Added support for rectangular On/Off regions. The "srcshape" parameter now
 can now be set to "RECT" to use rectangular sky regions. The parameter is now
 automatic. The parameters "width", "height", and "posang" were added to specify
@@ -247,6 +260,8 @@ the width, height and position angle of the rectangular sky regions (#3248).
 
 csphasecrv - Generate phase curve
 ---------------------------------
+Stamp output phase curve file (#3662).
+
 Added support for rectangular On/Off regions. The "srcshape" parameter now
 can now be set to "RECT" to use rectangular sky regions. The parameter is now
 automatic. The parameters "width", "height", and "posang" were added to specify
@@ -255,26 +270,29 @@ the width, height and position angle of the rectangular sky regions (#3248).
 
 cspull - Generate pull distributions
 ------------------------------------
-The ASCII output file was replaced by a FITS file (#1707).
+The ASCII output file was replaced by a FITS file (#1707). The output FITS file
+is stamped (#3662).
 
 
 csresmap - Generate residual map
 --------------------------------
-None
+Stamp output residual map (#3662).
 
 
 csresspec - Generate residual spectrum
 --------------------------------------
-None
+Stamp output residual spectrum (#3662).
 
 
 csroot2caldb - Generates calibration database from ROOT file
 ------------------------------------------------------------
-None
+Stamp output IRF files (#3662).
 
 
 csscs - Spectral component separation
 -------------------------------------
+Stamp output FITS file (#3662).
+
 Added support for rectangular On/Off regions. The "srcshape" parameter now
 can now be set to "RECT" to use rectangular sky regions. The parameter is now
 automatic. The parameters "width", "height", and "posang" were added to specify
@@ -293,11 +311,14 @@ The test source position is now used as pointing direction, eventually offset
 in galactic latitude by a number of degrees specified using the "offset"
 parameter (#3555).
 
-The ASCII output file was replaced by a FITS file (#1707).
+The ASCII output file was replaced by a FITS file (#1707). The output FITS file
+is stamped (#3662).
 
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
+Stamp output spectrum (#3662).
+
 The GModelSpectralFunc spectral model constructor is now used to convert any
 spectral model into a file function before spectral model fitting (#3626).
 
@@ -313,12 +334,13 @@ None
 
 cstsdist - Computes Test Statistic distribution
 -----------------------------------------------
-The ASCII output file was replaced by a FITS file (#1707).
+The ASCII output file was replaced by a FITS file (#1707). The output FITS
+file is stamped (#3662).
 
 
 cstsmapmerge - Merge Test Statistic maps
 ----------------------------------------
-None
+Stamp output TS map (#3662).
 
 
 cstsmapsplit - Prepare split Test Statistic computation
@@ -328,7 +350,7 @@ None
 
 csviscube - Generate visibility cube
 ------------------------------------
-None
+Stamp output visibility cube (#3662).
 
 
 csworkflow - Execute workflow

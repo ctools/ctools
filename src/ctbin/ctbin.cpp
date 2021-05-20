@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2020 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2021 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -509,6 +509,9 @@ void ctbin::save(void)
                 // Save cube
                 obs->save(outobs, clobber());
 
+                // Stamp counts cube
+                stamp(outobs);
+
             } // endif: observation was valid
 
         } // endif: outobs file was valid
@@ -533,6 +536,9 @@ void ctbin::save(void)
 
                 // Save counts cube
                 obs->save(filename, clobber());
+
+                // Stamp counts cube
+                stamp(filename);
 
             } // endif: observation was valid
 

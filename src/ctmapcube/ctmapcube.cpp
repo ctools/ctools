@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmapcube - Map cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2021 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -231,6 +231,8 @@ void ctmapcube::save(void)
         // Save map cube
         m_cube.save(m_outcube, clobber());
 
+        // Stamp map cube
+        stamp(m_outcube);
     }
 
     // Write into logger what has been done

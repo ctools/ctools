@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmodel - Model cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2019 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2021 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -326,6 +326,10 @@ void ctmodel::save(void)
 
         // Save cube
         m_cube.save(m_outcube, clobber());
+
+        // Stamp model cube
+        stamp(m_outcube);
+
     }
 
     // Write into logger what has been done

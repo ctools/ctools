@@ -419,6 +419,9 @@ void cttsmap::save(void)
         m_statusmap.write(fits);
         fits[fits.size()-1]->extname("STATUS MAP");
 
+        // Stamp FITS file
+        stamp(fits);
+
         // Save FITS file
         fits.saveto(m_outmap, clobber());
 

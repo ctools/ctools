@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a lightcurve.
 #
-# Copyright (C) 2014-2019 Michael Mayer
+# Copyright (C) 2014-2021 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -672,6 +672,9 @@ class cslightcrv(ctools.csobservation):
         # Create FITS file and append FITS table to FITS file
         self._fits = gammalib.GFits()
         self._fits.append(table)
+
+        # Stamp FITS file
+        self._stamp(self._fits)
 
         # Optionally publish light curve
         if self['publish'].boolean():

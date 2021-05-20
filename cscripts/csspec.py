@@ -1229,6 +1229,9 @@ class csspec(ctools.csobservation):
             table.append(norm_scan)
             table.append(dloglike_scan)
 
+        # Stamp table
+        self._stamp(table)
+
         # Create the FITS file now
         self._fits = gammalib.GFits()
         self._fits.append(table)

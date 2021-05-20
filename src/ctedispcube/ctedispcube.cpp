@@ -1,7 +1,7 @@
 /***************************************************************************
  *          ctedispcube - Energy dispersion cube generation tool           *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2018 by Maria Haupt                                 *
+ *  copyright (C) 2016-2021 by Maria Haupt                                 *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -269,6 +269,9 @@ void ctedispcube::save(void)
 
         // Save energy dispersion cube
         m_edispcube.save(m_outcube, clobber());
+
+        // Stamp energy dispersion cube
+        stamp(m_outcube);
 
     }
 

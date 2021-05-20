@@ -4,6 +4,7 @@
         ========================
 
         Add source counts constraints to cssens (#3668)
+        Stamp all output FITS files (#3662)
         Add ASCL shields to "About" page (#3630)
         Use file function constructor in csspec (#3626)
         Add BINS method to csspec (#3606)

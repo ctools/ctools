@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2018 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2021 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -365,11 +365,13 @@ void ctbkgcube::save(void)
     if ((*this)["outcube"].is_valid() && !m_background.cube().is_empty()) {
 
         // Get background cube file name
-        m_outcube  = (*this)["outcube"].filename();
+        m_outcube = (*this)["outcube"].filename();
 
         // Save background cube
         m_background.save(m_outcube, clobber());
 
+        // Stamp background cube
+        stamp(m_outcube);
     }
 
     // Save model definition file if requested

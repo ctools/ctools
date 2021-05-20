@@ -277,6 +277,9 @@ class csebins(ctools.csobservation):
         # Save energy boundaries
         self._ebounds.save(outfile, self._clobber())
 
+        # Stamp energy boundaries
+        self._stamp(outfile)
+
         # Return
         return
 
