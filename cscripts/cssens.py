@@ -199,13 +199,13 @@ class cssens(ctools.csobservation):
         if n > 0:
 
             # Sort the array
-            wrk_array = sorted(array)
+            array.sort()
 
             # Get median
             if n % 2 != 0:
-                median = wrk_array[int(n/2)]
+                median = array[int(n/2)]
             else:
-                median = (wrk_array[int((n-1)/2)] + wrk_array[int(n/2)]) / 2.0
+                median = (array[int((n-1)/2)] + array[int(n/2)]) / 2.0
 
         # Return median
         return median
