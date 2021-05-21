@@ -557,10 +557,9 @@ class cssens(ctools.csobservation):
                 try:
                     pred_crab_flux, regcoeff = self._predict_flux(results, ts_thres)
                     correct                  = pred_crab_flux / crab_flux
-                except Exception as e:
-                    # If the regression fails, retain the simple scaling with
-                    # ts_thres
-                    self._log_value(gammalib.TERSE, 'Skipping failed regression', e)
+                except:
+                    self._log_value(gammalib.TERSE, 'Skipping failed regression',
+                                    'Retain simple TS scaling relation')
 
             # Compute extrapolated fluxes based on the flux correction factor
             crab_flux   = correct * crab_flux
