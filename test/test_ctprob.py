@@ -159,7 +159,7 @@ class Test(test):
         try:
             prob.execute()
             self.test_try_failure('Exception not thrown')
-        except RuntimeError:
+        except IOError:
             self.test_try_success()
 
         # Setup ctprob with a list of observations and test prefix

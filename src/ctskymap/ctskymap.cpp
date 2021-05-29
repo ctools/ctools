@@ -818,8 +818,8 @@ void ctskymap::fill_maps(void)
  *
  * @param[in] obs CTA observation.
  *
- * @exception GException::no_list
- *            No event list found in observation.
+ * @exception GException::invalid_value
+ *            Observation does not contain an event list.
  *
  * Fills the events found in a CTA events list into a sky map. The method
  * adds the events to the m_counts member.
@@ -833,7 +833,10 @@ void ctskymap::fill_maps_counts(GCTAObservation* obs)
     // Make sure that the observation holds a CTA event list. If this
     // is not the case then throw an exception.
     if (events == NULL) {
-        throw GException::no_list(G_FILL_MAPS_COUNTS);
+        std::string msg = "Specified observation does not contain a CTA event "
+                          "list. Please specify a CTA observation containing "
+                          "a CTA event list as argument.";
+        throw GException::invalid_value(G_FILL_MAPS_COUNTS, msg);
     }
 
     // Setup energy range covered by data
