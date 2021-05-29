@@ -38,12 +38,12 @@ bad_entries = [entry for entry in list(locals())
 if len(bad_entries) > 0:
     for entry in bad_entries:
         del locals()[entry]
-    del entry
 
 # Clean-up
 del tools
 del gammalib
 del bad_entries
+del entry
 
 # Add version
 __version__ = '@PACKAGE_VERSION@'
