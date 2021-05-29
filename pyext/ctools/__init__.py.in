@@ -20,8 +20,17 @@
 # import gammalib first
 import gammalib
 
+# Make sur that library symbols are exported by setting the dynamic library
+# loading flag to RTLD_GLOBAL | RTLD_NOW. This is necessary on some systems.
+import sys
+flags = sys.getdlopenflags()
+sys.setdlopenflags(@DLFLAGS_RTLD_GLOBAL@ | @DLFLAGS_RTLD_NOW@)
+
 # Import sub modules
 from @PYTHON_RELATIVE_IMPORT@tools import *
+
+# Reset original flags
+sys.setdlopenflags(flags)
 
 # Remove swig register stuff
 bad_entries = [entry for entry in list(locals())

@@ -1,7 +1,7 @@
 #############################################################################
 # Configuration for ctools - tools for science analysis of CTA data         #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2020 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2021 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -357,6 +357,13 @@ esac
 AC_MSG_RESULT($RUNSHARED)
 AC_SUBST(SHAREDSUFFIX)
 AC_SUBST(RUNSHARED)
+
+
+#############################################################################
+# Determine values of RTLD_GLOBAL and RTLD_NOW                              #
+#############################################################################
+AX_DLFLAGS(RTLD_GLOBAL)
+AX_DLFLAGS(RTLD_NOW)
 
 
 #############################################################################
