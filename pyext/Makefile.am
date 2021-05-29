@@ -97,8 +97,8 @@ if BUILD_WRAPPERS
 
 # Set SWIG compile command
 SWIGCOMPILE = $(SWIG) -c++ -python -Wall \
-              -I$(DESTDIR)$(prefix)/share/gammalib/swig \
               -I$(GAMMALIB)/share/gammalib/swig \
+              -I$(DESTDIR)$(prefix)/share/gammalib/swig \
               -I$(top_srcdir)/pyext
 
 # Sources that are required for the build. All targets in the list will be
