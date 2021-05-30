@@ -247,7 +247,7 @@ def show_sensitivity():
     sensitivity = read_sensitivity(args[0])
 
     # Plot sensitivity data
-    plot_sensitivity(sensitivity, filename, plotfile)
+    plot_sensitivity(sensitivity, args[0], plotfile)
 
     # Return
     return
