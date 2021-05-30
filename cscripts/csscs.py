@@ -18,10 +18,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import ctools
-import gammalib
-import math
 import sys
+import math
+import gammalib
+import ctools
 from cscripts import mputils
 from cscripts import obsutils
 
