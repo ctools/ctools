@@ -242,13 +242,9 @@ def show_sensitivity():
 
     # Extract script parameters from options
     plotfile = options[0]['value']
-    if len(args) > 0:
-        filename = args[0]
-    else:
-        filename = 'sensitivity.dat'
 
     # Read sensitivity data
-    sensitivity = read_sensitivity(filename)
+    sensitivity = read_sensitivity(args[0])
 
     # Plot sensitivity data
     plot_sensitivity(sensitivity, filename, plotfile)
