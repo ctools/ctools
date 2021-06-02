@@ -4,8 +4,7 @@ About
 =====
 
 ctools is a software package developed for the scientific analysis of 
-Cherenkov Telescope Array (CTA) data, as well as data from existing
-Imaging Air Cherenkov Telescopes (such as H.E.S.S., MAGIC or VERITAS).
+Cherenkov telescope data, such as H.E.S.S., MAGIC, VERITAS or CTA.
 
 ctools comprises a set of ftools-like binary executables and Python scripts
 with a command-line interface allowing for interactive step-wise data analysis.
@@ -15,8 +14,8 @@ Creation of shell or Python scripts and pipelines is supported as well.
 
 ctools are based on GammaLib, a versatile toolbox for the scientific
 analysis of astronomical gamma-ray data. 
-Besides CTA, GammaLib supports the analysis of H.E.S.S., MAGIC, VERITAS,
-Fermi/LAT, CGRO/COMPTEL and INTEGRAL/SPI data.
+GammaLib supports the analysis of H.E.S.S., MAGIC, VERITAS, CTA, Fermi/LAT,
+CGRO/COMPTEL and INTEGRAL/SPI data.
 GammaLib supports in particular the combination of data from different instruments
 in a true joint multi-wavelength analysis that consistently handles the response
 of each instrument.
@@ -72,13 +71,6 @@ In addition please add the following acknowledgment:
 
 If the journal allows this, you can also include a link to
 http://cta.irap.omp.eu/ctools/ in addition to the above text.
-
-If you are giving a presentation or talk featuring work/research that makes
-use of ctools, we suggest using this logo on your title slide:
-
-.. figure:: ctools-logo.jpg
-   :width: 150px
-   :align: center
 
 And to see who published an article using ctools you may check the `following link <http://cdsads.u-strasbg.fr/cgi-bin/nph-ref_query?bibcode=2016A%26A...593A...1K&amp;refs=CITATIONS&amp;db_key=AST>`_.
 
