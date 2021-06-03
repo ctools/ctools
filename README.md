@@ -1,6 +1,6 @@
 ctools information
 ==================
-* Version:             2.0.0.dev (20 May 2021)
+* Version:             2.0.0.dev (3 June 2021)
 * GammaLib dependency: 2.0.0.dev
 
 [![Build Status](https://cta-jenkins.irap.omp.eu/buildStatus/icon?job=ctools-integrate-os)](https://cta-jenkins.irap.omp.eu/job/ctools-integrate-os/)
@@ -32,8 +32,9 @@ See the files [NEWS](NEWS) and [ChangeLog](ChangeLog).
 What are the ctools anyway?
 ===========================
 ctools are ftools-like executable for the scientific analysis of
-CTA observations.  They are based on GammaLib, a versatile toolbox 
-for the high-level analysis of astronomical gamma-ray data.
+Cherenkov telescope observations.  They are based on GammaLib,
+a versatile toolbox for the high-level analysis of astronomical gamma-ray 
+data.
 
 The following tools are available:
 
@@ -62,8 +63,8 @@ The following scripts are available:
     csbkgmodel    - generates background model for 3D analysis
     cscaldb       - lists available instrument response functions
     csebins       - generates energy boundaries for stacked analysis
-    cslightcrv    - computes light curve
     csinfo        - checks ctools and GammaLib installations
+    cslightcrv    - computes light curve
     csmodelinfo   - shows model container content
     csmodelmerge  - merges several model containers into one file
     csmodelselect - select models from model definition file
@@ -85,6 +86,7 @@ The following scripts are available:
     cstsmapmerge  - merges slices from Test Statistic map computations
     cstsmapsplit  - creates commands to split the Test Statistic map computations
     csviscube     - computes visibility cube
+    csworkflow    - run an analysis workflow
 
 
 Web sites
