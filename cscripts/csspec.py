@@ -1232,6 +1232,18 @@ class csspec(ctools.csobservation):
         # Stamp table
         self._stamp(table)
 
+        # Add metadata keywords
+        table.card('OBJECT', self['srcname'].string(), 'Source name')
+        table.card('METHOD', self._method, 'Spectrum generation method')
+        if self._method == 'BINS':
+            table.card('BINGAMMA', self['bingamma'].real(), 'Spectral index for BINS method')
+        table.card('STAT',     self['statistic'].string(), 'Optimization statistic')
+        table.card('EDISP',    self['edisp'].boolean(), 'Use energy dispersion?')
+        table.card('CALCULIM', self['calc_ulim'].boolean(), 'Upper limits computation')
+        table.card('CALCTS',   self['calc_ts'].boolean(), 'Test statistic computation')
+        table.card('FIXBKG',   self['fix_bkg'].boolean(), 'Fix background parameters')
+        table.card('FIXSRCS',  self['fix_srcs'].boolean(), 'Fix other source parameters')
+
         # Create the FITS file now
         self._fits = gammalib.GFits()
         self._fits.append(table)
