@@ -1,6 +1,6 @@
 ctools information
 ==================
-* Version:             2.0.0.dev (3 June 2021)
+* Version:             2.0.0.dev (24 June 2021)
 * GammaLib dependency: 2.0.0.dev
 
 [![Build Status](https://cta-jenkins.irap.omp.eu/buildStatus/icon?job=ctools-integrate-os)](https://cta-jenkins.irap.omp.eu/job/ctools-integrate-os/)
@@ -31,46 +31,54 @@ See the files [NEWS](NEWS) and [ChangeLog](ChangeLog).
 
 What are the ctools anyway?
 ===========================
-ctools are ftools-like executable for the scientific analysis of
-Cherenkov telescope observations.  They are based on GammaLib,
-a versatile toolbox for the high-level analysis of astronomical gamma-ray 
-data.
+ctools is a software package for the scientific analysis of astronomical
+gamma-ray data. The software comprises an extensive set of tools for 
+the analysis of data from existing and future Cherenkov telescopes, 
+including H.E.S.S., VERITAS, MAGIC and CTA. ctools supports also the 
+analysis of data from CGRO/COMPTEL, Fermi/LAT and INTEGRAL/SPI, 
+enabling the exploration of the full gamma-ray energy band, spanning 
+from hundreds of keV to hundreds of TeV.
 
-The following tools are available:
+The following tools and scripts are generic analysis utilities:
 
-    ctbin       - event binning
-    ctbkgcube   - generate a background cube
-    ctbutterfly - create a butterfly
-    ctcubemask  - mask bins in binned analysis
-    ctedispcube - generate energy dispersion cube
-    cterror     - likelihood profile error estimation
-    ctexpcube   - generate an exposure cube
-    ctfindvar   - search for source variability
-    ctlike      - maximum likelihood model fitting
-    ctmapcube   - generate sky map cube
-    ctmodel     - generation of model counts map
-    ctobssim    - simulation of CTA observations
-    ctphase     - computes the phase of each event
-    ctprob      - computes event probability for a given model
-    ctpsfcube   - generate a PSF cube
-    ctselect    - event selection
-    ctskymap    - CTA sky mapping tool
-    cttsmap     - generate a TS map
-    ctulimit    - compute upper limits
-
-The following scripts are available:
-
-    csbkgmodel    - generates background model for 3D analysis
+    ctbutterfly   - create a butterfly
+    cterror       - likelihood profile error estimation
+    ctmapcube     - generate sky map cube
+    ctlike        - maximum likelihood model fitting
+    cttsmap       - generate a TS map
+    ctulimit      - compute upper limits
     cscaldb       - lists available instrument response functions
-    csebins       - generates energy boundaries for stacked analysis
     csinfo        - checks ctools and GammaLib installations
     cslightcrv    - computes light curve
     csmodelinfo   - shows model container content
     csmodelmerge  - merges several model containers into one file
     csmodelselect - select models from model definition file
     csmodelsois   - generate map cube from subset of models
-    csobsdef      - generates observation definition file
     csobsinfo     - shows observation container content
+    csspec        - computes spectral points
+    cstsdist      - generates Test Statistic distribution
+    cstsmapmerge  - merges slices from Test Statistic map computations
+    cstsmapsplit  - creates commands to split the Test Statistic map computations
+    csworkflow    - run an analysis workflow
+
+The following tools and script support the analysis of CTA and IACT data:
+
+    ctbin         - event binning
+    ctcubemask    - mask bins in binned analysis
+    ctexpcube     - generate an exposure cube
+    ctpsfcube     - generate a PSF cube
+    ctedispcube   - generate energy dispersion cube
+    ctbkgcube     - generate a background cube
+    ctfindvar     - search for source variability
+    ctmodel       - generation of model counts map
+    ctobssim      - simulation of CTA observations
+    ctphase       - computes the phase of each event
+    ctprob        - computes event probability for a given model
+    ctselect      - event selection
+    ctskymap      - Sky mapping tool
+    csbkgmodel    - generates background model for 3D analysis
+    csebins       - generates energy boundaries for stacked analysis
+    csobsdef      - generates observation definition file
     csobsselect   - select observations from observation definition file
     csphagen      - generates PHA, ARF, RMF files based on source/background regions
     csphasecrv    - computes phase curve
@@ -80,13 +88,29 @@ The following scripts are available:
     csroot2caldb  - creates a caldb entry from a ROOT file
     csscs         - Performs spectral component separation
     cssens        - computes CTA sensitivity
-    csspec        - computes spectral points
     cssrcdetect   - detects sources in sky map
-    cstsdist      - generates Test Statistic distribution
-    cstsmapmerge  - merges slices from Test Statistic map computations
-    cstsmapsplit  - creates commands to split the Test Statistic map computations
     csviscube     - computes visibility cube
-    csworkflow    - run an analysis workflow
+
+The following scripts support the management of an IACT database:
+
+    csobs2caldb - Creates a caldb entry from an input observation
+    csiactdata  - Shows information about IACT data available on the user machine
+    csiactobs   - Generates observation definition file for IACT data from observation IDs
+    csfindobs   - Generates a list of IACT observation IDs
+    csiactcopy  - Copies IACT data from one location to another
+
+The following scripts support COMPTEL science analysis:
+
+    comlixfit    - Fit model to data using SRCLIX algorithm
+    comlixmap    - Create TS map using SRCLIX algorithm
+    comobsadd    - Combine observations
+    comobsback   - Generate background model for COMPTEL observations
+    comobsbin    - Bin COMPTEL observations
+    comobsmodel  - Generate model for binned COMPTEL observations
+    comobsres    - Generate residuals of COMPTEL observations
+    comobsselect - Select observations from COMPTEL database
+    comobssim    - Simulate COMPTEL observations
+    comsrcdetect - Detect source in TS map
 
 
 Web sites

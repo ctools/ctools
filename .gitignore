@@ -57,6 +57,7 @@ pyext/ctools/tools.py
 pyext/ctools/_tools.so
 pyext/ctools/tools_wrap.cpp
 cscripts/__init__.py
+modules/comscripts/__init__.py
 src/ctbin/ctbin
 src/ctfindvar/ctfindvar
 src/ctlike/ctlike
@@ -84,6 +85,11 @@ test/caldb/
 test/prod3
 test/csroot2caldb_*
 test/csiactcopy_*
+test/comobsbin_*
+test/comobsback_*
+test/comobsadd_*
+test/comobssim_*
+test/comlixfit_*
 test/*.fits
 test/*.dat
 test/*.xml

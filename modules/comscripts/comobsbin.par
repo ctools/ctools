@@ -1,0 +1,50 @@
+#############################################################################
+#                                                                           #
+#                     COMPTEL Science Analysis Tools                        #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      comobsbin.par                                                 #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the comobsbin script                       #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,     f, a, obs.xml,,, "Input observation definition file"
+outobs,    f, a, obs_binned.xml,,, "Output observation definition file"
+outfolder, s, a, $COMDATASTORE,,, "Output folder for files"
+
+#
+# Script parameters
+#==================
+ebinalg,  s, a, FILE,FILE|LIN|LOG,, "Algorithm for defining energy bins"
+emin,     r, a, 0.75,0.05,50.0, "Minimum energy (MeV)"
+emax,     r, a, 30.0,0.05,50.0, "Maximum energy (MeV)"
+phase,    s, a, NONE,,, "Phase expression in the format phasemin0-phasemax0,phasemin1-phasemax1,..."
+phase0,   t, a, JD 2451943.09,,, "Date of Phase 0 (UTC string, JD, MJD or MET in seconds)"
+period,   r, a, 3.90603,,, "Period (days)"
+enumbins, i, a, 1,1,20, "Number of energy bins"
+ebinfile, f, a, ebounds.fits,,, "Name of the file containing the energy bin definition"
+dchi,     r, h, 1.0,0.1,10.0, "Bin size in Chi direction (deg)"
+dpsi,     r, h, 1.0,0.1,10.0, "Bin size in Psi direction (deg)"
+dphibar,  r, h, 2.0,0.1,10.0, "Bin size in Phibar direction (deg)"
+nchi,     i, h, 80,1,500, "Number of bins in Chi direction"
+npsi,     i, h, 80,1,500, "Number of bins in Psi direction"
+nphibar,  i, h, 25,1,100, "Number of bins in Phibar direction"
+psdmin,   i, h, 0,0,110, "Minimum PSD value"
+psdmax,   i, h, 110,0,110, "Maximum PSD value"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Activate debugging mode?"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, comobsbin.log,,, "Log filename"

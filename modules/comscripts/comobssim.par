@@ -1,0 +1,38 @@
+#############################################################################
+#                                                                           #
+#                     COMPTEL Science Analysis Tools                        #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      comobssim.par                                                 #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the comobssim script                       #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,     f, a, obs.xml,,, "Input observation definition file"
+inmodel,   f, a, models.xml,,, "Input model definition file"
+suffix,    s, h, ,,, "Suffix for DRE files"
+outfolder, s, h, dri,,, "Output folder for files"
+outobs,    f, a, obs_sim.xml,,,"Output observation definition file"
+
+#
+# Script parameters
+#==================
+add,  b, a, yes,,, "Add to existing events?"
+seed, i, h, 1,,, "Random number generator seed"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Activate debugging mode?"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, comobssim.log,,, "Log filename"

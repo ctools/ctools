@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<observation_list title="observation list">
+  <observation name="CRAB" id="vp0001_0_000750-001000keV" instrument="COM">
+    <parameter name="DRE" file="datastore/vp0001_0_dre_psd0-110_000750-001000keV.fits" />
+    <parameter name="DRB" file="datastore/vp0001_0_drb_psd0-110_000750-001000keV.fits" />
+    <parameter name="DRG" file="datastore/vp0001_0_drg.fits" />
+    <parameter name="DRX" file="datastore/vp0001_0_drx.fits" />
+    <parameter name="IAQ" value="datastore/iaq_000750-001000keV.fits" />
+  </observation>
+  <observation name="CRAB" id="vp0001_0_001000-003000keV" instrument="COM">
+    <parameter name="DRE" file="datastore/vp0001_0_dre_psd0-110_001000-003000keV.fits" />
+    <parameter name="DRB" file="datastore/vp0001_0_drb_psd0-110_001000-003000keV.fits" />
+    <parameter name="DRG" file="datastore/vp0001_0_drg.fits" />
+    <parameter name="DRX" file="datastore/vp0001_0_drx.fits" />
+    <parameter name="IAQ" value="datastore/iaq_001000-003000keV.fits" />
+  </observation>
+  <observation name="CRAB" id="vp0001_0_003000-010000keV" instrument="COM">
+    <parameter name="DRE" file="datastore/vp0001_0_dre_psd0-110_003000-010000keV.fits" />
+    <parameter name="DRB" file="datastore/vp0001_0_drb_psd0-110_003000-010000keV.fits" />
+    <parameter name="DRG" file="datastore/vp0001_0_drg.fits" />
+    <parameter name="DRX" file="datastore/vp0001_0_drx.fits" />
+    <parameter name="IAQ" value="datastore/iaq_003000-010000keV.fits" />
+  </observation>
+  <observation name="CRAB" id="vp0001_0_010000-030000keV" instrument="COM">
+    <parameter name="DRE" file="datastore/vp0001_0_dre_psd0-110_010000-030000keV.fits" />
+    <parameter name="DRB" file="datastore/vp0001_0_drb_psd0-110_010000-030000keV.fits" />
+    <parameter name="DRG" file="datastore/vp0001_0_drg.fits" />
+    <parameter name="DRX" file="datastore/vp0001_0_drx.fits" />
+    <parameter name="IAQ" value="datastore/iaq_010000-030000keV.fits" />
+  </observation>
+</observation_list>

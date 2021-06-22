@@ -1,8 +1,9 @@
-2021-05-20
+2021-06-24
 
         * Version 2.0.0 released
         ========================
 
+        Add COMPTEL analysis scripts (#3738)
         Add source counts constraints to cssens (#3668)
         Stamp all output FITS files (#3662)
         Add ASCL shields to "About" page (#3630)

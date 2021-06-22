@@ -1059,6 +1059,7 @@ AC_CONFIG_FILES([Makefile
                  test/Makefile
                  test/test_python_ctools.sh
                  test/test_python_cscripts.sh
+                 test/test_python_comscripts.sh
                  test/test_examples.py
                  test/testing.py
                  pyext/Makefile
@@ -1067,6 +1068,9 @@ AC_CONFIG_FILES([Makefile
                  dev/conda.recipe/meta.yaml
                  cscripts/__init__.py
                  cscripts/Makefile
+                 modules/Makefile
+                 modules/comscripts/__init__.py
+                 modules/comscripts/Makefile
                  caldb/Makefile
                  models/Makefile
                  examples/Makefile
@@ -1075,6 +1079,7 @@ AC_CONFIG_FILES([Makefile
                 [if test -f test/test_python_ctools.sh; then chmod +x test/test_python_ctools.sh; fi;
                  if test -f test/test_python_cscripts.sh; then chmod +x test/test_python_cscripts.sh; fi;
                  if test -f test/test_examples.py; then chmod +x test/test_examples.py; fi;
+                 if test -f test/test_python_comscripts.sh; then chmod +x test/test_python_comscripts.sh; fi;
                  if test -f testconf.sh; then chmod +x testconf.sh; fi])
 AC_OUTPUT
 

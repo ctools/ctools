@@ -66,7 +66,7 @@ in an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
 
-   $ tar xvfz gammalib-1.7.0.tar.gz
+   $ tar xvfz gammalib-2.0.0.tar.gz
 
 (the ``$`` symbol indicates the console prompt and is not part of the
 command that you should type in).
@@ -76,7 +76,7 @@ typing
 
 .. code-block:: bash
 
-   $ cd gammalib-1.7.0
+   $ cd gammalib-2.0.0
    $ ./configure
    $ make
    $ make check
@@ -136,7 +136,7 @@ an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
 
-   $ tar xvfz ctools-1.7.0.tar.gz
+   $ tar xvfz ctools-2.0.0.tar.gz
 
 (the ``$`` symbol indicates the console prompt and is not part of the
 command that you should type in).
@@ -145,7 +145,7 @@ Step in the directory and build the ctools by typing
 
 .. code-block:: bash
 
-   $ cd ctools-1.7.0
+   $ cd ctools-2.0.0
    $ ./configure
    $ make
 
@@ -180,11 +180,12 @@ following output at the end of the unit testing:
    PASS: test_python_ctools.sh
    PASS: test_python_cscripts.sh
    PASS: test_examples.py
+   PASS: test_python_comscripts.sh
    ============================================================================
-   Testsuite summary for ctools 1.7.0
+   Testsuite summary for ctools 2.0.0
    ============================================================================
-   # TOTAL: 3
-   # PASS:  3
+   # TOTAL: 4
+   # PASS:  4
    # SKIP:  0
    # XFAIL: 0
    # FAIL:  0
@@ -200,11 +201,9 @@ For older automake version, you should see
    * ctools unit testing *
    ***********************
    Test ctobssim on command line: ...... ok
-   Test ctobssim from Python: ........................................... ok
+   Test ctobssim from Python: ................................................... ok
    Test ctselect on command line: ........ ok
    Test ctselect from Python: .............................................................. ok
-   Test ctphase on command line: ...... ok
-   Test ctphase from Python: .............. ok
    ...
    PASS test_python_ctools.sh
 
@@ -215,8 +214,6 @@ For older automake version, you should see
    Test ctobservation base class: ............................................. ok
    Test ctlikelihood base class: ... ok
    Test csbkgmodel on command line: ..... ok
-   Test csbkgmodel from Python: ........... ok
-   Test csbkgmodel pickeling: ...... ok
    ...
    PASS test_python_cscripts.sh
 
@@ -224,15 +221,23 @@ For older automake version, you should see
    * Examples testing *
    ********************
    Test make_pointings.py: ....... ok
-   Test show_butterfly.py: .. ok
+   Test show_butterfly.py: ... ok
    Test show_irf.py: .. ok
    Test show_lightcurve.py: .. ok
-   Test show_model.py: ... ok
-   Test show_obs.py: ... ok
    ...
    PASS test_examples.py
+
+   ***************************
+   * comscripts unit testing *
+   ***************************
+   Test comobsselect on command line: .... ok
+   Test comobsselect from Python: .. ok
+   Test comobsbin on command line: .............................. ok
+   Test comobsbin from Python: ........................... ok
+   ...
+   PASS test_python_comscripts.sh
    ==================
-   All 3 tests passed
+   All 4 tests passed
    ==================
 
 The same detailed information is also available for the newer automake 
@@ -244,6 +249,7 @@ versions, but there it is written in log files that you can find in the
    test_python_ctools.sh.log
    test_python_cscripts.sh.log
    test_examples.py.log
+   test_python_comscripts.sh.log
 
 If you do not see the same output, but a failure message, please check
 first the :ref:`issues` section. If you cannot fix the problem, please

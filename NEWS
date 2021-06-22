@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-20 May 2021
+24 June 2021
 
 
 Introduction
@@ -385,6 +385,56 @@ parameter now can now be set to "RECT" to use rectangular sky regions. The
 parameter is now automatic. The parameters "width", "height", and "posang" were
 added to specify the width, height and position angle of the rectangular sky
 regions (#3248).
+
+
+comlixfit - COMPTEL maximum likelihood fitting using SRCLIX algorithm
+---------------------------------------------------------------------
+Added script (#3738)
+
+
+comlixmap - Generation of COMPTEL Test Statistic map using SRCLIX algorithm
+---------------------------------------------------------------------------
+Added script (#3738)
+
+
+comobsadd - Combine COMPTEL observations
+----------------------------------------
+Added script (#3738)
+
+
+comobsback - Generate background model for COMPTEL observations
+---------------------------------------------------------------
+Added script (#3738)
+
+
+comobsbin - Bin COMPTEL observations
+------------------------------------
+Added script (#3738)
+
+
+comobsmodel - Generate model for binned COMPTEL observations
+------------------------------------------------------------
+Added script (#3738)
+
+
+comobsres - Generate residuals of COMPTEL observations
+------------------------------------------------------
+Added script (#3738)
+
+
+comobsselect - Select observations from COMPTEL database
+--------------------------------------------------------
+Added script (#3738)
+
+
+comobssim - Simulate COMPTEL observations
+-----------------------------------------
+Added script (#3738)
+
+
+comsrcdetect - Detect source in Test Statistic map
+--------------------------------------------------
+Added script (#3738)
 
 
 Examples

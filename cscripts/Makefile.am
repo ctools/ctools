@@ -289,24 +289,24 @@ EXTRA_DIST = $(binscripts) $(pythonscripts) $(parfiles) \
              $(testscripts) $(testdata) $(testiactdata) \
              $(testiactevents)
 
-# Add install hook rule to copy cscripts without .py into the bindir
+# Add install hook rule to create symbolic links to cscripts without .py in the bindir
 install-data-hook:
 	@binlist='$(binscripts)';\
 	for p in $$binlist; do \
-	  chmod +x "$(DESTDIR)$(bindir)/$$p"; \
+		chmod +x "$(DESTDIR)$(bindir)/$$p"; \
 	done
 
-	@linklist='$(linkscripts)';\
-	for p in $$linklist; do \
+	@linklist1='$(linkscripts)';\
+	for p in $$linklist1; do \
 		rm -rf "$(DESTDIR)$(bindir)/$$p"; \
-		cp "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py" "$(DESTDIR)$(bindir)/$$p"; \
+		ln -s "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py" "$(DESTDIR)$(bindir)/$$p"; \
 		chmod +x "$(DESTDIR)$(bindir)/$$p"; \
 	done
 
 # Uninstall hook rule to remove the cscripts from the bindir
 uninstall-hook:
-	@linklist='$(linkscripts)';\
-	for p in $$linklist; do \
+	@linklist2='$(linkscripts)';\
+	for p in $$linklist2; do \
 		rm -rf "$(DESTDIR)$(bindir)/$$p"; \
 	done
 
@@ -318,7 +318,7 @@ clean-local:
 		rm -rf $(top_builddir)/cscripts/modutils.py; \
 		rm -rf $(top_builddir)/cscripts/calutils.py; \
 		rm -rf $(top_builddir)/cscripts/ioutils.py; \
-                rm -rf $(top_builddir)/cscripts/mputils.py; \
+		rm -rf $(top_builddir)/cscripts/mputils.py; \
 		rm -rf $(top_builddir)/cscripts/*.par; \
 	fi
 	rm -rf $(top_builddir)/cscripts/*.pyc

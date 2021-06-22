@@ -106,6 +106,33 @@ class test(gammalib.GPythonTestSuite):
         # Return tool name
         return tool
 
+    # Set comscript name
+    def _comscript(self, name):
+        """
+        Set comscript name
+
+        Parameters
+        ----------
+        name : str
+            COMPTEL script name
+
+        Returns
+        -------
+        script : str
+            COMPTEL script name including path
+        """
+        # Set script name dependent on whether the software is installed or
+        # not. If the software is not installed the 'TEST_BUILDDIR' environment
+        # variable will exist
+        if 'TEST_BUILDDIR' in os.environ:
+            script = '@PYTHON_COVERAGE@' + os.environ['TEST_BUILDDIR'] + \
+                     '/modules/comscripts/'+name+'.py'
+        else:
+            script = name
+
+        # Return COMPTEL script name
+        return script
+
     # Execute command and catch any exception
     def _execute(self, cmd, success=True):
         """

@@ -1,0 +1,54 @@
+#############################################################################
+#                                                                           #
+#                     COMPTEL Science Analysis Tools                        #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      comlixmap.par                                                 #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the comlixmap script                       #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,   f, a, obs.xml,,, "Input observation definition file"
+inmodel, f, a, models.xml,,, "Input model definition file"
+srcname, s, a, Crab,,, "Test source name"
+outmap,  f, a, tsmap.fits,,, "Output Test Statistic map file"
+
+#
+# Map definition
+#===============
+coordsys, s, a, GAL,CEL|GAL,, "Coordinate system (CEL - celestial, GAL - galactic)"
+proj,     s, a, TAN,AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN,, "Projection method"
+xref,     r, a, 180.24,0,360, "First coordinate of image center in degrees (RA or galactic l)"
+yref,     r, a, -1.50,-90,90, "Second coordinate of image center in degrees (DEC or galactic b)"
+nxpix,    i, a, 10,1,500, "Size of the X axis in pixels"
+nypix,    i, a, 10,1,500, "Size of the Y axis in pixels"
+binsz,    r, a, 1.0,0.01,10.0, "Image scale (in degrees/pixel)"
+
+#
+# Script parameters
+#==================
+max_iter,      i, h, 50,1,1000, "Maximum number of SRCLIX iterations"
+like_accuracy, r, h, 0.05,1.0e-30,1.0, "Absolute accuracy of maximum likelihood value"
+fix_spat,      b, h, yes,,, "Fix spatial parameters for TS map computation?"
+bkgmethod,     s, a, BGDLIXE,PHINOR|BGDLIXA|BGDLIXE,, "Method for background computation"
+nrunav,        i, h, 3,,, "Number of bins used for running average"
+navgr,         i, h, 3,,, "Number of bins used for averaging"
+nincl,         i, h, 13,,, "Number of Phibar layers to include"
+nexcl,         i, h, 0,,, "Number of Phibar layers to exclude"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Activate debugging mode?"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, comlixmap.log,,, "Log filename"
