@@ -3,29 +3,32 @@
 About
 =====
 
-ctools is a software package developed for the scientific analysis of 
-Cherenkov telescope data, such as H.E.S.S., MAGIC, VERITAS or CTA.
+ctools is a software package for the scientific analysis of astronomical
+gamma-ray data. The package comprises an extensive set of tools for the analysis
+of data from existing and future Cherenkov telescopes, including H.E.S.S.,
+VERITAS, MAGIC and CTA. ctools supports also the analysis of data from
+CGRO/COMPTEL, Fermi/LAT and INTEGRAL/SPI, enabling the exploration of the full
+gamma-ray energy band, spanning from hundreds of keV to hundreds of TeV.
 
-ctools comprises a set of ftools-like binary executables and Python scripts
-with a command-line interface allowing for interactive step-wise data analysis.
-ctools includes also Python modules to control all tools and scripts from
-within Python.
-Creation of shell or Python scripts and pipelines is supported as well.
+The ctools philosophy inherited from ftools consists of providing building
+blocks that perform well-defined science data analysis tasks, including
+observation and event selection, binning, sky map creation, source detection,
+model fitting, spectra, phase curve and light curve generation, and observation
+simulations. The building blocks are then combined by the user to create
+flexible analysis workflows that can fit the needs of any scientist.
 
-ctools are based on GammaLib, a versatile toolbox for the scientific
-analysis of astronomical gamma-ray data. 
-GammaLib supports the analysis of H.E.S.S., MAGIC, VERITAS, CTA, Fermi/LAT,
-CGRO/COMPTEL and INTEGRAL/SPI data.
-GammaLib supports in particular the combination of data from different instruments
-in a true joint multi-wavelength analysis that consistently handles the response
-of each instrument.
-An interface to virtual observatory resources does also exist.
+ctools can be used as command-line executables alike ftools to carry out simple
+analyses even for users without any programming skills. Furthermore, the tools
+are accessible through dedicated Python modules providing an alternative user
+interface to the software, as well as the possibility to provide tutorials in
+the form of Jupyter notebooks. Shell or Python scripts can be used by more
+advanced users to build analysis pipelines to any degrees of complexity.
+
+ctools are based on `GammaLib <http://cta.irap.omp.eu/gammalib>`_, a versatile
+toolbox for the scientific analysis of astronomical gamma-ray data.
 
 ctools are developed by a team of enthousiastic gamma-ray astronomers with
-support from engineers. We regularily organise
-`coding sprints <https://cta-redmine.irap.omp.eu/projects/ctools/wiki/Coding_sprints>`_
-where key developers but also newcomers meet to discuss the developments 
-and next steps, and advance with the coding of the software.
+support from engineers.
 
 
 Acknowledging or citing ctools
@@ -64,10 +67,9 @@ for GammaLib.
 
 In addition please add the following acknowledgment:
 
-   *This research made use of ctools, a community-developed analysis package
-   for Imaging Air Cherenkov Telescope data. ctools is based on GammaLib,
-   a community-developed toolbox for the scientific analysis of astronomical
-   gamma-ray data.*
+   *This research made use of ctools, a community-developed gamma-ray astronomy
+   science analysis software. ctools is based on GammaLib, a community-developed
+   toolbox for the scientific analysis of astronomical gamma-ray data.*
 
 If the journal allows this, you can also include a link to
 http://cta.irap.omp.eu/ctools/ in addition to the above text.
