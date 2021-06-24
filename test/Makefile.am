@@ -81,7 +81,7 @@ installcheck-local:
 	if test "x$$?" != "x0"; then \
 		echo "*** cscripts unit test failure!"; \
 		exit 1; \
-	fi
+	fi; \
 	python -c 'import comscripts; comscripts.test()'; \
 	if test "x$$?" != "x0"; then \
 		echo "*** comscripts unit test failure!"; \
