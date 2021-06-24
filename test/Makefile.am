@@ -40,11 +40,10 @@ TESTS_ENVIRONMENT = @RUNSHARED@=$(top_builddir)/src/.libs$(TEST_ENV_DIR):$(LIBDI
                     TEST_DATA=$(abs_top_srcdir)/test/data
 
 # Tests (these are the tests to be executed)
-#TESTS = $(TEST_PYTHON_CTOOLS) \
-#        $(TEST_PYTHON_CSCRIPTS) \
-#        $(TEST_PYTHON_EXAMPLES) \
-#        $(TEST_PYTHON_COMSCRIPTS)
-TESTS = $(TEST_PYTHON_COMSCRIPTS)
+TESTS = $(TEST_PYTHON_CTOOLS) \
+        $(TEST_PYTHON_CSCRIPTS) \
+        $(TEST_PYTHON_EXAMPLES) \
+        $(TEST_PYTHON_COMSCRIPTS)
 
 # Create report directory
 all-local:
