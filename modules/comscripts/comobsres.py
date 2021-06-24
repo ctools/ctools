@@ -24,7 +24,6 @@ import os
 import math
 import gammalib
 import ctools
-import matplotlib.pyplot as plt
 
 
 # ======================= #
@@ -499,89 +498,6 @@ class comobsres(ctools.csobservation):
         # Return
         return sig
 
-    def _plot_sighist(self, sighist, nbins=80, sigma_min=-6.0, sigma_max=6.0, fontsize=11, title=None):
-         """
-         Plot the significance distribution
-
-         Parameters
-         ----------
-         sighist : list of floats
-              Significance values
-         nbins : int, optional
-              Number of histogram bins
-         sigma_min : float, optional
-              Lower limit of the x axis in the plot
-         sigma_max : float, optional
-              Upper limit of the x axis in the plot
-         fontsize : int, optional
-              Font size for axes
-         title : str, optional
-              Title string
-         """
-         # Compute bin edges, hence use nbins+1
-         binwidth  = (sigma_max - sigma_min) / float(nbins)
-         bin_edges = [sigma_min + binwidth*i for i in range(nbins+1)]
-
-         # Draw significance histogram
-         f, ax   = plt.subplots()
-         y, _, _ = plt.hist(sighist, bins=bin_edges, histtype='step', color='k')
-
-         # Set initial Gaussian parameters
-         y_max = float(y.max())
-         par1  = gammalib.GOptimizerPar('Norm',  y_max)
-         par2  = gammalib.GOptimizerPar('Mean',  0.0)
-         par3  = gammalib.GOptimizerPar('Sigma', 1.0)
-         pars  = gammalib.GOptimizerPars()
-         pars.append(par1)
-         pars.append(par2)
-         pars.append(par3)
-
-         # Set fit function
-         x = [0.5*(bin_edges[i]+bin_edges[i+1]) for i in range(nbins)]
-         fct = gaussian(x, y)
-
-         # Optimize function and compute errors
-         opt = gammalib.GOptimizerLM()
-         opt.optimize(fct, pars)
-         opt.errors(fct, pars)
-
-         # Recover parameters and errors
-         norm    = pars[0].value()
-         e_norm  = pars[0].error()
-         mean    = pars[1].value()
-         e_mean  = pars[1].error()
-         sigma   = pars[2].value()
-         e_sigma = pars[2].error()
-
-         # Draw text box
-         msg = 'mean: %.3f +/- %.3f \n width: %.3f +/- %.3f' % \
-              (mean, e_mean, sigma, e_sigma)
-         ax.text(0.97, 0.95, msg, ha='right', va='top',
-              bbox=dict(edgecolor='red', facecolor='white'),
-              transform=ax.transAxes, fontsize=8)
-
-         # Plot the normal
-         yvals = [norm * math.exp(-0.5*(x-mean)**2/(sigma**2)) for x in bin_edges]
-         ax.plot(bin_edges, yvals, 'r-')
-
-         # Configure the plot
-         ax.set_ylim(0.5, ax.get_ylim()[1]*2.5)
-         ax.set_xlim(sigma_min, sigma_max)
-         ax.set_xlabel('Significance', fontsize=fontsize)
-         ax.set_ylabel('Entries', fontsize=fontsize)
-         ax.grid()
-         ax.set_yscale('log')
-
-         # Add title
-         if title != None:
-              ax.set_title(title)
-
-         # Save figure
-         plt.savefig(title+'.png')
-
-         # Return
-         return
-
 
     # Public methods
     def run(self):
@@ -666,10 +582,6 @@ class comobsres(ctools.csobservation):
             # Fill residual map
             sig = self._fill_map(dre, drm, imap)
 
-            # Generate significance histogram
-            if self['png'].boolean():
-                self._plot_sighist(sig, title='%s_map' % (fname))
-
             # Build DRI residuals
             if self['dri'].boolean():
 
@@ -678,10 +590,6 @@ class comobsres(ctools.csobservation):
 
                 # Generate residual data space
                 sig = self._compute_residual_dri(dre, drm, imap, '%s' % fname, group)
-
-                # Generate significance histogram
-                if self['png'].boolean():
-                    self._plot_sighist(sig, title='%s_dri' % fname)
 
         # Return
         return
