@@ -53,18 +53,24 @@ def test(installed=False, debug=False):
     # If we have an installed version then create a temporary directory and
     # copy over all information that is needed
     if installed:
+
         # Create temporary working directory
         import tempfile
         path = tempfile.mkdtemp()
         os.chdir(path)
+
         # Get test directory
         import inspect
         testdir = inspect.getfile(comscripts.tests)
         dirname = os.path.dirname(testdir)
+
         # Copy test data in "data" directory
         os.system('cp -r %s %s' % (dirname + '/data', 'data'))
-        # Set test data environment variable
+
+        # Set 'TEST_DATA' and 'COMDATA' environment variable
         os.environ['TEST_DATA'] = 'data'
+        os.environ['COMDATA']   = '%s/data/comptel/data' % (path)
+
     # ... otherwise set the calibration database to the one shipped with the
     # package; we don't need to set the 'TEST_DATA', this is done by the
     # test environment
