@@ -29,7 +29,7 @@ if WITH_PYTHON
   TEST_PYTHON_CSCRIPTS   = test_python_cscripts.sh
   TEST_PYTHON_EXAMPLES   = test_examples.py
   TEST_PYTHON_COMSCRIPTS = test_python_comscripts.sh
-  TEST_PYTHON_ENV        = PYTHONPATH=$(top_builddir):$(top_builddir)/pyext:$(top_builddir)/cscripts:$(top_builddir)/modules/comscripts:$(top_builddir)/pyext/build/ctools/ctools:$(pythondir):$(pyexecdir):$(PYTHONPATH)
+  TEST_PYTHON_ENV        = PYTHONPATH=$(abs_top_builddir):$(abs_top_builddir)/pyext:$(abs_top_builddir)/cscripts:$(abs_top_builddir)/modules:$(abs_top_builddir)/pyext/build/ctools/ctools:$(pythondir):$(pyexecdir):$(PYTHONPATH)
 endif
 
 # Set test environment
@@ -40,10 +40,11 @@ TESTS_ENVIRONMENT = @RUNSHARED@=$(top_builddir)/src/.libs$(TEST_ENV_DIR):$(LIBDI
                     TEST_DATA=$(abs_top_srcdir)/test/data
 
 # Tests (these are the tests to be executed)
-TESTS = $(TEST_PYTHON_CTOOLS) \
-        $(TEST_PYTHON_CSCRIPTS) \
-        $(TEST_PYTHON_EXAMPLES) \
-        $(TEST_PYTHON_COMSCRIPTS)
+#TESTS = $(TEST_PYTHON_CTOOLS) \
+#        $(TEST_PYTHON_CSCRIPTS) \
+#        $(TEST_PYTHON_EXAMPLES) \
+#        $(TEST_PYTHON_COMSCRIPTS)
+TESTS = $(TEST_PYTHON_COMSCRIPTS)
 
 # Create report directory
 all-local:
