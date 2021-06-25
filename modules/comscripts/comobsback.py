@@ -53,7 +53,7 @@ class comobsback(ctools.csobservation):
             self.obs().load(self['inobs'].filename())
 
         # Set models if we have none
-        if self.obs().models().is_empty():
+        if self.obs().models().is_empty() and self['inmodel'].is_valid():
             self.obs().models(self['inmodel'].filename())
 
         # Query parameters

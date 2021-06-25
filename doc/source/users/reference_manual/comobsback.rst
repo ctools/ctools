@@ -19,7 +19,8 @@ General parameters
     Input observation definition XML file.
 
 ``inmodel [file]``
-    Input model definition XML file.
+    Input model definition XML file. If ``NONE`` is specified the input model
+    will be ignored.
 
 ``(suffix = srclix) [string]``
     Suffix for DRB files. This suffix will be appended to each DRB file so that
