@@ -3,7 +3,7 @@
         * Version 2.0.0 released
         ========================
 
-        Re-compute best log-likelihood in ctulimit.
+        Add restart of bisection in case of bad convergence in ctulimit
         Add COMPTEL analysis scripts (#3738)
         Add source counts constraints to cssens (#3668)
         Stamp all output FITS files (#3662)

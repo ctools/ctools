@@ -155,10 +155,11 @@ model parameters (#3562).
 
 ctulimit - Compute upper limit
 ------------------------------
-The best log-likelihood is recomputed for a fixed best parameter value to
-make sure that the value is compliant with the values obtained by the bisection
-algorithm. The bisection iterations are stopped with a warning if the parameter
-interval becomes tiny.
+If the bisection results in a result that is incompatible with the previously
+determine best maximum log-likelihood value or if the bisection interval tends
+towards zero then update the best log-likelihood value with the current result
+and restart the bisection algorithm once more. This allows for dealing with
+ill-conditioned fit problems.
 
 
 support - Support classes

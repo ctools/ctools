@@ -280,17 +280,18 @@ void ctulimit::run(void)
     // Write some parameters into logger
     log_value(NORMAL, "Model name", m_skymodel->name());
     log_value(NORMAL, "Parameter name", m_model_par->name());
+    log_value(NORMAL, "Parameter value", m_model_par->value());
     log_value(NORMAL, "Confidence level", gammalib::str(m_confidence*100.0)+"%");
-    log_value(NORMAL, "Best log-likelihood value", m_best_logL);
     log_value(NORMAL, "Log-likelihood difference", m_dlogL);
-    log_value(NORMAL, "Initial parameter range",
+    log_value(NORMAL, "Initial factor value range",
               "["+gammalib::str(parmin)+", "+gammalib::str(parmax)+"]");
 
     // Compute upper limit
     ulimit_bisection(parmin, parmax);
 
     // Write final parameter into logger
-    log_value(NORMAL, "Final parameter", m_model_par->value());
+    log_value(NORMAL, "Upper limit factor value", m_model_par->factor_value());
+    log_value(NORMAL, "Upper limit param. value", m_model_par->value());
 
     // Compute upper limit intensity and fluxes
     compute_ulimit();
@@ -370,6 +371,8 @@ void ctulimit::init_members(void)
     m_skymodel     = NULL;
     m_model_par    = NULL;
     m_best_logL    = 0.0;
+    m_best_value   = 0.0;
+    m_best_error   = 0.0;
     m_flux_ulimit  = 0.0;
     m_diff_ulimit  = 0.0;
     m_eflux_ulimit = 0.0;
@@ -403,6 +406,8 @@ void ctulimit::copy_members(const ctulimit& app)
     // Copy protected members
     m_dlogL        = app.m_dlogL;
     m_best_logL    = app.m_best_logL;
+    m_best_value   = app.m_best_value;
+    m_best_error   = app.m_best_error;
     m_diff_ulimit  = app.m_diff_ulimit;
     m_flux_ulimit  = app.m_flux_ulimit;
     m_eflux_ulimit = app.m_eflux_ulimit;
@@ -603,24 +608,17 @@ void ctulimit::get_parameter_brackets(double& parmin, double& parmax)
     log_header1(TERSE, "Find parameter brackets");
 
     // Extract current value and error
-    double value = m_model_par->factor_value();
-    double error = m_model_par->factor_error();
-
-    // Re-compute best log-likelihood for value fixed at optimum
-    m_best_logL = evaluate(*m_model_par, value);
-
-    // Write best log-likelihood
-    log_value(NORMAL, "Best log-likelihood",
-              "logL("+gammalib::str(value)+")="+gammalib::str(m_best_logL));
+    m_best_value = m_model_par->factor_value();
+    m_best_error = m_model_par->factor_error();
 
     // If parameter error is zero then take parameter value as error
-    if (error == 0.0) {
-        error = value;
+    if (m_best_error == 0.0) {
+        m_best_error = m_best_value;
     }
 
     // Compute parameter bracketing
-    parmin = value - m_sigma_min * error;
-    parmax = value + m_sigma_max * error;
+    parmin = m_best_value - m_sigma_min * m_best_error;
+    parmax = m_best_value + m_sigma_max * m_best_error;
     if (m_model_par->has_min() && m_model_par->factor_min() > parmin) {
         parmin = m_model_par->factor_min();
     }
@@ -693,8 +691,9 @@ void ctulimit::ulimit_bisection(const double& parmin, const double& parmax)
     double wrk_min = parmin;
     double wrk_max = parmax;
 
-    // Initialise iteration counter
-    int iter = 0;
+    // Initialise iteration counter and restart flag
+    int  iter    = 0;
+    bool restart = false;
 
     // Loop until breaking condition is reached
     while (true) {
@@ -715,28 +714,70 @@ void ctulimit::ulimit_bisection(const double& parmin, const double& parmax)
         double eval_mid = logL - (m_best_logL + m_dlogL);
 
         // Log information
-        log_value(EXPLICIT, "Iteration "+gammalib::str(iter),
+        log_value(NORMAL, "Iteration "+gammalib::str(iter),
                   "["+gammalib::str(wrk_min)+", "+gammalib::str(wrk_max)+"] "
-                  "dlogL("+gammalib::str(mid)+")="+gammalib::str(eval_mid));
+                  "logL("+gammalib::str(mid)+")="+gammalib::str(logL)+" "
+                  "dlogL="+gammalib::str(eval_mid));
 
         // Check for convergence inside tolerance
         if (std::abs(eval_mid) < m_tol) {
             break;
         }
 
-        // Check for vanishing parameter range
-        if (std::abs(wrk_min-wrk_max) < 1.0e-6) {
-            std::string msg = "*** WARNING: Parameter range "
-                              "["+gammalib::str(wrk_min)+", "+
-                                  gammalib::str(wrk_max)+"] has reduced to a "
-                              "narrow interval without reaching convergence!\n"
-                              "             The best log-likelihood value is "
-                              "probably not an absolute but only a local "
-                              "minimum.\n"
-                              "             Stop iterations.";
+        // Assess status
+        int status = 0;
+
+        // Check whether mid-point is close to best parameter value
+        double eps = (mid != 0.0) ? (mid - m_best_value)/mid : mid - m_best_value;
+        if (std::abs(eps) < 1.0e-6) {
+            std::string msg =
+            " *** WARNING: Parameter range mid-point "+gammalib::str(mid)+" is "
+            "close to best factor\n"
+            "              value "+gammalib::str(m_best_value)+" yet the "
+            "log-likelihood value "+gammalib::str(logL)+"\n"
+            "              at the mid-point differs significantly from the "
+            "log-likelihood value\n"
+            "              "+gammalib::str(m_best_logL)+" for the best factor "
+            "value.";
             log_string(TERSE, msg);
-            break;
+            status = 1;
         }
+
+        // Check for vanishing parameter range
+        eps = (mid != 0.0) ? (wrk_min - wrk_max)/mid : wrk_min - wrk_max;
+        if (std::abs(eps) < 1.0e-6) {
+            std::string msg =
+            " *** WARNING: Parameter range ["+gammalib::str(wrk_min)+", "+
+            gammalib::str(wrk_max)+"] has reduced\n"
+            "              to a narrow interval without reaching convergence! "
+            "The best\n"
+            "              log-likelihood value is probably not an absolute "
+            "but only a local\n"
+            "              minimum.";
+            log_string(TERSE, msg);
+            status = 2;
+        }
+
+        // Restart bisection if a restart is required
+        if (!restart && status != 0) {
+
+            // Adopt current logL as best log-likelihood
+            restart     = true;
+            iter        = 0;
+            wrk_min     = parmin;
+            wrk_max     = parmax;
+            m_best_logL = logL;
+
+            // Signal restart
+            std::string msg =
+            " Adopt "+gammalib::str(logL)+" as best log-likelihood and restart "
+            "bisection";
+            log_string(TERSE, msg);
+
+            // Restart
+            continue;
+
+        } // endif: restart bisection if required
 
         // Change boundaries for further iteration
         if (eval_mid > 0.0) {
