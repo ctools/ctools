@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2020 by Michael Mayer                               *
+ *  copyright (C) 2015-2021 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -268,7 +268,8 @@ void ctulimit::run(void)
 
     } // endif: likelihood was zero
 
-    // Get parameter brackets
+    // Get parameter brackets. Note that this method recomputes m_best_logL
+    // to make sure that the value is coherent for the upper limit search.
     double parmin;
     double parmax;
     get_parameter_brackets(parmin, parmax);
@@ -280,6 +281,7 @@ void ctulimit::run(void)
     log_value(NORMAL, "Model name", m_skymodel->name());
     log_value(NORMAL, "Parameter name", m_model_par->name());
     log_value(NORMAL, "Confidence level", gammalib::str(m_confidence*100.0)+"%");
+    log_value(NORMAL, "Best log-likelihood value", m_best_logL);
     log_value(NORMAL, "Log-likelihood difference", m_dlogL);
     log_value(NORMAL, "Initial parameter range",
               "["+gammalib::str(parmin)+", "+gammalib::str(parmax)+"]");
@@ -604,6 +606,13 @@ void ctulimit::get_parameter_brackets(double& parmin, double& parmax)
     double value = m_model_par->factor_value();
     double error = m_model_par->factor_error();
 
+    // Re-compute best log-likelihood for value fixed at optimum
+    m_best_logL = evaluate(*m_model_par, value);
+
+    // Write best log-likelihood
+    log_value(NORMAL, "Best log-likelihood",
+              "logL("+gammalib::str(value)+")="+gammalib::str(m_best_logL));
+
     // If parameter error is zero then take parameter value as error
     if (error == 0.0) {
         error = value;
@@ -671,7 +680,12 @@ void ctulimit::get_parameter_brackets(double& parmin, double& parmax)
  *            Exceeded maximum number of iterations in the upper limit
  *            search.
  *
- * Calculates the upper limit using a bisection method.
+ * Calculates the upper limit using a bisection method. The bisection is
+ * stopped if the log-likelihood value is within the tolerance of the target
+ * value. The bisection is also stopped putting a warning in the log file if
+ * the parameter interval becomes smaller than a tolerance of 1.0e-6. The
+ * method stops with an exception if the maximum number of iterations is
+ * exhausted.
  ***************************************************************************/
 void ctulimit::ulimit_bisection(const double& parmin, const double& parmax)
 {
@@ -707,6 +721,20 @@ void ctulimit::ulimit_bisection(const double& parmin, const double& parmax)
 
         // Check for convergence inside tolerance
         if (std::abs(eval_mid) < m_tol) {
+            break;
+        }
+
+        // Check for vanishing parameter range
+        if (std::abs(wrk_min-wrk_max) < 1.0e-6) {
+            std::string msg = "*** WARNING: Parameter range "
+                              "["+gammalib::str(wrk_min)+", "+
+                                  gammalib::str(wrk_max)+"] has reduced to a "
+                              "narrow interval without reaching convergence!\n"
+                              "             The best log-likelihood value is "
+                              "probably not an absolute but only a local "
+                              "minimum.\n"
+                              "             Stop iterations.";
+            log_string(TERSE, msg);
             break;
         }
 
