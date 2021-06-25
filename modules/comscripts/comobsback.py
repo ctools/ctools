@@ -584,12 +584,6 @@ class comobsback(ctools.csobservation):
             scrat = drg.copy()
             drb   = drg.copy()
 
-            # Initialise Chi2 and nincl2 map for bookkeeping
-            chi2_map   = drg.map().copy()
-            nincl2_map = drg.map().copy()
-            chi2_map.stack_maps()
-            nincl2_map.stack_maps()
-
             # Do Phibar normalization of DRG and store result in SCRAT.
             for i3 in range(nphibar):
                 sum_dre = 0.0
@@ -614,105 +608,57 @@ class comobsback(ctools.csobservation):
                 srcatfile = gammalib.GFilename(srcatname)
                 scrat.save(srcatfile, self['clobber'].boolean())
 
-            # Initialise array of
-            nincl2_hist = [0.0 for i in range(nincl2+1)]
-
             # Make background model
             for i1 in range(nchi):
                 for i2 in range(npsi):
 
-                    # Initialise nincl2 (add one since we reduce at beginning)
-                    nincl2 = int(nincl/2) + 1
+                    # Loop over Phibar
+                    for i3 in range(nphibar):
 
-                    # Loop while nincl2 is larger than 1
-                    while nincl2 > 1:
+                        # Determine index range for sum. There are two sums that
+                        # go over [isel1, iex1[ and [ixe2, isel2[
+                        iex1 = i3 - nexcl2
+                        iex2 = i3 + nexcl2 + 1
+                        if nexcl == 0:
+                            iex2 -= 1
+                        isel1 = max((i3 - nincl2), 0)
+                        isel2 = min((i3 + nincl2 + 1), nphibar)
+                        if isel1 == 0:
+                            isel2 = min(nincl, nphibar)
+                        if isel2 == nphibar:
+                            isel1 = max(nphibar - nincl, 0)
 
-                        # Reduce nincl2
-                        nincl2 -= 1
+                        # Initialise sums
+                        sum_dre   = 0.0
+                        sum_drm   = 0.0
+                        sum_scrat = 0.0
 
-                        # Initialise Chi-squared
-                        chi2 = 0.0
-                        ndof = 0.0
+                        # Compute average over small patch in Chi/Psi
+                        for j1 in range(max(0, i1 - navgr2), min(nchi, i1 + navgr2 + 1)):
+                            for j2 in range(max(0, i2 - navgr2), min(npsi, i2 + navgr2 + 1)):
 
-                        # Loop over Phibar
-                        for i3 in range(nphibar):
+                                # Take sum over [isel1, iex1[
+                                if iex1 >= 1:
+                                    for j3 in range(isel1, iex1):
+                                        jpix       = j1 + j2*nchi + j3*npix
+                                        sum_dre   += dre[jpix]
+                                        sum_drm   += drm[jpix]
+                                        sum_scrat += scrat[jpix]
 
-                            # Determine index range for sum. There are two sums that
-                            # go over [isel1, iex1[ and [ixe2, isel2[
-                            iex1 = i3 - nexcl2
-                            iex2 = i3 + nexcl2 + 1
-                            if nexcl == 0:
-                                iex2 -= 1
-                            isel1 = max((i3 - nincl2), 0)
-                            isel2 = min((i3 + nincl2 + 1), nphibar)
-                            if isel1 == 0:
-                                isel2 = min(nincl, nphibar)
-                            if isel2 == nphibar:
-                                isel1 = max(nphibar - nincl, 0)
+                                # Take sum over [iex2, isel2[
+                                if iex2 < nphibar:
+                                    for j3 in range(iex2, isel2):
+                                        jpix       = j1 + j2*nchi + j3*npix
+                                        sum_dre   += dre[jpix]
+                                        sum_drm   += drm[jpix]
+                                        sum_scrat += scrat[jpix]
 
-                            # Initialise sums
-                            sum_dre   = 0.0
-                            sum_drm   = 0.0
-                            sum_scrat = 0.0
-
-                            # Compute average over small patch in Chi/Psi
-                            for j1 in range(max(0, i1 - navgr2), min(nchi, i1 + navgr2 + 1)):
-                                for j2 in range(max(0, i2 - navgr2), min(npsi, i2 + navgr2 + 1)):
-
-                                    # Take sum over [isel1, iex1[
-                                    if iex1 >= 1:
-                                        for j3 in range(isel1, iex1):
-                                            jpix       = j1 + j2*nchi + j3*npix
-                                            sum_dre   += dre[jpix]
-                                            sum_drm   += drm[jpix]
-                                            sum_scrat += scrat[jpix]
-
-                                    # Take sum over [iex2, isel2[
-                                    if iex2 < nphibar:
-                                        for j3 in range(iex2, isel2):
-                                            jpix       = j1 + j2*nchi + j3*npix
-                                            sum_dre   += dre[jpix]
-                                            sum_drm   += drm[jpix]
-                                            sum_scrat += scrat[jpix]
-
-                            # Re-normalise SCRAT to derive DRB
-                            ipix = i1 + i2*nchi + i3*npix
-                            if sum_scrat > 0.0:
-                                drb[ipix] = scrat[ipix] * (sum_dre-sum_drm)/sum_scrat
-                            else:
-                                drb[ipix] = 0.0
-
-                            # Compute Chi2
-                            if drb[ipix] > 0.0:
-                                arg   = dre[ipix] - drm[ipix] - drb[ipix]
-                                chi2 += arg * arg / drb[ipix]
-                                ndof += 1.0
-
-                        # Normalise Chi2
-                        if ndof > 0.0:
-                            chi2 /= ndof
-
-                        # Update maps
-                        imap             = i1 + i2*nchi
-                        chi2_map[imap]   = chi2
-                        nincl2_map[imap] = nincl2
-
-                        # Break if Chi2 is below threshold
-                        if chi2 < 1.1:
-                            break
-
-                    # Log normalised Chi2
-                    #msg   = '(Chi,Psi)=(%3d,%3d)' % (i1, i2)
-                    #value = '%.2f (%d)' % (chi2, nincl2)
-                    #self._log_value(gammalib.NORMAL, msg, value)
-
-                    # Update nincl2 histogram
-                    nincl2_hist[nincl2] += 1
-
-            # Log nincl2 histogram
-            for i in range(nincl/2+1):
-                msg   = '(Chi,Psi) with nincl2 = %d' % (i)
-                self._log_value(gammalib.NORMAL, msg, nincl2_hist[i])
+                        # Re-normalise SCRAT to derive DRB
+                        ipix = i1 + i2*nchi + i3*npix
+                        if sum_scrat > 0.0:
+                            drb[ipix] = scrat[ipix] * (sum_dre-sum_drm)/sum_scrat
+                        else:
+                            drb[ipix] = 0.0
 
             # Get statistics
             sum_dre = 0.0
@@ -727,13 +673,7 @@ class comobsback(ctools.csobservation):
             self._log_value(gammalib.NORMAL, 'Events in DRB', sum_drb)
 
             # Save DRB
-            fits       = gammalib.GFits()
-            drb_hdu    = drb.write(fits)
-            chi2_hdu   = chi2_map.write(fits)
-            nincl2_hdu = nincl2_map.write(fits)
-            chi2_hdu.extname('Chi-squared')
-            nincl2_hdu.extname('nincl2')
-            fits.saveto(drbfile, self['clobber'].boolean())
+            drb.save(drbfile, self['clobber'].boolean())
 
             # Log creation
             self._log_value(gammalib.NORMAL, 'DRB file created', drbfile.url())
