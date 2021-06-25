@@ -65,6 +65,11 @@ clean-local:
 	rm -rf $(top_builddir)/test/prod3
 	rm -rf $(top_builddir)/test/csroot2caldb_*
 	rm -rf $(top_builddir)/test/csiactcopy_*
+	rm -rf $(top_builddir)/test/comlixfit_*
+	rm -rf $(top_builddir)/test/comobsadd_*
+	rm -rf $(top_builddir)/test/comobsback_*
+	rm -rf $(top_builddir)/test/comobsbin_*
+	rm -rf $(top_builddir)/test/comobssim_*
 	rm -rf $(top_builddir)/test/.DS_Store
 
 # Tests to be done on installed version
