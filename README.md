@@ -1,6 +1,6 @@
 ctools information
 ==================
-* Version:             2.0.0.dev (24 June 2021)
+* Version:             2.0.0.dev (25 June 2021)
 * GammaLib dependency: 2.0.0.dev
 
 [![Build Status](https://cta-jenkins.irap.omp.eu/buildStatus/icon?job=ctools-integrate-os)](https://cta-jenkins.irap.omp.eu/job/ctools-integrate-os/)
@@ -125,7 +125,7 @@ ctools require GammaLib.  Please refer to http://cta.irap.omp.eu/gammalib
 for instructions about how to install GammaLib.
 
 Once GammaLib is properly installed, make sure that you added the setup
-script to your .bashrc or $HOME/.profile script:
+script to your `.bashrc` or `$HOME/.profile` script:
 
     export GAMMALIB=/usr/local/gamma
     source $GAMMALIB/bin/gammalib-init.sh
@@ -136,7 +136,7 @@ If you use C shell or a variant then add the following to your
     setenv GAMMALIB /usr/local/gamma
     source $GAMMALIB/bin/gammalib-init.csh
 
-If you have installed GammaLib in another directory than /usr/local/gamma,
+If you have installed GammaLib in another directory than `/usr/local/gamma`,
 please adapt the path correspondingly.
 
 If you really insist, you may install ctools in a directory different to
@@ -150,38 +150,38 @@ The easiest is to install ctools via conda.  This also takes care of the
 installation of GammaLib.  Assuming that you have installed anaconda, type
 the following:
 
-     $ conda config --append channels conda-forge
-     $ conda config --append channels cta-observatory
-     $ conda install ctools
+    $ conda config --append channels conda-forge
+    $ conda config --append channels cta-observatory
+    $ conda install ctools
 
 
 Linux Installation
 ==================
 To build and install ctools, simply type the following:
 
-     $ ./configure
-     $ make
-     $ make check
-     $ make install
+    $ ./configure
+    $ make
+    $ make check
+    $ make install
 
 If the folder does not contain any `configure` file, please run
 
-     $ ./autogen.sh 
+    $ ./autogen.sh 
 
 before invoking `configure`.
 
-By default ctools installs itself in /usr/local/gamma.  If you need to
+By default ctools installs itself in `/usr/local/gamma`.  If you need to
 install ctools in a different location or in your home directory, use
-the --prefix option to ./configure.  For example:
+the `--prefix` option to `./configure`.  For example:
 
-     $ ./configure --prefix=/home/yourname/projects
-     $ make
-     $ make check
-     $ make install
+    $ ./configure --prefix=/home/yourname/projects
+    $ make
+    $ make check
+    $ make install
 
 The file INSTALL details more about using configure. Also try
 
-     $ ./configure --help.
+    $ ./configure --help.
 
 The `make check` command will run an extensive unit test to verify that
 ctools was correctly built.  Make sure that all tests were successful. 
@@ -189,55 +189,57 @@ ctools was correctly built.  Make sure that all tests were successful.
 
 Macintosh OS Installation
 ==========================
-ctools is known to work on various flavors of Mac OS.  To cope with
-different system versions and architectures, there are two Mac
-specific configure options:
+ctools builds and installs seamlessly on all Mac OS starting from at least Mac
+OS 10.6.
 
-     $ ./configure --enable-universalsdk[=PATH]
+On older systems you may use Mac specific configure options:
+
+    $ ./configure --enable-universalsdk[=PATH]
 
 creates a universal build of ctools.  The optional argument specifies
 which MacOS SDK should be used to perform the build.  This defaults to
-"/Developer/SDKs/MacOSX.10.4u.sdk".  Specify "/" when building on a 10.5
+`/Developer/SDKs/MacOSX.10.4u.sdk`.  Specify `/` when building on a 10.5
 system or higher, especially when building 64-bit code.
 
-     $ ./configure --with-univeral-archs=VALUE
+    $ ./configure --with-univeral-archs=VALUE
 
 specifies the kind of universal build that should be created.  Possible
-values are: "32-bit", "3-way", "intel" or "all".  By default, a "32-bit" 
+values are: `32-bit`, `3-way`, `intel` or `all`.  By default, a `32-bit` 
 build will be made.  This option is only valid when
-"--enable-universalsdk" is specified.
+`--enable-universalsdk` is specified.
 
 These options are in particular needed if your Python architecture differs
 from the default architecture of your system.  To examine the Python
 architecture you may type:
 
-     $ file `which python`
+    $ file `which python`
 
 which will return the architectures that are compiled in the Mach-0
 executable:
 
-     i386    32-bit intel
-     ppc     32-bit powerpc
-     ppc64   64-bit powerpc
-     x86_64  64-bit intel
+    i386    32-bit intel
+    ppc     32-bit powerpc
+    ppc64   64-bit powerpc
+    x86_64  64-bit intel
 
 If Python is 32-bit (ppc, i386) but the compiler produces by default
 64-bit code (ppc64, x86_64), the Python module will not work.  Using
 
-     $ ./configure --enable-universalsdk=/
+    $ ./configure --enable-universalsdk=/
 
 will force a universal 32-bit build which creates code for ppc and 
 i386.  If on the other hand Python is 64-bit (ppc64, x86_64) but the
 compiler produces by default 32-bit code (ppc, i386), the option
 
-     $ ./configure --enable-universalsdk=/ --with-univeral-archs=3-way
+    $ ./configure --enable-universalsdk=/ --with-univeral-archs=3-way
 
 will generate a universal build which contains 32-bit and 64-bit code.
 
 
 BSD Installation
 ================
-ctools has been tested on FreeBSD successfully.  Follow the Linux
+ctools has been successfully installed on FreeBSD.  Make sure that you
+use `gmake` for building of the software.  Otherwise follow the Linux
 installation instructions above.
 
 
@@ -257,7 +259,7 @@ Testing
 =======
 If you want to test ctools before installation, type the following:
 
-     $ make check
+    $ make check
 
 
 Setting up your environment
@@ -291,7 +293,7 @@ The doc directory (usually at /usr/local/gamma/share/doc/ctools)
 contains the most recent set of updated documentation for this release.
 A detailed documentation can be created by typing:
 
-     $ make doc
+    $ make doc
 
 before installing the library. Two types of documentation exist:
 * code documentation
@@ -325,7 +327,7 @@ problems with global symbols in the shared GammaLib library that prevent
 the model registry to work correctly.  Furthermore, GammaLib is not able
 to catch its own exceptions, which prevents the FITS interface to work
 correctly.  Possible it will work using gcc on Solaris, yet this has not
-so far been tested.
+been tested so far.
 
 
 Contact

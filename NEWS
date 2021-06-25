@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-24 June 2021
+25 June 2021
 
 
 Introduction
@@ -155,7 +155,10 @@ model parameters (#3562).
 
 ctulimit - Compute upper limit
 ------------------------------
-None
+The best log-likelihood is recomputed for a fixed best parameter value to
+make sure that the value is compliant with the values obtained by the bisection
+algorithm. The bisection iterations are stopped with a warning if the parameter
+interval becomes tiny.
 
 
 support - Support classes
