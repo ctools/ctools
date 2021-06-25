@@ -556,6 +556,9 @@ class comobsres(ctools.csobservation):
         title : str, optional
             Title string
         """
+        # Import matplotlib
+        import matplotlib.pyplot as plt
+
         # Compute bin edges, hence use nbins+1
         binwidth  = (sigma_max - sigma_min) / float(nbins)
         bin_edges = [sigma_min + binwidth*i for i in range(nbins+1)]
