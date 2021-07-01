@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for template module                                           #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2018 Juergen Knoedlseder                                    #
+# Copyright (C) 2018-2021 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -23,9 +23,9 @@
 INCLUDES = -I$(top_srcdir)/src/support
 
 # Program name
-bin_PROGRAMS = ctool_base \
-               ctool_obs \
-               ctool_like
+noinst_PROGRAMS = ctool_base \
+                  ctool_obs \
+                  ctool_like
 
 # Program definition
 ctool_base_SOURCES = main_base.cpp ctool_base.cpp
