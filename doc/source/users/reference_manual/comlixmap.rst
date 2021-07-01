@@ -58,16 +58,20 @@ General parameters
     Second coordinate of image center in degrees (DEC or galactic b).
 
 ``(nrunav = 3) [integer]``
-    Number of bins used for running average.
+    Number of Chi/Psi bins used for running average (relevant for ``BGDLIXA``
+    method).
 
-``(navgr = 3) [integer]``
-    Number of bins used for averaging.
+``(navgr = 9) [integer]``
+    Number of Chi/Psi bins used for averaging (relevant for ``BGDLIXA`` and
+    ``BGDLIXE`` methods).
 
-``(nincl = 13) [integer]``
-    Number of Phibar layers to include.
+``(nincl = 5) [integer]``
+    Number of Phibar layers to include (relevant for ``BGDLIXA`` and ``BGDLIXE``
+    methods).
 
 ``(nexcl = 0) [integer]``
-    Number of Phibar layers to exclude.
+    Number of Phibar layers to exclude (relevant for ``BGDLIXA`` and ``BGDLIXE``
+    methods).
 
 
 Standard parameters

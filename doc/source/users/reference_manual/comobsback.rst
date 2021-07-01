@@ -9,7 +9,18 @@ Generate background model for COMPTEL observations.
 Synopsis
 --------
 
-This script generates a background model for COMPTEL observations.
+This script generates a background model for COMPTEL observations using either
+the PHINOR, the BGDLIXA or the BGDLIXE algorithm. The resulting background
+model will be written into a DRB FITS file that will be stored in the folder
+defined by the ``outfolder`` parameter. The DRB FITS file name will be derived
+from the DRE filename with the background modelling method and parameters
+attached. An additional suffix, specified by the ``suffix`` parameter, may be
+added to the DRB filename.
+
+The script also generates an output observation definition XML file, specified
+by the ``outobs`` parameter, that contains a link to the generated background
+model. This output observation definition XML file should be used for further
+data analysis.
 
 
 General parameters
@@ -36,16 +47,25 @@ General parameters
     Method for background computation.
 
 ``(nrunav = 3) [integer]``
-    Number of bins used for running average.
+    Number of Chi/Psi bins used for running average (relevant for ``BGDLIXA``
+    method).
 
-``(navgr = 3) [integer]``
-    Number of bins used for averaging.
+``(navgr = 9) [integer]``
+    Number of Chi/Psi bins used for averaging (relevant for ``BGDLIXA`` and
+    ``BGDLIXE`` methods).
 
-``(nincl = 13) [integer]``
-    Number of Phibar layers to include.
+``(nincl = 5) [integer]``
+    Number of Phibar layers to include (relevant for ``BGDLIXA`` and ``BGDLIXE``
+    methods).
 
 ``(nexcl = 0) [integer]``
-    Number of Phibar layers to exclude.
+    Number of Phibar layers to exclude (relevant for ``BGDLIXA`` and ``BGDLIXE``
+    methods).
+
+``(phinor = yes) [boolean]``
+    Specifies whether the Phibar distribution of the resulting background model
+    should be normalised to the number of observed events minus the number of
+    source events.
 
 
 Standard parameters

@@ -60,6 +60,7 @@ class comobsback(ctools.csobservation):
         self['suffix'].string()
         self['outfolder'].string()
         self['bkgmethod'].string()
+        self['phinor'].boolean()
 
         # Check parameters for BGDLIXA
         if self['bkgmethod'].string() == 'BGDLIXA':
@@ -481,6 +482,23 @@ class comobsback(ctools.csobservation):
                                     sum_num += scrat[ipix]
                             drb[ipixu] *= sum_num
 
+            # Optionally Phibar normalise DRB
+            if self['phinor'].boolean():
+                for i3 in range(nphibar):
+                    sum_dre = 0.0
+                    sum_drb = 0.0
+                    sum_drm = 0.0
+                    for i in range(npix):
+                        ipix     = i3*npix + i
+                        sum_dre += dre[ipix]
+                        sum_drb += drb[ipix]
+                        sum_drm += drm[ipix]
+                    if sum_drb > 0.0:
+                        norm = (sum_dre-sum_drm) / sum_drb
+                        for i in range(npix):
+                            ipix       = i3*npix + i
+                            drb[ipix] *= norm
+
             # Get statistics
             sum_dre = 0.0
             sum_drm = 0.0
@@ -659,6 +677,23 @@ class comobsback(ctools.csobservation):
                             drb[ipix] = scrat[ipix] * (sum_dre-sum_drm)/sum_scrat
                         else:
                             drb[ipix] = 0.0
+
+            # Optionally Phibar normalise DRB
+            if self['phinor'].boolean():
+                for i3 in range(nphibar):
+                    sum_dre = 0.0
+                    sum_drb = 0.0
+                    sum_drm = 0.0
+                    for i in range(npix):
+                        ipix     = i3*npix + i
+                        sum_dre += dre[ipix]
+                        sum_drb += drb[ipix]
+                        sum_drm += drm[ipix]
+                    if sum_drb > 0.0:
+                        norm = (sum_dre-sum_drm) / sum_drb
+                        for i in range(npix):
+                            ipix       = i3*npix + i
+                            drb[ipix] *= norm
 
             # Get statistics
             sum_dre = 0.0
