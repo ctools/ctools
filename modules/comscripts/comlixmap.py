@@ -41,6 +41,7 @@ class comlixmap(ctools.cslikelihood):
         # Initialise members
         self._maps      = []
         self._map_names = []
+        self._srcnames  = []
 
         # Return
         return
@@ -58,11 +59,12 @@ class comlixmap(ctools.cslikelihood):
         if self.obs().models().is_empty():
             self.obs().models(self['inmodel'].filename())
 
-        # Get source name and check if source exists in model
-        srcname = self['srcname'].string()
-        if not self.obs().models().contains(srcname):
-            msg = 'Source "%s" not found in models.' % srcname
-            raise RuntimeError(msg)
+        # Get test source names and check if test sources exists in model
+        self._srcnames = self['srcname'].string().split(';')
+        for srcname in self._srcnames:
+            if not self.obs().models().contains(srcname):
+                msg = 'Source "%s" not found in models.' % srcname
+                raise RuntimeError(msg)
 
         # Query parameters
         self['like_accuracy'].real()
@@ -160,16 +162,20 @@ class comlixmap(ctools.cslikelihood):
         nxpix    = self['nxpix'].integer()
         nypix    = self['nypix'].integer()
 
-        # Compute number of free model parameters, exclusing 'RA' and 'DEC'
-        nfree  = 0
-        source = self.obs().models()[self['srcname'].string()]
-        for par in source:
-            if par.name() != 'RA' and par.name() != 'DEC' and par.is_free():
-                self._map_names.append(par.name())
-                nfree += 1
+        # Initialise number of free parameters
+        nfree = 0
+
+        # Compute number of free model parameters for all test sources,
+        # exclusing 'RA' and 'DEC'
+        for srcname in self._srcnames:
+            source = self.obs().models()[srcname]
+            for par in source:
+                if par.name() != 'RA' and par.name() != 'DEC' and par.is_free():
+                    self._map_names.append(par.name())
+                    nfree += 1
 
         # Initialise sky maps
-        for i in range(nfree+1):
+        for i in range(nfree+len(self._srcnames)):
             self._maps.append(gammalib.GSkyMap(proj, coordsys, xref, yref,
                                                -binsz, binsz, nxpix, nypix))
 
@@ -192,15 +198,18 @@ class comlixmap(ctools.cslikelihood):
         ts : float
             TS of test source
         """
-        # Set and fix position of test source
-        source = self.obs().models()[self['srcname'].string()]
-        source['RA'].value(dir.ra_deg())
-        source['DEC'].value(dir.dec_deg())
-        source['RA'].fix()
-        source['DEC'].fix()
+        # Loop over test source names
+        for srcname in self._srcnames:
 
-        # Remove response cache for test source
-        self.obs().remove_response_cache(self['srcname'].string())
+            # Set and fix position of test source
+            source = self.obs().models()[srcname]
+            source['RA'].value(dir.ra_deg())
+            source['DEC'].value(dir.dec_deg())
+            source['RA'].fix()
+            source['DEC'].fix()
+
+            # Remove response cache for test source
+            self.obs().remove_response_cache(srcname)
 
         # Get parameters and initialise some variables
         niter = self['max_iter'].integer()
@@ -240,7 +249,9 @@ class comlixmap(ctools.cslikelihood):
         ts = self._final_model_fit()
 
         # Log TS
-        self._log_value(gammalib.NORMAL, 'TS value', ts)
+        for i, srcname in enumerate(self._srcnames):
+            key = 'TS %s' % srcname
+            self._log_value(gammalib.NORMAL, key, ts[i])
 
         # Return TS
         return ts
@@ -261,8 +272,10 @@ class comlixmap(ctools.cslikelihood):
         # Run ctlike
         like.run()
 
-        # Recover TS for test source
-        ts = like.obs().models()[self['srcname'].string()].ts()
+        # Recover TS for all test sources
+        ts = []
+        for srcname in self._srcnames:
+            ts.append(like.obs().models()[srcname].ts())
 
         # Return TS
         return ts
@@ -289,9 +302,9 @@ class comlixmap(ctools.cslikelihood):
         # Log header
         self._log_header1(gammalib.NORMAL, 'Initialise models')
 
-        # Make sure that tscalc flag is only set for test source
+        # Make sure that tscalc flag is only set for test sources
         for source in self.obs().models():
-            if source.name() == self['srcname'].string():
+            if source.name() in self._srcnames:
                 source.tscalc(True)
             else:
                 source.tscalc(False)
@@ -332,16 +345,18 @@ class comlixmap(ctools.cslikelihood):
             # Compute TS
             ts = self._compute_ts(dir)
 
-            # Store TS value in map
-            self._maps[0][ipix] = ts
+            # Store TS values in sky map
+            for i, value in enumerate(ts):
+                self._maps[i][ipix] = value
 
-            # Extract fitted model parameters
-            ipar   = 1
-            source = self.obs().models()[self['srcname'].string()]
-            for par in source:
-                if par.name() != 'RA' and par.name() != 'DEC' and par.is_free():
-                    self._maps[ipar][ipix] = par.value()
-                    ipar += 1
+            # Store fitted model parameters in sky maps
+            ipar   = len(ts)
+            for srcname in self._srcnames:
+                source = self.obs().models()[srcname]
+                for par in source:
+                    if par.name() != 'RA' and par.name() != 'DEC' and par.is_free():
+                        self._maps[ipar][ipix] = par.value()
+                        ipar += 1
 
         # Return
         return
@@ -376,8 +391,10 @@ class comlixmap(ctools.cslikelihood):
                 map.write(fits)
 
             # Set extension name for all maps
+            for i, srcname in enumerate(self._srcnames):
+                fits[i].extname(srcname)
             for i, name in enumerate(self._map_names):
-                fits[i+1].extname(name)
+                fits[i+len(self._srcnames)].extname(name)
 
             # Save FITS file
             fits.saveto(outmap, self['clobber'].boolean())
