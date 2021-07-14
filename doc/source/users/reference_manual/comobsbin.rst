@@ -34,7 +34,7 @@ General parameters
     Maximum energy (MeV).
 
 ``phase [string]``
-    Phase expression in the format phasemin0-phasemax0,phasemin1-phasemax1,...
+    Phase expression in the format phasemin0-phasemax0;phasemin1-phasemax1;...
 
 ``phase0 [time]``
     Date of Phase 0 (UTC string, JD, MJD or MET in seconds).

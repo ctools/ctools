@@ -113,7 +113,7 @@ class comobsbin(ctools.csobservation):
         if gammalib.toupper(self['phase'].string()) != 'NONE':
 
             # Get phases and split them
-            phases = self['phase'].string().split(',')
+            phases = self['phase'].string().split(';')
 
             # Loop over phases
             for phase in phases:
@@ -191,8 +191,8 @@ class comobsbin(ctools.csobservation):
 
             # Set suffix
             phases           = self['phase'].string()
-            self._suffix     = '_phases'+phases.replace(',', '_')
-            self._dre_suffix = '_phases'+phases.replace(',', '_')
+            self._suffix     = '_phases'+phases.replace(';', '_')
+            self._dre_suffix = '_phases'+phases.replace(';', '_')
 
         # If PSD interval differs from standard interval then set the interval
         if self['psdmin'].integer() != 0 or self['psdmin'].integer() != 110:
