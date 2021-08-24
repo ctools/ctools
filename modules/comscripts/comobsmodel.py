@@ -199,7 +199,7 @@ class comobsmodel(ctools.csobservation):
         # Return source model
         return source
 
-    def _recast_model(self, model, ebounds, index, min, max):
+    def _recast_model(self, model, ebounds, index, min, max, fix=False):
         """
         Re-cast model
 
@@ -215,6 +215,8 @@ class comobsmodel(ctools.csobservation):
             Minimum intensities
         max : float
             Maximum intensities
+        fix : boolean
+            Fix intensity values
 
         Returns
         -------
@@ -248,6 +250,8 @@ class comobsmodel(ctools.csobservation):
             parname = 'Intensity%d' % i
             spectral[parname].min(min)
             spectral[parname].max(max)
+            if fix:
+                spectral[parname].fix()
 
         # Return spectral model
         return spectral
@@ -385,21 +389,26 @@ class comobsmodel(ctools.csobservation):
             Isotropic model
         """
         # Append model if CONST is selected ...
-        if self['iso'].string() == 'CONST':
+        if 'CONST' in self['iso'].string():
 
             # Set spatial model
             spatial  = gammalib.GModelSpatialDiffuseConst()
 
             # Set spectral model using initial scaling factors that correspond
-            # to the intensity in R-MIS-001985
+            # to Georg Weidenspointers extragalactic spectrum. Values integrated
+            # over the standard energy bands communicated by Werner Collmar and
+            # divided by width of standard energy bands.
             spectral = gammalib.GModelSpectralNodes()
-            spectral.append(gammalib.GEnergy(0.87, 'MeV'),  1.0e-5)
-            spectral.append(gammalib.GEnergy(1.73, 'MeV'),  1.0e-5)
-            spectral.append(gammalib.GEnergy(5.48, 'MeV'),  1.0e-5)
-            spectral.append(gammalib.GEnergy(17.32, 'MeV'), 1.0e-5)
+            spectral.append(gammalib.GEnergy(0.87, 'MeV'),  1.327e-3/0.25)
+            spectral.append(gammalib.GEnergy(1.73, 'MeV'),  2.358e-3/2.0)
+            spectral.append(gammalib.GEnergy(5.48, 'MeV'),  0.658e-3/7.0)
+            spectral.append(gammalib.GEnergy(17.32, 'MeV'), 0.148e-3/20.0)
+
+            # Set fix
+            fix = (self['iso'].string() == 'CONSTFIX')
 
             # Recast model
-            spectral = self._recast_model(spectral, ebounds, -2.0, 1.0e-20, 1.0)
+            spectral = self._recast_model(spectral, ebounds, -2.0, 1.0e-20, 1.0, fix=fix)
 
         # Autoscale spectral coefficients
         spectral.autoscale()
