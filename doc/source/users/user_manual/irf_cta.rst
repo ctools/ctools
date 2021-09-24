@@ -89,23 +89,26 @@ In total, the following six instrument response functions are available:
    provided by the CTA Consortium and Observatory.*
 
    The latest CTA reponse functions can be downloaded from
-   `this link (get the FITS tarball under "Source Files") <https://www.cta-observatory.org/science/cta-performance/>`_. Assuming that the name of the FITS tarball is
-   ``CTA-Performance-prod3b-v2-FITS.tar.gz`` (which corresponds to the
-   prod3b-v2 response functions), you install the response functions by
-   typing
+   `this link <https://zenodo.org/record/5499840/files/cta-prod5-zenodo-fitsonly-v0.1.zip?download=1>`_.
+   
+   This will download the file ``cta-prod5-zenodo-fitsonly-v0.1.zip`` in your
+   current working directory that you should unzip to get a folder named
+   ``cta-prod5-zenodo-fitsonly-v0``.
+   
+   Download the script :download:`csadd2caldb.py <csadd2caldb.py>` and execute
+   it as follows to add the IRFs to your calibration database:
 
    .. code-block:: bash
 
-      $ tar xvfz CTA-Performance-prod3b-v2-FITS.tar.gz -C $CTOOLS/share
+      $ ./csadd2caldb.py debug=yes
+      Parfile csadd2caldb.par not found. Create default parfile.
+      Input IRF folder [cta-prod5-zenodo-fitsonly-v0]
+      Output caldb folder [$CALDB]
 
-   or
-
-   .. code-block:: bash
-
-      $ sudo tar xvfz CTA-Performance-prod3b-v2-FITS.tar.gz -C $CTOOLS/share
-
-   if you need root priviledges to install in your ``$CTOOLS`` directory.
-   To use the prod3b-v2 response functions, specify ``prod3b-v2`` if a tool
+   Use ``sudo`` to run ``csadd2caldb.py`` if the installation of the IRFs requires
+   root privileges.
+   
+   To use the prod5-v0.1 functions, specify ``prod5-v0.1`` if a tool
    or script queries for the calibration database.
 
 
