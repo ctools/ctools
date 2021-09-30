@@ -67,7 +67,7 @@ class csadd2caldb(ctools.cscript):
 
             # Create default parfile
             pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar('indir','f','a','cta-prod5-zenodo-fitsonly-v0','','','Input IRF folder'))
+            pars.append(gammalib.GApplicationPar('indir','f','a','fits','','','Input IRF folder'))
             pars.append(gammalib.GApplicationPar('outdir','f','a','$CALDB','','','Output caldb folder'))
             pars.append_standard()
             pars.save(parfile)
@@ -110,7 +110,7 @@ class csadd2caldb(ctools.cscript):
         files = glob.glob('%s/*.FITS.tar.gz' % indir.url())
         tarfiles.extend(files)
 
-        # Search for tarfiles in 'files' subdirectory
+        # Search for tarfiles in 'fits' subdirectory
         files = glob.glob('%s/fits/*.FITS.tar.gz' % indir.url())
         tarfiles.extend(files)
 
@@ -142,8 +142,23 @@ class csadd2caldb(ctools.cscript):
         # Loop over all members in tarfile
         for member in tar.getmembers():
 
+            # Get subarray
+            subarrays  = ''
+            nsubarrays = 0
+            if 'LST' in member.name:
+                subarrays  += '_LST'
+                nsubarrays += 1
+            if 'MST' in member.name:
+                subarrays  += '_MST'
+                nsubarrays += 1
+            if 'SST' in member.name:
+                subarrays  += '_SST'
+                nsubarrays += 1
+            if nsubarrays > 1:
+                subarrays = ''
+
             # Extract Instrument
-            if 'South' in member.name:
+            if 'South-' in member.name:
                 site = 'South'
             else:
                 site = 'North'
@@ -162,9 +177,10 @@ class csadd2caldb(ctools.cscript):
             else:
                 orientation = ''
                 azimuth     = 90.0
+            
             elements   = member.name.split('-')
             zenith     = [e for e in elements if 'deg' in e][0].strip('deg')
-            instrument = '%s_z%s%s_%s' % (site, zenith, orientation, duration)
+            instrument = '%s_z%s%s_%s%s' % (site, zenith, orientation, duration, subarrays)
 
             # Build output directory
             path = '%s/%s' % (outdir, instrument)
