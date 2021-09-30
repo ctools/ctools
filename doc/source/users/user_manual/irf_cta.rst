@@ -80,6 +80,52 @@ In total, the following six instrument response functions are available:
 ``North_0.5h``, ``North_5h``, ``North_50h``, ``South_0.5h``,
 ``South_5h``, and ``South_50h``.
 
+The latest CTA reponse functions (``prod5-v0.1``) can be downloaded from
+`this link <https://zenodo.org/record/5499840#.YVV1di0itZo>`_.
+
+Addition of CTA response functions to the calibration database can be done
+using the script :download:`csadd2caldb.py <csadd2caldb.py>` that is available
+for download.
+
+To download and install the ``prod5-v0.1`` response functions you should execute
+the following commands in a terminal:
+
+.. code-block:: bash
+
+   $ mkdir temp
+   $ cd temp
+   $ wget https://zenodo.org/record/5499840/files/cta-prod5-zenodo-fitsonly-v0.1.zip
+   $ unzip cta-prod5-zenodo-fitsonly-v0.1.zip
+   $ ./csadd2caldb.py
+   Parfile csadd2caldb.par not found. Create default parfile.
+   Input IRF folder [fits]
+   Output caldb folder [$CALDB]
+
+This will download the file ``cta-prod5-zenodo-fitsonly-v0.1.zip`` in a
+temporary working directory, unzip the file to get, among others, the folder ``fits``
+with the CTA response in FITS format, and install the response in your calibration
+database.
+
+Use ``sudo`` to run ``csadd2caldb.py`` if the installation of the IRFs requires
+root privileges.
+
+To use the ``prod5-v0.1`` response functions, specify ``prod5-v0.1`` if a ctool
+or cscript queries for the calibration database.
+
+If you want to install the older ``prod3b-v2`` response functions you should use
+the following procedure:
+
+.. code-block:: bash
+
+   $ mkdir temp
+   $ cd temp
+   $ wget https://zenodo.org/record/5163273/files/CTA-Performance-IRFs-prod3b-v2-v1.0.0.zip
+   $ unzip CTA-Performance-IRFs-prod3b-v2-v1.0.0.zip
+   $ tar xvfz CTA-Prod3-Zenodo-main/fits/CTA-Performance-prod3b-v2-FITS.tar.gz -C $CTOOLS/share
+
+To use the ``prod3b-v2`` response functions, specify ``prod3b-v2`` if a ctool
+or cscript queries for the calibration database.
+
 .. note::
    If you use the CTA instrument response functions for a research project
    and specifically for a presentation or publication, we ask to add the
@@ -87,29 +133,6 @@ In total, the following six instrument response functions are available:
 
    *This research has made use of the CTA instrument response functions
    provided by the CTA Consortium and Observatory.*
-
-   The latest CTA reponse functions can be downloaded from
-   `this link <https://zenodo.org/record/5499840/files/cta-prod5-zenodo-fitsonly-v0.1.zip?download=1>`_.
-   
-   This will download the file ``cta-prod5-zenodo-fitsonly-v0.1.zip`` in your
-   current working directory that you should unzip to get a folder named
-   ``cta-prod5-zenodo-fitsonly-v0``.
-   
-   Download the script :download:`csadd2caldb.py <csadd2caldb.py>` and execute
-   it as follows to add the IRFs to your calibration database:
-
-   .. code-block:: bash
-
-      $ ./csadd2caldb.py debug=yes
-      Parfile csadd2caldb.par not found. Create default parfile.
-      Input IRF folder [cta-prod5-zenodo-fitsonly-v0]
-      Output caldb folder [$CALDB]
-
-   Use ``sudo`` to run ``csadd2caldb.py`` if the installation of the IRFs requires
-   root privileges.
-   
-   To use the prod5-v0.1 functions, specify ``prod5-v0.1`` if a tool
-   or script queries for the calibration database.
 
 
 Specifying CTA response functions
