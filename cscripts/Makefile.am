@@ -21,6 +21,7 @@
 
 # Scripts to be distributed in $(pyexecdir)/cscripts
 pythonscripts = $(top_builddir)/cscripts/__init__.py \
+                $(srcdir)/csadd2caldb.py \
                 $(srcdir)/csbkgmodel.py \
                 $(srcdir)/cscaldb.py \
                 $(srcdir)/csebins.py \
@@ -60,7 +61,8 @@ pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/mputils.py 	
 
 # Parfiles to be distributed in $(prefix)/syspfiles
-parfiles = $(srcdir)/csbkgmodel.par \
+parfiles = $(srcdir)/csadd2caldb.par \
+           $(srcdir)/csbkgmodel.par \
            $(srcdir)/cscaldb.par \
            $(srcdir)/csebins.par \
            $(srcdir)/cslightcrv.par \
@@ -93,7 +95,8 @@ parfiles = $(srcdir)/csbkgmodel.par \
            $(srcdir)/csiactobs.par
 
 # Scripts for which symbolic links will be created in bindir
-linkscripts = csbkgmodel \
+linkscripts = csadd2caldb \
+              csbkgmodel \
               cscaldb \
               csebins \
               csinfo \
@@ -132,6 +135,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_python_cscripts.py \
               $(top_srcdir)/test/test_cscript.py \
               $(top_srcdir)/test/test_cscaldb.py \
+              $(top_srcdir)/test/test_csadd2caldb.py \
               $(top_srcdir)/test/test_csbkgmodel.py \
               $(top_srcdir)/test/test_csebins.py \
               $(top_srcdir)/test/test_csfindobs.py \
@@ -266,6 +270,9 @@ testiactevents = $(top_srcdir)/test/data/iactdata/events/irf_file.fits.gz \
                  $(top_srcdir)/test/data/iactdata/events/events_7.fits.gz \
                  $(top_srcdir)/test/data/iactdata/events/events_8.fits.gz
 
+# Test data to be distributed in $(pyexecdir)/cscripts/tests/data/prod5-v0.1
+testprod501data = $(top_srcdir)/test/data/prod5-v0.1/CTA-Performance-prod5-v0.1-South-20deg.FITS.tar.gz
+
 # Install scripts, parfiles, test scripts and test data. Note that we don't
 # need to prepend $(DESTDIR) here (not fully clear why, but that's the way
 # it is)
@@ -283,11 +290,13 @@ testiactdatadir     = $(pyexecdir)/cscripts/tests/data/iactdata
 testiactdata_DATA   = $(testiactdata)
 testiacteventsdir   = $(pyexecdir)/cscripts/tests/data/iactdata/events
 testiactevents_DATA = $(testiactevents)
+testprod501dir      = $(pyexecdir)/cscripts/tests/data/prod5-v0.1
+testprod501_DATA    = $(testprod501data)
 
 # Files to be distributed in the tar file
 EXTRA_DIST = $(binscripts) $(pythonscripts) $(parfiles) \
              $(testscripts) $(testdata) $(testiactdata) \
-             $(testiactevents)
+             $(testiactevents) $(testprod501data)
 
 # Add install hook rule to create symbolic links to cscripts without .py in the bindir
 install-data-hook:

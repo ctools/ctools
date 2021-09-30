@@ -83,10 +83,6 @@ In total, the following six instrument response functions are available:
 The latest CTA reponse functions (``prod5-v0.1``) can be downloaded from
 `this link <https://zenodo.org/record/5499840#.YVV1di0itZo>`_.
 
-Addition of CTA response functions to the calibration database can be done
-using the script :download:`csadd2caldb.py <csadd2caldb.py>` that is available
-for download.
-
 To download and install the ``prod5-v0.1`` response functions you should execute
 the following commands in a terminal:
 
@@ -96,8 +92,7 @@ the following commands in a terminal:
    $ cd temp
    $ wget https://zenodo.org/record/5499840/files/cta-prod5-zenodo-fitsonly-v0.1.zip
    $ unzip cta-prod5-zenodo-fitsonly-v0.1.zip
-   $ ./csadd2caldb.py
-   Parfile csadd2caldb.par not found. Create default parfile.
+   $ csadd2caldb
    Input IRF folder [fits]
    Output caldb folder [$CALDB]
 

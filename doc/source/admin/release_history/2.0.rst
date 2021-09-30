@@ -1,7 +1,7 @@
 .. _2.0:
 
-ctools 2.0 release (25 June 2021)
-=================================
+ctools 2.0 release (30 September 2021)
+======================================
 
 Overview
 --------
@@ -58,6 +58,7 @@ New features
 
 * [`3738 <https://cta-redmine.irap.omp.eu/issues/3738>`_] -
   Add COMPTEL analysis scripts
+* Add :ref:`csadd2caldb` script
 
 
 Clean up

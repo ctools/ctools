@@ -64,6 +64,7 @@ CTA and IACT analysis tools and scripts
    cspull --- Generates pull distribution <cspull>
    csresmap --- Generates residual map <csresmap>
    csresspec --- Generates residual spectrum <csresspec>
+   csadd2caldb --- Adds CTA response function to calibration database <csadd2caldb>
    csroot2caldb --- Creates a caldb entry from a ROOT file <csroot2caldb>
    csscs --- Performs spectral component separation <csscs>
    cssens --- Computes CTA sensitivity <cssens>

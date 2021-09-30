@@ -39,9 +39,6 @@ class csadd2caldb(ctools.cscript):
         """
         Constructor
         """
-        # Make sure that parfile exists
-        self._parfile()
-
         # Initialise application by calling the base class constructor
         self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
@@ -50,31 +47,6 @@ class csadd2caldb(ctools.cscript):
 
 
     # Private methods
-    def _parfile(self):
-        """
-        Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a parfile.
-        """
-        # Set parfile name
-        parfile = self.__class__.__name__+'.par'
-
-        # Load parfile or create
-        try:
-            pars = gammalib.GApplicationPars(parfile)
-        except:
-            # Signal that parfile was not found
-            print('Parfile '+parfile+' not found. Create default parfile.')
-
-            # Create default parfile
-            pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar('indir','f','a','fits','','','Input IRF folder'))
-            pars.append(gammalib.GApplicationPar('outdir','f','a','$CALDB','','','Output caldb folder'))
-            pars.append_standard()
-            pars.save(parfile)
-
-        # Return
-        return
-
     def _get_parameters(self):
         """
         Get parameters from parfile
@@ -357,6 +329,12 @@ class csadd2caldb(ctools.cscript):
         """
         # Collect tarfiles
         tarfiles = self._collect_tarfiles(self['indir'].filename())
+
+        # Raise an exception if no tarfiles were found
+        if len(tarfiles) == 0:
+            msg = ('No tarfiles found in folder "'+self['indir'].filename().url()+'. '
+                   'Please specify a folder that contains IRF tarfiles.')
+            raise RuntimeError(msg)
 
         # Add IRFs in tarfiles
         for file in tarfiles:

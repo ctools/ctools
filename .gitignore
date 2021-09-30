@@ -83,6 +83,7 @@ src/template/ctool_obs
 test/pfiles/
 test/caldb/
 test/prod3
+test/csadd2caldb_*
 test/csroot2caldb_*
 test/csiactcopy_*
 test/comobsbin_*

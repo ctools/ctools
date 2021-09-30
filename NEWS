@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-25 June 2021
+30 September 2021
 
 
 Introduction
@@ -165,6 +165,12 @@ ill-conditioned fit problems.
 support - Support classes
 -------------------------
 Add stamping to ctool::save_event_list() method (#3662).
+
+
+csadd2caldb - Adds CTA response function to calibration database
+----------------------------------------------------------------
+New script that was added to support the installation of prod5-v0.1 CTA response
+functions into the calibration database.
 
 
 csbkgmodel - Generate background model for 3D analysis

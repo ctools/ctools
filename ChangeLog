@@ -1,8 +1,9 @@
-2021-06-25
+2021-09-30
 
         * Version 2.0.0 released
         ========================
 
+        Add csadd2caldb script
         Add restart of bisection in case of bad convergence in ctulimit
         Add COMPTEL analysis scripts (#3738)
         Add source counts constraints to cssens (#3668)
