@@ -134,7 +134,7 @@ make clean
 # =============== #
 cd $SRCDIR
 if [ ! -d "cfitsio" ]; then
-    wget https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/$CFITSIO.tar.gz
+    wget --no-check-certificate https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/$CFITSIO.tar.gz
     if [ "$?" -ne "0" ]; then
         echo "*** Unable to download $CFITSIO.tar.gz"
         exit 1
