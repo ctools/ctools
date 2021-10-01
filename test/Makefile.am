@@ -64,7 +64,7 @@ clean-local:
 	rm -rf $(top_builddir)/test/pfiles
 	rm -rf $(top_builddir)/test/prod3
 	rm -rf $(top_builddir)/test/csadd2caldb_*
-    rm -rf $(top_builddir)/test/csroot2caldb_*
+	rm -rf $(top_builddir)/test/csroot2caldb_*
 	rm -rf $(top_builddir)/test/csiactcopy_*
 	rm -rf $(top_builddir)/test/comlixfit_*
 	rm -rf $(top_builddir)/test/comobsadd_*
