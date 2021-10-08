@@ -152,25 +152,6 @@ class comlixfit(ctools.cslikelihood):
         # Return
         return
 
-    def _get_obs_header(self, obs):
-        """
-        Get observation header
-        """
-        # Set header
-        header = obs.instrument() + ' observation'
-
-        # If observation name is not empty then add name
-        if obs.name() is not '':
-            header += ' \"' + obs.name() + '\"'
-
-        # If observation ID is not empty then add ID
-        if obs.id() is not '':
-            header += ' (id=' + obs.id() + ')'
-
-        # Return header
-        return header
-
-
     # Public methods
     def run(self):
         """
