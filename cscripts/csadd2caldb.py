@@ -79,11 +79,11 @@ class csadd2caldb(ctools.cscript):
         tarfiles = []
 
         # Search for tarfiles in current directory
-        files = glob.glob('%s/*.FITS.tar.gz' % indir.url())
+        files = glob.glob('%s/*.FITS.tar*' % indir.url())
         tarfiles.extend(files)
 
         # Search for tarfiles in 'fits' subdirectory
-        files = glob.glob('%s/fits/*.FITS.tar.gz' % indir.url())
+        files = glob.glob('%s/fits/*.FITS.tar*' % indir.url())
         tarfiles.extend(files)
 
         # Return tarfiles

@@ -271,7 +271,7 @@ testiactevents = $(top_srcdir)/test/data/iactdata/events/irf_file.fits.gz \
                  $(top_srcdir)/test/data/iactdata/events/events_8.fits.gz
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data/prod5-v0.1
-testprod501data = $(top_srcdir)/test/data/prod5-v0.1/CTA-Performance-prod5-v0.1-South-20deg.FITS.tar.gz
+testprod501data = $(top_srcdir)/test/data/prod5-v0.1/CTA-Performance-prod5-v0.1-South-20deg.FITS.tar
 
 # Install scripts, parfiles, test scripts and test data. Note that we don't
 # need to prepend $(DESTDIR) here (not fully clear why, but that's the way
