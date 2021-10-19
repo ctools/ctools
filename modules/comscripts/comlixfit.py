@@ -91,6 +91,10 @@ class comlixfit(ctools.cslikelihood):
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
 
+        # Set optimizer logger
+        if self._logExplicit():
+            self.opt().logger(self._log)
+
         # Return
         return
 
@@ -182,6 +186,9 @@ class comlixfit(ctools.cslikelihood):
         # Loop over iterations
         for iter in range(niter):
 
+            # Write iteration header
+            self._log_header2(gammalib.EXPLICIT, 'Iteration %d' % (iter+1))
+
             # Update observations
             self._update_obs()
 
@@ -207,6 +214,10 @@ class comlixfit(ctools.cslikelihood):
             if iter > 0:
                 if delta < eps:
                     break
+
+        # Write header
+        self._log_header1(gammalib.EXPLICIT,
+                          'Final maximum likelihood model fitting')
 
         # Do final model fit
         self._final_model_fit()
