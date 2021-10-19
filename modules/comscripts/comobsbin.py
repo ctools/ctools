@@ -42,7 +42,8 @@ class comobsbin(ctools.csobservation):
         # Initialise members
         self._phases     = gammalib.GPhases()
         self._select     = gammalib.GCOMSelection()
-        self._suffix     = ''
+        self._drx_suffix = ''
+        self._drg_suffix = ''
         self._dre_suffix = ''
 
         # Return
@@ -72,6 +73,7 @@ class comobsbin(ctools.csobservation):
         self['nphibar'].integer()
         self['psdmin'].integer()
         self['psdmax'].integer()
+        self['zetamin'].real()
 
         # Query ahead output model filename
         if self._read_ahead():
@@ -191,11 +193,12 @@ class comobsbin(ctools.csobservation):
 
             # Set suffix
             phases           = self['phase'].string()
-            self._suffix     = '_phases'+phases.replace(';', '_')
+            self._drx_suffix = '_phases'+phases.replace(';', '_')
+            self._drg_suffix = '_phases'+phases.replace(';', '_')
             self._dre_suffix = '_phases'+phases.replace(';', '_')
 
         # If PSD interval differs from standard interval then set the interval
-        if self['psdmin'].integer() != 0 or self['psdmin'].integer() != 110:
+        if self['psdmin'].integer() != 0 or self['psdmax'].integer() != 110:
         
             # Set PSD interval
             self._select.psd_min(self['psdmin'].integer())
@@ -204,6 +207,11 @@ class comobsbin(ctools.csobservation):
             # Set DRE suffix
             self._dre_suffix += '_psd%d-%d' % (self['psdmin'].integer(),
                                                self['psdmax'].integer())
+
+        # If zeta angle differs from standard value then append zeta angle to suffix
+        if self['zetamin'].real() != 5.0:
+            self._drg_suffix += '_zeta%.1f' % (self['zetamin'].real())
+            self._dre_suffix += '_zeta%.1f' % (self['zetamin'].real())
 
         # Log input observations
         self._log_string(gammalib.NORMAL, str(self._select))
@@ -260,8 +268,8 @@ class comobsbin(ctools.csobservation):
         drx = gammalib.GCOMDri(expo)
 
         # Set DRG and DRX filenames
-        drxname = '%s/%s_drx%s.fits' % (self['outfolder'].string(), obs.id(), self._suffix)
-        drgname = '%s/%s_drg%s.fits' % (self['outfolder'].string(), obs.id(), self._suffix)
+        drxname = '%s/%s_drx%s.fits' % (self['outfolder'].string(), obs.id(), self._drx_suffix)
+        drgname = '%s/%s_drg%s.fits' % (self['outfolder'].string(), obs.id(), self._drg_suffix)
         drxfile = gammalib.GFilename(drxname)
         drgfile = gammalib.GFilename(drgname)
 
@@ -280,7 +288,7 @@ class comobsbin(ctools.csobservation):
         if drgfile.exists():
             self._log_value(gammalib.NORMAL, 'DRG file exists', drgfile.url())
         else:
-            drg.compute_drg(obs, self._select)
+            drg.compute_drg(obs, self._select, self['zetamin'].real())
             drg.save(drgfile, True)
             self._log_value(gammalib.NORMAL, 'DRG file created', drgfile.url())
             self._log_string(gammalib.NORMAL, str(drg))
@@ -312,7 +320,7 @@ class comobsbin(ctools.csobservation):
                 dre.ebounds(gammalib.GEbounds(ebounds.emin(i), ebounds.emax(i)))
 
                 # Compute DRE
-                dre.compute_dre(obs, self._select)
+                dre.compute_dre(obs, self._select, self['zetamin'].real())
 
                 # Save DRE
                 dre.save(drefile, True)

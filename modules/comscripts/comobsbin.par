@@ -39,6 +39,7 @@ npsi,     i, h, 80,1,500, "Number of bins in Psi direction"
 nphibar,  i, h, 25,1,100, "Number of bins in Phibar direction"
 psdmin,   i, h, 0,0,110, "Minimum PSD value"
 psdmax,   i, h, 110,0,110, "Maximum PSD value"
+zetamin,  r, h, 5.0,0.0,10.0, "Minimum Earth horizon - Phibar (zeta) angle"
 
 #
 # Standard parameters
