@@ -168,7 +168,7 @@ class Test(test):
             self.test_value(drg.nphibar(), 25, 'Check DRG Phibar size')
 
         # Check DRE file
-        fname = '%s/vp0001_0_dre_psd0-110_000750-001000keV.fits' % foldername
+        fname = '%s/vp0001_0_dre_000750-001000keV.fits' % foldername
         exists  = os.path.isfile(fname)
         self.test_assert(exists, 'Check that DRE file "%s" exists' % fname)
         if exists:
@@ -179,7 +179,7 @@ class Test(test):
             self.test_value(dre.nphibar(), 25, 'Check DRE Phibar size')
 
         # Check DRB file
-        fname = '%s/vp0001_0_drb_psd0-110_000750-001000keV.fits' % foldername
+        fname = '%s/vp0001_0_drb_000750-001000keV.fits' % foldername
         exists  = os.path.isfile(fname)
         self.test_assert(exists, 'Check that DRB file "%s" exists' % fname)
         if exists:
