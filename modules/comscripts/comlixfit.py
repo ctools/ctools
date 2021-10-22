@@ -39,6 +39,9 @@ class comlixfit(ctools.cslikelihood):
         # Initialise application by calling the base class constructor
         self._init_cslikelihood(self.__class__.__name__, ctools.__version__, argv)
 
+        # Initialise members
+        self._fixed_pars = []
+
         # Return
         return
 
@@ -59,6 +62,7 @@ class comlixfit(ctools.cslikelihood):
         self['max_iter'].integer()
         self['like_accuracy'].real()
         self['fix_spat_for_ts'].boolean()
+        self['fix_ext_for_initial'].boolean()
 
         # Get parameters
         bkgmethod = self['bkgmethod'].string()
@@ -156,6 +160,65 @@ class comlixfit(ctools.cslikelihood):
         # Return
         return
 
+    def _fix_ext_pars(self):
+        """
+        Fix spatial extension parameters
+        """
+        # Initialise list of fixed parameters
+        self._fixed_pars = []
+
+        # Set list of spatial extension parameters
+        pars = ['Radius', 'Width', 'Sigma', 'PA', 'MajorRadius', 'MinorRadius']
+
+        # Loop over all sky models
+        for model in self.obs().models():
+            if model.classname() == 'GModelSky':
+
+                # Loop over all parameters and fix all encountered spatial
+                # extension parameters
+                for par in pars:
+                    if model.spatial().has_par(par):
+                        if model[par].is_free():
+
+                            # Fix parameter
+                            model[par].fix()
+
+                            # Bookkeeping fixed parameters
+                            fixed = {'name': model.name(), 'par':  par}
+                            self._fixed_pars.append(fixed)
+
+                            # Log action
+                            value = '%s[%s]' % (model.name(), par)
+                            self._log_value(gammalib.EXPLICIT, 'Fixed parameter', value)
+
+        # Return
+        return
+
+    def _free_fixed_ext_pars(self):
+        """
+        Free fixed spatial extension parameters
+        """
+        # Continue only if there are fixed spatial extension parameters
+        if len(self._fixed_pars) > 0:
+
+            # Loop over fixed parameters
+            for fixed_par in self._fixed_pars:
+
+                # Free parameter
+                name = fixed_par['name']
+                par  = fixed_par['par']
+                self.obs().models()[name][par].free()
+
+                # Log action
+                value = '%s[%s]' % (name, par)
+                self._log_value(gammalib.EXPLICIT, 'Free fixed parameter', value)
+
+            # Clear list of fixed parameters
+            self._fixed_pars = []
+
+        # Return
+        return
+
     # Public methods
     def run(self):
         """
@@ -179,18 +242,25 @@ class comlixfit(ctools.cslikelihood):
         eps   = self['like_accuracy'].real()
         delta = 0.0
 
-        # Write header
+        # Log header
         self._log_header1(gammalib.NORMAL,
                           'Iterative maximum likelihood model fitting')
 
         # Loop over iterations
         for iter in range(niter):
 
-            # Write iteration header
+            # Log iteration header
             self._log_header2(gammalib.EXPLICIT, 'Iteration %d' % (iter+1))
 
             # Update observations
             self._update_obs()
+
+            # Optionally fix or free fixed spatial extension parameters
+            if self['fix_ext_for_initial'].boolean():
+                if iter == 0:
+                    self._fix_ext_pars()
+                else:
+                    self._free_fixed_ext_pars()
 
             # Fit model
             self.obs().optimize(self.opt())
@@ -210,12 +280,15 @@ class comlixfit(ctools.cslikelihood):
             self._log_value(gammalib.NORMAL, 'logL after iteration %d' % (iter+1),
                             result)
 
+            # Optionally log results
+            self._log_string(gammalib.VERBOSE, str(self.obs().models()))
+
             # Check for convergence
             if iter > 0:
                 if delta < eps:
                     break
 
-        # Write header
+        # Log header
         self._log_header1(gammalib.EXPLICIT,
                           'Final maximum likelihood model fitting')
 
@@ -231,7 +304,7 @@ class comlixfit(ctools.cslikelihood):
         self._log_value(gammalib.NORMAL, 'logL after final iteration',
                         result)
 
-        # Log header
+        # Log results
         self._log_header1(gammalib.NORMAL,
                           'Maximum likelihood optimisation results')
         self._log_string(gammalib.NORMAL, str(self.opt()))
@@ -244,7 +317,7 @@ class comlixfit(ctools.cslikelihood):
         """ 
         Save observation definition file
         """
-        # Write header
+        # Log header
         self._log_header1(gammalib.TERSE, 'Save observations')
 
         # Get output filenames
