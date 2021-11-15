@@ -114,6 +114,10 @@ class csadd2caldb(ctools.cscript):
         # Loop over all members in tarfile
         for member in tar.getmembers():
 
+            # Skip member names starting with a dot
+            if member.name[0] == '.':
+                continue
+
             # Get subarray
             subarrays  = ''
             nsubarrays = 0
@@ -129,7 +133,7 @@ class csadd2caldb(ctools.cscript):
             if nsubarrays > 1:
                 subarrays = ''
 
-            # Extract Instrument
+            # Extract attributes
             if 'South-' in member.name:
                 site = 'South'
             else:
@@ -149,10 +153,16 @@ class csadd2caldb(ctools.cscript):
             else:
                 orientation = ''
                 azimuth     = 90.0
-            
+            if 'D25' in member.name:
+                suffix = '_D25'
+            elif 'D27' in member.name:
+                suffix = '_D27'
+            else:
+                suffix = ''
+
             elements   = member.name.split('-')
             zenith     = [e for e in elements if 'deg' in e][0].strip('deg')
-            instrument = '%s_z%s%s_%s%s' % (site, zenith, orientation, duration, subarrays)
+            instrument = '%s%s_z%s%s_%s%s' % (site, suffix, zenith, orientation, duration, subarrays)
 
             # Build output directory
             path = '%s/%s' % (outdir, instrument)
@@ -268,7 +278,7 @@ class csadd2caldb(ctools.cscript):
         table.append(gammalib.GFitsTableStringCol('FILTER', 0, 10))
         table.append(gammalib.GFitsTableStringCol('CAL_DEV', 0, 20))
         table.append(gammalib.GFitsTableStringCol('CAL_DIR', 0, 70))
-        table.append(gammalib.GFitsTableStringCol('CAL_FILE', 0, 70))   # Extend beyond standard
+        table.append(gammalib.GFitsTableStringCol('CAL_FILE', 0, 128))   # Extend beyond standard
         table.append(gammalib.GFitsTableStringCol('CAL_CLAS', 0, 3))
         table.append(gammalib.GFitsTableStringCol('CAL_DTYP', 0, 4))
         table.append(gammalib.GFitsTableStringCol('CAL_CNAM', 0, 20))
