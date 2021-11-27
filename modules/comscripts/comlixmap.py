@@ -127,7 +127,7 @@ class comlixmap(ctools.cslikelihood):
         # Extract source models from observation model container
         models = gammalib.GModels()
         for model in self.obs().models():
-            if model.classname() == 'GModelSky':
+            if model.classname() == 'GModelSky' or model.classname() == 'GCOMModelDRM':
                 models.append(model)
 
         # Loop over all observations
