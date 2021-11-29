@@ -35,6 +35,8 @@ nrunav,              i, h, 3,,, "Number of Chi/Psi bins used for running average
 navgr,               i, h, 5,,, "Number of Chi/Psi bins used for averaging"
 nincl,               i, h, 5,,, "Number of Phibar layers to include"
 nexcl,               i, h, 0,,, "Number of Phibar layers to exclude"
+phi_first,           i, h, -1,,, "First Phibar layer for fitting (starting from 0; -1: no selection)"
+phi_last,            i, h, -1,,, "Last Phibar layer for fitting (starting from 0;-1: no selection)"
 
 #
 # Standard parameters

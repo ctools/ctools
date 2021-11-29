@@ -73,6 +73,14 @@ General parameters
     Number of Phibar layers to exclude (relevant for ``BGDLIXA`` and ``BGDLIXE``
     methods).
 
+``(phi_first = -1)  [integer]``
+    First Phibar layer for likelihood fitting, starting from 0. If -1 is specified
+    there is no first Phibar layer selection.
+
+``(phi_last = -1)  [integer]``
+    Last Phibar layer for likelihood fitting, starting from 0. If -1 is specified
+    there is no last Phibar layer selection.
+
 
 Standard parameters
 -------------------

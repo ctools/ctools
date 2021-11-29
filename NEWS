@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-30 September 2021
+29 November 2021
 
 
 Introduction
@@ -399,52 +399,58 @@ regions (#3248).
 
 comlixfit - COMPTEL maximum likelihood fitting using SRCLIX algorithm
 ---------------------------------------------------------------------
-Added script (#3738)
+Added phi_first and phi_last parameters to allow selection of the Phibar layers
+during the maximum likelihood fit (#3912).
+
+Added script (#3738).
 
 
 comlixmap - Generation of COMPTEL Test Statistic map using SRCLIX algorithm
 ---------------------------------------------------------------------------
-Added script (#3738)
+Added phi_first and phi_last parameters to allow selection of the Phibar layers
+during the maximum likelihood fit (#3912).
+
+Added script (#3738).
 
 
 comobsadd - Combine COMPTEL observations
 ----------------------------------------
-Added script (#3738)
+Added script (#3738).
 
 
 comobsback - Generate background model for COMPTEL observations
 ---------------------------------------------------------------
-Added script (#3738)
+Added script (#3738).
 
 
 comobsbin - Bin COMPTEL observations
 ------------------------------------
-Added script (#3738)
+Added script (#3738).
 
 
 comobsmodel - Generate model for binned COMPTEL observations
 ------------------------------------------------------------
-Added script (#3738)
+Added script (#3738).
 
 
 comobsres - Generate residuals of COMPTEL observations
 ------------------------------------------------------
-Added script (#3738)
+Added script (#3738).
 
 
 comobsselect - Select observations from COMPTEL database
 --------------------------------------------------------
-Added script (#3738)
+Added script (#3738).
 
 
 comobssim - Simulate COMPTEL observations
 -----------------------------------------
-Added script (#3738)
+Added script (#3738).
 
 
 comsrcdetect - Detect source in Test Statistic map
 --------------------------------------------------
-Added script (#3738)
+Added script (#3738).
 
 
 Examples

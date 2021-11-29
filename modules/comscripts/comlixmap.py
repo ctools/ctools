@@ -84,6 +84,8 @@ class comlixmap(ctools.cslikelihood):
         navgr     = self['navgr'].integer()
         nincl     = self['nincl'].integer()
         nexcl     = self['nexcl'].integer()
+        phi_first = self['phi_first'].integer()
+        phi_last  = self['phi_last'].integer()
 
         # Check for incorrect parameters
         if nexcl < 0 or nexcl >= nincl:
@@ -102,6 +104,14 @@ class comlixmap(ctools.cslikelihood):
         # Query ahead output model filename
         if self._read_ahead():
             self['outmap'].filename()
+
+        # Set Phibar layers for fitting
+        for obs in self.obs():
+            if obs.classname() == 'GCOMObservation':
+                if phi_first >= 0:
+                    obs.phi_first(phi_first)
+                if phi_last >= 0:
+                    obs.phi_last(phi_last)
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
