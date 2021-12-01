@@ -1,9 +1,8 @@
-2021-11-29
+2021-12-01
 
         * Version 2.0.0 released
         ========================
 
-        Add phi_first and phi_last parameters to comlixfit and comlixmap (#3912)
         Add csadd2caldb script
         Add restart of bisection in case of bad convergence in ctulimit
         Add COMPTEL analysis scripts (#3738)

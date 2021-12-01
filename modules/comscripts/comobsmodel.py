@@ -64,7 +64,8 @@ class comobsmodel(ctools.csobservation):
         self['brems'].string()
         self['ic'].string()
         self['iso'].string()
-        self['modeltype'].string()
+        self['diffusetype'].string()
+        self['bkgtype'].string()
         if self['ebinfile'].is_valid():
             self['ebinfile'].filename()
         self['bremsmap'].filename()
@@ -111,9 +112,9 @@ class comobsmodel(ctools.csobservation):
         # Return energy boundaries
         return ebounds
 
-    def _generate_background_model(self, obs):
+    def _generate_background_nodes_model(self, obs):
         """
-        Generate background model component for observation
+        Generate nodes background model component for observation
 
         Parameters
         ----------
@@ -160,6 +161,60 @@ class comobsmodel(ctools.csobservation):
 
         # Create background model from XML source element
         model = gammalib.GCOMModelDRBFitting(src)
+
+        # Return model
+        return model
+
+    def _generate_background_bins_model(self, obs):
+        """
+        Generate bins background model component for observation
+
+        Parameters
+        ----------
+        obs : `~gammalib.GCOMObservation`
+            COMPTEL observation
+
+        Returns
+        -------
+        model : `~gammalib.GCOMModelDRBPhibarBins`
+            Background model
+        """
+        # Set model attributes
+        name = 'Background_%s' % obs.id()
+        id   = obs.id()
+
+        # Extract attributes from observation
+        drb     = obs.drb()
+        npix    = drb.nchi() * drb.npsi()
+        nphibar = drb.nphibar()
+        dphibar = 2.0         # Fixed so far as we have no method to recover
+
+        # Create XML model list object
+        xml = gammalib.GXml()
+        lib = xml.append('source_library title="source library"')
+        src = lib.append('source name="%s" type="DRBPhibarBins" instrument="COM" id="%s"' % (name, id))
+
+        # Loop over all phibar layers
+        for k in range(nphibar):
+
+            # Compute DRB content for phibar layer
+            sum_drb = 0.0
+            for i in range(npix):
+                index    = i + k * npix
+                sum_drb += drb[index]
+
+            # Free or fix parameter
+            if sum_drb > 0.0:
+                free = '1'
+            else:
+                free = '0'
+
+            # Add bin
+            src.append('parameter name="Normalization" value="1.00" '
+                       'scale="1" min="0" max="1000" free="%s"' % free)
+
+        # Create background model from XML source element
+        model = gammalib.GCOMModelDRBPhibarBins(src)
 
         # Return model
         return model
@@ -231,7 +286,7 @@ class comobsmodel(ctools.csobservation):
             ebds = ebounds
 
         # Re-sample model for 'NODES' model type
-        if self['modeltype'].string() == 'NODES':
+        if self['diffusetype'].string() == 'NODES':
 
             # Setup energies vector for bin mean energies
             energies = gammalib.GEnergies()
@@ -485,7 +540,10 @@ class comobsmodel(ctools.csobservation):
             self._log_string(gammalib.NORMAL, str(obs))
 
             # Generate model
-            model = self._generate_background_model(obs)
+            if self['bkgtype'].string() == 'NODES':
+                model = self._generate_background_nodes_model(obs)
+            else:
+                model = self._generate_background_bins_model(obs)
 
             # Log model
             self._log_string(gammalib.EXPLICIT, str(model))

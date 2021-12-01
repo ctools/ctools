@@ -39,7 +39,8 @@ npsi,     i, h, 80,1,500, "Number of bins in Psi direction"
 nphibar,  i, h, 25,1,100, "Number of bins in Phibar direction"
 psdmin,   i, h, 0,0,110, "Minimum PSD value"
 psdmax,   i, h, 110,0,110, "Maximum PSD value"
-zetamin,  r, h, 5.0,0.0,10.0, "Minimum Earth horizon - Phibar (zeta) angle"
+zetamin,  r, h, 5.0,0.0,10.0, "Minimum Earth horizon - Phibar (zeta) angle (deg)"
+fpmtflag, i, h, 0,0,2, "Handling of D2 modules with failed PMT flag (0: exclude, 1: include, 2: exclude PMT)"
 
 #
 # Standard parameters

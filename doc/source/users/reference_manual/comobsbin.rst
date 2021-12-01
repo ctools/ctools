@@ -66,6 +66,18 @@ General parameters
 ``(nphibar = 25) [integer]``
     Number of bins in Phibar direction.
 
+``(psdmin = 0) [integer]``
+    Minimum PSD value.
+
+``(psdmax = 110) [integer]``
+    Maximum PSD value.
+
+``(zetamin = 5.0) [real]``
+    Minimum Earth horizon - Phibar (zeta) angle (deg).
+
+``(fpmtflag = 0) [integer]``
+    Handling of D2 modules with failed PMT flag (0: exclude, 1: include, 2: exclude PMT).
+
 
 Standard parameters
 -------------------

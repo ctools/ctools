@@ -74,6 +74,7 @@ class comobsbin(ctools.csobservation):
         self['psdmin'].integer()
         self['psdmax'].integer()
         self['zetamin'].real()
+        self['fpmtflag'].integer()
 
         # Query ahead output model filename
         if self._read_ahead():
@@ -191,13 +192,14 @@ class comobsbin(ctools.csobservation):
             # Set phases
             self._select.phases(self._phases)
 
-            # Set suffix
+            # Set DRE, DRG and DRX suffix
             phases           = self['phase'].string()
-            self._drx_suffix = '_phases'+phases.replace(';', '_')
-            self._drg_suffix = '_phases'+phases.replace(';', '_')
             self._dre_suffix = '_phases'+phases.replace(';', '_')
+            self._drg_suffix = '_phases'+phases.replace(';', '_')
+            self._drx_suffix = '_phases'+phases.replace(';', '_')
 
         # If PSD interval differs from standard interval then set the interval
+        # and append flag to suffix
         if self['psdmin'].integer() != 0 or self['psdmax'].integer() != 110:
         
             # Set PSD interval
@@ -208,10 +210,22 @@ class comobsbin(ctools.csobservation):
             self._dre_suffix += '_psd%d-%d' % (self['psdmin'].integer(),
                                                self['psdmax'].integer())
 
-        # If zeta angle differs from standard value then append zeta angle to suffix
+        # If zeta angle differs from standard value then append zeta angle to DRE
+        # and DRG suffix
         if self['zetamin'].real() != 5.0:
-            self._drg_suffix += '_zeta%.1f' % (self['zetamin'].real())
             self._dre_suffix += '_zeta%.1f' % (self['zetamin'].real())
+            self._drg_suffix += '_zeta%.1f' % (self['zetamin'].real())
+
+        # If handling of D2 modules with failed PMT flag differs from standard then
+        # set the flag and append flag to suffix
+        if self['fpmtflag'].integer() != 0:
+
+            # Set handling of D2 modules with failed PMT flag
+            self._select.fpmtflag(self['fpmtflag'].integer())
+
+            # Set DRE and DRG suffix
+            self._dre_suffix += '_fpmt%1d' % (self['fpmtflag'].integer())
+            self._drg_suffix += '_fpmt%1d' % (self['fpmtflag'].integer())
 
         # Log input observations
         self._log_string(gammalib.NORMAL, str(self._select))

@@ -41,8 +41,11 @@ General parameters
 ``iso <NONE|MAP|CUBE> [string]``
     Isotropic component.
 
-``modeltype <NODES|BINS> [string]``
+``diffusetype <NODES|BINS> [string]``
     Diffuse model type.
+
+``bkgtype <NODES|BINS> [string]``
+    Background model type.
 
 ``(bremsmap = $COMDATA/../skymaps/galprop/map_comptel_bremsstrahlung.fits) [file]``
     Bremsstrahlung map file name.
