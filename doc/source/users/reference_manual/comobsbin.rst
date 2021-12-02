@@ -48,6 +48,21 @@ General parameters
 ``ebinfile [string]``
     Name of the file containing the energy bin definition.
 
+``coordsys <CEL|GAL> [string]``
+    Coordinate system (CEL - celestial, GAL - galactic).
+
+``proj <AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN> [string]``
+    Projection method.
+
+``(usepnt = yes) [boolean]``
+    Use COMPTEL pointing direction for DRI centre instead of chi0/psi0 parameters?
+
+``chi0 [real]``
+    Right Ascension / Galactic longitude of DRI centre (J2000, in degrees).
+
+``psi0 [real]``
+    Declination / Galactic latitude of DRI centre (J2000, in degrees).
+
 ``(dchi = 1.0) [real]``
     Bin size in Chi direction (deg).
 
@@ -77,6 +92,12 @@ General parameters
 
 ``(fpmtflag = 0) [integer]``
     Handling of D2 modules with failed PMT flag (0: exclude, 1: include, 2: exclude PMT).
+
+``(d1use = 1111111) [string]``
+    D1 module usage (1: use, 0: don't use).
+
+``(d2use = 11111111111111) [string]``
+    D2 module usage (1: use, 0: don't use).
 
 
 Standard parameters

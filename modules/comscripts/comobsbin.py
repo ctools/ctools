@@ -64,6 +64,11 @@ class comobsbin(ctools.csobservation):
         if not self._phases.is_empty():
             self['phase0'].time()
             self['period'].real()
+        self['coordsys'].string()
+        self['proj'].string()
+        if not self['usepnt'].boolean():
+            self['chi0'].real()
+            self['psi0'].real()
         self['outfolder'].string()
         self['dchi'].real()
         self['dpsi'].real()
@@ -75,6 +80,20 @@ class comobsbin(ctools.csobservation):
         self['psdmax'].integer()
         self['zetamin'].real()
         self['fpmtflag'].integer()
+        
+        # Get D1 and D2 module usage strings
+        d1use = self['d1use'].string()
+        d2use = self['d2use'].string()
+
+        # Check D1 and D2 module usage strings
+        if len(d1use) != 7:
+            msg = 'Incorrect length %d of D1 usage string. String needs to have 7 digits.' % \
+                  len(d1use)
+            raise RuntimeError(msg)
+        if len(d2use) != 14:
+            msg = 'Incorrect length %d of D2 usage string.  String needs to have 14 digits.' % \
+                  len(d2use)
+            raise RuntimeError(msg)
 
         # Query ahead output model filename
         if self._read_ahead():
@@ -201,7 +220,7 @@ class comobsbin(ctools.csobservation):
         # If PSD interval differs from standard interval then set the interval
         # and append flag to suffix
         if self['psdmin'].integer() != 0 or self['psdmax'].integer() != 110:
-        
+
             # Set PSD interval
             self._select.psd_min(self['psdmin'].integer())
             self._select.psd_max(self['psdmax'].integer())
@@ -226,6 +245,38 @@ class comobsbin(ctools.csobservation):
             # Set DRE and DRG suffix
             self._dre_suffix += '_fpmt%1d' % (self['fpmtflag'].integer())
             self._drg_suffix += '_fpmt%1d' % (self['fpmtflag'].integer())
+
+        # If D1 module usage differs from standard value then set module usage
+        # and append usage to DRE and DRG suffix
+        d1use = self['d1use'].string()
+        if d1use != '1111111':
+
+            # Set usage flags
+            for i in range(7):
+                if d1use[i] == '1':
+                    self._select.use_d1(i,True)
+                else:
+                    self._select.use_d1(i,False)
+
+            # Set DRE and DRG suffix
+            self._dre_suffix += '_%s' % (d1use)
+            self._drg_suffix += '_%s' % (d1use)
+
+        # If D2 module usage differs from standard value then set module usage
+        # and append usage to DRE and DRG suffix
+        d2use = self['d2use'].string()
+        if d2use != '11111111111111':
+
+            # Set usage flags
+            for i in range(14):
+                if d2use[i] == '1':
+                    self._select.use_d2(i,True)
+                else:
+                    self._select.use_d2(i,False)
+
+            # Set DRE and DRG suffix
+            self._dre_suffix += '_%s' % (d2use)
+            self._drg_suffix += '_%s' % (d2use)
 
         # Log input observations
         self._log_string(gammalib.NORMAL, str(self._select))
@@ -262,7 +313,21 @@ class comobsbin(ctools.csobservation):
         # Get pointing direction
         pnt = self._get_pointing_direction(obs)
 
-        # Get dataspace dimension
+        # Get DRE and DRG centre definition, coordinate system and projection
+        coordsys = self['coordsys'].string()
+        proj     = self['proj'].string()
+        if self['usepnt'].boolean():
+            if coordsys == 'GAL':
+                chi0 = pnt.l_deg()
+                psi0 = pnt.b_deg()
+            else:
+                chi0 = pnt.ra_deg()
+                psi0 = pnt.dec_deg()
+        else:
+            chi0 = self['chi0'].real()
+            psi0 = self['psi0'].real()
+
+        # Get DRE and DRG dimension
         dchi    = self['dchi'].real()
         dpsi    = self['dpsi'].real()
         dphibar = self['dphibar'].real()
@@ -270,8 +335,29 @@ class comobsbin(ctools.csobservation):
         npsi    = self['npsi'].integer()
         nphibar = self['nphibar'].integer()
 
+        # Set DRI prefix in case that the DRI definition deviates from the standard
+        dri_prefix = ''
+        filler     = '_'
+        if coordsys != 'GAL':
+            dri_prefix += '_cel'
+            filler      = '-'
+        if proj != 'TAN':
+            dri_prefix += '%s%s' % (filler, proj)
+            filler      = '-'
+        if nchi != 80 or npsi != 80 or nphibar != 25:
+            dri_prefix += '%s%dx%dx%d' % (filler, nchi, npsi, nphibar)
+            filler      = '-'
+        if dchi != 1.0 or dpsi != 1.0 or dphibar != 2.0:
+            dri_prefix += '%s%.1fx%.1fx%.1f' % (filler, dchi, dpsi, dphibar)
+            filler      = '-'
+        if not self['usepnt'].boolean():
+            if psi0 < 0.0:
+                dri_prefix += '%s%.2f-%.2f' % (filler, chi0,-psi0)
+            else:
+                dri_prefix += '%s%.2f+%.2f' % (filler, chi0,psi0)
+
         # Create sky map for DRE and DRG
-        cube = gammalib.GSkyMap('TAN', 'GAL', pnt.l_deg(), pnt.b_deg(), dchi, dpsi, nchi, npsi)
+        cube = gammalib.GSkyMap(proj, coordsys, chi0, psi0, dchi, dpsi, nchi, npsi)
 
         # Create sky map for DRX
         expo = gammalib.GSkyMap('CAR', 'GAL', 0.0, 0.0, 1.0, 1.0, 360, 180)
@@ -282,8 +368,8 @@ class comobsbin(ctools.csobservation):
         drx = gammalib.GCOMDri(expo)
 
         # Set DRG and DRX filenames
-        drxname = '%s/%s_drx%s.fits' % (self['outfolder'].string(), obs.id(), self._drx_suffix)
-        drgname = '%s/%s_drg%s.fits' % (self['outfolder'].string(), obs.id(), self._drg_suffix)
+        drxname = '%s/%s_drx%s.fits'   % (self['outfolder'].string(), obs.id(), self._drx_suffix)
+        drgname = '%s/%s%s_drg%s.fits' % (self['outfolder'].string(), obs.id(), dri_prefix, self._drg_suffix)
         drxfile = gammalib.GFilename(drxname)
         drgfile = gammalib.GFilename(drgname)
 
@@ -314,8 +400,8 @@ class comobsbin(ctools.csobservation):
         for i in range(ebounds.size()):
 
             # Set DRE filename
-            drename = '%s/%s_dre%s_%6.6d-%6.6dkeV.fits' % \
-                      (self['outfolder'].string(), obs.id(), self._dre_suffix,
+            drename = '%s/%s%s_dre%s_%6.6d-%6.6dkeV.fits' % \
+                      (self['outfolder'].string(), obs.id(), dri_prefix, self._dre_suffix,
                        ebounds.emin(i).keV(), ebounds.emax(i).keV())
             drefile = gammalib.GFilename(drename)
 
