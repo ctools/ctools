@@ -334,10 +334,10 @@ class comobsmodel(ctools.csobservation):
             # Set spectral model using initial scaling factors that correspond
             # to the results of Bloemen et al. (1999)
             spectral = gammalib.GModelSpectralNodes()
-            spectral.append(gammalib.GEnergy(0.87, 'MeV'),  6.475e-3)
-            spectral.append(gammalib.GEnergy(1.73, 'MeV'),  1.403e-3)
-            spectral.append(gammalib.GEnergy(5.48, 'MeV'),  1.279e-4)
-            spectral.append(gammalib.GEnergy(17.32, 'MeV'), 1.552e-5)
+            spectral.append(gammalib.GEnergy(0.87, 'MeV'),  0.93)
+            spectral.append(gammalib.GEnergy(1.73, 'MeV'),  0.20)
+            spectral.append(gammalib.GEnergy(5.48, 'MeV'),  0.018)
+            spectral.append(gammalib.GEnergy(17.32, 'MeV'), 0.0022)
 
             # Recast model
             spectral = self._recast_model(spectral, ebounds, -2.0, 1.0e-10, 1.0)
@@ -393,10 +393,10 @@ class comobsmodel(ctools.csobservation):
             # Set spectral model using initial scaling factors that correspond
             # to the results of Bloemen et al. (1999)
             spectral = gammalib.GModelSpectralNodes()
-            spectral.append(gammalib.GEnergy(0.87, 'MeV'),  1.069e-2)
-            spectral.append(gammalib.GEnergy(1.73, 'MeV'),  3.043e-3)
-            spectral.append(gammalib.GEnergy(5.48, 'MeV'),  3.776e-4)
-            spectral.append(gammalib.GEnergy(17.32, 'MeV'), 5.175e-5)
+            spectral.append(gammalib.GEnergy(0.87, 'MeV'),  2.23)
+            spectral.append(gammalib.GEnergy(1.73, 'MeV'),  0.64)
+            spectral.append(gammalib.GEnergy(5.48, 'MeV'),  0.079)
+            spectral.append(gammalib.GEnergy(17.32, 'MeV'), 0.011)
 
             # Recast model
             spectral = self._recast_model(spectral, ebounds, -2.0, 1.0e-10, 1.0)
