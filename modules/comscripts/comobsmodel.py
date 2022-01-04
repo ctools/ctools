@@ -328,8 +328,8 @@ class comobsmodel(ctools.csobservation):
         # Append COMPTEL map if MAP is selected ...
         if self['brems'].string() == 'MAP':
 
-            # Set spatial model
-            spatial  = gammalib.GModelSpatialDiffuseMap(self['bremsmap'].filename())
+            # Set spatial model (do not normalise the map)
+            spatial  = gammalib.GModelSpatialDiffuseMap(self['bremsmap'].filename(), 1.0, False)
 
             # Set spectral model using initial scaling factors that correspond
             # to the results of Bloemen et al. (1999)
@@ -387,8 +387,8 @@ class comobsmodel(ctools.csobservation):
         # Append COMPTEL map if MAP is selected ...
         if self['ic'].string() == 'MAP':
 
-            # Set spatial model
-            spatial  = gammalib.GModelSpatialDiffuseMap(self['icmap'].filename())
+            # Set spatial model (do not normalise the map)
+            spatial  = gammalib.GModelSpatialDiffuseMap(self['icmap'].filename(), 1.0, False)
 
             # Set spectral model using initial scaling factors that correspond
             # to the results of Bloemen et al. (1999)
@@ -446,13 +446,15 @@ class comobsmodel(ctools.csobservation):
         # Append model if CONST is selected ...
         if 'CONST' in self['iso'].string():
 
-            # Set spatial model
-            spatial  = gammalib.GModelSpatialDiffuseConst()
+            # Set spatial model, scaled so that the spectral part gives flux per
+            # steradian
+            spatial  = gammalib.GModelSpatialDiffuseConst(gammalib.fourpi)
 
             # Set spectral model using initial scaling factors that correspond
             # to Georg Weidenspointers extragalactic spectrum. Values integrated
             # over the standard energy bands communicated by Werner Collmar and
             # divided by width of standard energy bands.
+            # See his e-mail from 14 July 2021.
             spectral = gammalib.GModelSpectralNodes()
             spectral.append(gammalib.GEnergy(0.87, 'MeV'),  1.327e-3/0.25)
             spectral.append(gammalib.GEnergy(1.73, 'MeV'),  2.358e-3/2.0)
