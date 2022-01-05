@@ -340,7 +340,7 @@ class comobsmodel(ctools.csobservation):
             spectral.append(gammalib.GEnergy(17.32, 'MeV'), 0.0022)
 
             # Recast model
-            spectral = self._recast_model(spectral, ebounds, -2.0, 1.0e-10, 1.0)
+            spectral = self._recast_model(spectral, ebounds, -2.0, 1.0e-10, 100.0)
 
         # ... otherwise append Fermi-LAT GALPROP cube
         else:
@@ -399,7 +399,7 @@ class comobsmodel(ctools.csobservation):
             spectral.append(gammalib.GEnergy(17.32, 'MeV'), 0.011)
 
             # Recast model
-            spectral = self._recast_model(spectral, ebounds, -2.0, 1.0e-10, 1.0)
+            spectral = self._recast_model(spectral, ebounds, -2.0, 1.0e-10, 100.0)
 
         # ... otherwise append Fermi-LAT GALPROP cube
         else:
