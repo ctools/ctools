@@ -386,7 +386,7 @@ class cspull(ctools.csobservation):
         table = gammalib.GFitsBinTable(nrows)
         table.extname('PULL_DISTRIBUTION')
 
-        # Add keywors for compatibility with gammalib.GMWLSpectrum
+        # Add keywords for compatibility with gammalib.GMWLSpectrum
         table.card('INSTRUME', 'CTA', 'Name of Instrument')
         table.card('TELESCOP', 'CTA', 'Name of Telescope')
 

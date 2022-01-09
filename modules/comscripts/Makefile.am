@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for comscripts Python scripts                                    #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2021 Juergen Knoedlseder                                    #
+# Copyright (C) 2021-2022 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -30,6 +30,7 @@ pythonscripts = $(top_builddir)/modules/comscripts/__init__.py \
                 $(srcdir)/comobsres.py \
                 $(srcdir)/comobsselect.py \
                 $(srcdir)/comobssim.py \
+                $(srcdir)/compulbin.py \
                 $(srcdir)/comsrcdetect.py
 
 # Parfiles to be distributed in $(prefix)/syspfiles
@@ -42,6 +43,7 @@ parfiles = $(srcdir)/comlixfit.par \
            $(srcdir)/comobsres.par \
            $(srcdir)/comobsselect.par \
            $(srcdir)/comobssim.par \
+           $(srcdir)/compulbin.par \
            $(srcdir)/comsrcdetect.par
 
 # Scripts for which symbolic links will be created in bindir
@@ -54,6 +56,7 @@ linkscripts = comlixfit \
               comobsres \
               comobsselect \
               comobssim \
+              compulbin \
               comsrcdetect
 
 # Test scripts to be distributed in $(pyexecdir)/comscripts/tests

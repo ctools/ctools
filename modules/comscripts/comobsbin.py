@@ -304,7 +304,7 @@ class comobsbin(ctools.csobservation):
             self._dre_suffix += '_%s' % (d2use)
             self._drg_suffix += '_%s' % (d2use)
 
-        # Log input observations
+        # Log selection set
         self._log_string(gammalib.NORMAL, str(self._select))
 
         # Return
