@@ -156,8 +156,8 @@ RadialGaussian
   * ``DEC`` is the Declination of the Gaussian centre (degrees)
   * :math:`\sigma` = ``Sigma`` (degrees)
 
- RadialGeneralGaussian
-~~~~~~~~~~~~~~
+RadialGeneralGaussian
+~~~~~~~~~~~~~~~~~~~~~
 
   The ``RadialGeneralGaussian`` model describes a generalised Gaussian
   intensity distribution, with the radial profile index as a model parameter.
@@ -165,11 +165,11 @@ RadialGaussian
   .. code-block:: xml
 
      <source name="Crab" type="ExtendedSource">
-       <spatialModel type="RadialGaussian">
-         <parameter name="RA"    scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
-         <parameter name="DEC"   scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
-         <parameter name="Radius" scale="1.0" value="0.20" min="0.01" max="10"  free="1"/>
-	 <parameter name="R_Index" scale="1.0" value="0.5"    min="0.01" max="10"  free="1"/>
+       <spatialModel type="RadialGeneralGaussian">
+         <parameter name="RA"      scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
+         <parameter name="DEC"     scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
+         <parameter name="Radius"  scale="1.0" value="0.20"    min="0.01" max="10"  free="1"/>
+	     <parameter name="R_Index" scale="1.0" value="0.5"     min="0.01" max="10"  free="1"/>
        </spatialModel>
        <spectrum type="...">
          ...
@@ -189,8 +189,8 @@ RadialGaussian
   * :math:`r` = ``Radius`` (degrees)
   * :math:`\eta` = ``R_Index``
 
-The model normalisation is correct in the small angle
- approximation and for  :math:`\eta` order unity or smaller.
+  The model normalisation is correct in the small angle approximation and for
+  :math:`\eta` order unity or smaller.
 
 RadialShell
 ~~~~~~~~~~~
@@ -311,8 +311,8 @@ EllipticalGaussian
     from North
   * :math:`\phi` is the azimuth angle with respect to North.
 
- EllipticalGeneralGaussian
-~~~~~~~~~~~~~~~~~~
+EllipticalGeneralGaussian
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
   The ``EllipticalGeneralGaussian`` model describes a Gaussian intensity distribution
 
@@ -324,8 +324,8 @@ EllipticalGaussian
         <parameter name="DEC"         scale="1.0" value="22.0145" min="-90"   max="90"  free="1"/>
         <parameter name="PA"          scale="1.0" value="45.0"    min="-360"  max="360" free="1"/>
         <parameter name="MinorRadius" scale="1.0" value="0.5"     min="0.001" max="10"  free="1"/>
-        <parameter name="MajorRadius" scale="1.0" value="2.0" min="0.001" max="10"  free="1"/>
-	<parameter name="R_Index" scale="1.0" value="0.5"    min="0.01" max="10"  free="1"/>
+        <parameter name="MajorRadius" scale="1.0" value="2.0"     min="0.001" max="10"  free="1"/>
+	    <parameter name="R_Index"     scale="1.0" value="0.5"     min="0.01"  max="10"  free="1"/>
       </spatialModel>
       <spectrum type="...">
         ...
@@ -356,8 +356,8 @@ EllipticalGaussian
   * :math:`\phi` is the azimuth angle with respect to North
   * :math:`\eta` = ``R_Index``
 
- The model normalisation is correct in the small angle
- approximation and for  :math:`\eta` order unity or smaller.
+  The model normalisation is correct in the small angle approximation and for
+  :math:`\eta` order unity or smaller.
 
 
 Diffuse source
