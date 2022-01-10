@@ -245,11 +245,11 @@ class compulbin(ctools.csobservation):
                     num_eha_too_small += 1
                     continue
 
-                # Get pulsar ephemerides for event time
-                ephemerides = self._select.pulsar().ephemerides(event.time())
+                # Get pulsar ephemeris for event time
+                ephemeris = self._select.pulsar().ephemeris(event.time())
 
                 # Compute Phigeo
-                phigeo = event.dir().dir().dist_deg(ephemerides.dir())
+                phigeo = event.dir().dir().dist_deg(ephemeris.dir())
 
                 # Make ARM selection
                 arm = event.phibar() - phigeo
@@ -261,11 +261,11 @@ class compulbin(ctools.csobservation):
                     continue
 
                 # Convert event time to Solar System Barycentre time
-                tdelta = obs.bvcs().tdelta(ephemerides.dir(), event.time())
+                tdelta = obs.bvcs().tdelta(ephemeris.dir(), event.time())
                 time   = event.time() + tdelta
 
                 # Compute pulsar phase
-                phase = ephemerides.phase(time)
+                phase = ephemeris.phase(time)
 
                 # Fill event in phase bin
                 ibin = int(phase / self._phasebin)
