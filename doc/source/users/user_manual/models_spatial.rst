@@ -156,6 +156,42 @@ RadialGaussian
   * ``DEC`` is the Declination of the Gaussian centre (degrees)
   * :math:`\sigma` = ``Sigma`` (degrees)
 
+RadialGeneralGaussian
+~~~~~~~~~~~~~~~~~~~~~
+
+  The ``RadialGeneralGaussian`` model describes a generalised Gaussian
+  intensity distribution, with the radial profile index as a model parameter.
+
+  .. code-block:: xml
+
+     <source name="Crab" type="ExtendedSource">
+       <spatialModel type="RadialGeneralGaussian">
+         <parameter name="RA"      scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
+         <parameter name="DEC"     scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
+         <parameter name="Radius"  scale="1.0" value="0.20"    min="0.01" max="10"  free="1"/>
+	     <parameter name="R_Index" scale="1.0" value="0.5"     min="0.01" max="10"  free="1"/>
+       </spatialModel>
+       <spectrum type="...">
+         ...
+       </spectrum>
+     </source>
+
+  and implements
+
+  .. math::
+     M_{\rm spatial}(\theta) = \frac{1}{2 \pi r^2 \eta \Gamma(2\eta)} \exp
+                    \left[- \left(\frac{\theta^2}{r^2}\right)^\frac{1}{\eta} \right],
+
+  where
+
+  * ``RA`` is the Right Ascension of the Gaussian centre (degrees)
+  * ``DEC`` is the Declination of the Gaussian centre (degrees)
+  * :math:`r` = ``Radius`` (degrees)
+  * :math:`\eta` = ``R_Index``
+
+  The model normalisation is correct in the small angle approximation and for
+  :math:`\eta` order unity or smaller.
+
 RadialShell
 ~~~~~~~~~~~
 
@@ -274,6 +310,54 @@ EllipticalGaussian
   * :math:`\phi_0` is the position angle of the ellipse, counted counterclockwise
     from North
   * :math:`\phi` is the azimuth angle with respect to North.
+
+EllipticalGeneralGaussian
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  The ``EllipticalGeneralGaussian`` model describes a Gaussian intensity distribution
+
+  .. code-block:: xml
+
+    <source name="Crab" type="ExtendedSource">
+      <spatialModel type="EllipticalGeneralGaussian">
+        <parameter name="RA"          scale="1.0" value="83.6331" min="-360"  max="360" free="1"/>
+        <parameter name="DEC"         scale="1.0" value="22.0145" min="-90"   max="90"  free="1"/>
+        <parameter name="PA"          scale="1.0" value="45.0"    min="-360"  max="360" free="1"/>
+        <parameter name="MinorRadius" scale="1.0" value="0.5"     min="0.001" max="10"  free="1"/>
+        <parameter name="MajorRadius" scale="1.0" value="2.0"     min="0.001" max="10"  free="1"/>
+	    <parameter name="R_Index"     scale="1.0" value="0.5"     min="0.01"  max="10"  free="1"/>
+      </spatialModel>
+      <spectrum type="...">
+        ...
+      </spectrum>
+    </source>
+
+  and implements
+
+  .. math::
+     M_{\rm spatial}(\theta, \phi) = \frac{1}{2 \pi r^2 \eta
+     \Gamma(2\eta)} \exp \left[ -\left(\frac{\theta^2}{2 r_\mathrm{eff}^2}\right)^\frac{1}{\eta} \right],
+
+  with
+
+  .. math::
+     r_\mathrm{eff} = \frac{ab} {\sqrt{\left( a \sin (\phi - \phi_0) \right)^2 +
+                      \sqrt{\left( b \cos (\phi - \phi_0) \right)^2}}}
+
+  where
+
+  * ``RA`` is the Right Ascension (degrees)
+  * ``DEC`` is the Declination (degrees)
+  * ``PA`` is the position angle, counted counterclockwise from North (degrees)
+  * :math:`a` = ``MinorRadius`` (degrees)
+  * :math:`b` = ``MajorRadius`` (degrees)
+  * :math:`\phi_0` is the position angle of the ellipse, counted counterclockwise
+    from North
+  * :math:`\phi` is the azimuth angle with respect to North
+  * :math:`\eta` = ``R_Index``
+
+  The model normalisation is correct in the small angle approximation and for
+  :math:`\eta` order unity or smaller.
 
 
 Diffuse source
