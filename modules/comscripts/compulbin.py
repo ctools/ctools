@@ -260,12 +260,17 @@ class compulbin(ctools.csobservation):
                     num_arm_too_large += 1
                     continue
 
-                # Convert event time to Solar System Barycentre time
+                # Convert event time to Solar System Barycentre time. Note
+                # that the time correction includes an UTC_TO_TT conversion
+                # term, but this terms has already applied when setting the
+                # GTime object. Hence if time is read as time.mjd() the
+                # correction would be applied twice, yet reading the time as
+                # time.mjd('UTC') will remove the correation again.
                 tdelta = obs.bvcs().tdelta(ephemeris.dir(), event.time())
                 time   = event.time() + tdelta
 
                 # Compute pulsar phase
-                phase = ephemeris.phase(time)
+                phase = ephemeris.phase(time, 'UTC')
 
                 # Fill event in phase bin
                 ibin = int(phase / self._phasebin)
