@@ -186,6 +186,10 @@ class compulbin(ctools.csobservation):
         tim = obs.tim()
         tim.reduce(self._select.pulsar().validity())
 
+        # Initialise JPL DE200 ephemerides (use in case that no
+        # BVC data are available)
+        ephem = gammalib.GEphemerides()
+
         # Loop over Orbit Aspect Data
         for oad in obs.oads():
 
@@ -260,16 +264,24 @@ class compulbin(ctools.csobservation):
                     num_arm_too_large += 1
                     continue
 
-                # Convert event time to Solar System Barycentre time. Note
-                # that the time correction includes an UTC_TO_TT conversion
-                # term, but this terms has already applied when setting the
-                # GTime object. Hence if time is read as time.mjd() the
+                # Convert event time to Solar System Barycentre time. If BVC
+                # information is available it will be used for the computation,
+                # otherwise the time correction will be computed on-the-fly
+                # from the JPL DE200 ephemerides.
+                #
+                # Note that the time correction includes an UTC_TO_TT conversion
+                # term, but this terms has already been applied when setting
+                # the GTime object. Hence if time is read as time.mjd() the
                 # correction would be applied twice, yet reading the time as
                 # time.mjd('UTC') will remove the correation again.
-                tdelta = obs.bvcs().tdelta(ephemeris.dir(), event.time())
-                time   = event.time() + tdelta
+                if obs.bvcs().is_empty():
+                    tdelta = ephem.geo2ssb(ephemeris.dir(), event.time(), oad.pos()) + \
+                             event.time().utc2tt()
+                else:
+                    tdelta = obs.bvcs().tdelta(ephemeris.dir(), event.time())
+                time = event.time() + tdelta
 
-                # Compute pulsar phase
+                # Compute pulsar phase (in UTC, see comment above)
                 phase = ephemeris.phase(time, 'UTC')
 
                 # Fill event in phase bin
