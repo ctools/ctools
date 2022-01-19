@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the comobsbin script.
 #
-# Copyright (C) 2021 Juergen Knoedlseder
+# Copyright (C) 2021-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -81,6 +81,7 @@ class Test(test):
         # Setup command
         cmd = comobsbin+' inobs="'+self._obs+'" ebinalg="FILE" '+ \
                         'ebinfile="'+self._ebounds+'" phase="NONE" '+ \
+                        'coordsys="GAL" proj="TAN" '+ \
                         'outfolder="comobsbin_cmd1" outobs="comobsbin_cmd1.xml" '+ \
                         'logfile="comobsbin_cmd1.log" chatter=1'
 
@@ -94,6 +95,7 @@ class Test(test):
         # Setup command
         cmd = comobsbin+' inobs="file_that_does_not_exist.xml" ebinalg="FILE" '+ \
                         'ebinfile="'+self._ebounds+'" phase="NONE" '+ \
+                        'coordsys="GAL" proj="TAN" '+ \
                         'outfolder="comobsbin_cmd2" outobs="comobsbin_cmd2.xml" '+ \
                         'logfile="comobsbin_cmd2.log" chatter=1'
 
@@ -118,6 +120,8 @@ class Test(test):
         bin['ebinalg']   = 'FILE'
         bin['ebinfile']  = self._ebounds
         bin['phase']     = 'NONE'
+        bin['coordsys']  = 'GAL'
+        bin['proj']      = 'TAN'
         bin['outfolder'] = 'comobsbin_py1'
         bin['outobs']    = 'comobsbin_py1.xml'
         bin['logfile']   = 'comobsbin_py1.log'

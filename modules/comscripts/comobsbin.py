@@ -2,7 +2,7 @@
 # ==========================================================================
 # Bin COMPTEL observations
 #
-# Copyright (C) 2019-2021 Juergen Knoedlseder
+# Copyright (C) 2019-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,11 +40,12 @@ class comobsbin(ctools.csobservation):
         self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise members
-        self._phases     = gammalib.GPhases()
-        self._select     = gammalib.GCOMSelection()
-        self._drx_suffix = ''
-        self._drg_suffix = ''
-        self._dre_suffix = ''
+        self._phases           = gammalib.GPhases()
+        self._select           = gammalib.GCOMSelection()
+        self._drx_suffix       = ''
+        self._drg_suffix       = ''
+        self._dre_suffix       = ''
+        self._global_datastore = '$COMDATA/datastore'
 
         # Return
         return
@@ -62,8 +63,11 @@ class comobsbin(ctools.csobservation):
         self._get_ebounds()
         self._get_phases()
         if not self._phases.is_empty():
-            self['phase0'].time()
-            self['period'].real()
+            if gammalib.toupper(self['psrname'].string()) != 'NONE':
+                self['ephemerides'].filename()
+            else:
+                self['phase0'].time()
+                self['period'].real()
         self['coordsys'].string()
         self['proj'].string()
         if not self['usepnt'].boolean():
@@ -80,7 +84,7 @@ class comobsbin(ctools.csobservation):
         self['psdmax'].integer()
         self['zetamin'].real()
         self['fpmtflag'].integer()
-        
+
         # Get D1 and D2 module usage strings
         d1use = self['d1use'].string()
         d2use = self['d2use'].string()
@@ -183,39 +187,62 @@ class comobsbin(ctools.csobservation):
         # Clear selection set
         self._select.clear()
 
-        # If phases are set then set the phase curve and phases of the
-        # selection set
+        # If phases are set then handle phase selection
         if not self._phases.is_empty():
 
-            # Raise error if period is not positive
-            if self['period'].real() <= 0.0:
-                msg = 'Period %f is not positive. Please specify a positive period.'
-                raise RuntimeError(msg)
+            # If pulsar string is valid then handle pulsar
+            psrname = self['psrname'].string()
+            if gammalib.toupper(psrname) != 'NONE':
 
-            # Get frequency of variability in units of Hz
-            f0 = 1.0 / (self['period'].real() * gammalib.sec_in_day)
+                # Log pulsar phase selection
+                self._log_string(gammalib.NORMAL, 'Phase selection for pulsar "%s"' %
+                                 psrname)
 
-            # Set temporal phase curve
-            phase_curve = gammalib.GModelTemporalPhaseCurve()
+                # Read ephemerides
+                pulsar = gammalib.GPulsar(self['ephemerides'].filename(), psrname)
 
-            # Set phase curve elements
-            phase_curve.mjd(self['phase0'].time()) # Reference time
-            phase_curve.phase(0.0)                 # Phase @ reference time
-            phase_curve.f0(f0)                     # Frequency @ reference time
-            phase_curve.f1(0.0)                    # No frequency derivative
-            phase_curve.f2(0.0)                    # No 2nd frequency derivative
+                # Set pulsar ephemerides
+                self._select.pulsar(pulsar)
 
-            # Set phase curve
-            self._select.phase_curve(phase_curve)
+                # Set pulsar phases
+                self._select.pulsar_phases(self._phases)
 
-            # Set phases
-            self._select.phases(self._phases)
+                # Set phase suffix
+                suffix = '_pulphase'
 
-            # Set DRE, DRG and DRX suffix
-            phases           = self['phase'].string()
-            self._dre_suffix = '_phases'+phases.replace(';', '_')
-            self._drg_suffix = '_phases'+phases.replace(';', '_')
-            self._drx_suffix = '_phases'+phases.replace(';', '_')
+                # Set DRE, DRG and DRX suffix
+                phases           = self['phase'].string()
+                self._dre_suffix = suffix+phases.replace(';', '_')
+                self._drg_suffix = suffix
+                self._drx_suffix = suffix
+
+            # ... otherwise handle orbital phase selection
+            else:
+
+                # Raise error if period is not positive
+                period = self['period'].real()
+                if period <= 0.0:
+                    msg = 'Period %f is not positive. Please specify a positive period.'
+                    raise RuntimeError(msg)
+
+                # Log orbital phase selection
+                self._log_string(gammalib.NORMAL, 'Orbital selection for period %f days' %
+                                 period)
+
+                # Set orbital period
+                self._select.orbital_period(period, self['phase0'].time())
+
+                # Set orbital phases
+                self._select.orbital_phases(self._phases)
+
+                # Set phase suffix
+                suffix = '_orbphase'
+
+                # Set DRE, DRG and DRX suffix
+                phases           = self['phase'].string()
+                self._dre_suffix = suffix+phases.replace(';', '_')
+                self._drg_suffix = suffix+phases.replace(';', '_')
+                self._drx_suffix = suffix+phases.replace(';', '_')
 
         # If PSD interval differs from standard interval then set the interval
         # and append flag to suffix
@@ -278,7 +305,7 @@ class comobsbin(ctools.csobservation):
             self._dre_suffix += '_%s' % (d2use)
             self._drg_suffix += '_%s' % (d2use)
 
-        # Log input observations
+        # Log selection set
         self._log_string(gammalib.NORMAL, str(self._select))
 
         # Return
@@ -373,24 +400,36 @@ class comobsbin(ctools.csobservation):
         drxfile = gammalib.GFilename(drxname)
         drgfile = gammalib.GFilename(drgname)
 
+        # Set DRG and DRX filenames in global data store
+        drxname_global = '%s/%s_drx%s.fits'   % (self._global_datastore, obs.id(), self._drx_suffix)
+        drgname_global = '%s/%s%s_drg%s.fits' % (self._global_datastore, obs.id(), dri_prefix, self._drg_suffix)
+        drxfile_global = gammalib.GFilename(drxname_global)
+        drgfile_global = gammalib.GFilename(drgname_global)
+
         # Compute DRX
         self._log_header3(gammalib.NORMAL, 'Compute DRX')
-        if drxfile.exists():
-            self._log_value(gammalib.NORMAL, 'DRX file exists', drxfile.url())
+        if drxfile_global.exists():
+            drxname = drxname_global
+            self._log_value(gammalib.NORMAL, 'Global DRX file exists', drxfile_global.url())
+        elif drxfile.exists():
+            self._log_value(gammalib.NORMAL, 'Local DRX file exists', drxfile.url())
         else:
             drx.compute_drx(obs, self._select)
             drx.save(drxfile, True)
-            self._log_value(gammalib.NORMAL, 'DRX file created', drxfile.url())
+            self._log_value(gammalib.NORMAL, 'Local DRX file created', drxfile.url())
             self._log_string(gammalib.NORMAL, str(drx))
 
         # Compute DRG
         self._log_header3(gammalib.NORMAL, 'Compute DRG')
-        if drgfile.exists():
-            self._log_value(gammalib.NORMAL, 'DRG file exists', drgfile.url())
+        if drgfile_global.exists():
+            drgname = drgname_global
+            self._log_value(gammalib.NORMAL, 'Global DRG file exists', drgfile_global.url())
+        elif drgfile.exists():
+            self._log_value(gammalib.NORMAL, 'Local DRG file exists', drgfile.url())
         else:
             drg.compute_drg(obs, self._select, self['zetamin'].real())
             drg.save(drgfile, True)
-            self._log_value(gammalib.NORMAL, 'DRG file created', drgfile.url())
+            self._log_value(gammalib.NORMAL, 'Local DRG file created', drgfile.url())
             self._log_string(gammalib.NORMAL, str(drg))
 
         # Initialse list of DRE names
@@ -405,13 +444,24 @@ class comobsbin(ctools.csobservation):
                        ebounds.emin(i).keV(), ebounds.emax(i).keV())
             drefile = gammalib.GFilename(drename)
 
+            # Set DRE filename in global data store
+            drename_global = '%s/%s%s_dre%s_%6.6d-%6.6dkeV.fits' % \
+                             (self._global_datastore, obs.id(), dri_prefix, self._dre_suffix,
+                              ebounds.emin(i).keV(), ebounds.emax(i).keV())
+            drefile_global = gammalib.GFilename(drename_global)
+
             # Write header
             self._log_header3(gammalib.NORMAL, 'Compute DRE for %.3f - %.3f MeV' % \
                               (ebounds.emin(i).MeV(), ebounds.emax(i).MeV()))
 
+            # If DRE file exists in global datastor then do nothing
+            if drefile_global.exists():
+                drename = drename_global
+                self._log_value(gammalib.NORMAL, 'Global DRE file exists', drefile_global.url())
+
             # If DRE file exists then do nothing
-            if drefile.exists():
-                self._log_value(gammalib.NORMAL, 'DRE file exists', drefile.url())
+            elif drefile.exists():
+                self._log_value(gammalib.NORMAL, 'Local DRE file exists', drefile.url())
 
             # ... otherwise compute and save it
             else:
@@ -426,7 +476,7 @@ class comobsbin(ctools.csobservation):
                 dre.save(drefile, True)
 
                 # Log creation
-                self._log_value(gammalib.NORMAL, 'DRE file created', drefile.url())
+                self._log_value(gammalib.NORMAL, 'Local DRE file created', drefile.url())
 
                 # Log DRE
                 self._log_string(gammalib.NORMAL, str(dre))
@@ -453,8 +503,8 @@ class comobsbin(ctools.csobservation):
         drbname : str
             DRB filename
         """ 
-        # Set DRB name
-        drbname = drename.replace('_dre_', '_drb_')
+        # Set DRB name (always in local datastore)
+        drbname = drename.replace('_dre_', '_drb_').replace(self._global_datastore, self['outfolder'].string())
         drbfile = gammalib.GFilename(drbname)
 
         # Write header
@@ -544,13 +594,24 @@ class comobsbin(ctools.csobservation):
                        ebounds.emin(i).keV(), ebounds.emax(i).keV())
             iaqfile = gammalib.GFilename(iaqname)
 
+            # Set global IAQ filename
+            iaqname_global = '%s/iaq_%6.6d-%6.6dkeV.fits' % \
+                             (self._global_datastore,
+                              ebounds.emin(i).keV(), ebounds.emax(i).keV())
+            iaqfile_global = gammalib.GFilename(iaqname_global)
+
             # Write header
             self._log_header3(gammalib.NORMAL, 'Compute IAQ for %.3f - %.3f MeV' % \
                               (ebounds.emin(i).MeV(), ebounds.emax(i).MeV()))
 
+            # If IAQ file exists in global datastore then do nothing
+            if iaqfile_global.exists():
+                iaqname = iaqname_global
+                self._log_value(gammalib.NORMAL, 'Global IAQ file exists', iaqfile_global.url())
+
             # If IAQ file exists then do nothing
-            if iaqfile.exists():
-                self._log_value(gammalib.NORMAL, 'IAQ file exists', iaqfile.url())
+            elif iaqfile.exists():
+                self._log_value(gammalib.NORMAL, 'Local IAQ file exists', iaqfile.url())
 
             # ... otherwise compute and save it
             else:
@@ -571,7 +632,7 @@ class comobsbin(ctools.csobservation):
                 iaq.save(iaqfile, True)
 
                 # Log creation
-                self._log_value(gammalib.NORMAL, 'IAQ file created', iaqfile.url())
+                self._log_value(gammalib.NORMAL, 'Local IAQ file created', iaqfile.url())
 
                 # Log IAQ
                 self._log_string(gammalib.NORMAL, str(iaq))

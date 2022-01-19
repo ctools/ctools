@@ -1,7 +1,7 @@
 # ==========================================================================
 # comscripts Python module
 #
-# Copyright (C) 2021 Juergen Knoedlseder
+# Copyright (C) 2021-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ __all__ = ['comlixfit',
            'comobsmodel',
            'comobsres',
            'comobssim',
+           'compulbin',
            'comsrcdetect']
 
 # Import
@@ -38,6 +39,7 @@ from comscripts.comobsbin    import comobsbin
 from comscripts.comobsmodel  import comobsmodel
 from comscripts.comobsres    import comobsres
 from comscripts.comobssim    import comobssim
+from comscripts.compulbin    import compulbin
 from comscripts.comsrcdetect import comsrcdetect
 
 # Add test function

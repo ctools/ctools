@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-1 December 2021
+9 January 2022
 
 
 Introduction
@@ -440,6 +440,11 @@ Added script (#3738).
 comobssim - Simulate COMPTEL observations
 -----------------------------------------
 Added script (#3738).
+
+
+compulbin - Generate pulsar phase curve
+---------------------------------------
+Added script (#3973).
 
 
 comsrcdetect - Detect source in Test Statistic map
