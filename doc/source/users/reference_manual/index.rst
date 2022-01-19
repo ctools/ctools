@@ -106,4 +106,5 @@ COMPTEL Science Analysis scripts
    comobsres --- Generate residuals of COMPTEL observations <comobsres>
    comobsselect --- Select observations from COMPTEL database <comobsselect>
    comobssim --- Simulate COMPTEL observations <comobssim>
+   compulbin --- Generate pulse profiles for pulsars <compulbin>
    comsrcdetect --- Detect source in TS map <comsrcdetect>
