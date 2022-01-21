@@ -2,7 +2,7 @@
 # ==========================================================================
 # Add COMPTEL observations
 #
-# Copyright (C) 2021 Juergen Knoedlseder
+# Copyright (C) 2021-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -153,18 +153,19 @@ class comobsadd(ctools.csobservation):
                         found = True
                         break
                 if not found:
-                    ebins.append({'emin'  : emin,
-                                  'emax'  : emax,
-                                  'dres'  : [o.drename()],
-                                  'drbs'  : [o.drbname()],
-                                  'drgs'  : [o.drgname()],
-                                  'drxs'  : [o.drxname()],
-                                  'iaq'   : o.response().rspname(),
-                                  'gti'   : o.events().dre().gti(),
-                                  'tofcor': o.events().dre().tof_correction(),
-                                  'nspinp': o.events().dre().num_superpackets(),
-                                  'nspuse': o.events().dre().num_used_superpackets(),
-                                  'nspskp': o.events().dre().num_skipped_superpackets()})
+                    ebins.append({'emin'     : emin,
+                                  'emax'     : emax,
+                                  'dres'     : [o.drename()],
+                                  'drbs'     : [o.drbname()],
+                                  'drgs'     : [o.drgname()],
+                                  'drxs'     : [o.drxname()],
+                                  'iaq'      : o.response().rspname(),
+                                  'gti'      : o.events().dre().gti(),
+                                  'tofcor'   : o.events().dre().tof_correction(),
+                                  'phasecor' : o.events().dre().phase_correction(),
+                                  'nspinp'   : o.events().dre().num_superpackets(),
+                                  'nspuse'   : o.events().dre().num_used_superpackets(),
+                                  'nspskp'   : o.events().dre().num_skipped_superpackets()})
 
             # Log DRI definition
             self._log_value(gammalib.NORMAL, 'Coordinate system', coordsys)
@@ -181,6 +182,7 @@ class comobsadd(ctools.csobservation):
                 self._log_value(gammalib.NORMAL, 'Energy bin %d' % i,
                                 '%s - %s' % (str(ebin['emin']), str(ebin['emax'])))
                 self._log_value(gammalib.NORMAL, ' ToF correction', ebin['tofcor'])
+                self._log_value(gammalib.NORMAL, ' Phase correction', ebin['phasecor'])
                 self._log_value(gammalib.NORMAL, ' Response', ebin['iaq'])
 
             # Create sky map for DRE, DRG and DRB
@@ -231,6 +233,9 @@ class comobsadd(ctools.csobservation):
 
                 # Set ToF correction
                 dre.tof_correction(ebin['tofcor'])
+
+                # Set phase correction
+                dre.phase_correction(ebin['phasecor'])
 
                 # Set superpackets usage
                 dre.num_superpackets(ebin['nspinp'])
