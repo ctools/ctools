@@ -79,7 +79,7 @@ class Test(test):
         comobsbin = self._comscript('comobsbin')
 
         # Setup command
-        cmd = comobsbin+' inobs="'+self._obs+'" ebinalg="FILE" '+ \
+        cmd = comobsbin+' inobs="'+self._obs+'" response="MODEL" ebinalg="FILE" '+ \
                         'ebinfile="'+self._ebounds+'" phase="NONE" '+ \
                         'coordsys="GAL" proj="TAN" '+ \
                         'outfolder="comobsbin_cmd1" outobs="comobsbin_cmd1.xml" '+ \
@@ -93,7 +93,7 @@ class Test(test):
         self._check_result('comobsbin_cmd1.xml', 'comobsbin_cmd1')
 
         # Setup command
-        cmd = comobsbin+' inobs="file_that_does_not_exist.xml" ebinalg="FILE" '+ \
+        cmd = comobsbin+' inobs="file_that_does_not_exist.xml" response="MODEL" ebinalg="FILE" '+ \
                         'ebinfile="'+self._ebounds+'" phase="NONE" '+ \
                         'coordsys="GAL" proj="TAN" '+ \
                         'outfolder="comobsbin_cmd2" outobs="comobsbin_cmd2.xml" '+ \
@@ -117,6 +117,7 @@ class Test(test):
         # Set-up script
         bin = comscripts.comobsbin()
         bin['inobs']     = self._obs
+        bin['response']  = 'MODEL'
         bin['ebinalg']   = 'FILE'
         bin['ebinfile']  = self._ebounds
         bin['phase']     = 'NONE'

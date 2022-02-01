@@ -60,6 +60,7 @@ class comobsbin(ctools.csobservation):
             self.obs().load(self['inobs'].filename())
 
         # Query parameters
+        self['response'].string()
         self._get_ebounds()
         self._get_phases()
         if not self._phases.is_empty():
@@ -582,63 +583,99 @@ class comobsbin(ctools.csobservation):
         dpsi    = self['dpsi'].real()
         dphibar = self['dphibar'].real()
 
+        # Get calibration database and response type
+        caldb    = gammalib.GCaldb('cgro', 'comptel')
+        response = gammalib.toupper(self['response'].string())
+
         # Initialse list of IAQ names
         iaqnames = []
 
         # Generate one IAQ for each energy boundary
         for i in range(ebounds.size()):
 
-            # Set IAQ filename
-            iaqname = '%s/iaq_%6.6d-%6.6dkeV.fits' % \
-                      (self['outfolder'].string(),
-                       ebounds.emin(i).keV(), ebounds.emax(i).keV())
-            iaqfile = gammalib.GFilename(iaqname)
+            # Handle simulated response
+            if response == 'SIM2' or response == 'SIM3':
 
-            # Set global IAQ filename
-            iaqname_global = '%s/iaq_%6.6d-%6.6dkeV.fits' % \
-                             (self._global_datastore,
-                              ebounds.emin(i).keV(), ebounds.emax(i).keV())
-            iaqfile_global = gammalib.GFilename(iaqname_global)
+                # Write header
+                self._log_header3(gammalib.NORMAL,
+                                  'Use CALDB IAQ for %.3f - %.3f MeV' %
+                                  (ebounds.emin(i).MeV(), ebounds.emax(i).MeV()))
 
-            # Write header
-            self._log_header3(gammalib.NORMAL, 'Compute IAQ for %.3f - %.3f MeV' % \
-                              (ebounds.emin(i).MeV(), ebounds.emax(i).MeV()))
+                # Build response name
+                iaqname = '%s(%.2f-%.2f)MeV(%.0f)deg' % \
+                          (response, ebounds.emin(i).MeV(), ebounds.emax(i).MeV(),
+                           dphibar)
 
-            # If IAQ file exists in global datastore then do nothing
-            if iaqfile_global.exists():
-                iaqname = iaqname_global
-                self._log_value(gammalib.NORMAL, 'Global IAQ file exists', iaqfile_global.url())
+                # Raise an exception if response does not exist
+                filename = caldb.filename('', '', 'IAQ', '', '', iaqname)
+                if filename.is_empty():
+                    msg = ('Could not find IAQ "'+iaqname+'" in calibration database. '
+                           'Please select a different response type.')
+                    raise RuntimeError(msg)
 
-            # If IAQ file exists then do nothing
-            elif iaqfile.exists():
-                self._log_value(gammalib.NORMAL, 'Local IAQ file exists', iaqfile.url())
+                # Log IAQ usage
+                self._log_value(gammalib.NORMAL, 'Use CALDB IAQ', iaqname)
 
-            # ... otherwise compute and save it
+                # Append IAQ name
+                iaqnames.append(iaqname)
+
+            # ... otherwise handle modeled response
             else:
 
-                # Initialise IAQ
-                iaq = gammalib.GCOMIaq(55.0, dchi, 50.0, dphibar)
+                # Set IAQ filename
+                iaqname = '%s/iaq_%6.6d-%6.6dkeV.fits' % \
+                          (self['outfolder'].string(),
+                           ebounds.emin(i).keV(), ebounds.emax(i).keV())
+                iaqfile = gammalib.GFilename(iaqname)
 
-                # Set IAQ energy range
-                ebds = gammalib.GEbounds(ebounds.emin(i), ebounds.emax(i))
+                # Set global IAQ filename
+                iaqname_global = '%s/iaq_%6.6d-%6.6dkeV.fits' % \
+                                 (self._global_datastore,
+                                  ebounds.emin(i).keV(), ebounds.emax(i).keV())
+                iaqfile_global = gammalib.GFilename(iaqname_global)
 
-                # Generate continuum IAQ
-                spectrum = gammalib.GModelSpectralPlaw(1.0,-2.0,gammalib.GEnergy(1.0,'MeV'))
+                # Write header
+                self._log_header3(gammalib.NORMAL,
+                                  'Compute IAQ for %.3f - %.3f MeV' %
+                                  (ebounds.emin(i).MeV(), ebounds.emax(i).MeV()))
 
-                # Compute IAQ
-                iaq.set(spectrum, ebds)
+                # If IAQ file exists in global datastore then do nothing
+                if iaqfile_global.exists():
+                    iaqname = iaqname_global
+                    self._log_value(gammalib.NORMAL,
+                                    'Global IAQ file exists', iaqfile_global.url())
 
-                # Save IAQ
-                iaq.save(iaqfile, True)
+                # If IAQ file exists then do nothing
+                elif iaqfile.exists():
+                    self._log_value(gammalib.NORMAL,
+                                    'Local IAQ file exists', iaqfile.url())
 
-                # Log creation
-                self._log_value(gammalib.NORMAL, 'Local IAQ file created', iaqfile.url())
+                # ... otherwise compute and save it
+                else:
 
-                # Log IAQ
-                self._log_string(gammalib.NORMAL, str(iaq))
+                    # Initialise IAQ
+                    iaq = gammalib.GCOMIaq(55.0, dchi, 50.0, dphibar)
 
-            # Append IAQ filename
-            iaqnames.append(iaqname)
+                    # Set IAQ energy range
+                    ebds = gammalib.GEbounds(ebounds.emin(i), ebounds.emax(i))
+
+                    # Generate continuum IAQ
+                    spectrum = gammalib.GModelSpectralPlaw(1.0,-2.0,gammalib.GEnergy(1.0,'MeV'))
+
+                    # Compute IAQ
+                    iaq.set(spectrum, ebds)
+
+                    # Save IAQ
+                    iaq.save(iaqfile, True)
+
+                    # Log creation
+                    self._log_value(gammalib.NORMAL, 'Local IAQ file created', iaqfile.url())
+
+                    # Log IAQ
+                    self._log_string(gammalib.NORMAL, str(iaq))
+
+                # Append IAQ filename
+                iaqnames.append(iaqname)
 
         # Return
         return iaqnames

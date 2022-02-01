@@ -23,6 +23,7 @@ outfolder, s, a, $COMDATASTORE,,, "Output folder for files"
 #
 # Script parameters
 #==================
+response,    s, a, MODEL,MODEL|SIM2|SIM3,, "Response type"
 ebinalg,     s, a, FILE,FILE|LIN|LOG,, "Algorithm for defining energy bins"
 emin,        r, a, 0.75,0.05,50.0, "Minimum energy (MeV)"
 emax,        r, a, 30.0,0.05,50.0, "Maximum energy (MeV)"

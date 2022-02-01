@@ -24,6 +24,10 @@ General parameters
 ``outfolder [string]``
     Output folder for files. Put here the location of your COMPTEL data store.
 
+``response <MODEL|SIM2|SIM3> [string]``
+    Response type specifying whether ``MODEL`` IAQs or simulated IAQs provided
+    in the COMPTEL calibration database should be used.
+
 ``ebinalg <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
 
