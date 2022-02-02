@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-19 January 2022
+2 February 2022
 
 
 Introduction
@@ -83,6 +83,8 @@ Stamp output FITS files (#3662).
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
+Added iter(), logL(), nobs() and npred() methods to access class attributes.
+
 Added the "refit_if_failed" parameter that instructs ctlike to do a refit in
 case that the initial fit failed. Failures considered are a stalled fit, an
 exhaustion of the maximum number of fit iterations, or a significant difference

@@ -1,7 +1,7 @@
 .. _2.0:
 
-ctools 2.0 release (30 September 2021)
-======================================
+ctools 2.0 release (2 February 2022)
+====================================
 
 Overview
 --------
@@ -24,6 +24,7 @@ Bug fixes
 Improvements
 ------------
 
+* Add methods to access :ref:`ctlike` attributes
 * Add restart of bisection in case of bad convergence in :ref:`ctulimit`
 * [`3662 <https://cta-redmine.irap.omp.eu/issues/3662>`_] -
   Stamp all output FITS files

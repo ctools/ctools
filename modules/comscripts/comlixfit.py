@@ -2,7 +2,7 @@
 # ==========================================================================
 # Perform SRCLIX model fitting of COMPTEL observations
 #
-# Copyright (C) 2021 Juergen Knoedlseder
+# Copyright (C) 2021-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,6 +41,10 @@ class comlixfit(ctools.cslikelihood):
 
         # Initialise members
         self._fixed_pars = []
+        self._iter       = 0
+        self._logL       = 0.0
+        self._nobs       = 0.0
+        self._npred      = 0.0
 
         # Return
         return
@@ -166,6 +170,10 @@ class comlixfit(ctools.cslikelihood):
         # Recover results
         self.opt(like.opt())
         self.obs(like.obs())
+        self._iter  += like.iter()
+        self._logL   = like.logL()
+        self._nobs   = like.nobs()
+        self._npred  = like.npred()
 
         # Return
         return
@@ -248,9 +256,10 @@ class comlixfit(ctools.cslikelihood):
         self._log_string(gammalib.NORMAL, str(self.obs()))
 
         # Get parameters and initialise some variables
-        niter = self['max_iter'].integer()
-        eps   = self['like_accuracy'].real()
-        delta = 0.0
+        niter      = self['max_iter'].integer()
+        eps        = self['like_accuracy'].real()
+        delta      = 0.0
+        self._iter = 0
 
         # Log header
         self._log_header1(gammalib.NORMAL,
@@ -281,6 +290,9 @@ class comlixfit(ctools.cslikelihood):
 
             # Store maximum likelihood value
             logL = self.opt().value()
+
+            # Increment iterations counter
+            self._iter += self.opt().iter()
 
             # Log maximum likelihood
             if iter == 0:
@@ -318,6 +330,16 @@ class comlixfit(ctools.cslikelihood):
         self._log_header1(gammalib.NORMAL,
                           'Maximum likelihood optimisation results')
         self._log_string(gammalib.NORMAL, str(self.opt()))
+        self._log_value(gammalib.NORMAL, 'Total number of iterations',
+                        self._iter)
+        self._log_value(gammalib.NORMAL, 'Maximum log likelihood',
+                        self._logL)
+        self._log_value(gammalib.NORMAL, 'Observed events  (Nobs)',
+                        self._nobs)
+        self._log_value(gammalib.NORMAL, 'Predicted events (Npred)',
+                        self._npred)
+        self._log_value(gammalib.NORMAL, 'Nobs - Npred',
+                        self._nobs-self._npred)
         self._log_string(gammalib.NORMAL, str(self.obs().models()))
 
         # Return

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2020 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -53,9 +53,13 @@ public:
     ctlike& operator=(const ctlike& app);
 
     // Methods
-    void clear(void);
-    void run(void);
-    void save(void);
+    void          clear(void);
+    void          run(void);
+    void          save(void);
+    const int&    iter(void) const;
+    const double& logL(void) const;
+    const double& nobs(void) const;
+    const double& npred(void) const;
 
 protected:
     // Protected methods
@@ -85,5 +89,53 @@ protected:
     double    m_nobs;            //!< Number of observed events
     double    m_npred;           //!< Number of predicted events
 };
+
+
+/***********************************************************************//**
+ * @brief Return number of maximum likelihood iterations
+ *
+ * @return Number of maximum likelihood iterations.
+ ***************************************************************************/
+inline
+const int& ctlike::iter(void) const
+{
+    return (m_iter);
+}
+
+
+/***********************************************************************//**
+ * @brief Return maximum likelihood value
+ *
+ * @return Maximum likelihood value.
+ ***************************************************************************/
+inline
+const double& ctlike::logL(void) const
+{
+    return (m_logL);
+}
+
+
+/***********************************************************************//**
+ * @brief Return number of observed events
+ *
+ * @return Number of observed events.
+ ***************************************************************************/
+inline
+const double& ctlike::nobs(void) const
+{
+    return (m_nobs);
+}
+
+
+/***********************************************************************//**
+ * @brief Return number of predicted events
+ *
+ * @return Number of predicted events.
+ ***************************************************************************/
+inline
+const double& ctlike::npred(void) const
+{
+    return (m_npred);
+}
 
 #endif /* CTLIKE_HPP */

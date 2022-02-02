@@ -71,11 +71,12 @@ def test(installed=False, debug=False):
         os.environ['TEST_DATA'] = 'data'
         os.environ['COMDATA']   = '%s/data/comptel/data' % (path)
 
-    # ... otherwise set the calibration database to the one shipped with the
-    # package; we don't need to set the 'TEST_DATA', this is done by the
-    # test environment
+    # ... otherwise set the calibration database to the installed GammaLib
+    # version and use the data in the test directory; we don't need to set
+    # the 'TEST_DATA' environment variable as this is done by the test
+    # environment
     else:
-        os.environ['CALDB']   = '%s/caldb'                  % (os.environ['TEST_SRCDIR'])
+        os.environ['CALDB']   = '%s/share/caldb'            % (os.environ['GAMMALIB'])
         os.environ['COMDATA'] = '%s/test/data/comptel/data' % (os.environ['TEST_SRCDIR'])
 
     # Create a local "pfiles" directory and set PFILES environment variable
