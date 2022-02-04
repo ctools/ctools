@@ -582,6 +582,7 @@ class comobsbin(ctools.csobservation):
         dchi    = self['dchi'].real()
         dpsi    = self['dpsi'].real()
         dphibar = self['dphibar'].real()
+        nphibar = self['nphibar'].integer()
 
         # Get calibration database and response type
         caldb    = gammalib.GCaldb('cgro', 'comptel')
@@ -622,16 +623,29 @@ class comobsbin(ctools.csobservation):
             # ... otherwise handle modeled response
             else:
 
+                # Set IAQ suffix in case that the DRI definition deviates from the
+                # standard
+                iaq_suffix = ''
+                filler     = '_'
+                if dphibar != 2.0:
+                    iaq_suffix += '%s%.1fdeg' % (filler, dphibar)
+                    filler      = '-'
+                if nphibar != 25:
+                    iaq_suffix += '%s%dbins' % (filler, nphibar)
+                    filler      = '-'
+
                 # Set IAQ filename
-                iaqname = '%s/iaq_%6.6d-%6.6dkeV.fits' % \
+                iaqname = '%s/iaq_%6.6d-%6.6dkeV%s.fits' % \
                           (self['outfolder'].string(),
-                           ebounds.emin(i).keV(), ebounds.emax(i).keV())
+                           ebounds.emin(i).keV(), ebounds.emax(i).keV(),
+                           iaq_suffix)
                 iaqfile = gammalib.GFilename(iaqname)
 
                 # Set global IAQ filename
-                iaqname_global = '%s/iaq_%6.6d-%6.6dkeV.fits' % \
+                iaqname_global = '%s/iaq_%6.6d-%6.6dkeV%s.fits' % \
                                  (self._global_datastore,
-                                  ebounds.emin(i).keV(), ebounds.emax(i).keV())
+                                  ebounds.emin(i).keV(), ebounds.emax(i).keV(),
+                                  iaq_suffix)
                 iaqfile_global = gammalib.GFilename(iaqname_global)
 
                 # Write header
@@ -653,8 +667,11 @@ class comobsbin(ctools.csobservation):
                 # ... otherwise compute and save it
                 else:
 
+                    # Set Phibar maximum
+                    phimax = float(int(nphibar * dphibar + 0.5))
+
                     # Initialise IAQ
-                    iaq = gammalib.GCOMIaq(55.0, dchi, 50.0, dphibar)
+                    iaq = gammalib.GCOMIaq(55.0, dchi, phimax, dphibar)
 
                     # Set IAQ energy range
                     ebds = gammalib.GEbounds(ebounds.emin(i), ebounds.emax(i))
