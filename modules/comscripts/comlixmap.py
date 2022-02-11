@@ -2,7 +2,7 @@
 # ==========================================================================
 # Create SRCLIX TS map
 #
-# Copyright (C) 2021 Juergen Knoedlseder
+# Copyright (C) 2021-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -176,11 +176,13 @@ class comlixmap(ctools.cslikelihood):
         nfree = 0
 
         # Compute number of free model parameters for all test sources,
-        # exclusing 'RA' and 'DEC'
+        # excluding 'RA', 'DEC', 'GLON' and 'GLAT'
         for srcname in self._srcnames:
             source = self.obs().models()[srcname]
             for par in source:
-                if par.name() != 'RA' and par.name() != 'DEC' and par.is_free():
+                if par.name() != 'RA'   and par.name() != 'DEC'  and \
+                   par.name() != 'GLON' and par.name() != 'GLAT' and \
+                   par.is_free():
                     self._map_names.append(par.name())
                     nfree += 1
 
@@ -213,10 +215,21 @@ class comlixmap(ctools.cslikelihood):
 
             # Set and fix position of test source
             source = self.obs().models()[srcname]
-            source['RA'].value(dir.ra_deg())
-            source['DEC'].value(dir.dec_deg())
-            source['RA'].fix()
-            source['DEC'].fix()
+            if source.has_par('RA') and source.has_par('DEC'):
+                source['RA'].value(dir.ra_deg())
+                source['DEC'].value(dir.dec_deg())
+                source['RA'].fix()
+                source['DEC'].fix()
+            elif source.has_par('GLON') and source.has_par('GLAT'):
+                source['GLON'].value(dir.l_deg())
+                source['GLAT'].value(dir.b_deg())
+                source['GLON'].fix()
+                source['GLAT'].fix()
+            else:
+                msg = ('Source "'+srcname+'" has neither RA/DEC nor GLON/GLAT '
+                       'parameters. Please specify a source than can be '
+                       'positioned.')
+                raise RuntimeError(msg)
 
             # Remove response cache for test source
             self.obs().remove_response_cache(srcname)
@@ -341,8 +354,15 @@ class comlixmap(ctools.cslikelihood):
         # Log header
         self._log_header1(gammalib.NORMAL, 'Generate TS map')
 
+        # Get a copy of the initial models
+        models = self.obs().models().copy()
+
         # Loop over grid positions
         for ipix in range(self._maps[0].npix()):
+
+            # Set initial models so that each pixel starts from the same
+            # initial model
+            self.obs().models(models)
 
             # Get sky direction of sky map pixel
             dir = self._maps[0].inx2dir(ipix)
@@ -364,7 +384,9 @@ class comlixmap(ctools.cslikelihood):
             for srcname in self._srcnames:
                 source = self.obs().models()[srcname]
                 for par in source:
-                    if par.name() != 'RA' and par.name() != 'DEC' and par.is_free():
+                    if par.name() != 'RA'   and par.name() != 'DEC'  and \
+                       par.name() != 'GLON' and par.name() != 'GLAT' and \
+                       par.is_free():
                         self._maps[ipar][ipix] = par.value()
                         ipar += 1
 
