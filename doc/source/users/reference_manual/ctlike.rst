@@ -128,6 +128,12 @@ General parameters
     log likelihood value. Converserly, decreasing the value will result in less
     iterations at the expense of a less accurate maximum likelihood value.
 
+``(accept_dec = 0.0) [real]``
+    Maximum accepted log-likelihood decrease. Setting this parameter to a positive
+    value with allow some decrease of the log-likelihood. This may help to get the
+    algorithm out of a local minimum. Use this parameter with case since it may
+    lead to a solution that is not the maximum likelihood solution.
+
 ``(max_iter = 50) [integer]``
     Maximum number of fit iterations.
 

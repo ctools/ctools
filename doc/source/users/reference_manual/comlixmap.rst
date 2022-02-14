@@ -31,7 +31,14 @@ General parameters
     Maximum number of SRCLIX iterations.
 
 ``(like_accuracy = 0.05) [real]``
-    Absolute accuracy of maximum likelihood value.
+    Absolute accuracy of maximum likelihood value. The SRCLIX iterations terminate
+    if the log-likelihood improvement is below this accuracy.
+
+``(accept_dec = 0.0) [real]``
+    Maximum accepted log-likelihood decrease. Setting this parameter to a positive
+    value with allow some decrease of the log-likelihood. This may help to get the
+    algorithm out of a local minimum. Use this parameter with case since it may
+    lead to a solution that is not the maximum likelihood solution.
 
 ``(fix_spat_for_ts = no) [boolean]``
     Fix spatial parameters for TS computation?

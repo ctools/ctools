@@ -28,6 +28,7 @@ outmodel,  f, a, results.xml,,, "Output model definition file"
 #==================
 max_iter,            i, h, 50,1,1000, "Maximum number of SRCLIX iterations"
 like_accuracy,       r, h, 0.05,1.0e-30,1.0, "Absolute accuracy of maximum likelihood value"
+accept_dec,          r, h, 0.0,0.0,10.0, "Maximum accepted log-likelihood decrease"
 fix_spat_for_ts,     b, h, no,,, "Fix spatial parameters for TS computation?"
 fix_ext_for_initial, b, h, no,,, "Fix extension parameters for initial fit iteration?"
 bkgmethod,           s, a, BGDLIXE,PHINOR|BGDLIXA|BGDLIXE,, "Method for background computation"

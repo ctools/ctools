@@ -35,6 +35,7 @@ statistic,       s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statisti
 refit,           b, h, no,,, "Do refitting?"
 refit_if_failed, b, h, yes,,, "Refit if fit failed?"
 like_accuracy,   r, h, 0.005,1.0e-30,1.0, "Absolute accuracy of maximum likelihood value"
+accept_dec,      r, h, 0.0,0.0,10.0, "Maximum accepted log-likelihood decrease"
 max_iter,        i, h, 50,1,1000, "Maximum number of fit iterations"
 fix_spat_for_ts, b, h, no,,, "Fix spatial parameters for TS computation?"
 

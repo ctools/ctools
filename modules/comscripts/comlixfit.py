@@ -65,6 +65,7 @@ class comlixfit(ctools.cslikelihood):
         # Query parameters
         self['max_iter'].integer()
         self['like_accuracy'].real()
+        self['accept_dec'].real()
         self['fix_spat_for_ts'].boolean()
         self['fix_ext_for_initial'].boolean()
 
@@ -265,6 +266,11 @@ class comlixfit(ctools.cslikelihood):
         self._log_header1(gammalib.NORMAL,
                           'Iterative maximum likelihood model fitting')
 
+        # Initialise optimiser
+        self.opt().max_iter(100)
+        self.opt().eps(0.005)
+        self.opt().accept_dec(self['accept_dec'].real())
+
         # Loop over iterations
         for iter in range(niter):
 
@@ -273,6 +279,10 @@ class comlixfit(ctools.cslikelihood):
 
             # Update observations
             self._update_obs()
+
+            # If first iteration then initialise best observation
+            if iter == 0:
+                best_obs = self.obs().copy()
 
             # Optionally fix or free fixed spatial extension parameters
             if self['fix_ext_for_initial'].boolean():
@@ -284,21 +294,26 @@ class comlixfit(ctools.cslikelihood):
             # Fit model
             self.obs().optimize(self.opt())
 
-            # Compute logL difference after first iteration
+            # Compute logL difference
             if iter > 0:
                 delta = logL - self.opt().value()
+            else:
+                logL = self.opt().value()
 
-            # Store maximum likelihood value
-            logL = self.opt().value()
+            # If log-likelihood improved then update best observations and
+            # last log-likelihood value
+            if delta >= 0.0:
+                best_obs = self.obs().copy()
+                logL     = self.opt().value()
 
             # Increment iterations counter
             self._iter += self.opt().iter()
 
             # Log maximum likelihood
             if iter == 0:
-                result = '%.5f' % (logL)
+                result = '%.5f' % (self.opt().value())
             else:
-                result = '%.5f (%.5f)' % (logL, delta)
+                result = '%.5f (%.5f)' % (self.opt().value(), delta)
             self._log_value(gammalib.NORMAL, 'logL after iteration %d' % (iter+1),
                             result)
 
@@ -314,12 +329,17 @@ class comlixfit(ctools.cslikelihood):
         self._log_header1(gammalib.EXPLICIT,
                           'Final maximum likelihood model fitting')
 
+        # Use best observations for maximum likelihood fitting. This avoids
+        # that observations that have a worse log-likelihood than the best
+        # value are used for final model fitting.
+        self.obs(best_obs)
+
         # Do final model fit
         self._final_model_fit()
 
         # Compute logL difference and store maximum likelihood value
-        delta  = logL - self.opt().value()
-        logL   = self.opt().value()
+        delta = logL - self.opt().value()
+        logL  = self.opt().value()
 
         # Log final maximum likelihood
         result = '%.5f (%.5f)' % (logL, delta)

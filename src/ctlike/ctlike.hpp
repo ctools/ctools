@@ -76,7 +76,6 @@ protected:
     GFilename m_outmodel;        //!< Source model output XML file name
     GFilename m_outcovmat;       //!< Covariance matrix output file name
     int       m_max_iter;        //!< Maximum number of iterations
-    double    m_like_accuracy;   //!< Log-likelihood accuracy
     bool      m_refit;           //!< Refitting?
     bool      m_refit_if_failed; //!< Refitting in case of failure?
     bool      m_apply_edisp;     //!< Apply energy dispersion?

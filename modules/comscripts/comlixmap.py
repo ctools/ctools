@@ -69,6 +69,7 @@ class comlixmap(ctools.cslikelihood):
         # Query parameters
         self['like_accuracy'].real()
         self['max_iter'].integer()
+        self['accept_dec'].real()
         self['fix_spat'].boolean()
         self['coordsys'].string()
         self['proj'].string()
@@ -210,6 +211,9 @@ class comlixmap(ctools.cslikelihood):
         ts : float
             TS of test source
         """
+        # Get list of flux normalisation parameters
+        pars = ['Prefactor', 'Normalization', 'EnergyFlux', 'PhotonFlux']
+        
         # Loop over test source names
         for srcname in self._srcnames:
 
@@ -245,21 +249,31 @@ class comlixmap(ctools.cslikelihood):
             # Update observations
             self._update_obs()
 
+            # If first iteration then initialise best observation
+            if iter == 0:
+                best_obs = self.obs().copy()
+
             # Fit model
             self.obs().optimize(self.opt())
 
-            # Compute logL difference after first iteration
+            # Compute log-likelihood difference or initialise
+            # log-likelihood value
             if iter > 0:
                 delta = logL - self.opt().value()
+            else:
+                logL = self.opt().value()
 
-            # Store maximum likelihood value
-            logL = self.opt().value()
+            # If log-likelihood improved then update best observations and
+            # last log-likelihood value
+            if delta >= 0.0:
+                best_obs = self.obs().copy()
+                logL     = self.opt().value()
 
             # Log maximum likelihood
             if iter == 0:
-                result = '%.5f' % (logL)
+                result = '%.5f' % (self.opt().value())
             else:
-                result = '%.5f (%.5f)' % (logL, delta)
+                result = '%.5f (%.5f)' % (self.opt().value(), delta)
             self._log_value(gammalib.NORMAL, 'logL after iteration %d' % (iter+1),
                             result)
 
@@ -268,13 +282,37 @@ class comlixmap(ctools.cslikelihood):
                 if delta < eps:
                     break
 
-        # Compute TS in final model fit
-        ts = self._final_model_fit()
+        # Use best observations for maximum likelihood fitting. This avoids
+        # that observations that have a worse log-likelihood than the best
+        # value are used for final model fitting.
+        self.obs(best_obs)
 
-        # Log TS
-        for i, srcname in enumerate(self._srcnames):
-            key = 'TS %s' % srcname
-            self._log_value(gammalib.NORMAL, key, ts[i])
+        # Compute log-likelihood and TS for best observations
+        value = self._final_model_fit()
+
+        # Compute log-likelihood difference
+        delta = logL - value
+
+        # Log final maximum likelihood
+        result = '%.5f (%.5f)' % (value, delta)
+        self._log_value(gammalib.NORMAL, 'logL after final iteration',
+                        result)
+
+        # Collect and log TS and source normalisation
+        ts = []
+        for srcname in self._srcnames:
+            source   = self.obs().models()[srcname]
+            ts_value = float(source.ts())
+            key      = 'TS %s' % srcname
+            value    = '%.3f'  % ts_value
+            ts.append(ts_value)
+            for par in pars:
+                if source.has_par(par):
+                    value += ' (%e +/- %e %s)' % (source[par].value(),
+                                                  source[par].error(),
+                                                  source[par].unit())
+                    break
+            self._log_value(gammalib.NORMAL, key, value)
 
         # Return TS
         return ts
@@ -285,8 +323,8 @@ class comlixmap(ctools.cslikelihood):
 
         Returns
         -------
-        ts : float
-            TS of test source
+        logL : float
+            Log-likelihood of final model fit
         """
         # Create instance of model fitting tool
         like = ctools.ctlike(self.obs())
@@ -295,13 +333,11 @@ class comlixmap(ctools.cslikelihood):
         # Run ctlike
         like.run()
 
-        # Recover TS for all test sources
-        ts = []
-        for srcname in self._srcnames:
-            ts.append(like.obs().models()[srcname].ts())
+        # Recover results
+        self.obs(like.obs())
 
-        # Return TS
-        return ts
+        # Return log-likelihood value
+        return (like.opt().value())
 
 
     # Public methods
@@ -356,6 +392,11 @@ class comlixmap(ctools.cslikelihood):
 
         # Get a copy of the initial models
         models = self.obs().models().copy()
+
+        # Initialise optimiser
+        self.opt().max_iter(100)
+        self.opt().eps(0.005)
+        self.opt().accept_dec(self['accept_dec'].real())
 
         # Loop over grid positions
         for ipix in range(self._maps[0].npix()):

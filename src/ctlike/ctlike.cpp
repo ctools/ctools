@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2020 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -425,7 +425,6 @@ void ctlike::init_members(void)
     m_outmodel.clear();
     m_outcovmat.clear();
     m_max_iter        = 50;
-    m_like_accuracy   = 0.005;
     m_refit           = false;
     m_refit_if_failed = true;
     m_apply_edisp     = false;
@@ -455,7 +454,6 @@ void ctlike::copy_members(const ctlike& app)
     m_outmodel        = app.m_outmodel;
     m_outcovmat       = app.m_outcovmat;
     m_max_iter        = app.m_max_iter;
-    m_like_accuracy   = app.m_like_accuracy;
     m_refit           = app.m_refit;
     m_refit_if_failed = app.m_refit_if_failed;
     m_apply_edisp     = app.m_apply_edisp;
@@ -507,10 +505,10 @@ void ctlike::get_parameters(void)
     } // endif: no models were associated with observations
 
     // Set optimizer characteristics from user parameters
-    m_max_iter      = (*this)["max_iter"].integer();
-    m_like_accuracy = (*this)["like_accuracy"].real();
-    m_opt.eps(m_like_accuracy);
+    m_max_iter = (*this)["max_iter"].integer();
     m_opt.max_iter(m_max_iter);
+    m_opt.eps((*this)["like_accuracy"].real());
+    m_opt.accept_dec((*this)["accept_dec"].real());
 
     // Get other parameters
     m_refit           = (*this)["refit"].boolean();
