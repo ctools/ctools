@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generate model for binned COMPTEL observations
 #
-# Copyright (C) 2019-2021 Juergen Knoedlseder
+# Copyright (C) 2019-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -451,15 +451,16 @@ class comobsmodel(ctools.csobservation):
             spatial  = gammalib.GModelSpatialDiffuseConst(gammalib.fourpi)
 
             # Set spectral model using initial scaling factors that correspond
-            # to Georg Weidenspointers extragalactic spectrum. Values integrated
-            # over the standard energy bands communicated by Werner Collmar and
-            # divided by width of standard energy bands.
-            # See his e-mail from 14 July 2021.
+            # to the spectrum
+            #
+            # I(E) = 1.12e-4 (E/5MeV)^-2.2 ph/cm2/s/sr/MeV
+            #
+            # determined by Georg Weidenspointer in this PhD thesis.
             spectral = gammalib.GModelSpectralNodes()
-            spectral.append(gammalib.GEnergy(0.87, 'MeV'),  1.327e-3/0.25)
-            spectral.append(gammalib.GEnergy(1.73, 'MeV'),  2.358e-3/2.0)
-            spectral.append(gammalib.GEnergy(5.48, 'MeV'),  0.658e-3/7.0)
-            spectral.append(gammalib.GEnergy(17.32, 'MeV'), 0.148e-3/20.0)
+            spectral.append(gammalib.GEnergy(0.87, 'MeV'),  5.2481e-3)
+            spectral.append(gammalib.GEnergy(1.73, 'MeV'),  1.1567e-3)
+            spectral.append(gammalib.GEnergy(5.48, 'MeV'),  9.15e-5)
+            spectral.append(gammalib.GEnergy(17.32, 'MeV'), 7.2e-6)
 
             # Set fix
             fix = (self['iso'].string() == 'CONSTFIX')
