@@ -284,15 +284,18 @@ class comlixfit(ctools.cslikelihood):
             if iter == 0:
                 best_obs = self.obs().copy()
 
-            # Optionally fix or free fixed spatial extension parameters
-            if self['fix_ext_for_initial'].boolean():
-                if iter == 0:
-                    self._fix_ext_pars()
-                else:
-                    self._free_fixed_ext_pars()
+            # Optionally fix spatial extension parameters for first
+            # iteration
+            if iter == 0 and self['fix_ext_for_initial'].boolean():
+                self._fix_ext_pars()
 
             # Fit model
             self.obs().optimize(self.opt())
+
+            # Optionally free fixed spatial extension parameters for first
+            # iteration
+            if iter == 0 and self['fix_ext_for_initial'].boolean():
+                self._free_fixed_ext_pars()
 
             # Compute logL difference
             if iter > 0:
@@ -333,9 +336,6 @@ class comlixfit(ctools.cslikelihood):
         # that observations that have a worse log-likelihood than the best
         # value are used for final model fitting.
         self.obs(best_obs)
-
-        # Make sure that any fixed extension parameter is free'd
-        self._free_fixed_ext_pars()
 
         # Do final model fit
         self._final_model_fit()
