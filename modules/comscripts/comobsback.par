@@ -27,8 +27,8 @@ outobs,    f, a, obs_back.xml,,, "Output observation definition file"
 #==================
 bkgmethod, s, a, BGDLIXE,PHINOR|BGDLIXA|BGDLIXE,, "Method for background computation"
 nrunav,    i, h, 3,,, "Number of Chi/Psi bins used for running average"
-navgr,     i, h, 9,,, "Number of Chi/Psi bins used for averaging"
-nincl,     i, h, 5,,, "Number of Phibar layers to include"
+navgr,     i, h, 3,,, "Number of Chi/Psi bins used for averaging"
+nincl,     i, h, 13,,, "Number of Phibar layers to include"
 nexcl,     i, h, 0,,, "Number of Phibar layers to exclude"
 phinor,    b, h, yes,,, "Normalise Phibar distribution?"
 
