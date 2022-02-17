@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the comobsback script.
 #
-# Copyright (C) 2021 Juergen Knoedlseder
+# Copyright (C) 2021-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -150,7 +150,7 @@ class Test(test):
         bgd.execute()
 
         # Check result
-        self._check_result('comobsback_py2.xml', 'comobsback_py2', 'bgdlixA-nr3-na9-ni5-ne0')
+        self._check_result('comobsback_py2.xml', 'comobsback_py2', 'bgdlixA-nr3-na3-ni13-ne0')
 
         # Test BGDLIXE
         bgd = comscripts.comobsback()
@@ -167,7 +167,7 @@ class Test(test):
         bgd.execute()
 
         # Check result
-        self._check_result('comobsback_py3.xml', 'comobsback_py3', 'bgdlixE-na9-ni5-ne0')
+        self._check_result('comobsback_py3.xml', 'comobsback_py3', 'bgdlixE-na3-ni13-ne0')
 
         # Return
         return
