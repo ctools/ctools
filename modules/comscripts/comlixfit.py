@@ -334,6 +334,9 @@ class comlixfit(ctools.cslikelihood):
         # value are used for final model fitting.
         self.obs(best_obs)
 
+        # Make sure that any fixed extension parameter is free'd
+        self._free_fixed_ext_pars()
+
         # Do final model fit
         self._final_model_fit()
 
