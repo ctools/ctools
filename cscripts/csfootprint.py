@@ -45,6 +45,9 @@ class csfootprint(ctools.cscript):
         # Initialise application by calling the base class constructor
         self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
+        # Initialise members
+        self._statistics = {}
+
         # Return
         return
 
@@ -59,7 +62,8 @@ class csfootprint(ctools.cscript):
             Pickled instance
         """
         # Set pickled dictionary
-        state = {'base' : ctools.cscript.__getstate__(self)}
+        state = {'base'       : ctools.cscript.__getstate__(self),
+                 'statistics' : self._statistics}
 
         # Return pickled dictionary
         return state
@@ -75,6 +79,7 @@ class csfootprint(ctools.cscript):
         """
         # Set state
         ctools.cscript.__setstate__(self, state['base'])
+        self._statistics = state['statistics']
 
         # Return
         return
@@ -491,6 +496,89 @@ class csfootprint(ctools.cscript):
         # Return
         return
 
+    # Create figure
+    def _create_figure(self, outfile, statistics):
+        """
+        Create figure
+
+        Parameters
+        ----------
+        outfile : str
+            Figure file name
+        statistics : dict
+            Statistics dictionary
+        """
+        # Optionally use matplotlib to create a figure
+        try:
+        
+            # Import matplotlib
+            import matplotlib.pyplot   as plt
+            import matplotlib.gridspec as gridspec
+
+            # Create figure
+            fig = plt.figure(figsize=(15.0,7.8))
+
+            # Create title and subtitle
+            title    = 'ctools carbon footprint report'
+            subtitle = r'Dates: %s - %s' % \
+                       (statistics['use_start'], statistics['use_stop'])
+            fig.suptitle(title, fontsize=16)
+            fig.text(0.5, 0.93, subtitle, fontsize=12, ha='center')
+
+            # Set plot margins
+            fig.subplots_adjust(left=0.07, bottom=0.07, right=0.97, top=0.88, wspace=0.3, hspace=0.35)
+
+            # Divide figure
+            gs1 = gridspec.GridSpec(3,3)
+            ax1 = fig.add_subplot(gs1[0,0:2])
+            ax2 = fig.add_subplot(gs1[0,2])
+
+            # Plot daily footprint
+            self._plot_daily(ax1, statistics)
+
+            #plt.show()
+
+            # Save figure
+            fig.savefig(outfile, dpi=300)
+
+            # Log file creation
+            self._log_value(gammalib.NORMAL, 'Graphics file', outfile)
+
+        # Catch exceptions
+        except (ImportError, RuntimeError):
+
+            # Log file creation
+            self._log_value(gammalib.NORMAL, 'Graphics file', 'matplotlib not available')
+
+        # Return
+        return
+
+    # Plot daily footprint
+    def _plot_daily(self, ax, statistics):
+        """
+        Plot daily footprint
+
+        Parameters
+        ----------
+        ax : pyplot
+            Plotting frame
+        statistics : dict
+            Statistics dictionary
+        """
+        # Create bar data
+        days = [i              for i, _  in enumerate(statistics['daily'])]
+        data = [entry['gCO2e'] for entry in statistics['daily']]
+
+        # Plot bar data
+        ax.bar(days, data, 1.0, bottom=0.0, color='red')
+
+        # Set labels
+        ax.set_title('Footprint')
+        ax.set_xlabel('Days since %s' % statistics['use_start'][0:10])
+        ax.set_ylabel(r'g CO$_2$e')
+        
+        # Return
+        return
 
     # Public methods
     def run(self):
@@ -508,12 +596,12 @@ class csfootprint(ctools.cscript):
         self._log_header1(gammalib.TERSE, 'Load statistics data')
 
         # Load statistics
-        statistics = self._load_statistics()
+        self._statistics = self._load_statistics()
 
         # Log statistics
-        self._global_statistics(statistics)
-        self._daily_statistics(statistics)
-        self._tools_statistics(statistics)
+        self._global_statistics(self._statistics)
+        self._daily_statistics(self._statistics)
+        self._tools_statistics(self._statistics)
 
         # Return
         return
@@ -528,8 +616,11 @@ class csfootprint(ctools.cscript):
         # Continue only if filename is valid
         if self['outfile'].is_valid():
 
-            # Implement saving of graphics file
-            pass
+            # Get outfile
+            outfile = self['outfile'].filename()
+
+            # Create figure
+            self._create_figure(outfile.url(), self._statistics)
 
         # ... signal that no graphics file was specified
         else:
