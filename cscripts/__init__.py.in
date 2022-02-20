@@ -1,7 +1,7 @@
 # ==========================================================================
 # cscripts Python module
 #
-# Copyright (C) 2015-2021 Juergen Knoedlseder
+# Copyright (C) 2015-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ __all__ = [
     "csbkgmodel",
     "cscaldb",
     "csebins",
+    "csfootprint",
     "csinfo",
     "cslightcrv",
     "csmodelinfo",
@@ -94,6 +95,7 @@ from cscripts.cstsmapmerge  import cstsmapmerge
 from cscripts.cstsmapsplit  import cstsmapsplit
 from cscripts.csviscube     import csviscube
 from cscripts.csscs         import csscs
+from cscripts.csfootprint    import csfootprint
 from cscripts.csworkflow    import csworkflow
 from cscripts               import obsutils
 from cscripts               import modutils

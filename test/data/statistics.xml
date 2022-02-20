@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<statistics title="High-level statistic">
+  <header>
+    <dates>
+      <creation>2022-02-19T22:09:05</creation>
+      <modified>2022-02-20T14:35:20</modified>
+      <start>2022-02-18T22:21:56</start>
+      <stop>2022-02-20T14:35:17</stop>
+    </dates>
+    <countries>
+      <country>FR</country>
+    </countries>
+  </header>
+  <data>
+    <daily>
+      <date>
+        <value>2022-02-18</value>
+        <tools>
+          <test_GApplication version="1.0.0" calls="10" wall="0" cpu="0.034568" gCO2e="3.6524768e-05" />
+          <ctobssim version="2.0.0.dev" calls="1795" wall="178" cpu="175.230736" gCO2e="0.172060195882" />
+          <ctselect version="2.0.0.dev" calls="87" wall="65" cpu="45.005446" gCO2e="0.0441931424436" />
+          <ctphase version="2.0.0.dev" calls="13" wall="0" cpu="0.162489" gCO2e="0.0001595595941" />
+          <ctfindvar version="2.0.0.dev" calls="9" wall="3" cpu="2.356012" gCO2e="0.002313321049" />
+          <ctbin version="2.0.0.dev" calls="31" wall="6" cpu="4.978268" gCO2e="0.004889514038" />
+          <ctlike version="2.0.0.dev" calls="220" wall="322" cpu="323.513057" gCO2e="0.31765157135" />
+          <cttsmap version="2.0.0.dev" calls="10" wall="12" cpu="10.679273" gCO2e="0.01048572233" />
+          <ctmodel version="2.0.0.dev" calls="28" wall="6" cpu="4.591355" gCO2e="0.004508190556" />
+          <ctskymap version="2.0.0.dev" calls="19" wall="1" cpu="0.433249" gCO2e="0.0004254149905" />
+          <ctexpcube version="2.0.0.dev" calls="24" wall="6" cpu="4.030692" gCO2e="0.00395767278" />
+          <ctpsfcube version="2.0.0.dev" calls="23" wall="5" cpu="3.274088" gCO2e="0.003214774076" />
+          <ctedispcube version="2.0.0.dev" calls="14" wall="3" cpu="3.050093" gCO2e="0.002994823833" />
+          <ctbkgcube version="2.0.0.dev" calls="23" wall="6" cpu="2.757245" gCO2e="0.002707299323" />
+          <ctmapcube version="2.0.0.dev" calls="14" wall="14" cpu="4.75437" gCO2e="0.0046682128217" />
+          <ctcubemask version="2.0.0.dev" calls="51" wall="8" cpu="1.13723" gCO2e="0.0011201495309" />
+          <ctbutterfly version="2.0.0.dev" calls="5" wall="1" cpu="0.759734" gCO2e="0.0007459676696" />
+          <ctulimit version="2.0.0.dev" calls="54" wall="64" cpu="65.159264" gCO2e="0.06397913951" />
+          <cterror version="2.0.0.dev" calls="10" wall="25" cpu="25.103675" gCO2e="0.02464868358" />
+          <ctprob version="2.0.0.dev" calls="11" wall="4" cpu="1.608447" gCO2e="0.0015793075709" />
+          <cscript_test version="2.0.0.dev" calls="27" wall="3" cpu="0.913572" gCO2e="0.000897810804" />
+          <ctobservation_test version="2.0.0.dev" calls="2" wall="0" cpu="0.002656" gCO2e="2.608842e-06" />
+          <ctlikelihood_test version="2.0.0.dev" calls="1" wall="0" cpu="0.000474" gCO2e="4.673725e-07" />
+          <csadd2caldb version="2.0.0.dev" calls="7" wall="0" cpu="0.082939" gCO2e="8.1443581e-05" />
+          <csbkgmodel version="2.0.0.dev" calls="16" wall="184" cpu="181.730569" gCO2e="0.178436729885" />
+          <cscaldb version="2.0.0.dev" calls="6" wall="0" cpu="0.020241" gCO2e="1.9882967e-05" />
+          <csebins version="2.0.0.dev" calls="3" wall="1" cpu="0.586342" gCO2e="0.000575717516" />
+          <csobsselect version="2.0.0.dev" calls="18" wall="1" cpu="0.091911" gCO2e="9.1630531e-05" />
+          <cslightcrv version="2.0.0.dev" calls="27" wall="45" cpu="29.142719" gCO2e="0.028614540668" />
+          <csphagen version="2.0.0.dev" calls="46" wall="38" cpu="33.605548" gCO2e="0.032996623152" />
+          <csmodelinfo version="2.0.0.dev" calls="4" wall="2" cpu="0.510316" gCO2e="0.000501071409" />
+          <csmodelmerge version="2.0.0.dev" calls="6" wall="0" cpu="0.035814" gCO2e="3.5175674e-05" />
+          <csmodelselect version="2.0.0.dev" calls="3" wall="0" cpu="0.032228" gCO2e="3.164878e-05" />
+          <csmodelsois version="2.0.0.dev" calls="4" wall="5" cpu="4.443827" gCO2e="0.004363287526" />
+          <csobs2caldb version="2.0.0.dev" calls="4" wall="0" cpu="0.536876" gCO2e="0.00052715198" />
+          <csobsdef version="2.0.0.dev" calls="5" wall="2" cpu="2.083649" gCO2e="0.002045889685" />
+          <csobsinfo version="2.0.0.dev" calls="5" wall="3" cpu="2.06328" gCO2e="0.00202735977" />
+          <csphasecrv version="2.0.0.dev" calls="26" wall="29" cpu="16.067829" gCO2e="0.015776636533" />
+          <cspull version="2.0.0.dev" calls="24" wall="6" cpu="2.647948" gCO2e="0.002599984392" />
+          <csresmap version="2.0.0.dev" calls="6" wall="0" cpu="0.614617" gCO2e="0.0006034869" />
+          <csresspec version="2.0.0.dev" calls="8" wall="3" cpu="3.078816" gCO2e="0.003023022045" />
+          <csroot2caldb version="2.0.0.dev" calls="2" wall="1" cpu="0.036487" gCO2e="3.58296e-05" />
+          <cssens version="2.0.0.dev" calls="12" wall="25" cpu="12.589562" gCO2e="0.012361392076" />
+          <csspec version="2.0.0.dev" calls="18" wall="64" cpu="43.689946" gCO2e="0.042898087855" />
+          <cssrcdetect version="2.0.0.dev" calls="3" wall="1" cpu="0.155595" gCO2e="0.00015277975" />
+          <cstsdist version="2.0.0.dev" calls="17" wall="78" cpu="58.977613" gCO2e="0.057908662799" />
+          <cstsmapmerge version="2.0.0.dev" calls="7" wall="0" cpu="0.054628" gCO2e="5.3648664e-05" />
+          <cstsmapsplit version="2.0.0.dev" calls="7" wall="3" cpu="0.686096" gCO2e="0.000673666381" />
+          <csviscube version="2.0.0.dev" calls="2" wall="1" cpu="1.127427" gCO2e="0.0011069963" />
+          <csscs version="2.0.0.dev" calls="55" wall="32" cpu="23.301421" gCO2e="0.022879160613" />
+          <csworkflow version="2.0.0.dev" calls="3" wall="22" cpu="21.524805" gCO2e="0.021134671" />
+          <mputils_test version="2.0.0.dev" calls="9" wall="0" cpu="0.019627" gCO2e="1.92879525e-05" />
+          <csfindobs version="2.0.0.dev" calls="5" wall="0" cpu="0.03152" gCO2e="3.0956552e-05" />
+          <csiactcopy version="2.0.0.dev" calls="8" wall="2" cpu="0.12279" gCO2e="0.000120576215" />
+          <csiactdata version="2.0.0.dev" calls="4" wall="0" cpu="0.023479" gCO2e="2.3057371e-05" />
+          <csiactobs version="2.0.0.dev" calls="9" wall="7" cpu="4.970589" gCO2e="0.004880509978" />
+          <comobsselect version="2.0.0.dev" calls="2" wall="1" cpu="0.118271" gCO2e="0.0001161293" />
+          <comobsbin version="2.0.0.dev" calls="3" wall="82" cpu="82.020818" gCO2e="0.080534191756" />
+          <comobsback version="2.0.0.dev" calls="5" wall="21" cpu="21.588201" gCO2e="0.02119691057" />
+          <comobsmodel version="2.0.0.dev" calls="3" wall="1" cpu="0.475343" gCO2e="0.000466731257" />
+          <comobsadd version="2.0.0.dev" calls="3" wall="2" cpu="1.467164" gCO2e="0.00144057658" />
+          <comobsres version="2.0.0.dev" calls="3" wall="19" cpu="17.898668" gCO2e="0.017574257417" />
+          <comobssim version="2.0.0.dev" calls="3" wall="1" cpu="0.355431" gCO2e="0.000348993711" />
+          <comlixfit version="2.0.0.dev" calls="5" wall="44" cpu="42.639466" gCO2e="0.041866632735" />
+          <comlixmap version="2.0.0.dev" calls="5" wall="71" cpu="70.110307" gCO2e="0.06883955744" />
+          <comsrcdetect version="2.0.0.dev" calls="3" wall="0" cpu="0.035303" gCO2e="3.4668041e-05" />
+        </tools>
+      </date>
+      <date>
+        <value>2022-02-19</value>
+        <tools>
+          <cscaldb version="2.0.0.dev" calls="79" wall="27" cpu="2.098166" gCO2e="0.00206024862" />
+          <ctobssim version="2.0.0.dev" calls="1" wall="35" cpu="7.797325" gCO2e="0.007656001" />
+        </tools>
+      </date>
+      <date>
+        <value>2022-02-20</value>
+        <tools>
+          <ctobssim version="2.0.0.dev" calls="14" wall="89" cpu="88.139225" gCO2e="0.086544736" />
+          <ctlike version="2.0.0.dev" calls="14" wall="1" cpu="2.907895" gCO2e="0.0028552129" />
+          <cspull version="2.0.0.dev" calls="10" wall="229" cpu="189.407517" gCO2e="0.1859745197" />
+          <test_GApplication version="1.0.0" calls="4" wall="1" cpu="0.020321" gCO2e="2.2644983e-05" country="FR" />
+          <cscaldb version="2.0.0.dev" country="FR" calls="7" wall="3" cpu="0.194611" gCO2e="0.00019109055" />
+          <csfootprint version="2.0.0.dev" country="FR" calls="80" wall="138" cpu="1.05496" gCO2e="0.00103598216" />
+        </tools>
+      </date>
+    </daily>
+    <countries>
+      <FR version="2.0.0.dev" calls="83" wall="140" cpu="1.136547" gCO2e="0.00111609432" />
+    </countries>
+    <versions>
+      <2.0.0.dev calls="82" wall="138" cpu="1.109517" gCO2e="0.00108955228" />
+    </versions>
+  </data>
+</statistics>

@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for cscripts scripts                                             #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2021 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2022 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -25,6 +25,7 @@ pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/csbkgmodel.py \
                 $(srcdir)/cscaldb.py \
                 $(srcdir)/csebins.py \
+                $(srcdir)/csfootprint.py \
                 $(srcdir)/csinfo.py \
                 $(srcdir)/cslightcrv.py \
                 $(srcdir)/csmodelinfo.py \
@@ -88,6 +89,7 @@ parfiles = $(srcdir)/csadd2caldb.par \
            $(srcdir)/cstsmapsplit.par \
            $(srcdir)/csviscube.par \
            $(srcdir)/csscs.par \
+           $(srcdir)/csfootprint.par \
            $(srcdir)/csworkflow.par \
            $(srcdir)/csfindobs.par \
            $(srcdir)/csiactcopy.par \
@@ -123,6 +125,7 @@ linkscripts = csadd2caldb \
               cstsmapsplit \
               csviscube \
               csscs \
+              csfootprint \
               csworkflow \
               csfindobs \
               csiactcopy \
@@ -163,6 +166,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_cstsmapsplit.py \
               $(top_srcdir)/test/test_csviscube.py \
               $(top_srcdir)/test/test_csscs.py \
+              $(top_srcdir)/test/test_csfootprint.py \
               $(top_srcdir)/test/test_csworkflow.py \
               $(top_srcdir)/test/test_obsutils.py \
               $(top_srcdir)/test/test_mputils.py \

@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for cscripts
 #
-# Copyright (C) 2016-2021 Juergen Knoedlseder
+# Copyright (C) 2016-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import test_cscaldb
 import test_csadd2caldb
 import test_csbkgmodel
 import test_csebins
+import test_csfootprint
 import test_csfindobs
 import test_csinfo
 import test_cslightcrv
@@ -146,6 +147,7 @@ def test(installed=False, debug=False):
              test_cstsmapsplit.Test(),
              test_csviscube.Test(),
              test_csscs.Test(),
+             test_csfootprint.Test(),
              test_csworkflow.Test(),
              test_obsutils.Test(),
              test_mputils.Test()]

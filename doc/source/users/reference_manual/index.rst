@@ -57,6 +57,7 @@ CTA and IACT analysis tools and scripts
    ctskymap --- Generates sky map <ctskymap>
    csbkgmodel --- Generates background model for 3D analysis <csbkgmodel>
    csebins --- Generates energy boundaries for stacked analysis <csebins>
+   csfootprint --- Generates carbon footprint report <csfootprint>
    csobsdef --- Generates observation definition file <csobsdef>
    csobsselect --- Select observations from observation definition file <csobsselect>
    csphagen --- Generates PHA, ARF, RMF files based on source/background regions <csphagen>

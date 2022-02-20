@@ -60,4 +60,104 @@ computation took, and :math:`{\rm Carbon\,\,footprint}` is the carbon footprint 
 
 The carbon footprint of all ctools and cscript runs are stored in an ASCII file
 that you will find in a folder under your home directory, named ``.gamma/statistics.csv``.
+This file is regularly scanned and purged by the GammaLib daemon that creates the
+high-level statistics file ``.gamma/statistics.xml`` that is in the same folder. You may
+display the content of this file using the ``csfootprint`` script:
+
+.. code-block:: bash
+
+   $ csfootprint debug=yes
+   Start time for report (UTC string, JD, MJD or MET in seconds) [NONE]
+   Stop time for report (UTC string, JD, MJD or MET in seconds) [NONE]
+   Output graphics file (NONE if no graphics should be generated) [NONE]
+   ...
+   2022-02-20T14:38:29: +===================+
+   2022-02-20T14:38:29: | Global statistics |
+   2022-02-20T14:38:29: +===================+
+   2022-02-20T14:38:29:  Creation date .............: 2022-02-19T22:09:05
+   2022-02-20T14:38:29:  Last statistics update ....: 2022-02-20T14:35:20
+   2022-02-20T14:38:29:  Statistics date interval ..: 2022-02-18T22:21:56 - 2022-02-20T14:35:17
+   2022-02-20T14:38:29:  Used date interval ........: 2022-02-18T22:21:56 - 2022-02-20T14:35:17
+   2022-02-20T14:38:29:  Duration of used interval .: 40.222 hours
+   2022-02-20T14:38:29:  Total number of ctool runs : 3104
+   2022-02-20T14:38:29:  Total wall clock time .....: 34.200 minutes
+   2022-02-20T14:38:29:  Total CPU time ............: 27.543 minutes
+   2022-02-20T14:38:29:  Average CPU load ..........: 80.5 %
+   2022-02-20T14:38:29:  Total carbon footprint ....: 1.623 g CO2e
+   2022-02-20T14:38:29:  Average carbon intensity ..: 3.535 g CO2e / CPU hour
+   2022-02-20T14:38:29:  Average daily footprint ...: 0.968 g CO2e / day
+   2022-02-20T14:38:29:  Expected annual footprint .: 353.632 g CO2e / year
+   2022-02-20T14:38:29:
+   2022-02-20T14:38:29: +==================+
+   2022-02-20T14:38:29: | Daily statistics |
+   2022-02-20T14:38:29: +==================+
+   2022-02-20T14:38:29: === Carbon footprint ===
+   2022-02-20T14:38:29:  2022-02-18 ................: 1.336 g CO2e
+   2022-02-20T14:38:29:  2022-02-19 ................: 0.010 g CO2e
+   2022-02-20T14:38:29:  2022-02-20 ................: 0.277 g CO2e
+   2022-02-20T14:38:29: === ctools or cscript calls ===
+   2022-02-20T14:38:29:  2022-02-18 ................: 2895
+   2022-02-20T14:38:29:  2022-02-19 ................: 80
+   2022-02-20T14:38:29:  2022-02-20 ................: 129
+   2022-02-20T14:38:29: === Used wall clock time ===
+   2022-02-20T14:38:29:  2022-02-18 ................: 25.483 minutes
+   2022-02-20T14:38:29:  2022-02-19 ................: 1.033 minutes
+   2022-02-20T14:38:29:  2022-02-20 ................: 7.683 minutes
+   2022-02-20T14:38:29: === Used CPU time ===
+   2022-02-20T14:38:29:  2022-02-18 ................: 22.682 minutes
+   2022-02-20T14:38:29:  2022-02-19 ................: 9.895 seconds
+   2022-02-20T14:38:29:  2022-02-20 ................: 4.695 minutes
+   2022-02-20T14:38:29:
+   2022-02-20T14:38:29: +================================+
+   2022-02-20T14:38:29: | ctools and cscripts statistics |
+   2022-02-20T14:38:29: +================================+
+   2022-02-20T14:38:29: === Carbon footprint ===
+   2022-02-20T14:38:29:  ctlike ....................: 0.318 g CO2e
+   2022-02-20T14:38:29:  cspull ....................: 0.186 g CO2e
+   2022-02-20T14:38:29:  csbkgmodel ................: 0.178 g CO2e
+   2022-02-20T14:38:29:  ctobssim ..................: 0.172 g CO2e
+   2022-02-20T14:38:29:  ctobssim ..................: 0.087 g CO2e
+   2022-02-20T14:38:29:  comobsbin .................: 0.081 g CO2e
+   2022-02-20T14:38:29:  comlixmap .................: 0.069 g CO2e
+   2022-02-20T14:38:29:  ctulimit ..................: 0.064 g CO2e
+   2022-02-20T14:38:29:  cstsdist ..................: 0.058 g CO2e
+   2022-02-20T14:38:29:  ctselect ..................: 0.044 g CO2e
+   2022-02-20T14:38:29:  ... (list truncated after 10 entries) ...
+   2022-02-20T14:38:29: === ctools or cscript calls ===
+   2022-02-20T14:38:29:  ctobssim ..................: 1795
+   2022-02-20T14:38:29:  ctlike ....................: 220
+   2022-02-20T14:38:29:  ctselect ..................: 87
+   2022-02-20T14:38:29:  csfootprint ...............: 80
+   2022-02-20T14:38:29:  cscaldb ...................: 79
+   2022-02-20T14:38:29:  csscs .....................: 55
+   2022-02-20T14:38:29:  ctulimit ..................: 54
+   2022-02-20T14:38:29:  ctcubemask ................: 51
+   2022-02-20T14:38:29:  csphagen ..................: 46
+   2022-02-20T14:38:29:  ctbin .....................: 31
+   2022-02-20T14:38:29:  ... (list truncated after 10 entries) ...
+   2022-02-20T14:38:29: === Used wall clock time ===
+   2022-02-20T14:38:29:  ctlike ....................: 5.367 minutes
+   2022-02-20T14:38:29:  cspull ....................: 3.817 minutes
+   2022-02-20T14:38:29:  csbkgmodel ................: 3.067 minutes
+   2022-02-20T14:38:29:  ctobssim ..................: 2.967 minutes
+   2022-02-20T14:38:29:  csfootprint ...............: 2.300 minutes
+   2022-02-20T14:38:29:  ctobssim ..................: 1.483 minutes
+   2022-02-20T14:38:29:  comobsbin .................: 1.367 minutes
+   2022-02-20T14:38:29:  cstsdist ..................: 1.300 minutes
+   2022-02-20T14:38:29:  comlixmap .................: 1.183 minutes
+   2022-02-20T14:38:29:  ctselect ..................: 1.083 minutes
+   2022-02-20T14:38:29:  ... (list truncated after 10 entries) ...
+   2022-02-20T14:38:29: === Used CPU time ===
+   2022-02-20T14:38:29:  ctlike ....................: 5.392 minutes
+   2022-02-20T14:38:29:  cspull ....................: 3.157 minutes
+   2022-02-20T14:38:29:  csbkgmodel ................: 3.029 minutes
+   2022-02-20T14:38:29:  ctobssim ..................: 2.921 minutes
+   2022-02-20T14:38:29:  ctobssim ..................: 1.469 minutes
+   2022-02-20T14:38:29:  comobsbin .................: 1.367 minutes
+   2022-02-20T14:38:29:  comlixmap .................: 1.169 minutes
+   2022-02-20T14:38:29:  ctulimit ..................: 1.086 minutes
+   2022-02-20T14:38:29:  cstsdist ..................: 58.978 seconds
+   2022-02-20T14:38:29:  ctselect ..................: 45.005 seconds
+   2022-02-20T14:38:29:  ... (list truncated after 10 entries) ...
+
 
