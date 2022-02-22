@@ -220,12 +220,16 @@ class csfootprint(ctools.cscript):
                 sum_gCO2e += gCO2e
 
                 # Update tools data
-                if name in statistics['tools']:
-                    statistics['tools'][name]['calls'] += calls
-                    statistics['tools'][name]['wall']  += wall
-                    statistics['tools'][name]['cpu']   += cpu
-                    statistics['tools'][name]['gCO2e'] += gCO2e
-                else:
+                exists = False
+                for s in statistics['tools']:
+                    if name == s['name']:
+                        s['calls'] += calls
+                        s['wall']  += wall
+                        s['cpu']   += cpu
+                        s['gCO2e'] += gCO2e
+                        exists      = True
+                        break
+                if not exists:
                     entry = {'name': name, 'calls': calls, 'wall': wall,
                              'cpu': cpu, 'gCO2e': gCO2e}
                     statistics['tools'].append(entry)
@@ -284,7 +288,7 @@ class csfootprint(ctools.cscript):
         # Format according to precision
         if gCO2e < 1000.0:
             format = '%.3f g CO2e' % (gCO2e)
-        elif seconds < 1.0e6:
+        elif gCO2e < 1.0e6:
             format = '%.3f kg CO2e' % (gCO2e/1000.0)
         else:
             format = '%.3f t CO2e' % (gCO2e/1.0e6)
@@ -486,7 +490,6 @@ class csfootprint(ctools.cscript):
             self._log_value(level, entry['name'], self._format_time(entry['cpu']))
         if len(sorted_entries) > 9 and self['chatter'].integer() < 3:
             self._log_string(gammalib.NORMAL, ' ... (list truncated after 10 entries) ...')
-            
 
         # Return
         return
