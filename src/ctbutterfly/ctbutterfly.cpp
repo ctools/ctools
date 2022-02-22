@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctbutterfly - butterfly calculation tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2021 by Michael Mayer                               *
+ *  copyright (C) 2014-2022 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -208,13 +208,8 @@ void ctbutterfly::clear(void)
  * This method takes the spectral fit and its covariance matrix to compute
  * the confidence band via Gaussian error propagation
  ***************************************************************************/
-void ctbutterfly::run(void)
+void ctbutterfly::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 

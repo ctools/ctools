@@ -54,7 +54,7 @@ public:
 
     // Methods
     void          clear(void);
-    void          run(void);
+    void          process(void);
     void          save(void);
     const int&    iter(void) const;
     const double& logL(void) const;

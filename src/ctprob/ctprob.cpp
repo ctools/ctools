@@ -1,7 +1,7 @@
 /***************************************************************************
  *          ctprob - Computes event probability for a given model          *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2017-2018 by Leonardo Di Venere                          *
+ *  copyright (C) 2017-2022 by Leonardo Di Venere                          *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -199,19 +199,14 @@ void ctprob::clear(void)
 
 
 /***********************************************************************//**
- * @brief Runs the ctprob tool
+ * @brief Process the ctprob tool
  *
  * This method reads in the application parameters and loops over all
  * unbinned observations to compute the probability for each event that it
  * comes from one of the model components.
  ***************************************************************************/
-void ctprob::run(void)
+void ctprob::process(void)
 {
-    // Switch screen logging on in debug mode
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get parameters
     get_parameters();
 

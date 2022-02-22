@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2021 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -217,20 +217,15 @@ void ctbin::clear(void)
 
 
 /***********************************************************************//**
- * @brief Run the event binning tool
+ * @brief Process the event binning tool
  *
  * Gets the user parameters and loops over all CTA observations in the
  * observation container to bin the events into either a single or a set of
  * counts cube. All observations in the observation container that do not
  * contain CTA event lists will be skipped.
  ***************************************************************************/
-void ctbin::run(void)
+void ctbin::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 

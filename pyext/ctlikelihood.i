@@ -1,7 +1,7 @@
 /***************************************************************************
  *              ctlikelihood - Base class for likelihood tools             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2021 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -63,7 +63,7 @@ public:
 
     // Dummy methods (implementation makes this class non-abstract)
     virtual void clear(void) {}
-    virtual void run(void) {}
+    virtual void process(void) {}
     virtual void save(void) {}
 };
 %}
@@ -120,7 +120,7 @@ public:
 
     // Pure virtual methods
     virtual void clear(void) = 0;
-    virtual void run(void) = 0;
+    virtual void process(void) = 0;
     virtual void save(void) = 0;
 
     // Methods
@@ -162,7 +162,7 @@ public:
 
     // Methods
     virtual void clear(void);
-    virtual void run(void);
+    virtual void process(void);
     virtual void save(void);
 };
 
@@ -212,10 +212,23 @@ def _init_cslikelihood(self, name, version, argv):
     self._log.date(True)
 cslikelihood._init_cslikelihood = _init_cslikelihood
 
+# Run the script
+def _run(self):
+    if self._logDebug():
+        self._log.cout(True)
+    self._inc_running()
+    self.process()
+    self._dec_running()
+cslikelihood.run = _run
+
 # Execute the script
 def _execute(self):
+    self._inc_running()
     self._read_ahead(True)
-    self.run()
+    if self._logDebug():
+        self._log.cout(True)
+    self.process()
     self.save()
+    self._dec_running()
 cslikelihood.execute = _execute
 %}

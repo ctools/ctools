@@ -1,7 +1,7 @@
 /***************************************************************************
  *          ctedispcube - Energy dispersion cube generation tool           *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2021 by Maria Haupt                                 *
+ *  copyright (C) 2016-2022 by Maria Haupt                                 *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -216,13 +216,8 @@ void ctedispcube::clear(void)
  * Generates the energy dispersion cube by looping over all unbinned CTA
  * observations in the observation container.
  ***************************************************************************/
-void ctedispcube::run(void)
+void ctedispcube::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 

@@ -2,7 +2,7 @@
 # ==========================================================================
 # Add IRFs to CALDB
 #
-# Copyright (C) 2021 Juergen Knoedlseder
+# Copyright (C) 2021-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -376,14 +376,10 @@ class csadd2caldb(ctools.cscript):
 
 
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
         # Get parameters
         self._get_parameters()
 

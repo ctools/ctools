@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    cttsmap - TS map calculation tool                    *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2021 by Michael Mayer                               *
+ *  copyright (C) 2014-2022 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -204,13 +204,8 @@ void cttsmap::clear(void)
  * given models including this additional source. The fit parameters of the
  * source and its TS values are filled into respective position in the map.
  ***************************************************************************/
-void cttsmap::run(void)
+void cttsmap::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 

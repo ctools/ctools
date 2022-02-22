@@ -55,7 +55,7 @@ public:
 
     // Methods
     void clear(void);
-    void run(void);
+    void process(void);
     void save(void);
 
 protected:

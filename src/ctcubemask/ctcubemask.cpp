@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctcubemask - Cube filter tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2021 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2022 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,6 @@
 
 
 /* __ Method name definitions ____________________________________________ */
-#define G_RUN                                             "ctcubemask::run()"
 #define G_APPLY_MASK               "ctcubemask::apply_mask(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
@@ -201,18 +200,13 @@ void ctcubemask::clear(void)
 
 
 /***********************************************************************//**
- * @brief mask data cube
+ * @brief Mask data cube
  *
  * This method reads in the application parameters and loops over all
  * observations that were found to apply a mask on the event cube.
  ***************************************************************************/
-void ctcubemask::run(void)
+void ctcubemask::process(void)
 {
-    // Switch screen logging on in debug mode
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get parameters
     get_parameters();
 

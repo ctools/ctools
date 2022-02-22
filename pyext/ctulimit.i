@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2016 by Michael Mayer                               *
+ *  copyright (C) 2015-2022 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -42,10 +42,10 @@ public:
     ctulimit(int argc, char *argv[]);
     ctulimit(const ctulimit& app);
     virtual ~ctulimit(void);
-    
+
     // Methods
     void          clear(void);
-    void          run(void);
+    void          process(void);
     void          save(void);
     const double& diff_ulimit(void) const;
     const double& flux_ulimit(void) const;

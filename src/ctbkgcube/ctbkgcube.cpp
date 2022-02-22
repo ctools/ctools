@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2021 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2022 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -33,7 +33,7 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_RUN                                              "ctbkgcube::run()"
+#define G_PROCESS                                       "ctbkgcube::process()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -206,13 +206,8 @@ void ctbkgcube::clear(void)
  * observation container, loops over all CTA observations in the container
  * and generates a background cube from the CTA observations.
  ***************************************************************************/
-void ctbkgcube::run(void)
+void ctbkgcube::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 
@@ -281,7 +276,7 @@ void ctbkgcube::run(void)
         std::string msg = "No background model found in model container. "
                           "At least one background model is required in the "
                           "model container to generate a background cube.";
-        throw GException::invalid_value(G_RUN, msg);
+        throw GException::invalid_value(G_PROCESS, msg);
     }
 
     // Write header

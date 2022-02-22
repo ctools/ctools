@@ -1,7 +1,7 @@
 /***************************************************************************
  *          ctedispcube - Energy dispersion cube generation tool           *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016 by Maria Haupt                                      *
+ *  copyright (C) 2016-2022 by Maria Haupt                                 *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -46,7 +46,7 @@ public:
 
     // Methods
     void                 clear(void);
-    void                 run(void);
+    void                 process(void);
     void                 save(void);
     const GCTACubeEdisp& edispcube(void) const;
 };

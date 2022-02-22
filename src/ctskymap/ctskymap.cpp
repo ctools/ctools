@@ -1,7 +1,7 @@
 /***************************************************************************
  *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2021 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -207,19 +207,14 @@ void ctskymap::clear(void)
 
 
 /***********************************************************************//**
- * @brief Run the sky mapping tool
+ * @brief Process the sky mapping tool
  *
  * Generates a sky map from event list by looping over all unbinned CTA
  * observation in the observation container and filling all events into
  * a sky map.
  ***************************************************************************/
-void ctskymap::run(void)
+void ctskymap::process(void)
 {
-    // Switch screen logging on in debug mode
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get parameters
     get_parameters();
 

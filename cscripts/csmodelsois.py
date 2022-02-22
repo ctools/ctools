@@ -2,7 +2,7 @@
 # ==========================================================================
 # Puts subset of sources in diffuse model cube
 #
-# Copyright (C) 2017-2021 Josh Cardenzana
+# Copyright (C) 2017-2022 Josh Cardenzana
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -146,14 +146,10 @@ class csmodelsois(ctools.cscript):
 
 
     # Public methods
-    def run(self):
+    def process(self):
         """
         Implements the actual bulk of the script's tasks
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
         # Get parameters
         self._get_parameters()
 

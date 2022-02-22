@@ -205,7 +205,7 @@ void ctlike::clear(void)
 
 
 /***********************************************************************//**
- * @brief Run maximum likelihood analysis
+ * @brief Process maximum likelihood analysis
  *
  * The following analysis steps are performed:
  * 1. Read the parameters (and write them into logger)
@@ -213,13 +213,8 @@ void ctlike::clear(void)
  * 3. Setup models for optimizing
  * 4. Optimize model (and write result into logger)
  ***************************************************************************/
-void ctlike::run(void)
+void ctlike::process(void)
 {
-    // Switch screen logging on in debug mode
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get parameters
     get_parameters();
 

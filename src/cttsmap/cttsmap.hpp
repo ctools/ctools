@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    cttsmap - TS map calculation tool                    *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Michael Mayer                               *
+ *  copyright (C) 2014-2022 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -67,7 +67,7 @@ public:
 
     // Methods
     void           clear(void);
-    void           run(void);
+    void           process(void);
     void           save(void);
     void           publish(const std::string& name = "");
     const GSkyMap& tsmap(void) const;

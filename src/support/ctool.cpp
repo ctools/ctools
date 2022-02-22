@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2021 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -249,22 +249,60 @@ ctool& ctool::operator=(const ctool& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Execute application
+ * @brief Run ctool
  *
- * This is the main execution method of a ctool. The method is invoked when
- * the executable is called from the command line. It signals that output
- * parameters should be read ahead, runs the tools, and saves the results.
+ * This method runs a ctool by calling the process() method of a ctool. The
+ * method switches on screen dump in case that the debug parameter is true.
+ ***************************************************************************/
+void ctool::run(void)
+{
+    // Increment number of running tools
+    running()++;
+
+    // If we're in debug mode then all output is also dumped on the screen
+    if (logDebug()) {
+        log.cout(true);
+    }
+
+    // Run the tool
+    process();
+
+    // Decrement number of running tools
+    running()--;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Execute ctool
+ *
+ * This method executes a ctool by calling the process() and save() methods
+ * of a ctool. The method signals that some parameters should be read ahead
+ * and switches on screen dump in case that the debug parameter is true.
  ***************************************************************************/
 void ctool::execute(void)
 {
+    // Increment number of running tools
+    running()++;
+
     // Signal that some parameters should be read ahead
     m_read_ahead = true;
 
+    // If we're in debug mode then all output is also dumped on the screen
+    if (logDebug()) {
+        log.cout(true);
+    }
+
     // Run the tool
-    run();
+    process();
 
     // Save the results
     save();
+
+    // Decrement number of running tools
+    running()--;
 
     // Return
     return;

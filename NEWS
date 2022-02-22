@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-2 February 2022
+22 February 2022
 
 
 Introduction
@@ -34,7 +34,10 @@ Added optimizer setter to ctlikelihood base class.
 
 Base classes
 ------------
-None
+Renamed virtual abstract ctool::run() method to ctool::process() and introduce
+high-level non-abstact class ctool::run() that handles the counting of running
+GApplication instances. In that way a tool knows whether it is a child or a
+parent application (#3592).
 
 
 ctbin - CTA event binning

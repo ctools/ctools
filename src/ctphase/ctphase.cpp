@@ -1,7 +1,7 @@
 /***************************************************************************
  *          ctphase - Append phase information to CTA events file          *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2017-2018 by Joshua Cardenzana                           *
+ *  copyright (C) 2017-2022 by Joshua Cardenzana                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -200,19 +200,14 @@ void ctphase::clear(void)
 
 
 /***********************************************************************//**
- * @brief Runs the ctprob tool
+ * @brief Process the ctprob tool
  *
  * This method reads in the application parameters and loops over all
  * unbinned observations to compute the phase information for each event
  * based on an input model.
  ***************************************************************************/
-void ctphase::run(void)
+void ctphase::process(void)
 {
-    // Switch screen logging on in debug mode
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get parameters
     get_parameters();
 

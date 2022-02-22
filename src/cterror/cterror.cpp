@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 cterror - Parameter error calculation tool              *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2019 by Florent Forest                              *
+ *  copyright (C) 2015-2022 by Florent Forest                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -220,13 +220,8 @@ void cterror::clear(void)
  *
  * Computes the parameter errors using a likelihood profile method.
  ***************************************************************************/
-void cterror::run(void)
+void cterror::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2021 by Michael Mayer                               *
+ *  copyright (C) 2015-2022 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -219,13 +219,8 @@ void ctulimit::clear(void)
  *
  * Computes the upper limit depending on the given algorithm
  ***************************************************************************/
-void ctulimit::run(void)
+void ctulimit::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 

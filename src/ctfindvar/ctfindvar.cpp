@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctfindvar - Time variability search tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2018-2021 by Simon Bonnefoy                              *
+ *  copyright (C) 2018-2022 by Simon Bonnefoy                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -221,15 +221,10 @@ void ctfindvar::clear(void)
 
 
 /***********************************************************************//**
- * @brief Run time variability search tool
+ * @brief Process time variability search tool
  ***************************************************************************/
-void ctfindvar::run(void)
+void ctfindvar::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 

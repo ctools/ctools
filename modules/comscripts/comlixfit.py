@@ -239,14 +239,10 @@ class comlixfit(ctools.cslikelihood):
         return
 
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
         # Get parameters
         self._get_parameters()
 

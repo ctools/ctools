@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2021 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -227,18 +227,13 @@ void ctobssim::clear(void)
 
 
 /***********************************************************************//**
- * @brief Run the ctobssim tool.
+ * @brief Process the ctobssim tool.
  *
  * Gets the user parameters, loops over all CTA observations in the
  * observation container, and simulate events for each observation. 
  ***************************************************************************/
-void ctobssim::run(void)
+void ctobssim::process(void)
 {
-    // Switch screen logging on in debug mode
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get parameters
     get_parameters();
 

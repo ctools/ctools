@@ -1,8 +1,10 @@
-2022-02-02
+2022-02-22
 
         * Version 2.0.0 released
         ========================
 
+        Rename virtual abstract ctool::run() method to ctool::process() and
+          add non-abstract ctool::run() method (#3592) (#3592)
         Add methods to access ctlike attributes
         Add csadd2caldb script
         Add restart of bisection in case of bad convergence in ctulimit
