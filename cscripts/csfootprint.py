@@ -18,6 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
+import pwd
 import sys
 import gammalib
 import ctools
@@ -217,7 +219,7 @@ class csfootprint(ctools.cscript):
                 wall  = float(tool.attribute('wall'))
                 cpu   = float(tool.attribute('cpu'))
                 gCO2e = float(tool.attribute('gCO2e'))
-                
+
                 # Update sums
                 sum_calls += calls
                 sum_wall  += wall
@@ -271,17 +273,17 @@ class csfootprint(ctools.cscript):
         """
         # Format according to precision
         if seconds < 60.0:
-            format = '%.3f seconds' % (seconds)
+            format = '%.1f seconds' % (seconds)
         elif seconds < 3600.0:
-            format = '%.3f minutes' % (seconds/60.0)
+            format = '%.1f minutes' % (seconds/60.0)
         else:
-            format = '%.3f hours' % (seconds/3600.0)
+            format = '%.1f hours' % (seconds/3600.0)
 
         # Return format
         return format
 
     # Format carbon footprint
-    def _format_footprint(self, gCO2e):
+    def _format_footprint(self, gCO2e, latex=False):
         """
         Format carbon footprint
 
@@ -289,17 +291,104 @@ class csfootprint(ctools.cscript):
         ----------
         gCO2e : float
             Carbon footprint in gCO2e
+        latex : bool, optional
+            Use LaTeX formatting
         """
+        # Set unit
+        if latex:
+            unit = r'CO$_2$e'
+        else:
+            unit = 'CO2e'
+        
         # Format according to precision
         if gCO2e < 1000.0:
-            format = '%.3f g CO2e' % (gCO2e)
+            format = '%.1f g %s' % (gCO2e, unit)
         elif gCO2e < 1.0e6:
-            format = '%.3f kg CO2e' % (gCO2e/1000.0)
+            format = '%.1f kg %s' % (gCO2e/1000.0, unit)
         else:
-            format = '%.3f t CO2e' % (gCO2e/1.0e6)
+            format = '%.1f t %s' % (gCO2e/1.0e6, unit)
 
         # Return format
         return format
+
+    # Get global information
+    def _get_global_information(self, statistics, latex=False):
+        """
+        Get global information from statistics
+        
+        Parameters
+        ----------
+        statistics : dict
+            Statistics dictionary
+        latex : bool, optional
+            Use LaTeX formatting
+        """
+        # Derive information
+        tstart    = gammalib.GTime(statistics['use_start'])
+        tstop     = gammalib.GTime(statistics['use_stop'])
+        duration  = tstop - tstart
+        cpu_hours = statistics['cpu']/3600.0
+        if statistics['cpu'] != 0.0:
+            ci_cpu = statistics['gCO2e']/cpu_hours
+        else:
+            ci_cpu = 0.0
+        if duration != 0.0:
+            fp_dur = statistics['gCO2e']/(duration * gammalib.sec2day)
+        else:
+            fp_dur = 0.0
+        fp_yr   = fp_dur * 365.25
+        dur_str = self._format_time(duration)
+        if statistics['wall'] != 0.0:
+            load_str = '%.1f %%' % (statistics['cpu']/statistics['wall']*100.0)
+        else:
+            load_str = 'undefined'
+        ci_cpu_str = self._format_footprint(ci_cpu, latex) + ' / CPU hour'
+        fp_dur_str = self._format_footprint(fp_dur, latex) + ' / day'
+        fp_yr_str  = self._format_footprint(fp_yr, latex) + ' / year'
+        wall_str   = self._format_time(statistics['wall'])
+        cpu_str    = self._format_time(statistics['cpu'])
+        gCO2e_str  = self._format_footprint(statistics['gCO2e'], latex)
+        date_str   = '%s - %s' % (statistics['start'], statistics['stop'])
+        use_str    = '%s - %s' % (statistics['use_start'], statistics['use_stop'])
+
+        # Split footprint into infrastructure and electricity use footprint
+        if statistics['cpu'] != 0.0:
+            ef_kWh         = 108.0
+            ef_total       = 4.68
+            ef_electricity = 2.43
+            ef_other       = ef_total - ef_electricity
+            val_ef         = (ci_cpu - ef_other) * ef_kWh / ef_electricity
+            gCO2e_infra    = ef_other * cpu_hours
+            gCO2e_elect    = ef_electricity * val_ef / ef_kWh * cpu_hours
+        else:
+            val_ef      = 0.0
+            gCO2e_infra = 0.0
+            gCO2e_elect = 0.0
+        gCO2e_kWh_str   = self._format_footprint(val_ef, latex) + ' / kWh'
+        gCO2e_infra_str = self._format_footprint(gCO2e_infra, latex)
+        gCO2e_elect_str = self._format_footprint(gCO2e_elect, latex)
+
+        # Build electricity footprint string
+        elect_str = '%s (%s)' % (gCO2e_elect_str, gCO2e_kWh_str)
+
+        # Build result directory
+        result = {'ci_cpu':      ci_cpu_str,
+                  'fp_dur':      fp_dur_str,
+                  'fp_yr':       fp_yr_str,
+                  'wall':        wall_str,
+                  'cpu':         cpu_str,
+                  'gCO2e':       gCO2e_str,
+                  'date':        date_str,
+                  'use':         use_str,
+                  'dur':         dur_str,
+                  'load':        load_str,
+                  'gCO2e_kWh':   gCO2e_kWh_str,
+                  'gCO2e_infra': gCO2e_infra_str,
+                  'gCO2e_elect': gCO2e_elect_str,
+                  'elect':       elect_str}
+
+        # Return result
+        return result
 
     # Log global statistics
     def _global_statistics(self, statistics):
@@ -314,47 +403,25 @@ class csfootprint(ctools.cscript):
         # Log header
         self._log_header1(gammalib.TERSE, 'Global statistics')
 
-        # Derive information
-        tstart   = gammalib.GTime(statistics['use_start'])
-        tstop    = gammalib.GTime(statistics['use_stop'])
-        duration = tstop - tstart
-        if statistics['cpu'] != 0.0:
-            ci_cpu = statistics['gCO2e']/(statistics['cpu']/3600.0)
-        else:
-            ci_cpu = 0.0
-        if duration != 0.0:
-            fp_dur = statistics['gCO2e']/(duration * gammalib.sec2day)
-        else:
-            fp_dur = 0.0
-        fp_yr      = fp_dur * 365.25
-        dur_str    = self._format_time(duration)
-        if statistics['wall'] != 0.0:
-            load_str = '%.1f %%' % (statistics['cpu']/statistics['wall']*100.0)
-        else:
-            load_str = 'undefined'
-        ci_cpu_str = self._format_footprint(ci_cpu) + ' / CPU hour'
-        fp_dur_str = self._format_footprint(fp_dur) + ' / day'
-        fp_yr_str  = self._format_footprint(fp_yr) + ' / year'
-        wall_str   = self._format_time(statistics['wall'])
-        cpu_str    = self._format_time(statistics['cpu'])
-        gCO2e_str  = self._format_footprint(statistics['gCO2e'])
-        date_str   = '%s - %s' % (statistics['start'], statistics['stop'])
-        use_str    = '%s - %s' % (statistics['use_start'], statistics['use_stop'])
+        # Derive information from statistics
+        info = self._get_global_information(statistics)
 
         # Log report information
         self._log_value(gammalib.NORMAL, 'Creation date', statistics['creation'])
         self._log_value(gammalib.NORMAL, 'Last statistics update', statistics['modified'])
-        self._log_value(gammalib.NORMAL, 'Statistics date interval', date_str)
-        self._log_value(gammalib.NORMAL, 'Used date interval', use_str)
-        self._log_value(gammalib.NORMAL, 'Duration of used interval', dur_str)
+        self._log_value(gammalib.NORMAL, 'Statistics date interval', info['date'])
+        self._log_value(gammalib.NORMAL, 'Used date interval', info['use'])
+        self._log_value(gammalib.NORMAL, 'Duration of used interval', info['dur'])
         self._log_value(gammalib.NORMAL, 'Total number of ctool runs', statistics['calls'])
-        self._log_value(gammalib.NORMAL, 'Total wall clock time', wall_str)
-        self._log_value(gammalib.NORMAL, 'Total CPU time', cpu_str)
-        self._log_value(gammalib.NORMAL, 'Average CPU load', load_str)
-        self._log_value(gammalib.NORMAL, 'Total carbon footprint', gCO2e_str)
-        self._log_value(gammalib.NORMAL, 'Average carbon intensity', ci_cpu_str)
-        self._log_value(gammalib.NORMAL, 'Average daily footprint', fp_dur_str)
-        self._log_value(gammalib.NORMAL, 'Expected annual footprint', fp_yr_str)
+        self._log_value(gammalib.NORMAL, 'Total wall clock time', info['wall'])
+        self._log_value(gammalib.NORMAL, 'Total CPU time', info['cpu'])
+        self._log_value(gammalib.NORMAL, 'Average CPU load', info['load'])
+        self._log_value(gammalib.NORMAL, 'Total carbon footprint', info['gCO2e'])
+        self._log_value(gammalib.NORMAL, ' due to power consumption', info['elect'])
+        self._log_value(gammalib.NORMAL, ' due to infrastructure', info['gCO2e_infra'])
+        self._log_value(gammalib.NORMAL, 'Average carbon intensity', info['ci_cpu'])
+        self._log_value(gammalib.NORMAL, 'Average daily footprint', info['fp_dur'])
+        self._log_value(gammalib.NORMAL, 'Expected annual footprint', info['fp_yr'])
 
         # Return
         return
@@ -513,33 +580,86 @@ class csfootprint(ctools.cscript):
         """
         # Optionally use matplotlib to create a figure
         try:
-        
+
             # Import matplotlib
             import matplotlib.pyplot   as plt
             import matplotlib.gridspec as gridspec
 
             # Create figure
-            fig = plt.figure(figsize=(15.0,7.8))
+            ysize = 7.0
+            xsize = 1.4142 * ysize
+            fig = plt.figure(figsize=(xsize, ysize))
 
             # Create title and subtitle
-            title    = 'ctools carbon footprint report'
+            user     = pwd.getpwuid(os.getuid())[0]
+            title    = 'ctools carbon footprint report for user "%s"' % (user)
             subtitle = r'Dates: %s - %s' % \
                        (statistics['use_start'], statistics['use_stop'])
             fig.suptitle(title, fontsize=16)
-            fig.text(0.5, 0.93, subtitle, fontsize=12, ha='center')
+            fig.text(0.5, 0.925, subtitle, fontsize=11, ha='center')
 
             # Set plot margins
-            fig.subplots_adjust(left=0.07, bottom=0.07, right=0.97, top=0.88, wspace=0.3, hspace=0.35)
+            fig.subplots_adjust(left=0.07, bottom=0.07, right=0.97, top=0.88,
+                                wspace=0.1, hspace=0.2)
 
             # Divide figure
-            gs1 = gridspec.GridSpec(3,3)
+            gs1 = gridspec.GridSpec(4,3) # (rows,cols)
+            gs1.update(hspace=0.8, wspace=0.8)
             ax1 = fig.add_subplot(gs1[0,0:2])
-            ax2 = fig.add_subplot(gs1[0,2])
+            ax2 = fig.add_subplot(gs1[1,0:2])
+            ax3 = fig.add_subplot(gs1[2,0:2])
+            ax4 = fig.add_subplot(gs1[3,0:2])
+            #
+            gs2 = gridspec.GridSpec(8,3) # (rows,cols)
+            gs2.update(hspace=0.3, bottom=0.0, top=0.95, right=0.96, wspace=0.0)
+            ax10 = fig.add_subplot(gs2[2:5,2])
+            ax11 = fig.add_subplot(gs2[5:8,2])
 
-            # Plot daily footprint
-            self._plot_daily(ax1, statistics)
+            # Plot daily figures
+            self._plot_daily(ax1, statistics, quantity='gCO2e', title='Footprint',
+                             ylabel=r'g CO$_2$e')
+            self._plot_daily(ax2, statistics, quantity='cpu', title='CPU hours',
+                             ylabel='hours', yscale=1.0/3600.0)
+            self._plot_daily(ax3, statistics, quantity='wall', title='Wall clock hours',
+                             ylabel='hours', yscale=1.0/3600.0)
+            self._plot_daily(ax4, statistics, quantity='calls',
+                             title='ctools calls', ylabel='calls')
 
-            #plt.show()
+            # Plot pie figures
+            self._plot_pie(ax10, statistics, quantity='gCO2e', title='Footprint')
+            self._plot_pie(ax11, statistics, quantity='calls', title='ctools calls')
+
+            # Derive summary information from statistics
+            info = self._get_global_information(statistics, latex=True)
+
+            # Write summary information
+            x0       = 0.63
+            y0       = 0.89
+            dx       = 0.17
+            dy       = 0.022
+            fontsize = 8
+            fig.text(x0,    y0, 'Total carbon footprint: ', fontsize=fontsize, ha='left')
+            fig.text(x0+dx, y0, info['gCO2e'], fontsize=fontsize, ha='left')
+            y0 -= dy
+            fig.text(x0,    y0, ' due to power consumption: ', fontsize=fontsize, ha='left')
+            fig.text(x0+dx, y0, info['elect'], fontsize=fontsize, ha='left')
+            y0 -= dy
+            fig.text(x0,    y0, ' due to infrastructure: ', fontsize=fontsize, ha='left')
+            fig.text(x0+dx, y0, info['gCO2e_infra'], fontsize=fontsize, ha='left')
+            y0 -= dy
+            fig.text(x0,    y0, 'Total CPU time: ', fontsize=fontsize, ha='left')
+            fig.text(x0+dx, y0, info['cpu'], fontsize=fontsize, ha='left')
+            y0 -= dy
+            fig.text(x0,    y0, 'Average carbon intensity: ', fontsize=fontsize, ha='left')
+            fig.text(x0+dx, y0, info['ci_cpu'], fontsize=fontsize, ha='left')
+            y0 -= dy
+            fig.text(x0,    y0, 'Average daily footprint: ', fontsize=fontsize, ha='left')
+            fig.text(x0+dx, y0, info['fp_dur'], fontsize=fontsize, ha='left')
+            y0 -= dy
+            fig.text(x0,    y0, 'Expected annual footprint: ', fontsize=fontsize, ha='left')
+            fig.text(x0+dx, y0, info['fp_yr'], fontsize=fontsize, ha='left')
+
+            plt.show()
 
             # Save figure
             fig.savefig(outfile, dpi=300)
@@ -556,10 +676,11 @@ class csfootprint(ctools.cscript):
         # Return
         return
 
-    # Plot daily footprint
-    def _plot_daily(self, ax, statistics):
+    # Plot daily figure
+    def _plot_daily(self, ax, statistics, quantity='gCO2e', title='Footprint',
+                    ylabel=r'g CO$_2$e', yscale=1.0):
         """
-        Plot daily footprint
+        Plot daily figure
 
         Parameters
         ----------
@@ -567,21 +688,84 @@ class csfootprint(ctools.cscript):
             Plotting frame
         statistics : dict
             Statistics dictionary
+        quantity : str, optional
+            Quantity to plot
+        title : str, optional
+            Plot title
+        ylabel : str, optional
+            Y axis label
+        yscale : float, optional
+            Y axis scale
         """
         # Create bar data
-        days = [i              for i, _  in enumerate(statistics['daily'])]
-        data = [entry['gCO2e'] for entry in statistics['daily']]
+        days = [i                      for i, _  in enumerate(statistics['daily'])]
+        data = [entry[quantity]*yscale for entry in statistics['daily']]
 
         # Plot bar data
         ax.bar(days, data, 1.0, bottom=0.0, color='red')
 
         # Set labels
-        ax.set_title('Footprint')
+        ax.set_title(title)
         ax.set_xlabel('Days since %s' % statistics['use_start'][0:10])
-        ax.set_ylabel(r'g CO$_2$e')
-        
+        ax.set_ylabel(ylabel)
+
         # Return
         return
+
+    # Plot pie figure
+    def _plot_pie(self, ax, statistics, quantity='gCO2e', title='Footprint', num=5):
+        """
+        Plot pie figure
+
+        Parameters
+        ----------
+        ax : pyplot
+            Plotting frame
+        statistics : dict
+            Statistics dictionary
+        quantity : str, optional
+            Quantity to plot
+        title : str, optional
+            Plot title
+        num : integer, optional
+            Number of pies displayed explicitly
+        """
+        # Get Python version information
+        req_version = (2,4)
+        cur_version = sys.version_info
+
+        # Optionally sort list
+        if cur_version > req_version:
+            sorted_entries = sorted(statistics['tools'], key=lambda d: d[quantity], reverse=True)
+        else:
+            sorted_entries = statistics['tools']
+
+        # Create pie data
+        labels = []
+        sizes  = []
+        others = 0.0
+        for i, entry in enumerate(sorted_entries):
+            if i < num:
+                labels.append(entry['name'])
+                sizes.append(entry[quantity])
+            else:
+                others += entry[quantity]
+        labels.append('others')
+        sizes.append(others)
+
+        # Plot pie chart
+        wedges, _, _ = ax.pie(sizes, autopct='%1.0f%%', pctdistance=0.8,
+                              startangle=90, radius=1.0,
+                              wedgeprops=dict(width=0.4, edgecolor='w'))
+        ax.axis('equal')
+        ax.legend(wedges, labels, loc='center', fontsize=8, frameon=False)
+
+        # Set labels
+        ax.set_title(title)
+
+        # Return
+        return
+
 
     # Public methods
     def process(self):
