@@ -664,7 +664,8 @@ class csfootprint(ctools.cscript):
             fig.text(x0+dx, y0, info['fp_yr'], fontsize=fontsize, ha='left')
 
             # Optionally display figure for debugging
-            #plt.show()
+            if self._logDebug():
+                plt.show()
 
             # Save figure
             fig.savefig(outfile, dpi=300)
