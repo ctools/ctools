@@ -21,6 +21,7 @@
 import os
 import pwd
 import sys
+import inspect
 import gammalib
 import ctools
 
@@ -625,9 +626,12 @@ class csfootprint(ctools.cscript):
             self._plot_daily(ax4, statistics, quantity='calls',
                              title='ctools calls', ylabel='calls')
 
+            # Kludge to adapt pie plotting to matplotlib version
+            args, _, _, _ = inspect.getargspec(plt.pie)
+
             # Plot pie figures
-            self._plot_pie(ax10, statistics, quantity='gCO2e', title='Footprint')
-            self._plot_pie(ax11, statistics, quantity='calls', title='ctools calls')
+            self._plot_pie(ax10, statistics, quantity='gCO2e', title='Footprint', args=args)
+            self._plot_pie(ax11, statistics, quantity='calls', title='ctools calls', args=args)
 
             # Derive summary information from statistics
             info = self._get_global_information(statistics, latex=True)
@@ -659,7 +663,8 @@ class csfootprint(ctools.cscript):
             fig.text(x0,    y0, 'Expected annual footprint: ', fontsize=fontsize, ha='left')
             fig.text(x0+dx, y0, info['fp_yr'], fontsize=fontsize, ha='left')
 
-            plt.show()
+            # Optionally display figure for debugging
+            #plt.show()
 
             # Save figure
             fig.savefig(outfile, dpi=300)
@@ -713,7 +718,7 @@ class csfootprint(ctools.cscript):
         return
 
     # Plot pie figure
-    def _plot_pie(self, ax, statistics, quantity='gCO2e', title='Footprint', num=5):
+    def _plot_pie(self, ax, statistics, quantity='gCO2e', title='Footprint', num=5, args=None):
         """
         Plot pie figure
 
@@ -729,6 +734,8 @@ class csfootprint(ctools.cscript):
             Plot title
         num : integer, optional
             Number of pies displayed explicitly
+        arg : list or str, optional
+            List of pie method keyword arguments
         """
         # Get Python version information
         req_version = (2,4)
@@ -754,9 +761,13 @@ class csfootprint(ctools.cscript):
         sizes.append(others)
 
         # Plot pie chart
-        wedges, _, _ = ax.pie(sizes, autopct='%1.0f%%', pctdistance=0.8,
-                              startangle=90, radius=1.0,
-                              wedgeprops=dict(width=0.4, edgecolor='w'))
+        if 'wedgeprops' in args:
+            wedges, _, _ = ax.pie(sizes, autopct='%1.0f%%', pctdistance=0.8,
+                                  startangle=90, radius=1.0,
+                                  wedgeprops=dict(width=0.4, edgecolor='w'))
+        else:
+            wedges, _, _ = ax.pie(sizes, autopct='%1.0f%%', pctdistance=0.8,
+                                  startangle=90, radius=1.0)
         ax.axis('equal')
         ax.legend(wedges, labels, loc='center', fontsize=8, frameon=False)
 
