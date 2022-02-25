@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for ctools unit tests                                         #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2021 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2022 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -71,6 +71,7 @@ clean-local:
 	rm -rf $(top_builddir)/test/comobsback_*
 	rm -rf $(top_builddir)/test/comobsbin_*
 	rm -rf $(top_builddir)/test/comobssim_*
+	rm -rf $(top_builddir)/test/comgendb_*
 	rm -rf $(top_builddir)/test/.DS_Store
 
 # Tests to be done on installed version

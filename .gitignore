@@ -91,6 +91,7 @@ test/comobsback_*
 test/comobsadd_*
 test/comobssim_*
 test/comlixfit_*
+test/comgendb_*
 test/*.fits
 test/*.dat
 test/*.xml

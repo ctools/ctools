@@ -17,7 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-__all__ = ['comlixfit',
+__all__ = ['comgendb',
+           'comlixfit',
            'comlixmap',
            'comobsadd',
            'comobsselect',
@@ -30,6 +31,7 @@ __all__ = ['comlixfit',
            'comsrcdetect']
 
 # Import
+from comscripts.comgendb     import comgendb
 from comscripts.comlixfit    import comlixfit
 from comscripts.comlixmap    import comlixmap
 from comscripts.comobsadd    import comobsadd

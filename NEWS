@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-22 February 2022
+25 February 2022
 
 
 Introduction
@@ -400,6 +400,11 @@ parameter now can now be set to "RECT" to use rectangular sky regions. The
 parameter is now automatic. The parameters "width", "height", and "posang" were
 added to specify the width, height and position angle of the rectangular sky
 regions (#3248).
+
+
+comgendb - Generate COMPTEL database
+------------------------------------
+Added script (#3983).
 
 
 comlixfit - COMPTEL maximum likelihood fitting using SRCLIX algorithm

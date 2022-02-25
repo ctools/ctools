@@ -98,6 +98,7 @@ COMPTEL Science Analysis scripts
 .. toctree::
    :maxdepth: 1
 
+   comgendb --- Generate COMPTEL database <comgendb>
    comlixfit --- Fit model to data using SRCLIX algorithm <comlixfit>
    comlixmap --- Create TS map using SRCLIX algorithm <comlixmap>
    comobsadd --- Combine observations <comobsadd>

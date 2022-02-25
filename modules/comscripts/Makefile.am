@@ -21,6 +21,7 @@
 
 # Scripts to be distributed in $(pyexecdir)/comscripts
 pythonscripts = $(top_builddir)/modules/comscripts/__init__.py \
+                $(srcdir)/comgendb.py \
                 $(srcdir)/comlixfit.py \
                 $(srcdir)/comlixmap.py \
                 $(srcdir)/comobsadd.py \
@@ -34,7 +35,8 @@ pythonscripts = $(top_builddir)/modules/comscripts/__init__.py \
                 $(srcdir)/comsrcdetect.py
 
 # Parfiles to be distributed in $(prefix)/syspfiles
-parfiles = $(srcdir)/comlixfit.par \
+parfiles = $(srcdir)/comgendb.par \
+           $(srcdir)/comlixfit.par \
            $(srcdir)/comlixmap.par \
            $(srcdir)/comobsadd.par \
            $(srcdir)/comobsback.par \
@@ -47,7 +49,8 @@ parfiles = $(srcdir)/comlixfit.par \
            $(srcdir)/comsrcdetect.par
 
 # Scripts for which symbolic links will be created in bindir
-linkscripts = comlixfit \
+linkscripts = comgendb \
+              comlixfit \
               comlixmap \
               comobsadd \
               comobsback \

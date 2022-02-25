@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for comscripts
 #
-# Copyright (C) 2021 Juergen Knoedlseder
+# Copyright (C) 2021-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import sys
 import gammalib
 import comscripts
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+import test_comgendb
 import test_comobsselect
 import test_comobsbin
 import test_comobsback
@@ -99,7 +100,8 @@ def test(installed=False, debug=False):
         os.system('chmod u+w pfiles/*')
 
     # Define list of test suites
-    tests = [test_comobsselect.Test(),
+    tests = [test_comgendb.Test(),
+             test_comobsselect.Test(),
              test_comobsbin.Test(),
              test_comobsback.Test(),
              test_comobsmodel.Test(),
