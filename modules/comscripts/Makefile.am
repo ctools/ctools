@@ -75,7 +75,8 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_comobsres.py \
               $(top_srcdir)/test/test_comobsselect.py \
               $(top_srcdir)/test/test_comobssim.py \
-              $(top_srcdir)/test/test_comsrcdetect.py
+              $(top_srcdir)/test/test_comsrcdetect.py \
+              $(top_srcdir)/test/test_comgendb.py
 
 # Test data to be distributed in $(pyexecdir)/comscripts/tests/data/comptel
 testdata = $(top_srcdir)/test/data/comptel/ebounds_std.fits.gz \
