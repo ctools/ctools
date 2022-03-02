@@ -160,6 +160,23 @@ class comgendb(ctools.cscript):
         # Return relative path
         return relpath
 
+    def _tjd_start(self, element):
+        """
+        Return 'tjd_start' value from dictionary
+
+        Parameters
+        ----------
+        element : dict
+            Element of list
+
+        Returns
+        -------
+        tjd_start : float
+            Value of element['tjd_start']
+        """
+        # Return
+        return element.get('tjd_start')
+
     def _get_evp_list(self):
         """
         Get EVP list
@@ -192,7 +209,7 @@ class comgendb(ctools.cscript):
                 evp_list.extend(evps)
 
         # Sort EVP list by start day
-        evp_list = sorted(evp_list, key=lambda k: k['tjd_start'])
+        evp_list.sort(key=self._tjd_start)
 
         # Return EVP list
         return evp_list
@@ -274,7 +291,7 @@ class comgendb(ctools.cscript):
             evp_list.append(evp_dict)
 
         # Sort EVP list by start day
-        evp_list = sorted(evp_list, key=lambda k: k['tjd_start'])
+        evp_list.sort(key=self._tjd_start)
 
         # Return EVP list
         return evp_list
@@ -426,7 +443,7 @@ class comgendb(ctools.cscript):
                 oad_list.extend(oads)
 
         # Sort OAD list by start day
-        oad_list = sorted(oad_list, key=lambda k: k['tjd_start'])
+        oad_list.sort(key=self._tjd_start)
 
         # Return OAD list
         return oad_list
@@ -488,7 +505,7 @@ class comgendb(ctools.cscript):
             oad_list.append(oad_dict)
 
         # Sort OAD list by start day
-        oad_list = sorted(oad_list, key=lambda k: k['tjd_start'])
+        oad_list.sort(key=self._tjd_start)
 
         # Return OAD list
         return oad_list
@@ -613,7 +630,7 @@ class comgendb(ctools.cscript):
                 tim_list.extend(tims)
 
         # Sort TIM list by start day
-        tim_list = sorted(tim_list, key=lambda k: k['tjd_start'])
+        tim_list.sort(key=self._tjd_start)
 
         # Return TIM list
         return tim_list
@@ -675,7 +692,7 @@ class comgendb(ctools.cscript):
             tim_list.append(tim_dict)
 
         # Sort OAD list by start day
-        tim_list = sorted(tim_list, key=lambda k: k['tjd_start'])
+        tim_list.sort(key=self._tjd_start)
 
         # Return TIM list
         return tim_list
@@ -824,7 +841,7 @@ class comgendb(ctools.cscript):
                     xml_list.append(xml)
 
         # Sort XML list by start day
-        xml_list = sorted(xml_list, key=lambda k: k['tjd_start'])
+        xml_list.sort(key=self._tjd_start)
 
         # Return XML list
         return xml_list
@@ -1211,7 +1228,7 @@ class comgendb(ctools.cscript):
                     oads.append(oad)
 
         # Sort OAD list by start day
-        oads = sorted(oads, key=lambda k: k['tjd_start'])
+        oads.sort(key=self._tjd_start)
 
         # Return OADs
         return oads
