@@ -105,7 +105,7 @@ class comgendb(ctools.cscript):
         """
         # Set archive directory name
         dirname = gammalib.expand_env(self['archive'].string())
-        
+
         # Raise an exception if the archive does not exist
         if not os.path.isdir(dirname):
             msg = ('Archive directory "%s" does not exist.' % dirname)
@@ -120,6 +120,45 @@ class comgendb(ctools.cscript):
 
         # Return phases
         return phases
+
+    def _get_relpath(self, path, dest):
+        """
+        Get relative path with respect to dest
+
+        Parameters
+        ----------
+        path : str
+            Full path name
+        dest : str
+            Destination path name
+
+        Returns
+        -------
+        relpath : str
+            Relative path
+        """
+        # Split path and destination in segments
+        path_split = path.split('/')
+        dest_split = dest.split('/')
+
+        # Get index of last agreement
+        index = -1
+        for i, segment in enumerate(dest_split):
+            if segment == path_split[i]:
+                index = i
+
+        # Set relative path
+        if index == -1:
+            relpath = path
+        else:
+            relpath = ''
+            for i in range(index+1,len(path_split)):
+                if relpath != '':
+                    relpath += '/'
+                relpath += path_split[i]
+
+        # Return relative path
+        return relpath
 
     def _get_evp_list(self):
         """
@@ -189,7 +228,7 @@ class comgendb(ctools.cscript):
         for evp in evps:
 
             # Set EVP filename
-            evpname = archive+'/'+os.path.relpath(evp, archive_path).strip('.gz')
+            evpname = archive+'/'+self._get_relpath(evp, archive_path).strip('.gz')
 
             # Try opening file
             try:
@@ -423,7 +462,7 @@ class comgendb(ctools.cscript):
         for oad in oads:
 
             # Set OAD filename
-            oadname = archive+'/'+os.path.relpath(oad, archive_path).strip('.gz')
+            oadname = archive+'/'+self._get_relpath(oad, archive_path).strip('.gz')
 
             # Try opening file
             try:
@@ -610,7 +649,7 @@ class comgendb(ctools.cscript):
         for tim in tims:
 
             # Set TIM filename
-            timname = archive+'/'+os.path.relpath(tim, archive_path).strip('.gz')
+            timname = archive+'/'+self._get_relpath(tim, archive_path).strip('.gz')
 
             # Try opening file
             try:
@@ -830,7 +869,7 @@ class comgendb(ctools.cscript):
                 vpname = os.path.basename(vp)
 
                 # Get all TIMs for VP
-                tims = filter(lambda k: k['vp'] == vpname, tim_list)
+                tims = list(filter(lambda k: k['vp'] == vpname, tim_list))
 
                 # Continue if list is empty
                 if len(tims) < 1:
@@ -840,7 +879,7 @@ class comgendb(ctools.cscript):
                 quality = max([tim['quality'] for tim in tims])
 
                 # Get all TIMs for VP with maximum quality
-                best_tims = filter(lambda k: k['quality'] == quality, tims)
+                best_tims = list(filter(lambda k: k['quality'] == quality, tims))
 
                 # Append these TIMs to the filtered list
                 filtered_tim_list.extend(best_tims)
@@ -972,7 +1011,7 @@ class comgendb(ctools.cscript):
         vpname = os.path.basename(vp)
 
         # Get all EVPs for VP
-        evps = filter(lambda k: k['vp'] == vpname, evp_list)
+        evps = list(filter(lambda k: k['vp'] == vpname, evp_list))
 
         # Initialise best EVP
         best_verno_evp   = None
@@ -1025,7 +1064,7 @@ class comgendb(ctools.cscript):
 
                         # If there are several EVPs with highest version then select
                         # the one with the best quality
-                        evps = filter(lambda k: k['vp'] == vpname and k['verno'] == best_verno, evp_list)
+                        evps = list(filter(lambda k: k['vp'] == vpname and k['verno'] == best_verno, evp_list))
                         if len(evps) > 1:
                             self._log_string(gammalib.NORMAL, '--- Several EVPs for %s '
                                              'have highest version' % (vpname))
@@ -1062,7 +1101,7 @@ class comgendb(ctools.cscript):
 
                 # If there are several EVPs with the best quality then select the one
                 # with the highest version
-                evps = filter(lambda k: k['vp'] == vpname and k['quality'] == best_quality, evp_list)
+                evps = list(filter(lambda k: k['vp'] == vpname and k['quality'] == best_quality, evp_list))
                 if len(evps) > 1:
                     self._log_string(gammalib.NORMAL, '--- Several EVPs for %s have '
                                      'best quality' % (vpname))
