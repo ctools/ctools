@@ -837,7 +837,7 @@ class comgendb(ctools.cscript):
                     continue
 
                 # Get maximum quality of all TIMs in VP
-                quality = max(tim['quality'] for tim in tims)
+                quality = max([tim['quality'] for tim in tims])
 
                 # Get all TIMs for VP with maximum quality
                 best_tims = filter(lambda k: k['quality'] == quality, tims)
