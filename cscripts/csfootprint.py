@@ -600,7 +600,7 @@ class csfootprint(ctools.cscript):
             fig.text(0.5, 0.925, subtitle, fontsize=11, ha='center')
 
             # Set plot margins
-            fig.subplots_adjust(left=0.07, bottom=0.07, right=0.97, top=0.88,
+            fig.subplots_adjust(left=0.08, bottom=0.07, right=0.97, top=0.88,
                                 wspace=0.1, hspace=0.2)
 
             # Divide figure
