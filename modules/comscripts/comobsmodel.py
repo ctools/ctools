@@ -123,7 +123,7 @@ class comobsmodel(ctools.csobservation):
 
         Returns
         -------
-        model : `~gammalib.GCOMModelDRBFitting`
+        model : `~gammalib.GCOMModelDRBPhibarNodes`
             Background model
         """
         # Set model attributes
@@ -134,12 +134,12 @@ class comobsmodel(ctools.csobservation):
         drb     = obs.drb()
         npix    = drb.nchi() * drb.npsi()
         nphibar = drb.nphibar()
-        dphibar = 2.0         # Fixed so far as we have no method to recover
+        dphibar = 2.0         # Fixed so far as we have no method to recover the value
 
         # Create XML model list object
         xml = gammalib.GXml()
         lib = xml.append('source_library title="source library"')
-        src = lib.append('source name="%s" type="DRBFitting" instrument="COM" id="%s"' % (name, id))
+        src = lib.append('source name="%s" type="DRBPhibarNodes" instrument="COM" id="%s"' % (name, id))
 
         # Loop over all phibar layers
         for k in range(nphibar):
@@ -160,7 +160,7 @@ class comobsmodel(ctools.csobservation):
                             'scale="1" min="0" max="1000" free="1"')
 
         # Create background model from XML source element
-        model = gammalib.GCOMModelDRBFitting(src)
+        model = gammalib.GCOMModelDRBPhibarNodes(src)
 
         # Return model
         return model
@@ -187,7 +187,7 @@ class comobsmodel(ctools.csobservation):
         drb     = obs.drb()
         npix    = drb.nchi() * drb.npsi()
         nphibar = drb.nphibar()
-        dphibar = 2.0         # Fixed so far as we have no method to recover
+        dphibar = 2.0         # Fixed so far as we have no method to recover the value
 
         # Create XML model list object
         xml = gammalib.GXml()
