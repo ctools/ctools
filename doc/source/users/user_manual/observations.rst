@@ -3,8 +3,8 @@
 Combining observations
 ----------------------
 
-Data taking by IACTs is typically split into so-called *runs*, which we refer
-here to *observations*. You typically want to combine these observations so
+Data taking by telescope is typically split into observations (sometimes called
+*runs* for IACTs). You typically want to combine these observations so
 that all data available for a source are used for the analysis. There are two
 basic methods how the combination can be done: either by listing all
 observations to perform a joint analysis, or by combining all observations

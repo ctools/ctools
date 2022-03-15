@@ -1,4 +1,4 @@
-.. _um_data:
+.. _um_iact_data:
 
 IACT data
 ---------
@@ -11,7 +11,7 @@ event direction, the reconstructed event energy and the trigger time. Event
 lists are provided as FITS binary tables. An example for a minimal event list
 is shown below.
 
-.. figure:: eventlist.png
+.. figure:: iact_eventlist.png
    :width: 70%
    :align: center
 
@@ -21,7 +21,7 @@ header of the event list binary table. An example for the metadata that is
 included in the header of the H.E.S.S. Collaboration event lists is shown
 below.
 
-.. figure:: eventheader.png
+.. figure:: iact_eventheader.png
    :width: 70%
    :align: center
 
@@ -31,7 +31,7 @@ to a time interval of continuous data taking, and the two columns correspond
 to the start and stop times of these time intervals. An example for the GTIs
 of the H.E.S.S. event lists comprising a single GTI is shown below.
 
-.. figure:: gti.png
+.. figure:: iact_gti.png
    :width: 40%
    :align: center
 
