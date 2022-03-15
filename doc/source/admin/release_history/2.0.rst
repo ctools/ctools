@@ -1,7 +1,7 @@
 .. _2.0:
 
-ctools 2.0 release (25 February 2022)
-=====================================
+ctools 2.0 release (15 March 2022)
+==================================
 
 Overview
 --------
@@ -11,7 +11,8 @@ ctools 2.0 is a major release that adds significant functionality.
 In particular, this release provides:
 
 * Analysis scripts for the science analysis of COMPTEL data
-* ...
+* Tracking of the carbon footprint of the ctools usage
+* Storing of model fitting results in XML model definition result files
 
 
 Bug fixes
@@ -64,7 +65,3 @@ New features
 * [`3738 <https://cta-redmine.irap.omp.eu/issues/3738>`_] -
   Add COMPTEL analysis scripts
 * Add :ref:`csadd2caldb` script
-
-
-Clean up
---------

@@ -3,9 +3,9 @@
 Introduction
 ============
 
-ctools is a software package developed for the scientific analysis of 
-Cherenkov Telescope Array (CTA) data or any other Imaging Air Cherenkov 
-Telescope.
+ctools is a software package developed for the scientific analysis of
+gamma-ray astronomy data with emphasis on data from the Cherenkov Telescope
+Array (CTA) data or any other Imaging Air Cherenkov Telescope.
 
 In this User Manual you will now learn how to use the ctools package.
 If you encounter any problems, please read the :ref:`sec_help` section.
@@ -152,3 +152,19 @@ method before running the tool, for example
    ...
    >>> sim.logFileOpen()
    >>> sim.run()
+
+
+Additional modules
+------------------
+
+From version 2.0.0 on ctools includes an additional module comprising scripts
+for COMPTEL/CGRO data analysis. All COMPTEL scripts start with ``com`` (for example
+:ref:`comlixfit` for the fitting of data using the SRCLIX algorithm) and are used
+in the same way as the regular ctools or cscripts. All COMPTEL scripts are also
+available from Python through a dedicated ``comscripts`` module:
+
+.. code-block:: python
+
+   >>> import comscripts
+   >>> fit = comscripts.comlixfit()
+
