@@ -36,9 +36,18 @@ General parameters
 ``(armmax = 3.0) [real]``
     Maximum ARM (deg).
 
+``coordsys <CEL|GAL> [string]``
+    Coordinate system (CEL - celestial, GAL - galactic).
+
+``proj <AIT|AZP|CAR|GLS|MOL|SFL|SIN|STG|TAN> [string]``
+    Projection method.
+
 ``(margin = 30.0) [real]``
     Sky map margin (deg). This margin is added to the data cube size so that
     also source positions outside the range spanned by the data cube are considered.
+
+``(binsz = 1.0) [real]``
+    Sky map bin size (deg).
 
 ``(grouping = 1) [integer]``
     Number of Chi/Psi bins to group for residual computation.

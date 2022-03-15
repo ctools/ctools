@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the comobsres script.
 #
-# Copyright (C) 2021 Juergen Knoedlseder
+# Copyright (C) 2021-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -75,7 +75,8 @@ class Test(test):
 
         # Setup command
         cmd = comobsres+' inobs="'+self._obs+'" inmodel="'+self._model+'" '+ \
-                        'algorithm="SIGNIFICANCE" margin="0.0" '+ \
+                        'algorithm="SIGNIFICANCE" margin="0.0" binsz="5.0" '+ \
+                        'coordsys="GAL" proj="TAN" '+ \
                         'outfolder="comobsres_cmd1" outmap="comobsres_cmd1.fits" '+ \
                         'logfile="comobsres_cmd1.log" chatter=1'
 
@@ -88,7 +89,8 @@ class Test(test):
 
         # Setup command
         cmd = comobsres+' inobs="file_that_does_not_exist.xml" inmodel="'+self._model+'" '+ \
-                        'algorithm="SIGNIFICANCE" margin="0.0" '+ \
+                        'algorithm="SIGNIFICANCE" margin="0.0" binsz="5.0" '+ \
+                        'coordsys="GAL" proj="TAN" '+ \
                         'outfolder="comobsres_cmd2" outmap="comobsres_cmd2.fits" '+ \
                         'logfile="comobsres_cmd2.log" chatter=1'
 
@@ -112,7 +114,10 @@ class Test(test):
         add['inobs']     = self._obs
         add['inmodel']   = self._model
         add['algorithm'] = 'SIGNIFICANCE'
+        add['coordsys']  = 'GAL'
+        add['proj']      = 'TAN'
         add['margin']    = 0.0
+        add['binsz']     = 5.0
         add['outfolder'] = 'comobsres_py1'
         add['outmap']    = 'comobsres_py1.fits'
         add['logfile']   = 'comobsres_py1.log'
@@ -138,7 +143,7 @@ class Test(test):
         map = gammalib.GSkyMap(filename)
 
         # Check that there is one observation
-        self.test_value(map.npix(), 3025, 'Check for number of pixels in sky map')
+        self.test_value(map.npix(), 121, 'Check for number of pixels in sky map')
 
         # Return
         return

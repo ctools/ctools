@@ -145,7 +145,10 @@ class comobsres(ctools.csobservation):
         self['algorithm'].string()
         self['armmin'].real()
         self['armmax'].real()
+        self['coordsys'].string()
+        self['proj'].string()
         self['margin'].real()
+        self['binsz'].real()
 
         # Query PNG parameters
         if self['png'].boolean():
@@ -186,6 +189,11 @@ class comobsres(ctools.csobservation):
         glon_max = None
         glat_min = None
         glat_max = None
+
+        # Get parameters
+        proj     = self['proj'].string()
+        coordsys = self['coordsys'].string()
+        binsz    = self['binsz'].real()
 
         # Loop over all input observations
         for obs in inobs:
@@ -243,15 +251,22 @@ class comobsres(ctools.csobservation):
         # Compute width and number of pixels
         glon_width = glon_max - glon_min
         glat_width = glat_max - glat_min
-        nx         = int(glon_width+0.5)
-        ny         = int(glat_width+0.5)
+        nx         = int(glon_width/binsz+0.5)
+        ny         = int(glat_width/binsz+0.5)
         if nx > 360:
             nx = 360
         if ny > 180:
             ny = 180
 
+        # Translate to celestial coordinates if requested
+        if coordsys == 'CEL':
+            centre = gammalib.GSkyDir()
+            centre.lb_deg(glon, glat)
+            glon = centre.ra_deg()
+            glat = centre.dec_deg()
+
         # Allocate map
-        map = gammalib.GSkyMap('TAN', 'GAL', glon, glat, -1.0, 1.0, nx, ny)
+        map = gammalib.GSkyMap(proj, coordsys, glon, glat, -binsz, binsz, nx, ny)
 
         # Return map
         return map
