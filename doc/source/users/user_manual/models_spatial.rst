@@ -10,6 +10,11 @@ in ctools for gamma-ray sources.
    Except of the ``DiffuseMapCube`` model, all spatial models are normalised
    so that when integrated over the sphere the result is unity.
 
+.. note::
+   In the following model descriptions, celestial coordinates ``RA`` and ``DEC``
+   may be replaced by Galactic coordinates ``GLON`` and ``GLAT``.
+
+
 Point source
 ^^^^^^^^^^^^
 
@@ -31,34 +36,6 @@ Point source
 
   * ``RA`` is the Right Ascension (degrees)
   * ``DEC`` is the Declination (degrees)
-
-  Instead of ``RA`` and ``DEC`` one may use ``GLON`` and ``GLAT`` to give the
-  position in Galactic coordinates
-
-  .. code-block:: xml
-
-    <source name="Crab" type="PointSource">
-      <spatialModel type="PointSource">
-        <parameter name="GLON" scale="1.0" value="184.5575" min="-360" max="360" free="1"/>
-        <parameter name="GLAT" scale="1.0" value="-5.7844"  min="-90"  max="90"  free="1"/>
-      </spatialModel>
-      <spectrum type="...">
-        ...
-      </spectrum>
-    </source>
-
-  where
-
-  * ``GLON`` is the Galactic longitude (degrees)
-  * ``GLAT`` is the Galactic latitude (degrees)
-
-  .. note::
-     Galactic coordinates using the ``GLON`` and ``GLAT`` parameters can be
-     specified for all spatial models that require a sky coordinate. Galactic
-     coordinates are transformed internally into celestial coordinates, and
-     in case that a model is written into an XML file, the corresponding
-     parameters will be replaced by the celestial coordinates ``RA`` and
-     ``DEC``.
 
   .. note::
      For compatibility with the Fermi/LAT ScienceTools the model type
@@ -190,7 +167,7 @@ RadialGeneralGaussian
   * :math:`\eta` = ``R_Index``
 
   The model normalisation is correct in the small angle approximation and for
-  :math:`\eta` order unity or smaller.
+  :math:`\eta` of the order of unity or smaller.
 
 RadialShell
 ~~~~~~~~~~~
@@ -235,6 +212,98 @@ RadialShell
   * ``DEC`` is the Declination of the shell centre (degrees)
   * :math:`\theta_{\rm out}` = ``Radius`` + ``Width`` (degrees)
   * :math:`\theta_{\rm in}` = ``Radius`` (degrees)
+
+
+Radial profiles
+~~~~~~~~~~~~~~~
+
+  Radial profiles are defined by a arbitrary function of the radial distance from a central
+  position. The following radial profiles exist:
+
+Burkert Dark matter profile
+...........................
+
+  .. code-block:: xml
+
+    <source name="Crab" type="ExtendedSource">
+      <spatialModel type="DMBurkertProfile">
+        <parameter name="RA"           scale="1.0" value="83.6331" min="-360"    max="360"   free="1"/>
+        <parameter name="DEC"          scale="1.0" value="22.0145" min="-90"     max="90"    free="1"/>
+        <parameter name="ScaleRadius"  scale="1.0" value="21.5"    min="0.0001"  max="1000"  free="0"/>
+        <parameter name="ScaleDensity" scale="1.0" value="0.2"     min="0.0001"  max="1000"  free="0"/>
+        <parameter name="HaloDistance" scale="1.0" value="7.94"    min="0.0001"  max="1000"  free="0"/>
+        <parameter name="ThetaMin"     scale="1.0" value="1.0e-6"  min="1.0e-10" max="1000"  free="0"/>
+        <parameter name="ThetaMax"     scale="1.0" value="180.0"   min="0.0001"  max="1000"  free="0"/>
+        <parameter name="CoreRadius"   scale="1.0" value="0.5"     min="0.0001"  max="1000"  free="0"/>
+      </spatialModel>
+      <spectrum type="...">
+        ...
+      </spectrum>
+    </source>
+
+Einasto Dark matter profile
+...........................
+
+  .. code-block:: xml
+
+    <source name="Crab" type="ExtendedSource">
+      <spatialModel type="DMEinastoProfile">
+        <parameter name="RA"           scale="1.0" value="83.6331" min="-360"    max="360"   free="1"/>
+        <parameter name="DEC"          scale="1.0" value="22.0145" min="-90"     max="90"    free="1"/>
+        <parameter name="ScaleRadius"  scale="1.0" value="21.5"    min="0.0001"  max="1000"  free="0"/>
+        <parameter name="ScaleDensity" scale="1.0" value="0.2"     min="0.0001"  max="1000"  free="0"/>
+        <parameter name="HaloDistance" scale="1.0" value="7.94"    min="0.0001"  max="1000"  free="0"/>
+        <parameter name="Alpha"        scale="1.0" value="0.17"    min="0.0001"  max="1000"  free="0"/>
+        <parameter name="ThetaMin"     scale="1.0" value="1.0e-6"  min="1.0e-10" max="1000"  free="0"/>
+        <parameter name="ThetaMax"     scale="1.0" value="180.0"   min="0.0001"  max="1000"  free="0"/>
+        <parameter name="CoreRadius"   scale="1.0" value="0.5"     min="0.0001"  max="1000"  free="0"/>
+      </spatialModel>
+      <spectrum type="...">
+        ...
+      </spectrum>
+    </source>
+
+Zhao Dark matter profile
+........................
+
+  .. code-block:: xml
+
+    <source name="Crab" type="ExtendedSource">
+      <spatialModel type="DMZhaoProfile">
+        <parameter name="RA"           scale="1.0" value="83.6331" min="-360"    max="360"   free="1"/>
+        <parameter name="DEC"          scale="1.0" value="22.0145" min="-90"     max="90"    free="1"/>
+        <parameter name="ScaleRadius"  scale="1.0" value="21.5"    min="0.0001"  max="1000"  free="0"/>
+        <parameter name="ScaleDensity" scale="1.0" value="0.2"     min="0.0001"  max="1000"  free="0"/>
+        <parameter name="HaloDistance" scale="1.0" value="7.94"    min="0.0001"  max="1000"  free="0"/>
+        <parameter name="Alpha"        scale="1.0" value="0.17"    min="0.0001"  max="1000"  free="0"/>
+        <parameter name="Beta"         scale="1.0" value="3.00"    min="0.0001"  max="1000"  free="0"/>
+        <parameter name="Gamma"        scale="1.0" value="1.00"    min="0.0001"  max="1000"  free="0"/>
+        <parameter name="ThetaMin"     scale="1.0" value="1.0e-6"  min="1.0e-10" max="1000"  free="0"/>
+        <parameter name="ThetaMax"     scale="1.0" value="180.0"   min="0.0001"  max="1000"  free="0"/>
+        <parameter name="CoreRadius"   scale="1.0" value="0.5"     min="0.0001"  max="1000"  free="0"/>
+      </spatialModel>
+      <spectrum type="...">
+        ...
+      </spectrum>
+    </source>
+
+Gaussian profile
+................
+
+  This profile is equivalent to ``RadialGaussian``.
+
+  .. code-block:: xml
+
+    <source name="Crab" type="ExtendedSource">
+      <spatialModel type="GaussianProfile">
+        <parameter name="RA"    scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
+        <parameter name="DEC"   scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
+        <parameter name="Sigma" scale="1.0" value="0.45"    min="0.01" max="10"  free="1"/>
+      </spatialModel>
+      <spectrum type="...">
+        ...
+      </spectrum>
+    </source>
 
 
 Elliptical source
@@ -325,7 +394,7 @@ EllipticalGeneralGaussian
         <parameter name="PA"          scale="1.0" value="45.0"    min="-360"  max="360" free="1"/>
         <parameter name="MinorRadius" scale="1.0" value="0.5"     min="0.001" max="10"  free="1"/>
         <parameter name="MajorRadius" scale="1.0" value="2.0"     min="0.001" max="10"  free="1"/>
-	    <parameter name="R_Index"     scale="1.0" value="0.5"     min="0.01"  max="10"  free="1"/>
+        <parameter name="R_Index"     scale="1.0" value="0.5"     min="0.01"  max="10"  free="1"/>
       </spatialModel>
       <spectrum type="...">
         ...
@@ -357,7 +426,7 @@ EllipticalGeneralGaussian
   * :math:`\eta` = ``R_Index``
 
   The model normalisation is correct in the small angle approximation and for
-  :math:`\eta` order unity or smaller.
+  :math:`\eta` of the order of unity or smaller.
 
 
 Diffuse source

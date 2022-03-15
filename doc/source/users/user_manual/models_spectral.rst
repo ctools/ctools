@@ -444,6 +444,33 @@ Node function
      ordering.
 
 
+Bin function
+^^^^^^^^^^^^
+
+  .. code-block:: xml
+
+     <spectrum type="BinFunction">
+       <parameter name="Index" scale="-1" value="2.48" min="0.0" max="+5.0" free="0"/>
+       <bin>
+         <parameter scale="1.0"   name="LowerLimit" min="0.1"   max="1.0e20" value="0.75" free="0"/>
+         <parameter scale="1.0"   name="UpperLimit" min="0.1"   max="1.0e20" value="1.0"  free="0"/>
+         <parameter scale="1e-07" name="Intensity"  min="1e-07" max="1000.0" value="1.0"  free="1"/>
+       </bin>
+       <bin>
+         <parameter scale="1.0"   name="LowerLimit" min="0.1"   max="1.0e20" value="1.0"  free="0"/>
+         <parameter scale="1.0"   name="UpperLimit" min="0.1"   max="1.0e20" value="3.0"  free="0"/>
+         <parameter scale="1e-07" name="Intensity"  min="1e-07" max="1000.0" value="0.5"  free="1"/>
+       </bin>
+     </spectrum>
+
+  This spectral model component implements energy bins defined by ``LowerLimit`` and
+  ``UpperLimit`` values given in units of :math:`{\rm MeV}`. Within an energy bin the
+  intensity follows a power law with spectral index defined by the ``Index`` parameter.
+  Intensities are given in units of
+  :math:`{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}`
+  and are specified for the logarithmic bin centre.
+
+
 Table model
 ^^^^^^^^^^^
 
