@@ -1,4 +1,4 @@
-.. _sec_iact_selection:
+.. _iact_selection:
 
 Selecting IACT observations
 ===========================

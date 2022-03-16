@@ -1,4 +1,4 @@
-.. _start:
+.. _cta_quickstart:
 
 First steps with ctools
 -----------------------

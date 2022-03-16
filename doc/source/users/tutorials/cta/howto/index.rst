@@ -1,10 +1,10 @@
-.. _howto:
+.. _cta_howto:
 
-ctools How-tos
-==============
+CTA How-tos
+===========
 
 The following sections teach you how to use ctools to address some typical
-science analysis.
+CTA science analysis.
 
 CTA data analysis
 -----------------
@@ -47,7 +47,4 @@ Analysis of data from other instruments
 .. toctree::
    :maxdepth: 1
 
-   How to analyse Fermi-LAT data with ctools? <fermi/index>
-   How to analyse COMPTEL data with ctools? <comptel/index>
-   How to analyse data from existing IACTs (H.E.S.S., VERITAS or MAGIC) with ctools? <iact/index>
    howto_combine_instruments

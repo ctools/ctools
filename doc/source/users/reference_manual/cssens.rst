@@ -131,8 +131,8 @@ General parameters
     Constraint on the minimum number of required source counts with respect to
     the number of background counts. This value is a fraction that is
     conventionally set to ``0.05`` (or 5%) which means that the number of source
-    counts needs to exceed 5% of the number of background counts. If ``0.0``is
-    specifie then no constraint will be applied.
+    counts needs to exceed 5% of the number of background counts. If ``0.0`` is
+    specified then no constraint will be applied.
 
 ``(bkgrad = 0.33) [real]``
     Radius in degrees used to estimate the number of background counts

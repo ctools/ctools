@@ -13,6 +13,5 @@ This documentation will guide you in the process of using ctools.
    reference_manual/index
    doxygen
    tips/index
-   user_contributed/index
    environment
    glossary

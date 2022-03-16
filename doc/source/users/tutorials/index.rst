@@ -6,8 +6,9 @@ Tutorials
 .. toctree::
    :maxdepth: 1
 
-   quickstart/index
-   howto/index
+   spi/index
+   comptel/index
+   fermi/index
+   hess/index
+   cta/index
    notebooks
-   1dc/index
-   hess_dr1/index

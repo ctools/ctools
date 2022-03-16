@@ -1,4 +1,4 @@
-.. _hess_dr1_data:
+.. _hess_data:
 
 Getting the data
 ================

@@ -1,4 +1,4 @@
-.. _hess_dr1_fermi:
+.. _hess_joint_fermi:
 
 Joint analysis of H.E.S.S. and Fermi data
 =========================================
@@ -10,7 +10,7 @@ Joint analysis of H.E.S.S. and Fermi data
 
 In this tutorial you will learn how to jointly analyse data observed with
 H.E.S.S. and the Fermi-LAT. This follows the same procedure illustrated in
-`this section <../howto/howto_combine_instruments.html>`_.
+`this section <../cta/howto/howto_combine_instruments.html>`_.
 
 Prepare Fermi-LAT data
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -18,7 +18,7 @@ Prepare Fermi-LAT data
 For this tutorial you need to gather data for a source available in
 the H.E.S.S. public data release, the Crab nebula.
 The preparation of Fermi-LAT data can be adapted from
-`this section <../howto/fermi/howto_fermi_prepare.html>`_. Get Source Class LAT data from the
+`this section <../cta/howto/fermi/howto_fermi_prepare.html>`_. Get Source Class LAT data from the
 Crab in the energy range 50-1000 GeV. Apply a zenith angle cut at 105
 deg. Then bin them on a 60x60 pixel
 grid with 0.05 deg step, and on a logarithmic energy grid with 15 bins

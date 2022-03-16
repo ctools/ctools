@@ -1,4 +1,4 @@
-.. _1dc:
+.. _cta_1dc:
 
 First CTA Data Challenge
 ========================

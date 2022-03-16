@@ -1,11 +1,11 @@
-.. _howto_fermi:
+.. _tutorials_fermi:
 
-Analysing Fermi-LAT data
-------------------------
+Fermi/LAT
+=========
 
   .. admonition:: What you will learn
 
-     You will learn how to analyse data from the LAT telescope about NASA's
+     You will learn how to analyse data from the LAT telescope aboard NASA's
      `Fermi <https://fermi.gsfc.nasa.gov/ssc/>`_ satellite with ctools.
 
 You can use ctools to analyse data from the LAT telescope aboard NASA's
