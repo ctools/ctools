@@ -15,4 +15,4 @@ The following bugs were fixed:
 * [`3624 <https://cta-redmine.irap.omp.eu/issues/3624>`_] -
   Replace spectral model by file function in :ref:`csspec`
 * [`3623 <https://cta-redmine.irap.omp.eu/issues/3623>`_] -
-  Update csinfo script
+  Update :doxy:`csinfo` script

@@ -29,10 +29,10 @@ tutorial that is based on a simple analysis of the Vela pulsar.
 .. toctree::
    :maxdepth: 1
 
-   howto_fermi_prepare
-   howto_fermi_fitting
-   howto_fermi_butterfly
-   howto_fermi_spectrum
-   howto_fermi_tsmap
-   howto_fermi_ulimit
-   howto_fermi_errors
+   fermi_prepare
+   fermi_fitting
+   fermi_butterfly
+   fermi_spectrum
+   fermi_tsmap
+   fermi_ulimit
+   fermi_errors

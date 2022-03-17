@@ -92,8 +92,8 @@ IACT database management scripts
    csiactcopy --- Copies IACT data from one location to another <csiactcopy>
    
 
-COMPTEL Science Analysis scripts
---------------------------------
+COMPTEL analysis scripts
+------------------------
 
 .. toctree::
    :maxdepth: 1

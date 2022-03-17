@@ -137,4 +137,4 @@ model.
    corresponding layers. In the first example above, the first four layers are
    fixed. In the second example, all layers with :math:`\bar{\varphi}`
    values below 16 degrees were fixed, the first fitted normalisation
-   is for :math:`\bar{\varphi}=17` degrees.
+   is for :math:`\bar{\varphi}` = 17 degrees.

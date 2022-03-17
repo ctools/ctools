@@ -23,7 +23,7 @@ outmodel, f, a, models.xml,,, "Output model definition file"
 # Script parameters
 #==================
 ra,          r, a, NONE,,, "Right Ascension of point source (deg)"
-dec,         r, a, NONE,,, "Declinaison of point source (deg)"
+dec,         r, a, NONE,,, "Declination of point source (deg)"
 srcname,     s, a, NONE,,, "Name of point source"
 brems,       s, a, NONE,NONE|MAP|CUBE,, "Bremsstrahlung component"
 ic,          s, a, NONE,NONE|MAP|CUBE,, "Inverse Compton component"

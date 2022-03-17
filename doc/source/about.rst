@@ -10,7 +10,7 @@ VERITAS, MAGIC and CTA. ctools supports also the analysis of data from
 CGRO/COMPTEL, Fermi/LAT and INTEGRAL/SPI, enabling the exploration of the full
 gamma-ray energy band, spanning from hundreds of keV to hundreds of TeV.
 
-The ctools philosophy inherited from ftools consists of providing building
+The ctools philosophy is inherited from ftools and consists of providing building
 blocks that perform well-defined science data analysis tasks, including
 observation and event selection, binning, sky map creation, source detection,
 model fitting, spectra, phase curve and light curve generation, and observation

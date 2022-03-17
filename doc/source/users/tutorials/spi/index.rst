@@ -9,5 +9,7 @@ INTEGRAL/SPI
      `INTEGRAL <https://sci.esa.int/web/integral>`_
      satellite with ctools.
 
+A tutorial for SPI data analysis will be provided in future releases of ctools.
+
 .. toctree::
    :maxdepth: 1

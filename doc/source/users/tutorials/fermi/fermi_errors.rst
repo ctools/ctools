@@ -1,7 +1,7 @@
-.. _howto_fermi_errors:
+.. _fermi_errors:
 
-Determine asymmetric model parameter errors for a model component
------------------------------------------------------------------
+Determine errors for a model parameters
+---------------------------------------
 
   .. admonition:: What you will learn
 

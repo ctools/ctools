@@ -1,7 +1,7 @@
-.. _howto_fermi_ulimit:
+.. _fermi_ulimit:
 
-Derive upper flux limits for a source
--------------------------------------
+Derive upper flux limits
+------------------------
 
   .. admonition:: What you will learn
 

@@ -1,4 +1,4 @@
-.. _howto_fermi_prepare:
+.. _fermi_prepare:
 
 Prepare Fermi-LAT data
 ----------------------
@@ -29,7 +29,7 @@ Start with requesting the data you are interested in from the
 `Fermi-LAT Data server <https://fermi.gsfc.nasa.gov/cgi-bin/ssc/LAT/LATDataQuery.cgi>`_.
 As example the figure below shows a request for data around the Vela pulsar.
 
-.. figure:: howto_fermi_query.jpg
+.. figure:: fermi_query.jpg
    :width: 600px
    :align: center
 
@@ -38,7 +38,7 @@ As example the figure below shows a request for data around the Vela pulsar.
 After submitting the request you will get information of how to retrieve the
 data:
 
-.. figure:: howto_fermi_data.jpg
+.. figure:: fermi_data.jpg
    :width: 600px
    :align: center
 

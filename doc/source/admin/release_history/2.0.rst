@@ -26,7 +26,7 @@ Improvements
 ------------
 
 * [`3592 <https://cta-redmine.irap.omp.eu/issues/3592>`_] -
-  Rename virtual abstract ``ctool::run()`` method to ``ctool::process()`` and add non-abstract ``ctool::run()`` method (#3592)
+  Rename virtual abstract :doxy:`ctool::run` method to :doxy:`ctool::process` and add non-abstract :doxy:`ctool::run` method
 * Add methods to access :ref:`ctlike` attributes
 * Add restart of bisection in case of bad convergence in :ref:`ctulimit`
 * [`3662 <https://cta-redmine.irap.omp.eu/issues/3662>`_] -
@@ -43,14 +43,14 @@ Improvements
   Add hidden ``fix_spat`` parameter to :ref:`cttsmap`
 * [`3555 <https://cta-redmine.irap.omp.eu/issues/3555>`_] -
   Use test source position in :ref:`cssens`
-* Add optimizer setter to ``ctlikelihood`` base class.
+* Add optimizer setter to :doxy:`ctlikelihood` base class.
 * Add ``refit_if_failed`` parameter to :ref:`ctlike`
 * [`3441 <https://cta-redmine.irap.omp.eu/issues/3441>`_] -
-  Add ``models()`` method to :ref:`ctobssim`
+  Add :doxy:`ctobssim::models` method
 * [`3431 <https://cta-redmine.irap.omp.eu/issues/3431>`_] -
   Add :ref:`ctlike` results to XML file
 * [`3324 <https://cta-redmine.irap.omp.eu/issues/3324>`_] -
-  Replace ``std::tmpnam()`` by ``gammalib::tmpnam()`` function in :ref:`ctselect`
+  Replace :doxy:`std::tmpnam` by :doxy:`gammalib::tmpnam` function in :ref:`ctselect`
 * [`3324 <https://cta-redmine.irap.omp.eu/issues/3324>`_] -
   Remove implicit conversion warnings
 * [`1707 <https://cta-redmine.irap.omp.eu/issues/1707>`_] -
@@ -65,3 +65,5 @@ New features
 * [`3738 <https://cta-redmine.irap.omp.eu/issues/3738>`_] -
   Add COMPTEL analysis scripts
 * Add :ref:`csadd2caldb` script
+* [`3592 <https://cta-redmine.irap.omp.eu/issues/3592>`_] -
+  Add :ref:`csfootprint` script

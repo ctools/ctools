@@ -1,7 +1,7 @@
-.. _howto_fermi_spectrum:
+.. _fermi_spectrum:
 
-Generate a spectral energy distribution for a source
-----------------------------------------------------
+Generate a spectrum
+-------------------
 
   .. admonition:: What you will learn
 
@@ -31,7 +31,7 @@ will convert the Vela spectrum in the input model into a node function and fit
 all intensity nodes using :ref:`ctlike`. The resulting node intensities are
 then interpreted as the spectral point, and are displayed graphically below:
 
-.. figure:: howto_fermi_spectrum.png
+.. figure:: fermi_spectrum.png
    :width: 600px
    :align: center
 

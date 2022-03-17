@@ -1,7 +1,7 @@
 .. _um_classical:
 
-Classical On/Off analysis
--------------------------
+Classical IACT On/Off analysis
+------------------------------
 
 The traditional technique that is widely used by the IACT community for spectral
 analysis consists in selecting the source events from an On region and

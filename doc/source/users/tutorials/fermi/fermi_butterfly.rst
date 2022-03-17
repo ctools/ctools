@@ -1,7 +1,7 @@
-.. _howto_fermi_butterfly:
+.. _fermi_butterfly:
 
-Generate a butterfly diagram for a model component
---------------------------------------------------
+Generate a butterfly diagram
+----------------------------
 
   .. admonition:: What you will learn
 
@@ -29,7 +29,7 @@ output file from :ref:`ctlike` as input:
 the envelope of the butterfly diagram. The figure below gives a graphical
 representation of the envelope.
 
-.. figure:: howto_fermi_butterfly.png
+.. figure:: fermi_butterfly.png
    :width: 600px
    :align: center
 

@@ -1,9 +1,9 @@
 .. _um_irf_intro:
 
-What are instrument response functions?
----------------------------------------
+What are IRFs?
+--------------
 
-The :ref:`instrument response functions <glossary_irf>` provide a mathematical
+The :ref:`instrument response functions <glossary_irf>` (IRFs) provide a mathematical
 description that links the reconstructed photon arrival direction :math:`p'`,
 energy :math:`E'` and trigger time :math:`t'` of an event to the true incident
 direction :math:`p`, energy :math:`E` and time :math:`t` of a photon. The

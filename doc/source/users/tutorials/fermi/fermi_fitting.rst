@@ -1,4 +1,4 @@
-.. _howto_fermi_fitting:
+.. _fermi_fitting:
 
 Fit a model to the data
 -----------------------

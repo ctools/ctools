@@ -23,7 +23,7 @@ outfile,   f, a, pulsar.fits,,, "Output pulsar phase bins file"
 # Script parameters
 #==================
 psrname,     s, a, PSR B0531+21,,, "Pulsar name"
-ephemerides, f, a, ephem_crab.psrtime,,, "Pulsar ephemerides file"
+ephemerides, f, a, $CTOOLS/share/models/ephem_xte.psrtime,,, "Pulsar ephemerides file"
 emin,        r, a, 0.75,0.05,50.0, "Minimum energy (MeV)"
 emax,        r, a, 30.0,0.05,50.0, "Maximum energy (MeV)"
 pnumbins,    i, a, 33,1,200, "Number of phase bins"

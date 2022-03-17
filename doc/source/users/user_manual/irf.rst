@@ -1,7 +1,7 @@
 .. _um_irf:
 
-Instrument Response Functions
------------------------------
+IRFs
+----
 
 .. toctree::
    :maxdepth: 1

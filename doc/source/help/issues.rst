@@ -45,7 +45,7 @@ Installation issues
 
       export GIT_SSL_NO_VERIFY=true
 
- .. _conda_python:
+.. _conda_python:
 
 .. topic:: ctools does not compile against conda Python
 

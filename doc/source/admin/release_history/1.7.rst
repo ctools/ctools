@@ -56,5 +56,5 @@ Improvements
 New features
 ------------
 * [`2961 <https://cta-redmine.irap.omp.eu/issues/2961>`_] -
-  Add csscs script for spectral component separation
+  Add :ref:`csscs` script for spectral component separation
 
