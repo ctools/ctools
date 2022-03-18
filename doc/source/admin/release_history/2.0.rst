@@ -25,6 +25,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`4006 <https://cta-redmine.irap.omp.eu/issues/4006>`_] -
+  Allow determination of upper limits on spatial parameters in :ref:`ctulimit`
 * [`3592 <https://cta-redmine.irap.omp.eu/issues/3592>`_] -
   Rename virtual abstract :doxy:`ctool::run` method to :doxy:`ctool::process` and add non-abstract :doxy:`ctool::run` method
 * Add methods to access :ref:`ctlike` attributes

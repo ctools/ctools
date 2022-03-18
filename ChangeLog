@@ -1,8 +1,9 @@
-2022-02-25
+2022-03-18
 
         * Version 2.0.0 released
         ========================
 
+        Allow determination of upper limits on spatial parameters in ctulimit (#4006)
         Add comgendb script (#3983)
         Rename virtual abstract ctool::run() method to ctool::process() and
           add non-abstract ctool::run() method (#3592) (#3592)

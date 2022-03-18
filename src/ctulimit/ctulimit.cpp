@@ -485,13 +485,14 @@ void ctulimit::get_parameters(void)
 
 
 /***********************************************************************//**
- * @brief Get application parameters
+ * @brief Get model parameter
  *
  * @exception GException::invalid_value
  *            Did not find a valid model or model parameter
  *
  * Extracts a pointer to the sky model (m_skymodel) and a pointer to the
- * relevant model parameter (m_model_par) from the model container. If no
+ * model parameter (m_model_par) that should be varied for the upper limit
+ * determination from the model container.
  ***************************************************************************/
 void ctulimit::get_model_parameter(void)
 {
@@ -528,15 +529,19 @@ void ctulimit::get_model_parameter(void)
 
     // If a parameter name was specified then use that parameter
     if (!m_parname.empty()) {
-        if (m_skymodel->spectral()->has_par(m_parname)) {
+        if (m_skymodel->spatial()->has_par(m_parname)) {
+            m_model_par = &(m_skymodel->spatial()->operator[](m_parname));
+        }
+        else if (m_skymodel->spectral()->has_par(m_parname)) {
             m_model_par = &(m_skymodel->spectral()->operator[](m_parname));
         }
         else {
-            std::string msg = "Spectral model of source \""+m_srcname+"\" has "
-                              "no parameter \""+m_parname+"\". Please specify "
-                              "a value parameter name of leave the parameter "
-                              "name blank for autodetermination of an "
-                              "intensity- or flux-like parameter.";
+            std::string msg = "Spatial or spectral model of source \""+
+                              m_srcname+"\" has no parameter \""+m_parname+
+                              "\". Please specify a valid parameter name "
+                              "or leave the parameter name blank for "
+                              "autodetermination of an intensity- or "
+                              "flux-like parameter.";
             throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
         }
     }

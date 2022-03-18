@@ -35,6 +35,9 @@ General parameters
 ``srcname [string]``
     Name of source model for which the upper flux limit should be computed.
 
+``(parname = "") [string]``
+    Optional model parameter name (either a spatial or a spectral parameter)
+
 ``expcube [file]``
     Input exposure cube file.
 

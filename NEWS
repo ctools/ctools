@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-25 February 2022
+18 March 2022
 
 
 Introduction
@@ -160,6 +160,9 @@ model parameters (#3562).
 
 ctulimit - Compute upper limit
 ------------------------------
+The tool now accepts also spatial parameters as parname argument so that upper
+limits can be determined on spatial parameters (#4006)
+
 If the bisection results in a result that is incompatible with the previously
 determine best maximum log-likelihood value or if the bisection interval tends
 towards zero then update the best log-likelihood value with the current result
