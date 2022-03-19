@@ -284,68 +284,68 @@ void cttsmap::process(void)
     // Loop over grid positions
     for (int i = binmin; i < binmax; ++i) {
 
-    	// Get the coordinate of current bin
-    	GSkyDir bincentre = m_tsmap.inx2dir(i);
+        // Get the coordinate of current bin
+        GSkyDir bincentre = m_tsmap.inx2dir(i);
 
-    	// Header for verbose logging
+        // Header for verbose logging
         log_header2(EXPLICIT, "Computing TS for bin number "+gammalib::str(i)+
                     " at "+bincentre.print());
 
-    	// Add test source at current bin position
+        // Add test source at current bin position
         (*m_testsource)["RA"].value(bincentre.ra_deg());
         (*m_testsource)["DEC"].value(bincentre.dec_deg());
         models.append(*m_testsource);
 
-    	// Assign models to observations
-    	m_obs.models(models);
+        // Assign models to observations
+        m_obs.models(models);
 
         // Make sure that no values are cached for test source
         m_obs.remove_response_cache(m_srcname);
 
-    	// Optimize observation container
-    	m_obs.optimize(m_opt);
+        // Optimize observation container
+        m_obs.optimize(m_opt);
 
-    	// Compute errors if necessary
-    	if (m_errors) {
-    		m_obs.errors(m_opt);
-    	}
+        // Compute errors if necessary
+        if (m_errors) {
+            m_obs.errors(m_opt);
+        }
 
-    	// Get status of optimization
-    	int status = m_opt.status();
+        // Get status of optimization
+        int status = m_opt.status();
 
-    	// Retrieve the Likelihood value
-    	double logL1 = -(m_opt.value());
+        // Retrieve the Likelihood value
+        double logL1 = -(m_opt.value());
 
-    	// Compute TS value
-    	double ts = 2.0 * (logL1 - m_logL0);
+        // Compute TS value
+        double ts = 2.0 * (logL1 - m_logL0);
 
-    	// Log information
-    	if (logExplicit()) {
+        // Log information
+        if (logExplicit()) {
             log_value(EXPLICIT, "TS value", ts);
-    	}
+        }
         else if (logNormal()) {
             log_value(NORMAL, "TS value (bin "+gammalib::str(i)+")",
                       gammalib::str(ts)+" ("+bincentre.print()+")");
         }
 
-    	// Get test source model instance
-    	GModels best_fit_model = m_obs.models();
-    	GModel* testsource     = best_fit_model[m_srcname];
+        // Get test source model instance
+        GModels best_fit_model = m_obs.models();
+        GModel* testsource     = best_fit_model[m_srcname];
 
-    	// Assign values to the maps
-    	m_tsmap(i) = ts;
+        // Assign values to the maps
+        m_tsmap(i) = ts;
 
-    	// Extract fitted test source parameters
+        // Extract fitted test source parameters
         for (int j = 0; j < m_mapnames.size(); ++j) {
 
             // If map name start with "e_" then set the parameter error ...
             if (m_mapnames[j].substr(0,2) == "e_") {
 
                 // Get parameter name by removing the error prefix
-            	std::string parname = m_mapnames[j].substr(2, m_mapnames[j].size());
+                std::string parname = m_mapnames[j].substr(2, m_mapnames[j].size());
 
                 // Get parameter error
-           		m_maps[j](i) = (*testsource)[parname].error();
+                m_maps[j](i) = (*testsource)[parname].error();
 
             }
 
@@ -359,8 +359,8 @@ void cttsmap::process(void)
         // Set Fit status of the bin
         m_statusmap(i) = status;
 
-    	// Remove model from container
-    	models.remove(m_srcname);
+        // Remove model from container
+        models.remove(m_srcname);
 
     } // endfor: looped over grid positions
 
@@ -631,13 +631,13 @@ void cttsmap::init_maps(const GSkyMap& map)
     m_tsmap = GSkyMap(map);
 
     // Initialise map information
-	m_statusmap.clear();
+    m_statusmap.clear();
 
-	// Create status map and progress map
-	m_statusmap = GSkyMap(map);
+    // Create status map and progress map
+    m_statusmap = GSkyMap(map);
 
-	// Set status map to invalid value -1 to signal that bin wasn't computed yet
-	m_statusmap = -1.0;
+    // Set status map to invalid value -1 to signal that bin wasn't computed yet
+    m_statusmap = -1.0;
 
     // Loop over all model parameters
     for (int i = 0; i < m_testsource->size(); i++) {
