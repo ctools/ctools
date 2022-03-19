@@ -365,6 +365,7 @@ void ctulimit::init_members(void)
     m_dlogL        = 0.0;
     m_skymodel     = NULL;
     m_model_par    = NULL;
+    m_is_spatial   = false;
     m_best_logL    = 0.0;
     m_best_value   = 0.0;
     m_best_error   = 0.0;
@@ -503,8 +504,9 @@ void ctulimit::get_model_parameter(void)
                           NULL};
 
     // Initialises sky model and model parameters pointers
-    m_skymodel  = NULL;
-    m_model_par = NULL;
+    m_skymodel   = NULL;
+    m_model_par  = NULL;
+    m_is_spatial = false;
 
     // If the model container does not container the specified source then
     // throw an exception
@@ -530,7 +532,8 @@ void ctulimit::get_model_parameter(void)
     // If a parameter name was specified then use that parameter
     if (!m_parname.empty()) {
         if (m_skymodel->spatial()->has_par(m_parname)) {
-            m_model_par = &(m_skymodel->spatial()->operator[](m_parname));
+            m_model_par  = &(m_skymodel->spatial()->operator[](m_parname));
+            m_is_spatial = true;
         }
         else if (m_skymodel->spectral()->has_par(m_parname)) {
             m_model_par = &(m_skymodel->spectral()->operator[](m_parname));
@@ -704,6 +707,12 @@ void ctulimit::ulimit_bisection(const double& parmin, const double& parmax)
                               " has been reached. You may consider to increase"
                               " the \"max_iter\" parameter and re-run ctulimit.";
             throw GException::invalid_value(G_UL_BISECTION, msg);
+        }
+
+        // If model parameter is spatial parameter then make sure that no
+        // values are cached for source
+        if (m_is_spatial) {
+            m_obs.remove_response_cache(m_srcname);
         }
 
         // Compute center of boundary
