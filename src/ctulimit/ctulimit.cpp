@@ -245,7 +245,7 @@ void ctulimit::process(void)
         // Write header into logger
         log_header1(TERSE, "Compute best-fit likelihood");
 
-        // Make sure that requested model parameters is free
+        // Make sure that requested model parameter is free
         m_model_par->free();
 
         // Optimize and save best log-likelihood
@@ -643,6 +643,12 @@ void ctulimit::get_parameter_brackets(double& parmin, double& parmax)
             throw GException::invalid_value(G_GET_PARAMETER_BRACKETS, msg);
         }
 
+        // If model parameter is spatial parameter then make sure that no
+        // values are cached for source
+        if (m_is_spatial) {
+            m_obs.remove_response_cache(m_srcname);
+        }
+
         // Evaluate logL at upper boundary
         double logL     = evaluate(*m_model_par, parmax);
         double eval_mid = logL - (m_best_logL + m_dlogL);
@@ -838,7 +844,6 @@ void ctulimit::compute_ulimit(void)
     GModelSpatialDiffuseCube* cube =
         dynamic_cast<GModelSpatialDiffuseCube*>(m_skymodel->spatial());
     if (cube != NULL) {
-
 
         // Set MC cone to the entire sky. This method call is needed to
         // set-up the cube spectrum
