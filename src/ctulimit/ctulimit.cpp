@@ -263,8 +263,19 @@ void ctulimit::process(void)
 
     } // endif: likelihood was zero
 
-    // Get parameter brackets. Note that this method recomputes m_best_logL
-    // to make sure that the value is coherent for the upper limit search.
+    // ... otherwise use original log-likelihood
+    else {
+
+        // Write header into logger
+        log_header1(TERSE, "Extract best-fit likelihood");
+
+        // Write optimised model into logger
+        log_value(NORMAL,"Maximum log likelihood",gammalib::str(m_best_logL,3));
+        log_string(NORMAL, m_obs.models().print(m_chatter));
+
+    }
+
+    // Get parameter brackets
     double parmin;
     double parmax;
     get_parameter_brackets(parmin, parmax);
@@ -275,8 +286,9 @@ void ctulimit::process(void)
     // Write some parameters into logger
     log_value(NORMAL, "Model name", m_skymodel->name());
     log_value(NORMAL, "Parameter name", m_model_par->name());
-    log_value(NORMAL, "Parameter value", m_model_par->value());
+    log_value(NORMAL, "Best factor value", m_best_value);
     log_value(NORMAL, "Confidence level", gammalib::str(m_confidence*100.0)+"%");
+    log_value(NORMAL, "Maximum log likelihood",gammalib::str(m_best_logL,3));
     log_value(NORMAL, "Log-likelihood difference", m_dlogL);
     log_value(NORMAL, "Initial factor value range",
               "["+gammalib::str(parmin)+", "+gammalib::str(parmax)+"]");
