@@ -161,12 +161,12 @@ class comobssim(ctools.csobservation):
             obs.events(events)
 
             # Set DRE filename
-            dreid   = '_dre_sim-seed%6.6d_' % (seed)
+            dreid   = 'dre_sim-seed%6.6d' % (seed)
             if suffix != '':
                 dreid += '%s_' % (suffix)
             drename = os.path.basename(obs.drename().url())
             drename = '%s/%s' % (self['outfolder'].string(),
-                                 drename.replace('_dre_', dreid))
+                                 drename.replace('dre', dreid))
             obs.drename(drename)
 
         # Write header
