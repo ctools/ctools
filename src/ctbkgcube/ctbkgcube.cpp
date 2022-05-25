@@ -317,7 +317,7 @@ void ctbkgcube::process(void)
 
     // Set model instruments
     //model.instruments(instruments);
-    model.instruments("CTA,HESS,MAGIC,VERITAS"); // Temporary fix for #2140
+    model.instruments("CTA,HESS,MAGIC,VERITAS,ASTRI"); // Temporary fix for #2140
 
     // Append model to output container
     m_outmdl.append(model);

@@ -1084,21 +1084,29 @@ void ctbin::obs_cube_stacked(void)
         // Attach event cube to CTA observation
         obs.events(m_cubes[0]);
 
-        // Compute average pointing direction for all CTA event lists
-        double ra     = 0.0;
-        double dec    = 0.0;
-        double number = 0.0;
+        // Compute average pointing direction for all CTA event lists and
+        // extract first instrument
+        double      ra         = 0.0;
+        double      dec        = 0.0;
+        double      number     = 0.0;
+        std::string instrument = "";
         for (int i = 0; i < m_obs.size(); ++i) {
             GCTAObservation* cta = dynamic_cast<GCTAObservation*>(m_obs[i]);
             if ((cta != NULL) && (cta->eventtype() == "EventList")) {
                 ra     += cta->pointing().dir().ra();
                 dec    += cta->pointing().dir().dec();
                 number += 1.0;
+                if (instrument.empty()) {
+                    instrument = cta->instrument();
+                }
             }
         }
         if (number > 0.0) {
             ra  /= number;
             dec /= number;
+        }
+        if (instrument.empty()) {
+            instrument = "cta";
         }
         GSkyDir dir;
         dir.radec(ra, dec);
@@ -1108,6 +1116,7 @@ void ctbin::obs_cube_stacked(void)
         double deadc = (m_ontime > 0.0) ? m_livetime / m_ontime : 0.0;
 
         // Set CTA observation attributes
+        obs.instrument(instrument);
         obs.pointing(pointing);
         obs.ra_obj(dir.ra_deg());   //!< Dummy
         obs.dec_obj(dir.dec_deg()); //!< Dummy

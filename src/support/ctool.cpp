@@ -1039,15 +1039,16 @@ GCTAEventCube ctool::create_cube(const GObservations& obs)
  *
  * The following parameters are read
  *
- *      ra:     Right Ascension of pointing and RoI centre (deg)
- *      dec:    Declination of pointing and RoI centre (deg)
- *      rad:    Radius of RoI (deg)
- *      deadc:  Deadtime correction factor
- *      tmin:   Start time
- *      tmax:   Stop time
- *      emin:   Minimum energy (TeV)
- *      emax:   Maximum energy (TeV)
- *      mjdref: Time reference (optional)
+ *      ra:         Right Ascension of pointing and RoI centre (deg)
+ *      dec:        Declination of pointing and RoI centre (deg)
+ *      rad:        Radius of RoI (deg)
+ *      deadc:      Deadtime correction factor
+ *      tmin:       Start time
+ *      tmax:       Stop time
+ *      emin:       Minimum energy (TeV)
+ *      emax:       Maximum energy (TeV)
+ *      mjdref:     Time reference (optional)
+ *      instrument: Name of Cherenkov Telescope (optional)
  *
  * If the time reference parametere "mjdref" is not available, the CTA time
  * reference will be assumed.
@@ -1072,6 +1073,11 @@ GCTAObservation ctool::create_cta_obs(void)
                        ? GTimeReference((*this)["mjdref"].real(), "s", "TT", "LOCAL")
                        : GTimeReference(G_CTA_MJDREF, "s", "TT", "LOCAL");
 
+    // Set instrument
+    std::string instrument = (has_par("instrument"))
+                           ? (*this)["instrument"].string()
+                           : "CTA";
+
     // Set GTI
     GGti gti = get_gti(ref);
 
@@ -1086,7 +1092,8 @@ GCTAObservation ctool::create_cta_obs(void)
     // Attach empty event list to CTA observation
     obs.events(list);
 
-    // Set observation ontime, livetime and deadtime correction factor
+    // Set instrument, ontime, livetime and deadtime correction factor
+    obs.instrument(instrument);
     obs.pointing(pnt);
     obs.ontime(gti.ontime());
     obs.livetime(gti.ontime()*deadc);
