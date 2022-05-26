@@ -1,7 +1,7 @@
 .. _2.0:
 
-ctools 2.0 release (15 March 2022)
-==================================
+ctools 2.0 release (25 May 2022)
+================================
 
 Overview
 --------
@@ -25,6 +25,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`4058 <https://cta-redmine.irap.omp.eu/issues/4058>`_] -
+  Add support for ASTRI instrument
 * [`4006 <https://cta-redmine.irap.omp.eu/issues/4006>`_] -
   Allow determination of upper limits on spatial parameters in :ref:`ctulimit`
 * [`3592 <https://cta-redmine.irap.omp.eu/issues/3592>`_] -

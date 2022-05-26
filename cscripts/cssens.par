@@ -16,14 +16,15 @@
 #
 # Input and output parameters
 #============================
-inobs,   f, h, NONE,,, "Input event list, counts cube, or observation definition XML file"
-inmodel, f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
-srcname, s, a, Crab,,, "Source name"
-caldb,   s, a, prod2,,, "Calibration database"
-irf,     s, a, South_50h,,, "Instrument response function"
-edisp,   b, h, no,,, "Apply energy dispersion?"
-deadc,   r, h, 0.98,0,1, "Deadtime correction factor"
-outfile, f, a, sensitivity.fits,,, "Output sensitivity FITS file"
+inobs,      f, h, NONE,,, "Input event list, counts cube, or observation definition XML file"
+inmodel,    f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
+srcname,    s, a, Crab,,, "Source name"
+instrument, s, h, CTA,CTA|HESS|MAGIC|VERITAS|ASTRI,, "Name of Cherenkov telescope"
+caldb,      s, a, prod2,,, "Calibration database"
+irf,        s, a, South_50h,,, "Instrument response function"
+edisp,      b, h, no,,, "Apply energy dispersion?"
+deadc,      r, h, 0.98,0,1, "Deadtime correction factor"
+outfile,    f, a, sensitivity.fits,,, "Output sensitivity FITS file"
 
 #
 # Script parameters

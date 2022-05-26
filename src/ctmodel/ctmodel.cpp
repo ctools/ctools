@@ -673,6 +673,9 @@ void ctmodel::get_obs(void)
             GCTAObservation cta;
             cta.events(cube);
 
+            // Set name of Cherenkov telescope
+            cta.instrument((*this)["instrument"].string());
+
             // If querying of energy dispersion cube is requested then
             // query it now
             if (query_edisp) {

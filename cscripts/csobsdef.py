@@ -205,6 +205,14 @@ class csobsdef(ctools.cscript):
             # Create empty CTA observation
             obs = gammalib.GCTAObservation()
 
+            # Set instrument
+            if 'instrument' in header:
+                instrument = self._pntdef[row, header.index('instrument')]
+            else:
+                instrument = self['instrument'].string()
+            instrument = gammalib.tolower(instrument)
+            obs.instrument(instrument)
+
             # Set observation name. If no observation name was given then
             # use "None".
             if 'name' in header:

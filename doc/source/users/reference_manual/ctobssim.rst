@@ -50,6 +50,9 @@ General parameters
 ``inmodel [file]``
     Input model XML file.
 
+``(instrument = CTA) [string]``
+    Name of Cherenkov telescope.
+
 ``caldb [string]``
     Calibration database.
 

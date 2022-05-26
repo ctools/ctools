@@ -61,6 +61,9 @@ General parameters
 ``onrad [real]``
     Radius of On region (deg).
 
+``(instrument = CTA) [string]``
+    Name of Cherenkov telescope.
+
 ``caldb [string]``
     Calibration database.
 
