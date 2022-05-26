@@ -60,9 +60,11 @@ class csebins(ctools.csobservation):
             if self['inobs'].is_valid():
                 self.obs(gammalib.GObservations(self['inobs'].filename()))
             else:
-                cta   = gammalib.GCTAObservation()
-                caldb = gammalib.GCaldb('cta', self['caldb'].string())
-                rsp   = gammalib.GCTAResponseIrf(self['irf'].string(), caldb)
+                cta     = gammalib.GCTAObservation()
+                mission = gammalib.tolower(self['instrument'].string())
+                caldb   = gammalib.GCaldb(mission, self['caldb'].string())
+                rsp     = gammalib.GCTAResponseIrf(self['irf'].string(), caldb)
+                cta.instrument(mission)
                 cta.response(rsp)
                 self.obs().append(cta)
 

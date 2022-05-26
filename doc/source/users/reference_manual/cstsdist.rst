@@ -60,6 +60,9 @@ General parameters
 ``bkgcube [file]``
     Input background cube file.
 
+``(instrument = CTA) [string]``
+    Name of Cherenkov telescope.
+
 ``caldb [string]``
     Calibration database.
 

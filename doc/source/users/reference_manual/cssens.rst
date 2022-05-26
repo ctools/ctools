@@ -62,6 +62,9 @@ General parameters
     Name of the source in the source model XML file which should be used
     for sensitivity computation.
 
+``(instrument = CTA) [string]``
+    Name of Cherenkov telescope.
+
 ``caldb [string]``
     Calibration database.
 

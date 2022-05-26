@@ -16,18 +16,19 @@
 #
 # Input and output parameters
 #============================
-inobs,     f, a, events.fits,,, "Input event list, counts cube, or observation definition XML file"
-inmodel,   f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
-srcname,   s, a, Crab,,, "Source name"
-expcube,   f, a, NONE,,, "Input exposure cube file"
-psfcube,   f, a, NONE,,, "Input PSF cube file"
-edispcube, f, a, NONE,,, "Input energy dispersion cube file"
-bkgcube,   f, a, NONE,,, "Input background cube file"
-caldb,     s, a, prod2,,, "Calibration database"
-irf,       s, a, South_0.5h,,, "Instrument response function"
-edisp,     b, h, no,,, "Apply energy dispersion?"
-deadc,     r, h, 0.98,0,1, "Deadtime correction factor"
-outfile,   f, a, ts.fits,,, "Output Test Statistic distribution FITS file"
+inobs,      f, a, events.fits,,, "Input event list, counts cube, or observation definition XML file"
+inmodel,    f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
+srcname,    s, a, Crab,,, "Source name"
+expcube,    f, a, NONE,,, "Input exposure cube file"
+psfcube,    f, a, NONE,,, "Input PSF cube file"
+edispcube,  f, a, NONE,,, "Input energy dispersion cube file"
+bkgcube,    f, a, NONE,,, "Input background cube file"
+instrument, s, h, CTA,CTA|HESS|MAGIC|VERITAS|ASTRI,, "Name of Cherenkov telescope"
+caldb,      s, a, prod2,,, "Calibration database"
+irf,        s, a, South_0.5h,,, "Instrument response function"
+edisp,      b, h, no,,, "Apply energy dispersion?"
+deadc,      r, h, 0.98,0,1, "Deadtime correction factor"
+outfile,    f, a, ts.fits,,, "Output Test Statistic distribution FITS file"
 
 #
 # Script parameters

@@ -231,7 +231,8 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
 # ======================= #
 def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.98, \
             emin=0.1, emax=100.0, rad=5.0, \
-            irf='South_50h', caldb='prod2', obsid='000000', mjdref=51544.5):
+            instrument='CTA', irf='South_50h', caldb='prod2', \
+            obsid='000000', mjdref=51544.5):
     """
     Set a single CTA observation
 
@@ -255,6 +256,8 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.98, \
         Maximum event energy (TeV)
     rad : float, optional
         ROI radius used for analysis (deg)
+    instrument : str, optional
+        Name of Cherenkov Telescope
     irf : str, optional
         Instrument response function
     caldb : str, optional
@@ -270,12 +273,16 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.98, \
     # Allocate CTA observation
     obs = gammalib.GCTAObservation()
 
+    # Set mission
+    mission = gammalib.tolower(instrument)
+    obs.instrument(mission)
+
     # Set CTA calibration database
     db = gammalib.GCaldb()
     if (gammalib.dir_exists(caldb)):
         db.rootdir(caldb)
     else:
-        db.open('cta', caldb)
+        db.open(mission, caldb)
 
     # Set pointing direction for CTA observation
     pnt = gammalib.GCTAPointing()

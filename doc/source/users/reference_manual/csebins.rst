@@ -23,6 +23,9 @@ General parameters
 ``inobs [file]``
     Input observation definition XML file.
 
+``(instrument = CTA) [string]``
+    Name of Cherenkov telescope.
+
 ``caldb [string]``
     Calibration database.
 

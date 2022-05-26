@@ -279,12 +279,13 @@ class cssens(ctools.csobservation):
                 pntdir.radec_deg(0.0, 0.0)
 
             # Read other relevant user parameters
-            caldb    = self['caldb'].string()
-            irf      = self['irf'].string()
-            deadc    = self['deadc'].real()
-            duration = self['duration'].real()
-            rad      = self['rad'].real()
-            offset   = self['offset'].real()
+            instrument = self['instrument'].string()
+            caldb      = self['caldb'].string()
+            irf        = self['irf'].string()
+            deadc      = self['deadc'].real()
+            duration   = self['duration'].real()
+            rad        = self['rad'].real()
+            offset     = self['offset'].real()
 
             # Add offset to pointing direction
             pntdir.rotate_deg(0.0, offset)
@@ -293,7 +294,7 @@ class cssens(ctools.csobservation):
             obs = gammalib.GObservations()
 
             # Create CTA observation
-            run = obsutils.set_obs(pntdir, caldb=caldb, irf=irf,
+            run = obsutils.set_obs(pntdir, instrument=instrument, caldb=caldb, irf=irf,
                                    duration=duration, deadc=deadc,
                                    emin=emin, emax=emax, rad=rad)
 
