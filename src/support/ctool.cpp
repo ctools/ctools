@@ -1836,6 +1836,11 @@ void ctool::set_obs_response(GCTAObservation* obs)
         std::string database = (*this)["caldb"].string();
         std::string irf      = (*this)["irf"].string();
 
+        // Optionally set instrument
+        std::string instrument = (has_par("instrument"))
+                               ? (*this)["instrument"].string()
+                               : "CTA";
+
         // Create an XML element containing the database and IRF name. This
         // kluge will make sure that the information is later written
         // to the observation definition XML file, in case an observation
@@ -1844,7 +1849,13 @@ void ctool::set_obs_response(GCTAObservation* obs)
                                 " database=\""+database+"\""
                                 " response=\""+irf+"\"";
 
+        // Allocate XML element
         GXmlElement xml;
+
+        // Set instrument attribute
+        xml.attribute("instrument", instrument);
+
+        // Append parameter
         xml.append(parameter);
 
         // Create CTA response
