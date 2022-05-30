@@ -375,15 +375,15 @@ void ctulimit::init_members(void)
 
     // Initialise protected members
     m_dlogL        = 0.0;
-    m_skymodel     = NULL;
-    m_model_par    = NULL;
-    m_is_spatial   = false;
     m_best_logL    = 0.0;
     m_best_value   = 0.0;
     m_best_error   = 0.0;
     m_flux_ulimit  = 0.0;
     m_diff_ulimit  = 0.0;
     m_eflux_ulimit = 0.0;
+    m_skymodel     = NULL;
+    m_model_par    = NULL;
+    m_is_spatial   = false;
 
     // Return
     return;

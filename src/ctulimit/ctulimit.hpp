@@ -95,15 +95,15 @@ protected:
 
     // Protected members
     double        m_dlogL;        //!< Likelihood difference for upper limit computation
-    GModelSky*    m_skymodel;     //!< Pointer to sky model
-    GModelPar*    m_model_par;    //!< Pointer to model parameter
-    bool          m_is_spatial;   //!< Signal that model parameter is spatial parameter
     double        m_best_logL;    //!< Best fit log likelihood of given model
     double        m_best_value;   //!< Best parameter value factor
     double        m_best_error;   //!< Best parameter value error
     double        m_diff_ulimit;  //!< Differential upper limit value
     double        m_flux_ulimit;  //!< Flux upper limit value
     double        m_eflux_ulimit; //!< Energy flux upper limits
+    GModelSky*    m_skymodel;     //!< Pointer to sky model
+    GModelPar*    m_model_par;    //!< Pointer to model parameter
+    bool          m_is_spatial;   //!< Signal that model parameter is spatial parameter
 };
 
 

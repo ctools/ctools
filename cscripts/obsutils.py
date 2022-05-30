@@ -274,7 +274,7 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.98, \
     obs = gammalib.GCTAObservation()
 
     # Set mission
-    mission = gammalib.tolower(instrument)
+    mission = gammalib.toupper(instrument)
     obs.instrument(mission)
 
     # Set CTA calibration database
