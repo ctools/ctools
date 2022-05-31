@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-25 May 2022
+31 May 2022
 
 
 Introduction
@@ -11,7 +11,7 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-Added support for ASTRI instrument (#4058).
+Added support for ASTRI and FACT instruments (#4058).
 
 
 Documentation

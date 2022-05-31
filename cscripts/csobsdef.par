@@ -24,7 +24,7 @@ outobs, f, a, obs.xml,,, "Output observation definition XML file"
 #=================================
 duration,   r, a, 1800.0,,, "Pointing duration (seconds)"
 name,       s, h, None,,, "Observation name"
-instrument, s, h, CTA,CTA|HESS|MAGIC|VERITAS|ASTRI,, "Name of Cherenkov telescope"
+instrument, s, h, CTA,CTA|HESS|MAGIC|VERITAS|ASTRI|FACT,, "Name of Cherenkov telescope"
 caldb,      s, h, ,,, "Calibration database"
 irf,        s, h, ,,, "Instrument response function"
 emin,       r, h, UNDEF,,, "Lower energy limit (TeV)"
