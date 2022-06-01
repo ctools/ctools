@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-31 May 2022
+1 June 2022
 
 
 Introduction
@@ -218,7 +218,8 @@ None
 
 cslightcrv - Generate light curve
 ---------------------------------
-Stamp output light curve file (#3662).
+Add confidence parameter to allow specifying confidence level for upper limit
+computation (#3725).
 
 Added support for rectangular On/Off regions. The "srcshape" parameter now
 can now be set to "RECT" to use rectangular sky regions. The parameter is now
@@ -319,6 +320,9 @@ the width, height and position angle of the rectangular sky regions (#3248).
 
 cssens - Computes sensitivity curve
 -----------------------------------
+Add confidence parameter to allow specifying confidence level for upper limit
+computation (#3725).
+
 Added constraints on the minimum number of source counts in the sensitivity
 computations. The constraints are specified by the new parameters "mincounts",
 "bkgexcess" and "bkgrad". In addition, a "seed" parameter was added allowing

@@ -60,6 +60,7 @@ etruebins,     i, h, 30,,, "Number of bins per decade for true energy bins"
 statistic,     s, h, DEFAULT,DEFAULT|CSTAT|WSTAT|CHI2,, "Optimization statistic"
 calc_ts,       b, h, yes,,, "Compute TS value for each bin?"
 calc_ulim,     b, h, yes,,, "Compute upper limit for each bin?"
+confidence,    r, h, 0.95,0.0,1.0, "Confidence level for upper limit computation"
 fix_srcs,      b, h, yes,,, "Fix other sky model parameters?"
 fix_bkg,       b, h, no,,, "Fix background model parameters?"
 

@@ -160,8 +160,9 @@ class cslightcrv(ctools.csobservation):
 
         # Query the hidden parameters, just in case
         self['edisp'].boolean()
-        self['calc_ulim'].boolean()
         self['calc_ts'].boolean()
+        self['calc_ulim'].boolean()
+        self['confidence'].real()
         self['fix_bkg'].boolean()
         self['fix_srcs'].boolean()
 
@@ -394,12 +395,13 @@ class cslightcrv(ctools.csobservation):
 
             # Create instance of upper limit tool
             ulimit = ctools.ctulimit(cpy_obs)
-            ulimit['srcname']   = self._srcname
-            ulimit['eref']      = 1.0
-            ulimit['emin']      = self['emin'].real()
-            ulimit['emax']      = self['emax'].real()
-            ulimit['sigma_min'] = 0.0
-            ulimit['sigma_max'] = 3.0
+            ulimit['srcname']    = self._srcname
+            ulimit['eref']       = 1.0
+            ulimit['emin']       = self['emin'].real()
+            ulimit['emax']       = self['emax'].real()
+            ulimit['sigma_min']  = 0.0
+            ulimit['sigma_max']  = 3.0
+            ulimit['confidence'] = self['confidence'].real()
 
             # Try to run upper limit tool and catch any exceptions
             try:

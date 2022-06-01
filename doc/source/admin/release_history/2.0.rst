@@ -29,10 +29,10 @@ Improvements
   Add support for ASTRI instrument
 * [`4006 <https://cta-redmine.irap.omp.eu/issues/4006>`_] -
   Allow determination of upper limits on spatial parameters in :ref:`ctulimit`
-* [`3592 <https://cta-redmine.irap.omp.eu/issues/3592>`_] -
-  Rename virtual abstract :doxy:`ctool::run` method to :doxy:`ctool::process` and add non-abstract :doxy:`ctool::run` method
 * Add methods to access :ref:`ctlike` attributes
 * Add restart of bisection in case of bad convergence in :ref:`ctulimit`
+* [`3725 <https://cta-redmine.irap.omp.eu/issues/3725>`_] -
+  Add confidence parameter to :ref:`csspec` and :ref:`cslightcrv`
 * [`3662 <https://cta-redmine.irap.omp.eu/issues/3662>`_] -
   Stamp all output FITS files
 * [`3668 <https://cta-redmine.irap.omp.eu/issues/3668>`_] -
@@ -43,6 +43,8 @@ Improvements
   Use file function constructor in csspec
 * [`3606 <https://cta-redmine.irap.omp.eu/issues/3606>`_] -
   Add ``BINS`` method to :ref:`csspec`
+* [`3592 <https://cta-redmine.irap.omp.eu/issues/3592>`_] -
+  Rename virtual abstract :doxy:`ctool::run` method to :doxy:`ctool::process` and add non-abstract :doxy:`ctool::run` method
 * [`3562 <https://cta-redmine.irap.omp.eu/issues/3562>`_] -
   Add hidden ``fix_spat`` parameter to :ref:`cttsmap`
 * [`3555 <https://cta-redmine.irap.omp.eu/issues/3555>`_] -

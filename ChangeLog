@@ -1,4 +1,4 @@
-2022-05-31
+2022-06-01
 
         * Version 2.0.0 released
         ========================
@@ -6,17 +6,18 @@
         Add support for ASTRI and FACT instrument (#4058)
         Allow determination of upper limits on spatial parameters in ctulimit (#4006)
         Add comgendb script (#3983)
-        Rename virtual abstract ctool::run() method to ctool::process() and
-          add non-abstract ctool::run() method (#3592) (#3592)
         Add methods to access ctlike attributes
         Add csadd2caldb script
         Add restart of bisection in case of bad convergence in ctulimit
         Add COMPTEL analysis scripts (#3738)
+        Add confidence parameter to csspec and cslightcrv (#3725)
         Add source counts constraints to cssens (#3668)
         Stamp all output FITS files (#3662)
         Add ASCL shields to "About" page (#3630)
         Use file function constructor in csspec (#3626)
         Add BINS method to csspec (#3606)
+        Rename virtual abstract ctool::run() method to ctool::process() and
+          add non-abstract ctool::run() method (#3592)
         Add hidden "fix_spat" parameter to cttsmap (#3562)
         Use test source position in cssens (#3555)
         Add optimizer setter to ctlikelihood base class

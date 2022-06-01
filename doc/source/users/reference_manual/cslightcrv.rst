@@ -199,6 +199,9 @@ General parameters
 ``(calc_ulim = yes) [boolean]``
     Compute upper limit for each time bin?
 
+``(confidence = 0.95) [real]``
+    Confidence level for upper limit computation.
+
 ``(fix_srcs = yes) [boolean]``
     Fix other sky model parameters?
 

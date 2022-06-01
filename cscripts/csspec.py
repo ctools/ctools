@@ -175,8 +175,9 @@ class csspec(ctools.csobservation):
 
         # Query other parameeters
         self['edisp'].boolean()
-        self['calc_ulim'].boolean()
         self['calc_ts'].boolean()
+        self['calc_ulim'].boolean()
+        self['confidence'].real()
         self['fix_bkg'].boolean()
         self['fix_srcs'].boolean()
         self['bingamma'].real()
@@ -791,8 +792,9 @@ class csspec(ctools.csobservation):
 
                 # Create upper limit object  
                 ulimit = ctools.ctulimit(like.obs())
-                ulimit['srcname'] = self['srcname'].string()
-                ulimit['eref']    = elogmean.TeV()
+                ulimit['srcname']    = self['srcname'].string()
+                ulimit['eref']       = elogmean.TeV()
+                ulimit['confidence'] = self['confidence'].real()
 
                 # If chatter level is verbose and debugging is requested
                 # then switch also on the debug model in ctulimit
