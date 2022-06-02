@@ -2,7 +2,7 @@
 # ==========================================================================
 # Shows butterfly diagram created with ctbutterfly
 #
-# Copyright (C) 2014-2021 Michael Mayer
+# Copyright (C) 2014-2022 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -150,7 +150,11 @@ def read_butterfly_fits(filename):
     # Fill vectors
     nrows = table.nrows()
     for row in range(nrows):
-    
+
+        # Exclude zero intensities
+        if c_intensity[row] <= 0.0:
+            continue
+
         # Get conversion coefficient TeV -> erg
         conv = c_energy[row] * c_energy[row] * 1.0e6 * gammalib.MeV2erg
 
@@ -165,6 +169,8 @@ def read_butterfly_fits(filename):
     # Loop over the rows backwards to compute the lower edge of the
     # confidence band
     for row in range(nrows-1,-1,-1):
+        if c_intensity[row] <= 0.0:
+            continue
         conv      = c_energy[row] * c_energy[row] * 1.0e6 * gammalib.MeV2erg
         low_error = max(c_intensity_min[row] * conv, 1e-26)
         butterfly['butterfly_x'].append(c_energy[row])
