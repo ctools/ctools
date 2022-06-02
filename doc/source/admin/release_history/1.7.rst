@@ -1,7 +1,7 @@
 .. _1.7:
 
-ctools 1.7 release
-==================
+ctools 1.7 release (17 July 2020)
+=================================
 
 Overview
 --------
@@ -10,40 +10,51 @@ ctools 1.7 is a major release that adds significant functionality.
 
 In particular, this release provides:
 
-* ...
-* ...
+* csscs, a cscript for spectral component separation
+* support for INTEGRAL/SPI telescope data analysis
 
 
 Bug fixes
 ---------
 
+* [`3261 <https://cta-redmine.irap.omp.eu/issues/3261>`_] -
+  Avoid negative squared standard deviations in :ref:`cssrcdetect`
 * [`3156 <https://cta-redmine.irap.omp.eu/issues/3156>`_] -
   Adapt show_pull_histogram.py to matplotlib > 3.1.0
-* Avoid negative squared standard deviations in :ref:`cssrcdetect`
 * [`3066 <https://cta-redmine.irap.omp.eu/issues/3066>`_] -
   Fix log file header repetition in some cscripts
-
+* [`2765 <https://cta-redmine.irap.omp.eu/issues/2765>`_] -
+  Fix numerical glitch in residual computation
 
 Improvements
 ------------
 
+* [`3163 <https://cta-redmine.irap.omp.eu/issues/3163>`_] -
+  Add Interface Manual to User documentation
+* [`3154 <https://cta-redmine.irap.omp.eu/issues/3154>`_] -
+  Add On/Off analysis to ctlike reference manual
+* [`3075 <https://cta-redmine.irap.omp.eu/issues/3075>`_] -
+  Update user manual for latest CTA IRF
 * [`3065 <https://cta-redmine.irap.omp.eu/issues/3065>`_] -
   Add Moon constraints to :ref:`csviscube`
+* [`2976 <https://cta-redmine.irap.omp.eu/issues/2976>`_] -
+  Improve handling of reflected regions with exclusion regions
 * [`2973 <https://cta-redmine.irap.omp.eu/issues/2973>`_] -
   Remove response cache before source testing in :ref:`cttsmap`
 * [`2938 <https://cta-redmine.irap.omp.eu/issues/2938>`_] -
   Add support for Castro plots to :ref:`csspec`
 * [`2925 <https://cta-redmine.irap.omp.eu/issues/2925>`_] -
   Enabling running of example scripts from objects in memory
+* [`2881 <https://cta-redmine.irap.omp.eu/issues/2881>`_] -
+  Add support for power-law binning to :ref:`ctbin`, :ref:`ctedispcube`,
+  :ref:`ctexpcube`, :ref:`ctmapcube`, :ref:`ctmodel`, :ref:`ctpsfcube`,
+  :ref:`csphagen`, :ref:`csresmap`, :ref:`csresspec`, and :ref:`csspec`
 * [`1889 <https://cta-redmine.irap.omp.eu/issues/1889>`_] -
   Allow using spectral models without ``Prefactor`` parameter in :ref:`cssens` and :ref:`cstsdist`
 
 
 New features
 ------------
-
-
-
-Clean up
---------
+* [`2961 <https://cta-redmine.irap.omp.eu/issues/2961>`_] -
+  Add :ref:`csscs` script for spectral component separation
 

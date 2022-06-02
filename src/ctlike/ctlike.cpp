@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2019 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -205,7 +205,7 @@ void ctlike::clear(void)
 
 
 /***********************************************************************//**
- * @brief Run maximum likelihood analysis
+ * @brief Process maximum likelihood analysis
  *
  * The following analysis steps are performed:
  * 1. Read the parameters (and write them into logger)
@@ -213,13 +213,8 @@ void ctlike::clear(void)
  * 3. Setup models for optimizing
  * 4. Optimize model (and write result into logger)
  ***************************************************************************/
-void ctlike::run(void)
+void ctlike::process(void)
 {
-    // Switch screen logging on in debug mode
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get parameters
     get_parameters();
 
@@ -230,16 +225,25 @@ void ctlike::run(void)
     // Write input observation container into logger
     log_observations(NORMAL, m_obs, "Input observation");
 
+    // Compute number of observed events in all observations
+    m_nobs = 0.0;
+    for (int i = 0; i < m_obs.size(); ++i) {
+        double data = m_obs[i]->nobserved();
+        if (data >= 0.0) {
+            m_nobs += data;
+        }
+    }
+
     // Optimize model parameters using LM optimizer
     optimize_lm();
 
     // Store copy of curvature matrix
     GMatrixSparse curvature =
         *(const_cast<GObservations::likelihood&>(m_obs.function()).curvature());
-    
+
     // Store Npred
-    double npred = m_obs.npred();
-    
+    m_npred = m_obs.npred();
+
     // Store models for which TS should be computed
     std::vector<std::string> ts_srcs;
     GModels models_orig = m_obs.models();
@@ -252,6 +256,16 @@ void ctlike::run(void)
 
     // Compute TS values if requested
     if (!ts_srcs.empty()) {
+
+        // Write general fit results in logger (will be repeated at the
+        // end)
+        log_header1(EXPLICIT, "Maximum likelihood optimisation results");
+        log_string(EXPLICIT, m_opt.print(m_chatter));
+        log_value(EXPLICIT, "Maximum log likelihood", gammalib::str(m_logL,3));
+        log_value(EXPLICIT, "Observed events  (Nobs)", gammalib::str(m_nobs,3));
+        log_value(EXPLICIT, "Predicted events (Npred)", gammalib::str(m_npred,3)+
+                  " (Nobs - Npred = "+gammalib::str(m_nobs-m_npred)+")");
+        log_string(VERBOSE, m_obs.models().print(m_chatter));
 
         // Store original maximum likelihood and models
         double  logL_src = m_logL;
@@ -281,34 +295,40 @@ void ctlike::run(void)
 
         // Loop over stored models, remove source and refit
         for (int i = 0; i < ts_srcs.size(); ++i) {
-            models.remove(ts_srcs[i]);
-            m_obs.models(models);    
+
+            // Create copy of models
+            GModels models_copy = models;
+
+            // Remove source of interest
+            models_copy.remove(ts_srcs[i]);
+
+            // Set models for fitting
+            m_obs.models(models_copy);
+
+            // Re-optimise log-likelihood for the source removed
             double logL_nosrc = reoptimize_lm();
-            double ts         = 2.0 * (logL_src-logL_nosrc);
+
+            // Compute source TS value
+            double ts = 2.0 * (logL_src-logL_nosrc);
+
+            // Store TS value in original model
             models_orig[ts_srcs[i]]->ts(ts);
-            models = models_orig;
-        }
+
+        } // endfor: looped over sources
 
         // Restore best fit values
         m_obs.models(models_orig);
-    }
 
-    // Compute number of observed events in all observations
-    double num_events = 0.0;
-    for (int i = 0; i < m_obs.size(); ++i) {
-        double data = m_obs[i]->nobserved();
-        if (data >= 0.0) {
-            num_events += data;
-        }
-    }
+    } // endif: requested TS computation
 
     // Write results into logger
     log_header1(NORMAL, "Maximum likelihood optimisation results");
     log_string(NORMAL, m_opt.print(m_chatter));
+    log_value(NORMAL, "Total number of iterations", m_iter);
     log_value(NORMAL, "Maximum log likelihood", gammalib::str(m_logL,3));
-    log_value(NORMAL, "Observed events  (Nobs)", gammalib::str(num_events,3));
-    log_value(NORMAL, "Predicted events (Npred)", gammalib::str(npred,3)+
-              " (Nobs - Npred = "+gammalib::str(num_events-npred)+")");
+    log_value(NORMAL, "Observed events  (Nobs)", gammalib::str(m_nobs,3));
+    log_value(NORMAL, "Predicted events (Npred)", gammalib::str(m_npred,3)+
+              " (Nobs - Npred = "+gammalib::str(m_nobs-m_npred)+")");
     log_string(NORMAL, m_obs.models().print(m_chatter));
 
     // Restore energy dispersion flags of all CTA observations
@@ -342,6 +362,9 @@ void ctlike::save(void)
     // Save model only if filename is valid
     if ((*this)["outmodel"].is_valid()) {
 
+        // Generate XML instance
+        GXml xml = xml_result();
+
         // Get output filename
         m_outmodel = (*this)["outmodel"].filename();
 
@@ -349,9 +372,9 @@ void ctlike::save(void)
         log_value(NORMAL, "Model definition file", m_outmodel.url());
 
         // Write results out as XML model
-        m_obs.models().save(m_outmodel);
+        xml.save(m_outmodel);
 
-    }
+    } // endif: filename was valid
 
     // ... otherwise signal that file was not saved
     else {
@@ -377,6 +400,75 @@ void ctlike::save(void)
         log_value(NORMAL, "Covariance matrix file", "NONE");
     }
 
+    // Return
+    return;
+}
+
+
+/*==========================================================================
+ =                                                                         =
+ =                             Private methods                             =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Initialise class members
+ ***************************************************************************/
+void ctlike::init_members(void)
+{
+    // Initialise members
+    m_outmodel.clear();
+    m_outcovmat.clear();
+    m_max_iter        = 50;
+    m_refit           = false;
+    m_refit_if_failed = true;
+    m_apply_edisp     = false;
+    m_fix_spat_for_ts = false;
+    m_chatter         = static_cast<GChatter>(2);
+    m_iter            = 0;
+    m_logL            = 0.0;
+    m_nobs            = 0.0;
+    m_npred           = 0.0;
+
+    // Set logger properties
+    log.date(true);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Copy class members
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+void ctlike::copy_members(const ctlike& app)
+{
+    // Copy attributes
+    m_outmodel        = app.m_outmodel;
+    m_outcovmat       = app.m_outcovmat;
+    m_max_iter        = app.m_max_iter;
+    m_refit           = app.m_refit;
+    m_refit_if_failed = app.m_refit_if_failed;
+    m_apply_edisp     = app.m_apply_edisp;
+    m_fix_spat_for_ts = app.m_fix_spat_for_ts;
+    m_chatter         = app.m_chatter;
+    m_iter            = app.m_iter;
+    m_logL            = app.m_logL;
+    m_nobs            = app.m_nobs;
+    m_npred           = app.m_npred;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Delete class members
+ ***************************************************************************/
+void ctlike::free_members(void)
+{
     // Return
     return;
 }
@@ -408,11 +500,14 @@ void ctlike::get_parameters(void)
     } // endif: no models were associated with observations
 
     // Set optimizer characteristics from user parameters
+    m_max_iter = (*this)["max_iter"].integer();
+    m_opt.max_iter(m_max_iter);
     m_opt.eps((*this)["like_accuracy"].real());
-    m_opt.max_iter((*this)["max_iter"].integer());
+    m_opt.accept_dec((*this)["accept_dec"].real());
 
     // Get other parameters
     m_refit           = (*this)["refit"].boolean();
+    m_refit_if_failed = (*this)["refit_if_failed"].boolean();
     m_apply_edisp     = (*this)["edisp"].boolean();
     m_fix_spat_for_ts = (*this)["fix_spat_for_ts"].boolean();
     m_chatter         = static_cast<GChatter>((*this)["chatter"].integer());
@@ -458,6 +553,9 @@ void ctlike::optimize_lm(void)
     log_header1(TERSE, "Maximum likelihood optimisation");
     log.indent(1);
 
+    // Initialise number of iterations
+    m_iter = 0;
+
     // Compute number of fitted parameters
     int nfit = 0;
     for (int i = 0; i < m_obs.models().size(); ++i) {
@@ -479,8 +577,11 @@ void ctlike::optimize_lm(void)
     // Perform LM optimization
     m_obs.optimize(m_opt);
 
+    // Add number of iterations
+    m_iter += m_opt.iter();
+
     // Optionally refit
-    if (m_refit) {
+    if (refit(&m_opt)) {
 
         // Dump new header
         log.indent(0);
@@ -489,6 +590,9 @@ void ctlike::optimize_lm(void)
 
         // Optimise again
         m_obs.optimize(m_opt);
+
+        // Add number of iterations
+        m_iter += m_opt.iter();
 
     }
 
@@ -524,15 +628,27 @@ double ctlike::reoptimize_lm(void)
     log_header1(TERSE, "Maximum likelihood re-optimisation");
     log.indent(1);
 
+    // Initialise number of iterations
+    int iter = 0;
+
     // Create a clone of the optimizer for the re-optimisation
     GOptimizer* opt = m_opt.clone();
 
     // Perform LM optimization
     m_obs.optimize(*opt);
 
+    // Add number of iterations
+    iter += opt->iter();
+
     // Optionally refit
-    if (m_refit) {
+    if (refit(opt)) {
+
+        // Refit
         m_obs.optimize(*opt);
+
+        // Add number of iterations
+        iter += opt->iter();
+
     }
 
     // Store maximum log likelihood value
@@ -540,68 +656,158 @@ double ctlike::reoptimize_lm(void)
 
     // Write optimization results
     log.indent(0);
-    log_header1(NORMAL, "Maximum likelihood re-optimisation results");
-    log_string(NORMAL, opt->print(m_chatter));
+    log_header1(EXPLICIT, "Maximum likelihood re-optimisation results");
+    log_string(EXPLICIT, opt->print(m_chatter));
+    log_value(EXPLICIT, "Total number of iterations", iter);
+    log_value(EXPLICIT, "Maximum log likelihood", gammalib::str(logL,3));
+    log_value(EXPLICIT, "Observed events  (Nobs)", gammalib::str(m_nobs,3));
+    log_value(EXPLICIT, "Predicted events (Npred)", gammalib::str(m_obs.npred(),3)+
+              " (Nobs - Npred = "+gammalib::str(m_nobs-m_obs.npred())+")");
+    log_string(VERBOSE, m_obs.models().print(m_chatter));
 
     // Return
     return (logL);
 }
 
 
-/*==========================================================================
- =                                                                         =
- =                             Private methods                             =
- =                                                                         =
- ==========================================================================*/
-
 /***********************************************************************//**
- * @brief Initialise class members
- ***************************************************************************/
-void ctlike::init_members(void)
-{
-    // Initialise members
-    m_outmodel.clear();
-    m_outcovmat.clear();
-    m_refit           = false;
-    m_logL            = 0.0;
-    m_apply_edisp     = false;
-    m_fix_spat_for_ts = false;
-    m_chatter         = static_cast<GChatter>(2);
-
-    // Set logger properties
-    log.date(true);
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Copy class members
+ * @brief Generate XML result
  *
- * @param[in] app Application.
+ * @return XML result
+ *
+ * Generates the XML result composed of the ctlike results and the model
+ * fitting results.
  ***************************************************************************/
-void ctlike::copy_members(const ctlike& app)
+GXml ctlike::xml_result(void) const
 {
-    // Copy attributes
-    m_refit           = app.m_refit;
-    m_outmodel        = app.m_outmodel;
-    m_outcovmat       = app.m_outcovmat;
-    m_logL            = app.m_logL;
-    m_apply_edisp     = app.m_apply_edisp;
-    m_fix_spat_for_ts = app.m_fix_spat_for_ts;
-    m_chatter         = app.m_chatter;
+    // Initialise XML result
+    GXml xml;
 
-    // Return
-    return;
+    // Set fit status
+    std::string status;
+    switch (m_opt.status()) {
+    case G_LM_CONVERGED:
+        status.append("converged");
+        break;
+    case G_LM_STALLED:
+        status.append("stalled");
+        break;
+    case G_LM_SINGULAR:
+        status.append("singular curvature matrix encountered");
+        break;
+    case G_LM_NOT_POSTIVE_DEFINITE:
+        status.append("curvature matrix not positive definite");
+        break;
+    case G_LM_BAD_ERRORS:
+        status.append("errors are inaccurate");
+        break;
+    default:
+        status.append("unknown");
+        break;
+    }
+
+    // Set flag strings
+    std::string refit           = (m_refit) ? "yes" : "no";
+    std::string edisp           = (m_apply_edisp) ? "yes" : "no";
+    std::string fix_spat_for_ts = (m_fix_spat_for_ts) ? "yes" : "no";
+
+    // Write ctlike results into XML instance
+    if (xml.elements("ctlike_results") == 0) {
+        xml.append(GXmlElement("ctlike_results title=\"ctlike fit results\""));
+    }
+    GXmlElement* result = xml.element("ctlike_results", 0);
+    result->append(GXmlElement("status", status));
+    result->append(GXmlElement("log-likelihood", m_logL));
+    result->append(GXmlElement("precision", m_opt.eps()));
+    result->append(GXmlElement("iterations", m_iter));
+    result->append(GXmlElement("lambda", m_opt.lambda()));
+    result->append(GXmlElement("total_parameters", m_opt.npars()));
+    result->append(GXmlElement("fitted_parameters", m_opt.nfree()));
+    result->append(GXmlElement("observed-events", m_nobs));
+    result->append(GXmlElement("predicted-events", m_npred));
+    result->append(GXmlElement("refit", refit));
+    result->append(GXmlElement("edisp", edisp));
+    result->append(GXmlElement("fix-spatial-for-ts", fix_spat_for_ts));
+    result->append(GXmlElement("elapsed-time", this->telapse()));
+    result->append(GXmlElement("cpu-seconds", this->celapse()));
+
+    // Write model results into XML instance
+    m_obs.models().write(xml);
+
+    // Return XML result
+    return xml;
 }
 
 
 /***********************************************************************//**
- * @brief Delete class members
+ * @brief Refit needed?
+ *
+ * @param[in] opt Pointer to optimiser.
+ * @return True if refit is needed, false otherwise.
+ *
+ * This method returns true if either the "refit" parameter is set to yes
+ * or the "refit_if_failed" parameter is set to yes and the fit has failed.
+ * The fit is considered as failed if it either has stalled or the number
+ * of fit iterations is exhausted.
  ***************************************************************************/
-void ctlike::free_members(void)
+bool ctlike::refit(const GOptimizer* opt)
 {
-    // Return
-    return;
+    // Initialise refit flag
+    bool refit = m_refit;
+
+    // If flag is false and "refit_if_failed" is true then examine optimiser
+    // result to determine whether the fit has failed
+    if (!refit && m_refit_if_failed) {
+
+        // Has the fit stalled?
+        if (opt->status() == G_LM_STALLED) {
+            refit = true;
+            log_value(NORMAL, "Refit requested", "Fit has stalled");
+        }
+
+        // ... otherwise were the number of fit iterations exhausted?
+        else if (opt->iter() >= m_max_iter) {
+            refit = true;
+            log_value(NORMAL, "Refit requested",
+                              "Number of fit iterations exhausted");
+        }
+
+        // ... otherwise check if there is a significant difference between
+        // the number of observed and predicted events
+        else {
+            double npred      = m_obs.npred();
+            double difference = m_nobs - npred;
+            if (m_nobs > 0.0) {
+                double fraction = difference / m_nobs;
+                if (std::abs(fraction) > 1.0e-5) {
+                    refit = true;
+                    log_value(NORMAL, "Refit requested",
+                              "Difference "+
+                              gammalib::str(difference,3)+
+                              " between number of observed events "+
+                              gammalib::str(m_nobs,3)+
+                              " and predicted events "+
+                              gammalib::str(npred,3)+
+                              " is larger than +/- 1.0e-5 times the number of"+
+                              " observed events ("+
+                              gammalib::str(fraction)+").");
+                }
+            }
+            if (!refit && std::abs(difference) > 5.0) {
+                refit = true;
+                log_value(NORMAL, "Refit requested",
+                          "Difference "+
+                          gammalib::str(difference,3)+
+                          " between number of observed events "+
+                          gammalib::str(m_nobs,3)+
+                          " and predicted events "+
+                          gammalib::str(npred,3)+
+                          " is larger than +/- 5.");
+            }
+        } // endelse: check number of events
+
+    }
+
+    // Return refit flag
+    return refit;
 }

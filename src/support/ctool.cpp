@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2019 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -249,22 +249,60 @@ ctool& ctool::operator=(const ctool& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Execute application
+ * @brief Run ctool
  *
- * This is the main execution method of a ctool. The method is invoked when
- * the executable is called from the command line. It signals that output
- * parameters should be read ahead, runs the tools, and saves the results.
+ * This method runs a ctool by calling the process() method of a ctool. The
+ * method switches on screen dump in case that the debug parameter is true.
+ ***************************************************************************/
+void ctool::run(void)
+{
+    // Increment number of running tools
+    running()++;
+
+    // If we're in debug mode then all output is also dumped on the screen
+    if (logDebug()) {
+        log.cout(true);
+    }
+
+    // Run the tool
+    process();
+
+    // Decrement number of running tools
+    running()--;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Execute ctool
+ *
+ * This method executes a ctool by calling the process() and save() methods
+ * of a ctool. The method signals that some parameters should be read ahead
+ * and switches on screen dump in case that the debug parameter is true.
  ***************************************************************************/
 void ctool::execute(void)
 {
+    // Increment number of running tools
+    running()++;
+
     // Signal that some parameters should be read ahead
     m_read_ahead = true;
 
+    // If we're in debug mode then all output is also dumped on the screen
+    if (logDebug()) {
+        log.cout(true);
+    }
+
     // Run the tool
-    run();
+    process();
 
     // Save the results
     save();
+
+    // Decrement number of running tools
+    running()--;
 
     // Return
     return;
@@ -688,25 +726,23 @@ GEbounds ctool::create_ebounds(void)
 
     } // endif: ebinalg was "FILE"
 
-    // ... otherwise use a linear or a logarithmically-spaced energy binning
+    // ... otherwise use native energy binning algorithms
     else {
 
         // Get task parameters
-    	double emin     = (*this)["emin"].real();
-    	double emax     = (*this)["emax"].real();
-    	int    enumbins = (*this)["enumbins"].integer();
+    	double emin      = (*this)["emin"].real();
+    	double emax      = (*this)["emax"].real();
+    	int    enumbins  = (*this)["enumbins"].integer();
+        double ebingamma = 1.0;
 
-        // Initialise log mode for ebinning
-        bool log = true;
-
-        // Check if algorithm is linear
-        if (ebinalg == "LIN") {
-            log = false;
+        // Get task parameter for POW method
+        if (ebinalg == "POW") {
+            ebingamma = (*this)["ebingamma"].real();
         }
 
-        // Setup energy bins
-        ebounds = GEbounds(enumbins, GEnergy(emin, "TeV"),
-                                     GEnergy(emax, "TeV"), log);
+        // Setup energy boundaries
+        ebounds = GEbounds(enumbins, GEnergy(emin, "TeV"), GEnergy(emax, "TeV"),
+                           ebinalg, ebingamma);
 
     } // endelse: ebinalg was not "FILE"
 
@@ -854,57 +890,23 @@ GEnergies ctool::create_energies(void)
 
     } // endif: ebinalg was "FILE"
 
-    // ... otherwise, if energy binning algorithm is of type "POW" (case
-    // sensitive), then set the energy binning according to a power-law
-    else if (ebinalg == "POW") {
+    // ... otherwise use native energy binning algorithms
+    else {
 
         // Get task parameters
     	double emin      = (*this)["emin"].real();
     	double emax      = (*this)["emax"].real();
     	int    enumbins  = (*this)["enumbins"].integer();
-        double ebingamma = (*this)["ebingamma"].real();
+        double ebingamma = 1.0;
 
-        // Precomputation
-        double a = 1.0 - ebingamma;
-        double c = (a == 0.0)
-                   ? 1.0 / (std::log(emax) - std::log(emin))
-                   : a   / (std::pow(emax,a) - std::pow(emin,a));
-        double b = double(c*(enumbins-1.0));
-
-        // Initialise first energy
-        double e = emin;
-        energies.append(GEnergy(e, "TeV"));
-
-        // Loop over energy bins
-        for (int i = 0; i < enumbins-1; ++i) {
-            double log_e_next = (a == 0.0)
-                                ? 1.0/b + std::log(e)
-                                : std::log(a/b + std::pow(e,a)) / a;
-            double e_next = std::exp(log_e_next);
-            energies.append(GEnergy(e_next, "TeV"));
-            e = e_next;
-        }
-    }
-
-    // ... otherwise use a linear or a logarithmically-spaced energy binning
-    else {
-
-        // Get task parameters
-    	double emin     = (*this)["emin"].real();
-    	double emax     = (*this)["emax"].real();
-    	int    enumbins = (*this)["enumbins"].integer();
-
-        // Initialise log mode for ebinning
-        bool log = true;
-
-        // Check if algorithm is linear
-        if (ebinalg == "LIN") {
-            log = false;
+        // Get task parameter for POW method
+        if (ebinalg == "POW") {
+            ebingamma = (*this)["ebingamma"].real();
         }
 
         // Setup energy nodes
-        energies = GEnergies(enumbins, GEnergy(emin, "TeV"),
-                                       GEnergy(emax, "TeV"), log);
+        energies = GEnergies(enumbins, GEnergy(emin, "TeV"), GEnergy(emax, "TeV"),
+                             ebinalg, ebingamma);
 
     } // endelse: ebinalg was not "FILE"
 
@@ -1037,15 +1039,16 @@ GCTAEventCube ctool::create_cube(const GObservations& obs)
  *
  * The following parameters are read
  *
- *      ra:     Right Ascension of pointing and RoI centre (deg)
- *      dec:    Declination of pointing and RoI centre (deg)
- *      rad:    Radius of RoI (deg)
- *      deadc:  Deadtime correction factor
- *      tmin:   Start time
- *      tmax:   Stop time
- *      emin:   Minimum energy (TeV)
- *      emax:   Maximum energy (TeV)
- *      mjdref: Time reference (optional)
+ *      ra:         Right Ascension of pointing and RoI centre (deg)
+ *      dec:        Declination of pointing and RoI centre (deg)
+ *      rad:        Radius of RoI (deg)
+ *      deadc:      Deadtime correction factor
+ *      tmin:       Start time
+ *      tmax:       Stop time
+ *      emin:       Minimum energy (TeV)
+ *      emax:       Maximum energy (TeV)
+ *      mjdref:     Time reference (optional)
+ *      instrument: Name of Cherenkov Telescope (optional)
  *
  * If the time reference parametere "mjdref" is not available, the CTA time
  * reference will be assumed.
@@ -1070,6 +1073,11 @@ GCTAObservation ctool::create_cta_obs(void)
                        ? GTimeReference((*this)["mjdref"].real(), "s", "TT", "LOCAL")
                        : GTimeReference(G_CTA_MJDREF, "s", "TT", "LOCAL");
 
+    // Set instrument
+    std::string instrument = (has_par("instrument"))
+                           ? (*this)["instrument"].string()
+                           : "CTA";
+
     // Set GTI
     GGti gti = get_gti(ref);
 
@@ -1084,7 +1092,8 @@ GCTAObservation ctool::create_cta_obs(void)
     // Attach empty event list to CTA observation
     obs.events(list);
 
-    // Set observation ontime, livetime and deadtime correction factor
+    // Set instrument, ontime, livetime and deadtime correction factor
+    obs.instrument(instrument);
     obs.pointing(pnt);
     obs.ontime(gti.ontime());
     obs.livetime(gti.ontime()*deadc);
@@ -1827,6 +1836,11 @@ void ctool::set_obs_response(GCTAObservation* obs)
         std::string database = (*this)["caldb"].string();
         std::string irf      = (*this)["irf"].string();
 
+        // Optionally set instrument
+        std::string instrument = (has_par("instrument"))
+                               ? (*this)["instrument"].string()
+                               : "CTA";
+
         // Create an XML element containing the database and IRF name. This
         // kluge will make sure that the information is later written
         // to the observation definition XML file, in case an observation
@@ -1835,7 +1849,13 @@ void ctool::set_obs_response(GCTAObservation* obs)
                                 " database=\""+database+"\""
                                 " response=\""+irf+"\"";
 
+        // Allocate XML element
         GXmlElement xml;
+
+        // Set instrument attribute
+        xml.attribute("instrument", instrument);
+
+        // Append parameter
         xml.append(parameter);
 
         // Create CTA response
@@ -2301,6 +2321,9 @@ void ctool::save_event_list(const GCTAObservation* obs,
 
             // Close input file
             infits.close();
+
+            // Stamp FITS file
+            stamp(outfits);
 
             // Save file to disk and close it (we need both operations)
             outfits.saveto(outname.url(), clobber());

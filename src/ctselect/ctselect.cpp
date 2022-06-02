@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctselect - Data selection tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -33,7 +33,7 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_RUN                                               "ctselect::run()"
+#define G_PROCESS                                       "ctselect::process()"
 #define G_GET_PARAMETERS                         "ctselect::get_parameters()"
 #define G_SELECT_EVENTS          "ctselect::select_events(GCTAObservation*, "\
                                   "std::string&, std::string&, std::string&)"
@@ -42,7 +42,6 @@
 /* __ Debug definitions __________________________________________________ */
 
 /* __ Coding definitions _________________________________________________ */
-//#define G_USE_MKSTEMP               //!< Use mkstemp for temporary filename
 
 
 /*==========================================================================
@@ -213,13 +212,8 @@ void ctselect::clear(void)
  * The temporary file is deleted after this action so that no disk overflow
  * will occur.
  ***************************************************************************/
-void ctselect::run(void)
+void ctselect::process(void)
 {
-    // Switch screen logging on in debug mode
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get parameters
     get_parameters();
 
@@ -292,18 +286,12 @@ void ctselect::run(void)
         if (!m_infiles[i].empty()) {
             std::string message = check_infile(m_infiles[i], m_evtname[i]);
             if (!message.empty()) {
-                throw GException::invalid_value(G_RUN, message);
+                throw GException::invalid_value(G_PROCESS, message);
             }
         }
 
         // Get temporary file name
-        #if G_USE_MKSTEMP
-        char tpl[]  = "ctselectXXXXXX";
-        int  fileid = mkstemp(tpl);
-        std::string filename(tpl);
-        #else
-        std::string filename = std::tmpnam(NULL);
-        #endif
+        std::string filename = gammalib::tmpnam();
 
         // Save observation in temporary file. We add here the events and
         // GTI extension name so that the GCTAObservation::save method can
@@ -323,17 +311,12 @@ void ctselect::run(void)
         if (!filename.empty()) {
             std::string message = check_infile(filename, m_evtname[i]);
             if (!message.empty()) {
-                throw GException::invalid_value(G_RUN, message);
+                throw GException::invalid_value(G_PROCESS, message);
             }
         }
 
         // Load observation from temporary file, including event selection
         select_events(obs, filename, m_evtname[i], m_gtiname[i]);
-
-        // Close temporary file
-        #if G_USE_MKSTEMP
-        close(fileid);
-        #endif
 
         // Remove temporary file
         std::remove(filename.c_str());
@@ -965,7 +948,7 @@ void ctselect::select_events(GCTAObservation*   obs,
                     std::string msg = \
                         "Invalid RoI selection: the new RoI must be enclosed "
                         "in the original RoI";
-                    throw GException::invalid_value(G_RUN, msg);
+                    throw GException::invalid_value(G_PROCESS, msg);
                 }
             }
         }

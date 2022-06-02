@@ -7,7 +7,7 @@ The following sections present the temporal model components that are available
 in ctools.
 
 .. warning::
-   Recall that the model is factorised according to
+   Recall that the source model is factorised according to
 
    .. math::
       M(p,E,t) = M_{\rm spatial}(p|E) \times M_{\rm spectral}(E) \times M_{\rm temporal}(t)

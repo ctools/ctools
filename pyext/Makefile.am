@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools Python extension module                               #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2017 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2020 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -97,8 +97,8 @@ if BUILD_WRAPPERS
 
 # Set SWIG compile command
 SWIGCOMPILE = $(SWIG) -c++ -python -Wall \
-              -I$(DESTDIR)$(prefix)/share/gammalib/swig \
               -I$(GAMMALIB)/share/gammalib/swig \
+              -I$(DESTDIR)$(prefix)/share/gammalib/swig \
               -I$(top_srcdir)/pyext
 
 # Sources that are required for the build. All targets in the list will be
@@ -160,6 +160,11 @@ if IS_ELCAPITAN
 		install_name_tool -add_rpath ${GAMMALIB}/lib $$f; \
 	done
 endif
+	-for f in build/ctools/ctools/_*.so; do \
+		dst=`echo $$f | sed 's/build\/ctools\///g'`; \
+		cp $$f $$dst; \
+		echo "Copied "$$f" -> "$$dst; \
+	done
 
 # Install the ctools Python module
 install-exec-local:
@@ -192,7 +197,7 @@ clean-local:
 	rm -rf $(top_builddir)/pyext/ctools/c*.py
 	rm -rf $(top_builddir)/pyext/ctools/*.pyc
 	rm -rf $(top_builddir)/pyext/ctools/*_wrap.cpp
-	rm -rf $(top_builddir)/pyext/ctools/_tools.so
+	rm -rf $(top_builddir)/pyext/ctools/_tools*.so
 	rm -rf $(top_builddir)/pyext/ctools/__pycache__
 
 endif # WITH_PYTHON

@@ -83,6 +83,9 @@ General parameters
 ``(max_iter = 50) [integer]``
     Maximum number of fit iterations.
 
+``(fix_spat = no) [boolean]``
+    Fix spatial parameters for TS map computation.
+
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for map centre instead of xref/yref parameters?
 

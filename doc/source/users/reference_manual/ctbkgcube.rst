@@ -24,8 +24,9 @@ the ``incube`` parameter.
 
 :ref:`ctbkgcube` generates a background cube FITS file comprising two extensions.
 The primary extension contains a 3-dimensional image that contains the 
-background cube values. The next extension named ``EBOUNDS`` contains a
-binary table that defines the energy boundaries of the background cube.
+background cube values. The values are in units of MeV**(-1) s**(-1) sr**(-1).
+The next extension named ``EBOUNDS`` contains a binary table that defines the
+energy boundaries of the background cube.
 
 :ref:`ctbkgcube` generates also an output model XML file that can serve as input 
 for a maximum likelihood analysis. The output model XML file is a copy of

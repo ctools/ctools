@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctcubemask - Cube filter tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2017 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2022 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -59,7 +59,7 @@ public:
 
     // Methods
     void clear(void);
-    void run(void);
+    void process(void);
     void save(void);
     void publish(const std::string& name = "");
 

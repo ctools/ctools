@@ -7,7 +7,7 @@ A central element of any data analysis is the modeling of the observed
 event distribution.
 Generally, the measured events can be separated into two distinct classes:
 events being attributed to gamma rays of celestial origin (the "source" 
-events) or events being attributed to any other kind of trigger (the 
+events) and events being attributed to any other kind of trigger (the
 "background" events).
 In the first case, the :ref:`Instrument Response Functions (IRFs) <um_irf>`
 describe how an incident gamma-ray converts into a measured event.

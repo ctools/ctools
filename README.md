@@ -1,7 +1,7 @@
 ctools information
 ==================
-* Version:             1.7.0.dev (29 May 2019)
-* GammaLib dependency: 1.7.0.dev
+* Version:             2.0.0.dev (1 June 2022)
+* GammaLib dependency: 2.0.0.dev
 
 [![Build Status](https://cta-jenkins.irap.omp.eu/buildStatus/icon?job=ctools-integrate-os)](https://cta-jenkins.irap.omp.eu/job/ctools-integrate-os/)
 
@@ -31,44 +31,54 @@ See the files [NEWS](NEWS) and [ChangeLog](ChangeLog).
 
 What are the ctools anyway?
 ===========================
-ctools are ftools-like executable for the scientific analysis of
-CTA observations.  They are based on GammaLib, a versatile toolbox 
-for the high-level analysis of astronomical gamma-ray data.
+ctools is a software package for the scientific analysis of astronomical
+gamma-ray data. The software comprises an extensive set of tools for 
+the analysis of data from existing and future Cherenkov telescopes, 
+including H.E.S.S., VERITAS, MAGIC and CTA. ctools supports also the 
+analysis of data from CGRO/COMPTEL, Fermi/LAT and INTEGRAL/SPI, 
+enabling the exploration of the full gamma-ray energy band, spanning 
+from hundreds of keV to hundreds of TeV.
 
-The following tools are available:
+The following tools and scripts are generic analysis utilities:
 
-    ctbin       - event binning
-    ctbkgcube   - generate a background cube
-    ctbutterfly - create a butterfly
-    ctcubemask  - mask bins in binned analysis
-    ctedispcube - generate energy dispersion cube
-    cterror     - likelihood profile error estimation
-    ctexpcube   - generate an exposure cube
-    ctfindvar   - search for source variability
-    ctlike      - maximum likelihood model fitting
-    ctmapcube   - generate sky map cube
-    ctmodel     - generation of model counts map
-    ctobssim    - simulation of CTA observations
-    ctphase     - computes the phase of each event
-    ctprob      - computes event probability for a given model
-    ctpsfcube   - generate a PSF cube
-    ctselect    - event selection
-    ctskymap    - CTA sky mapping tool
-    cttsmap     - generate a TS map
-    ctulimit    - compute upper limits
-
-The following scripts are available:
-
-    csbkgmodel    - generates background model for 3D analysis
+    ctbutterfly   - create a butterfly
+    cterror       - likelihood profile error estimation
+    ctmapcube     - generate sky map cube
+    ctlike        - maximum likelihood model fitting
+    cttsmap       - generate a TS map
+    ctulimit      - compute upper limits
     cscaldb       - lists available instrument response functions
-    csebins       - generates energy boundaries for stacked analysis
+    csinfo        - checks ctools and GammaLib installations
     cslightcrv    - computes light curve
     csmodelinfo   - shows model container content
     csmodelmerge  - merges several model containers into one file
     csmodelselect - select models from model definition file
     csmodelsois   - generate map cube from subset of models
-    csobsdef      - generates observation definition file
     csobsinfo     - shows observation container content
+    csspec        - computes spectral points
+    cstsdist      - generates Test Statistic distribution
+    cstsmapmerge  - merges slices from Test Statistic map computations
+    cstsmapsplit  - creates commands to split the Test Statistic map computations
+    csworkflow    - run an analysis workflow
+
+The following tools and script support the analysis of CTA and IACT data:
+
+    ctbin         - event binning
+    ctcubemask    - mask bins in binned analysis
+    ctexpcube     - generate an exposure cube
+    ctpsfcube     - generate a PSF cube
+    ctedispcube   - generate energy dispersion cube
+    ctbkgcube     - generate a background cube
+    ctfindvar     - search for source variability
+    ctmodel       - generation of model counts map
+    ctobssim      - simulation of CTA observations
+    ctphase       - computes the phase of each event
+    ctprob        - computes event probability for a given model
+    ctselect      - event selection
+    ctskymap      - Sky mapping tool
+    csbkgmodel    - generates background model for 3D analysis
+    csebins       - generates energy boundaries for stacked analysis
+    csobsdef      - generates observation definition file
     csobsselect   - select observations from observation definition file
     csphagen      - generates PHA, ARF, RMF files based on source/background regions
     csphasecrv    - computes phase curve
@@ -76,13 +86,31 @@ The following scripts are available:
     csresmap      - generates residual map
     csresspec     - generates residual spectrum
     csroot2caldb  - creates a caldb entry from a ROOT file
+    csscs         - Performs spectral component separation
     cssens        - computes CTA sensitivity
-    csspec        - computes spectral points
     cssrcdetect   - detects sources in sky map
-    cstsdist      - generates Test Statistic distribution
-    cstsmapmerge  - merges slices from Test Statistic map computations
-    cstsmapsplit  - creates commands to split the Test Statistic map computations
     csviscube     - computes visibility cube
+
+The following scripts support the management of an IACT database:
+
+    csobs2caldb - Creates a caldb entry from an input observation
+    csiactdata  - Shows information about IACT data available on the user machine
+    csiactobs   - Generates observation definition file for IACT data from observation IDs
+    csfindobs   - Generates a list of IACT observation IDs
+    csiactcopy  - Copies IACT data from one location to another
+
+The following scripts support COMPTEL science analysis:
+
+    comlixfit    - Fit model to data using SRCLIX algorithm
+    comlixmap    - Create TS map using SRCLIX algorithm
+    comobsadd    - Combine observations
+    comobsback   - Generate background model for COMPTEL observations
+    comobsbin    - Bin COMPTEL observations
+    comobsmodel  - Generate model for binned COMPTEL observations
+    comobsres    - Generate residuals of COMPTEL observations
+    comobsselect - Select observations from COMPTEL database
+    comobssim    - Simulate COMPTEL observations
+    comsrcdetect - Detect source in TS map
 
 
 Web sites
@@ -97,7 +125,7 @@ ctools require GammaLib.  Please refer to http://cta.irap.omp.eu/gammalib
 for instructions about how to install GammaLib.
 
 Once GammaLib is properly installed, make sure that you added the setup
-script to your .bashrc or $HOME/.profile script:
+script to your `.bashrc` or `$HOME/.profile` script:
 
     export GAMMALIB=/usr/local/gamma
     source $GAMMALIB/bin/gammalib-init.sh
@@ -108,7 +136,7 @@ If you use C shell or a variant then add the following to your
     setenv GAMMALIB /usr/local/gamma
     source $GAMMALIB/bin/gammalib-init.csh
 
-If you have installed GammaLib in another directory than /usr/local/gamma,
+If you have installed GammaLib in another directory than `/usr/local/gamma`,
 please adapt the path correspondingly.
 
 If you really insist, you may install ctools in a directory different to
@@ -122,83 +150,96 @@ The easiest is to install ctools via conda.  This also takes care of the
 installation of GammaLib.  Assuming that you have installed anaconda, type
 the following:
 
-     $ conda config --append channels conda-forge
-     $ conda config --append channels cta-observatory
-     $ conda install ctools
+    $ conda config --append channels conda-forge
+    $ conda config --append channels cta-observatory
+    $ conda install ctools
 
 
-Unix Installation
-=================
+Linux Installation
+==================
 To build and install ctools, simply type the following:
 
-     $ ./configure
-     $ make
-     $ make install
+    $ ./configure
+    $ make
+    $ make check
+    $ make install
 
-By default ctools installs itself in /usr/local/gamma.  If you need to
+If the folder does not contain any `configure` file, please run
+
+    $ ./autogen.sh 
+
+before invoking `configure`.
+
+By default ctools installs itself in `/usr/local/gamma`.  If you need to
 install ctools in a different location or in your home directory, use
-the --prefix option to ./configure.  For example:
+the `--prefix` option to `./configure`.  For example:
 
-     $ ./configure --prefix=/home/yourname/projects
-     $ make
-     $ make install
+    $ ./configure --prefix=/home/yourname/projects
+    $ make
+    $ make check
+    $ make install
 
 The file INSTALL details more about using configure. Also try
 
-     $ ./configure --help.
+    $ ./configure --help.
+
+The `make check` command will run an extensive unit test to verify that
+ctools was correctly built.  Make sure that all tests were successful. 
 
 
-Macintosh OS X Installation
-============================
-ctools is known to work on various flavors of OS X.  To cope with
-different system versions and architectures, there are two Mac
-specific configure options:
+Macintosh OS Installation
+==========================
+ctools builds and installs seamlessly on all Mac OS starting from at least Mac
+OS 10.6.
 
-     $ ./configure --enable-universalsdk[=PATH]
+On older systems you may use Mac specific configure options:
+
+    $ ./configure --enable-universalsdk[=PATH]
 
 creates a universal build of ctools.  The optional argument specifies
-which OSX SDK should be used to perform the build.  This defaults to
-"/Developer/SDKs/MacOSX.10.4u.sdk".  Specify "/" when building on a 10.5
+which MacOS SDK should be used to perform the build.  This defaults to
+`/Developer/SDKs/MacOSX.10.4u.sdk`.  Specify `/` when building on a 10.5
 system or higher, especially when building 64-bit code.
 
-     $ ./configure --with-univeral-archs=VALUE
+    $ ./configure --with-univeral-archs=VALUE
 
 specifies the kind of universal build that should be created.  Possible
-values are: "32-bit", "3-way", "intel" or "all".  By default, a "32-bit" 
+values are: `32-bit`, `3-way`, `intel` or `all`.  By default, a `32-bit` 
 build will be made.  This option is only valid when
-"--enable-universalsdk" is specified.
+`--enable-universalsdk` is specified.
 
 These options are in particular needed if your Python architecture differs
 from the default architecture of your system.  To examine the Python
 architecture you may type:
 
-     $ file `which python`
+    $ file `which python`
 
 which will return the architectures that are compiled in the Mach-0
 executable:
 
-     i386    32-bit intel
-     ppc     32-bit powerpc
-     ppc64   64-bit powerpc
-     x86_64  64-bit intel
+    i386    32-bit intel
+    ppc     32-bit powerpc
+    ppc64   64-bit powerpc
+    x86_64  64-bit intel
 
 If Python is 32-bit (ppc, i386) but the compiler produces by default
 64-bit code (ppc64, x86_64), the Python module will not work.  Using
 
-     $ ./configure --enable-universalsdk=/
+    $ ./configure --enable-universalsdk=/
 
 will force a universal 32-bit build which creates code for ppc and 
 i386.  If on the other hand Python is 64-bit (ppc64, x86_64) but the
 compiler produces by default 32-bit code (ppc, i386), the option
 
-     $ ./configure --enable-universalsdk=/ --with-univeral-archs=3-way
+    $ ./configure --enable-universalsdk=/ --with-univeral-archs=3-way
 
 will generate a universal build which contains 32-bit and 64-bit code.
 
 
 BSD Installation
 ================
-ctools has been tested on FreeBSD successfully.  Follow the Linux
+ctools has been successfully installed on FreeBSD.  Make sure that you
+use `gmake` for building of the software.  Otherwise follow the Linux
 installation instructions above.
 
 
@@ -210,14 +251,15 @@ shared library (see "Known problems" below).
 
 Windows Installation
 ====================
-There have been no efforts so far to compile ctools under Windows.
+On Windows ctools needs to be installed into a virtual machine running
+a Linux distribution.
 
 
 Testing
 =======
 If you want to test ctools before installation, type the following:
 
-     $ make check
+    $ make check
 
 
 Setting up your environment
@@ -251,7 +293,7 @@ The doc directory (usually at /usr/local/gamma/share/doc/ctools)
 contains the most recent set of updated documentation for this release.
 A detailed documentation can be created by typing:
 
-     $ make doc
+    $ make doc
 
 before installing the library. Two types of documentation exist:
 * code documentation
@@ -285,7 +327,7 @@ problems with global symbols in the shared GammaLib library that prevent
 the model registry to work correctly.  Furthermore, GammaLib is not able
 to catch its own exceptions, which prevents the FITS interface to work
 correctly.  Possible it will work using gcc on Solaris, yet this has not
-so far been tested.
+been tested so far.
 
 
 Contact

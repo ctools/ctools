@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools package                                               #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2021 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -23,7 +23,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 # Subdirectories
-SUBDIRS = src pyext test caldb models examples cscripts
+SUBDIRS = src pyext test caldb models modules examples cscripts
 
 # Pkgconfig directory
 pkgconfigdir = $(libdir)/pkgconfig
@@ -33,9 +33,11 @@ pkgconfig_DATA = ctools.pc
 
 # Conda activate directory
 condaactivatedir = $(sysconfdir)/conda/activate.d
-condaactivate_DATA = dev/01-ctools-activate.sh
+condaactivate_DATA = dev/01-ctools-activate.sh \
+                     dev/01-ctools-activate.csh
 condadeactivatedir = $(sysconfdir)/conda/deactivate.d
-condadeactivate_DATA = dev/00-ctools-deactivate.sh
+condadeactivate_DATA = dev/00-ctools-deactivate.sh \
+                       dev/00-ctools-deactivate.csh
 
 # Manual pages to install
 man_MANS = 
@@ -55,6 +57,7 @@ EXTRA_DIST = README.md \
              doc/Doxyfile doc/source \
              dev/testreport.py \
              dev/01-ctools-activate.sh dev/00-ctools-deactivate.sh \
+             dev/01-ctools-activate.csh dev/00-ctools-deactivate.csh \
              dev/conda.recipe/build.sh \
              dev/conda.recipe/conda_build_config.yaml \
              dev/conda.recipe/meta.yaml.in
@@ -161,6 +164,8 @@ dynamic-analysis: coverage valgrind
 cppcheck:
 	@if type cppcheck >/dev/null 2>&1; then \
 		cppcheck -v --enable=all --xml --xml-version=2 \
+        --suppress=missingIncludeSystem --check-config \
+        -Isrc/support -I$(INCDIR_GAMMALIB) \
 		src 2> cppcheck-result.xml; \
 	else \
 		echo "cppcheck not found in PATH."; \
@@ -209,11 +214,21 @@ valgrind:
 # Add science verification rule
 science-verification:
 	@if type test/science_verification.py >/dev/null 2>&1; then \
-	    cd test; \
-	    ./science_verification.py; \
-	    cd ..; \
+		cd test; \
+		./science_verification.py; \
+		cd ..; \
 	else \
 		echo "science_verification.py not found in test."; \
+	fi
+
+# Add tutorials verification rule
+check-tutorials:
+	@if type test/tutorials.py >/dev/null 2>&1; then \
+		cd test; \
+		./tutorials.py; \
+		cd ..; \
+	else \
+		echo "tutorials.py not found in test."; \
 	fi
 
 # Add Sphinx rule

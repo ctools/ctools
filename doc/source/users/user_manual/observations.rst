@@ -3,8 +3,8 @@
 Combining observations
 ----------------------
 
-Data taking by IACTs is typically split into so-called *runs*, which we refer
-here to *observations*. You typically want to combine these observations so
+Data taking by telescope is typically split into observations (sometimes called
+*runs* for IACTs). You typically want to combine these observations so
 that all data available for a source are used for the analysis. There are two
 basic methods how the combination can be done: either by listing all
 observations to perform a joint analysis, or by combining all observations
@@ -149,12 +149,14 @@ Stacked data analysis
 
 To speed-up the computations, binned observations can be stacked together,
 requiring the computation of average response functions that properly weight
-the individual instrument response functions for each observation. Stacking
-of observations is possible for binned counts cubes and On/Off spectra.
+the individual instrument response functions for each observation. For IACT
+analysis, stacking of observations is possible for binned counts cubes and
+On/Off spectra. For COMPTEL data analysis, stacking is performed using the
+:ref:`comobsadd` script.
 
 
-Stacked counts cubes
-~~~~~~~~~~~~~~~~~~~~
+Stacked IACT counts cubes
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, :ref:`ctbin` stacks the events from multiple observations into
 a single counts cube (to produce counts cubes for each individual observation,
@@ -217,8 +219,8 @@ The files for a stacked binned observation are specified as follows in an
 (the ``EdispCube`` parameter is optional).
 
 
-Stacked On/Off spectra
-~~~~~~~~~~~~~~~~~~~~~~
+Stacked IACT On/Off spectra
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, :ref:`csphagen` creates On/Off spectra and response information
 for each individual observation, but executing :ref:`csphagen` with the
@@ -270,4 +272,30 @@ On/Off observation has the same format as for a single On/Off observation:
        <parameter name="Rmf"     file="onoff_stacked_rmf.fits" />
      </observation>
    </observation_list>
+
+
+Stacked COMPTEL data space
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can stack binned COMPTEL observations using the :ref:`comobsadd` script.
+Binned event data are stacked using
+
+.. math::
+   {\tt DRE}(\chi, \psi, \bar{\varphi}|\{E\}) = \sum_i {\tt DRE}_i(\chi, \psi, \bar{\varphi}|\{E\})
+
+the background models are stacked using
+
+.. math::
+   {\tt DRB}(\chi, \psi, \bar{\varphi}|\{E\}) = \sum_i {\tt DRB}_i(\chi, \psi, \bar{\varphi}|\{E\})
+
+the exposures are stacked by determining the maximum of the sum of all exposures using
+
+.. math::
+   {\tt DRX}(\alpha, \delta) = \sum_i \max_{\alpha',\delta'} {\tt DRX}_i(\alpha', \delta')
+
+and the geometries are stacked by weighting with the respective exposure time for
+individual observations using
+
+.. math::
+   {\tt DRG}(\chi, \psi, \bar{\varphi}) = \frac{1}{T} \sum_i T_i \, {\tt DRG}_i(\chi, \psi, \bar{\varphi})
 

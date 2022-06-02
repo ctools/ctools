@@ -1,7 +1,7 @@
 # ==========================================================================
 # cscripts Python module
 #
-# Copyright (C) 2015-2018 Juergen Knoedlseder
+# Copyright (C) 2015-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,9 +24,11 @@ cur_version = sys.version_info
 
 # List all scripts in this module
 __all__ = [
+    "csadd2caldb",
     "csbkgmodel",
     "cscaldb",
     "csebins",
+    "csfootprint",
     "csinfo",
     "cslightcrv",
     "csmodelinfo",
@@ -50,6 +52,7 @@ __all__ = [
     "cstsmapmerge",
     "cstsmapsplit",
     "csviscube",
+    "csscs",
     "csworkflow",
     "obsutils",
     "modutils",
@@ -64,6 +67,7 @@ if cur_version > req_version:
                     "csiactobs"])
 
 # Import
+from cscripts.csadd2caldb   import csadd2caldb
 from cscripts.csbkgmodel    import csbkgmodel
 from cscripts.cscaldb       import cscaldb
 from cscripts.csebins       import csebins
@@ -90,6 +94,8 @@ from cscripts.cstsdist      import cstsdist
 from cscripts.cstsmapmerge  import cstsmapmerge
 from cscripts.cstsmapsplit  import cstsmapsplit
 from cscripts.csviscube     import csviscube
+from cscripts.csscs         import csscs
+from cscripts.csfootprint    import csfootprint
 from cscripts.csworkflow    import csworkflow
 from cscripts               import obsutils
 from cscripts               import modutils
@@ -116,3 +122,4 @@ def test():
 
 # Add version
 __version__ = '@PACKAGE_VERSION@'
+

@@ -7,8 +7,10 @@ Modelling the data
    :maxdepth: 1
 
    models_concept
-   models_implementation
-   models_spatial_src
-   models_spatial_bgd
+   models_source
+   models_spatial
    models_spectral
    models_temporal
+   models_bgd_iact
+   models_bgd_comptel
+   models_bgd_spi

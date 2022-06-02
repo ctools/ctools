@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generation of an observation definition file
 #
-# Copyright (C) 2015-2018 Juergen Knoedlseder
+# Copyright (C) 2015-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,20 +35,21 @@ class csobsdef(ctools.cscript):
     pointing per row). The following header keywords are supported (case
     sensitive, column order irrelevant):
 
-    name     - Observation name string
-    id       - Unique observation identifier string
-    ra       - Right Ascension of pointing (deg)
-    dec      - Declination of pointing (deg)
-    lon      - Galactic longitude of pointing (deg)
-    lat      - Galactic latitude of pointing (deg)
-    tmin     - Start of pointing (seconds)
-    duration - Duration of pointing (seconds)
-    emin     - Lower energy limit (TeV)
-    emax     - Upper energy limit (TeV)
-    rad      - Radius of region of interest (deg)
-    deadc    - Deadtime correction factor [0-1]
-    caldb    - Calibration database
-    irf      - Response function name
+    name       - Observation name string
+    id         - Unique observation identifier string
+    ra         - Right Ascension of pointing (deg)
+    dec        - Declination of pointing (deg)
+    lon        - Galactic longitude of pointing (deg)
+    lat        - Galactic latitude of pointing (deg)
+    tmin       - Start of pointing (seconds)
+    duration   - Duration of pointing (seconds)
+    emin       - Lower energy limit (TeV)
+    emax       - Upper energy limit (TeV)
+    rad        - Radius of region of interest (deg)
+    deadc      - Deadtime correction factor [0-1]
+    instrument - Name of Cherenkov telescope
+    caldb      - Calibration database
+    irf        - Response function name
 
     Only the pairs (ra,dec) or (lon,lat) are mandatory header keywords.
     All other keywords are optional and can be specified when calling
@@ -70,7 +71,7 @@ class csobsdef(ctools.cscript):
 
         ./csobsdef caldb=prod2 irf=South_50h
             Creates observation definition file using the "South_50h"
-            IRF in the "prod2" calibration database.
+            IRF in the "prod2" calibration database of CTA.
     """
 
     # Constructor
@@ -157,19 +158,15 @@ class csobsdef(ctools.cscript):
 
  
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
 
         Raises
         ------
         RuntimeError
             Invalid pointing definition file format
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
         # Get parameters
         self._get_parameters()
 
@@ -208,6 +205,14 @@ class csobsdef(ctools.cscript):
 
             # Create empty CTA observation
             obs = gammalib.GCTAObservation()
+
+            # Set instrument
+            if 'instrument' in header:
+                instrument = self._pntdef[row, header.index('instrument')]
+            else:
+                instrument = self['instrument'].string()
+            instrument = gammalib.toupper(instrument)
+            obs.instrument(instrument)
 
             # Set observation name. If no observation name was given then
             # use "None".

@@ -1,7 +1,7 @@
 # ==========================================================================
 # Utility functions for observation handling
 #
-# Copyright (C) 2011-2019 Juergen Knoedlseder
+# Copyright (C) 2011-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -129,6 +129,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
             phagen['emin']        = emin
             phagen['emax']        = emax
             phagen['enumbins']    = nbins
+            phagen['srcshape']    = 'CIRCLE'
             phagen['coordsys']    = 'CEL'
             phagen['ra']          = ra
             phagen['dec']         = dec
@@ -230,7 +231,8 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
 # ======================= #
 def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.98, \
             emin=0.1, emax=100.0, rad=5.0, \
-            irf='South_50h', caldb='prod2', obsid='000000', mjdref=51544.5):
+            instrument='CTA', irf='South_50h', caldb='prod2', \
+            obsid='000000', mjdref=51544.5):
     """
     Set a single CTA observation
 
@@ -254,6 +256,8 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.98, \
         Maximum event energy (TeV)
     rad : float, optional
         ROI radius used for analysis (deg)
+    instrument : str, optional
+        Name of Cherenkov Telescope
     irf : str, optional
         Instrument response function
     caldb : str, optional
@@ -269,12 +273,16 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.98, \
     # Allocate CTA observation
     obs = gammalib.GCTAObservation()
 
+    # Set mission
+    mission = gammalib.toupper(instrument)
+    obs.instrument(mission)
+
     # Set CTA calibration database
     db = gammalib.GCaldb()
     if (gammalib.dir_exists(caldb)):
         db.rootdir(caldb)
     else:
-        db.open('cta', caldb)
+        db.open(mission, caldb)
 
     # Set pointing direction for CTA observation
     pnt = gammalib.GCTAPointing()
@@ -745,7 +753,7 @@ def get_stacked_obs(cls, obs, nthreads=0):
 # ================================ #
 # Get On/Off observation container #
 # ================================ #
-def get_onoff_obs(cls, obs, nthreads=0):
+def get_onoff_obs(cls, obs, nthreads=0, ra = None, dec = None, srcname = ''):
     """
     Create On/Off observations container from given observations
 
@@ -757,6 +765,12 @@ def get_onoff_obs(cls, obs, nthreads=0):
         Observation container
     nthreads : str, optional
         Number of parallel processes for On/Off spectra computation (0=all available CPUs)
+    ra : float, optional
+        R.A. of source region centre
+    dec : float, optional
+        Dec. of source region centre
+    srcname : str, optional
+        Source name
 
     Returns
     -------
@@ -767,21 +781,16 @@ def get_onoff_obs(cls, obs, nthreads=0):
     if cls._logExplicit():
         cls._log.header3('Creating On/Off observations')
 
-    # Initialise inmodel, srcname, inexclusion and use_model_bkg
+    # Initialise inmodel and use_model_bkg
     inmodel       = 'NONE'
-    srcname       = ''
-    inexclusion   = 'NONE'
     use_model_bkg = True
 
-    # Set inmodel, srcname, inexclusion and use_model_bkg if they are available
+    # Set inmodel, srcname, and use_model_bkg if they are available
     if cls.has_par('inmodel') and obs.models().size() == 0:
         if cls['inmodel'].is_valid():
             inmodel = cls['inmodel'].value()
-    if cls.has_par('srcname'):
+    if srcname == '' and cls.has_par('srcname'):
         srcname = cls['srcname'].value()
-    if cls.has_par('inexclusion'):
-        if cls['inexclusion'].is_valid():
-            inexclusion = cls['inexclusion'].value()
     if cls.has_par('use_model_bkg'):
         use_model_bkg = cls['use_model_bkg'].boolean()
 
@@ -789,21 +798,31 @@ def get_onoff_obs(cls, obs, nthreads=0):
     phagen = cscripts.csphagen(obs)
     phagen['inmodel']     = inmodel
     phagen['srcname']     = srcname
-    phagen['inexclusion'] = inexclusion
     phagen['emin']        = cls['emin'].real()
     phagen['emax']        = cls['emax'].real()
     phagen['enumbins']    = cls['enumbins'].integer()
     phagen['ebinalg']     = 'LOG'
     phagen['srcshape']    = cls['srcshape'].string()
-    phagen['coordsys']    = cls['coordsys'].string()
-    if cls['coordsys'].string() == 'CEL':
-        phagen['ra']  = cls['xref'].real()
-        phagen['dec'] = cls['yref'].real()
-    elif cls['coordsys'].string() == 'GAL':
-        phagen['glon'] = cls['xref'].real()
-        phagen['glat'] = cls['yref'].real()
+    # User has specified custom centre for the source region
+    if ra != None and dec != None:
+        phagen['coordsys'] = 'CEL'
+        phagen['ra']       = ra
+        phagen['dec']      = dec
+    # Otherwise use default in class
+    else:
+        phagen['coordsys']    = cls['coordsys'].string()
+        if cls['coordsys'].string() == 'CEL':
+            phagen['ra']  = cls['xref'].real()
+            phagen['dec'] = cls['yref'].real()
+        elif cls['coordsys'].string() == 'GAL':
+            phagen['glon'] = cls['xref'].real()
+            phagen['glat'] = cls['yref'].real()
     if cls['srcshape'].string() == 'CIRCLE':
         phagen['rad'] = cls['rad'].real()
+    elif cls['srcshape'].string() == 'RECT':
+        phagen['width']  = cls['width'].real()
+        phagen['height'] = cls['height'].real()
+        phagen['posang'] = cls['posang'].real()
     phagen['bkgmethod'] = cls['bkgmethod'].string()
     if cls['bkgmethod'].string() == 'REFLECTED':
         phagen['bkgregmin'] = cls['bkgregmin'].integer()
@@ -818,13 +837,37 @@ def get_onoff_obs(cls, obs, nthreads=0):
     phagen['debug']         = cls['debug'].boolean()
     phagen['nthreads']      = nthreads
 
-    # Pipe exclusion map
+    # Set exclusion map
+    # Initialise exclusion map flag to False
+    use_excl_map = False
+    # Initialise inexclusion par flag to False
+    use_inexclusion = False
+    # Do we have valid exclusion map in memory?
     if hasattr(cls, 'exclusion_map'):
         exclusion_map = cls.exclusion_map()
         if exclusion_map is not None:
+            # Set use exclusion map flag to True
+            use_excl_map = True
+            # Set exclusion map
             phagen.exclusion_map(exclusion_map)
+    # If we do not have valid exclusion map in memory ...
+    if not use_excl_map:
+        # ... do we have an inxeclusion parameter?
+        if cls.has_par('inexclusion'):
+            # If the inexclusion parameter is valid
+            if cls['inexclusion'].is_valid():
+                # Set use inexclusion flag to True
+                use_inexclusion = True
+                # Set inexclusion parameter
+                inexclusion = cls['inexclusion'].value()
+                phagen['inexclusion'] = inexclusion
+    # If there is no valid exclusion map in memory
+    # nor valid inexclusion parameter
+    if not use_excl_map and not use_inexclusion:
+        # Set inexclusion for csphagen to None
+        phagen['inexclusion'] = 'NONE'
 
-	# Run csphagen
+    # Run csphagen
     phagen.run()
 
     # Clone resulting observation container
@@ -866,8 +909,6 @@ def residuals(cls, counts, model):
         Residuals
     """
     # Find type of objects we are manipulating and set size to iterate later
-
-    # If GNdarray
     if counts.classname() == 'GNdarray':
         nelem = counts.size()
     elif counts.classname() == 'GSkyMap':
@@ -916,6 +957,8 @@ def residuals(cls, counts, model):
                 if data_val > 0.0:
                     log_val      = math.log(data_val / model_val)
                     residuals[i] = (data_val * log_val) + model_val - data_val
+                    if residuals[i] < 0.0:   # See glitch issue #2765
+                        residuals[i] = 0.0
 
                 # ... otherwise compute the reduced value of the above
                 # expression. This is necessary to avoid computing log(0).
@@ -976,6 +1019,8 @@ def create_counts_cube(cls, obs):
         ctbin['enumbins'] = cls['enumbins'].integer()
         ctbin['emin']     = cls['emin'].real()
         ctbin['emax']     = cls['emax'].real()
+        if cls['ebinalg'].string() == 'POW':
+            ctbin['ebingamma'] = cls['ebingamma'].real()
     ctbin['chatter']  = cls['chatter'].integer()
     ctbin['clobber']  = cls['clobber'].boolean()
     ctbin['debug']    = cls['debug'].boolean()

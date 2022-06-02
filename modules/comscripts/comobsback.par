@@ -1,0 +1,42 @@
+#############################################################################
+#                                                                           #
+#                     COMPTEL Science Analysis Tools                        #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      comobsback.par                                                #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the comobsback script                      #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,     f, a, obs.xml,,, "Input observation definition file"
+inmodel,   f, a, models.xml,,, "Input model definition file"
+suffix,    s, h, ,,, "Suffix for DRB files"
+outfolder, s, h, dri,,, "Output folder for DRB files"
+outobs,    f, a, obs_back.xml,,, "Output observation definition file"
+
+#
+# Script parameters
+#==================
+bkgmethod, s, a, BGDLIXE,PHINOR|BGDLIXA|BGDLIXE,, "Method for background computation"
+nrunav,    i, h, 3,,, "Number of Chi/Psi bins used for running average"
+navgr,     i, h, 5,,, "Number of Chi/Psi bins used for averaging"
+nincl,     i, h, 15,,, "Number of Phibar layers to include"
+nexcl,     i, h, 0,,, "Number of Phibar layers to exclude"
+phinor,    b, h, yes,,, "Normalise Phibar distribution?"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Activate debugging mode?"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, comobsback.log,,, "Log filename"

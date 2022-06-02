@@ -1,0 +1,75 @@
+.. _2.0:
+
+ctools 2.0 release (25 May 2022)
+================================
+
+Overview
+--------
+
+ctools 2.0 is a major release that adds significant functionality.
+
+In particular, this release provides:
+
+* Analysis scripts for the science analysis of COMPTEL data
+* Tracking of the carbon footprint of the ctools usage
+* Storing of model fitting results in XML model definition result files
+
+
+Bug fixes
+---------
+
+* [`3426 <https://cta-redmine.irap.omp.eu/issues/3426>`_] -
+  Fix implementation of ``fix_spat_for_ts`` parameter in :ref:`ctlike`
+
+
+Improvements
+------------
+
+* [`4058 <https://cta-redmine.irap.omp.eu/issues/4058>`_] -
+  Add support for ASTRI instrument
+* [`4006 <https://cta-redmine.irap.omp.eu/issues/4006>`_] -
+  Allow determination of upper limits on spatial parameters in :ref:`ctulimit`
+* Add methods to access :ref:`ctlike` attributes
+* Add restart of bisection in case of bad convergence in :ref:`ctulimit`
+* [`3725 <https://cta-redmine.irap.omp.eu/issues/3725>`_] -
+  Add confidence parameter to :ref:`csspec` and :ref:`cslightcrv`
+* [`3662 <https://cta-redmine.irap.omp.eu/issues/3662>`_] -
+  Stamp all output FITS files
+* [`3668 <https://cta-redmine.irap.omp.eu/issues/3668>`_] -
+  Add source counts constraints to :ref:`cssens`
+* [`3630 <https://cta-redmine.irap.omp.eu/issues/3630>`_] -
+  Add ASCL shields to **About** page
+* [`3626 <https://cta-redmine.irap.omp.eu/issues/3626>`_] -
+  Use file function constructor in csspec
+* [`3606 <https://cta-redmine.irap.omp.eu/issues/3606>`_] -
+  Add ``BINS`` method to :ref:`csspec`
+* [`3592 <https://cta-redmine.irap.omp.eu/issues/3592>`_] -
+  Rename virtual abstract :doxy:`ctool::run` method to :doxy:`ctool::process` and add non-abstract :doxy:`ctool::run` method
+* [`3562 <https://cta-redmine.irap.omp.eu/issues/3562>`_] -
+  Add hidden ``fix_spat`` parameter to :ref:`cttsmap`
+* [`3555 <https://cta-redmine.irap.omp.eu/issues/3555>`_] -
+  Use test source position in :ref:`cssens`
+* Add optimizer setter to :doxy:`ctlikelihood` base class.
+* Add ``refit_if_failed`` parameter to :ref:`ctlike`
+* [`3441 <https://cta-redmine.irap.omp.eu/issues/3441>`_] -
+  Add :doxy:`ctobssim::models` method
+* [`3431 <https://cta-redmine.irap.omp.eu/issues/3431>`_] -
+  Add :ref:`ctlike` results to XML file
+* [`3324 <https://cta-redmine.irap.omp.eu/issues/3324>`_] -
+  Replace :doxy:`std::tmpnam` by :doxy:`gammalib::tmpnam` function in :ref:`ctselect`
+* [`3324 <https://cta-redmine.irap.omp.eu/issues/3324>`_] -
+  Remove implicit conversion warnings
+* [`1707 <https://cta-redmine.irap.omp.eu/issues/1707>`_] -
+  Replace ASCII output files by FITS files
+
+
+New features
+------------
+
+* [`3983 <https://cta-redmine.irap.omp.eu/issues/3983>`_] -
+  Add :ref:`comgendb` script
+* [`3738 <https://cta-redmine.irap.omp.eu/issues/3738>`_] -
+  Add COMPTEL analysis scripts
+* Add :ref:`csadd2caldb` script
+* [`3592 <https://cta-redmine.irap.omp.eu/issues/3592>`_] -
+  Add :ref:`csfootprint` script

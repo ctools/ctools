@@ -14,19 +14,20 @@ pointing list is a comma-separated value (CSV) ASCII file with header keywords
 in the first row followed by a list of pointings (one pointing per row). The
 following header keywords are supported (case sensitive, column order irrelevant):
 
-- name     - Observation name string
-- id       - Unique observation identifier string
-- ra       - Right Ascension of pointing (deg)
-- dec      - Declination of pointing (deg)
-- lon      - Galactic longitude of pointing (deg)
-- lat      - Galactic latitude of pointing (deg)
-- duration - Duration of pointing (seconds)
-- emin     - Lower energy limit (TeV)
-- emax     - Upper energy limit (TeV)
-- rad      - Radius of region of interest (deg)
-- deadc    - Deadtime correction factor [0-1]
-- caldb    - Calibration database
-- irf      - Response function name
+- name       - Observation name string
+- id         - Unique observation identifier string
+- ra         - Right Ascension of pointing (deg)
+- dec        - Declination of pointing (deg)
+- lon        - Galactic longitude of pointing (deg)
+- lat        - Galactic latitude of pointing (deg)
+- duration   - Duration of pointing (seconds)
+- emin       - Lower energy limit (TeV)
+- emax       - Upper energy limit (TeV)
+- rad        - Radius of region of interest (deg)
+- deadc      - Deadtime correction factor [0-1]
+- instrument - Name of Cherenkov Telescope
+- caldb      - Calibration database
+- irf        - Response function name
 
 Only the pairs (ra,dec) or (lon,lat) are mandatory header keywords. All other
 keywords are optional and can be specified when calling :ref:`csobsdef` as user
@@ -63,6 +64,9 @@ General parameters
 
 ``(name = None) [string]``
     Observation name.
+
+``(instrument = CTA) [string]``
+    Name of Cherenkov telescope.
 
 ``(caldb = "") [string]``
     Calibration database.

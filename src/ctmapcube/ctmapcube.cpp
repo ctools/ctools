@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmapcube - Map cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -182,13 +182,8 @@ void ctmapcube::clear(void)
  * This method reads the task parameters from the parfile and generates the
  * map cube.
  ***************************************************************************/
-void ctmapcube::run(void)
+void ctmapcube::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 
@@ -231,6 +226,8 @@ void ctmapcube::save(void)
         // Save map cube
         m_cube.save(m_outcube, clobber());
 
+        // Stamp map cube
+        stamp(m_outcube);
     }
 
     // Write into logger what has been done

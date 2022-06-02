@@ -86,10 +86,10 @@ Power law
   .. code-block:: xml
 
     <spectrum type="PowerLaw">
-      <parameter scale="1e-07" name="PhotonFlux" min="1e-07" max="1000.0"    value="1.0" free="1"/>
-      <parameter scale="1.0"   name="Index"      min="-5.0"  max="+5.0"      value="-2.0" free="1"/>
-      <parameter scale="1.0"   name="LowerLimit" min="10.0"  max="1000000.0" value="100.0" free="0"/>
-      <parameter scale="1.0"   name="UpperLimit" min="10.0"  max="1000000.0" value="500000.0" free="0"/>
+      <parameter name="PhotonFlux" scale="1e-07" value="1.0"      min="1e-07" max="1000.0"    free="1"/>
+      <parameter name="Index"      scale="1.0"   value="-2.0"     min="-5.0"  max="+5.0"      free="1"/>
+      <parameter name="LowerLimit" scale="1.0"   value="100.0"    min="10.0"  max="1000000.0" free="0"/>
+      <parameter name="UpperLimit" scale="1.0"   value="500000.0" min="10.0"  max="1000000.0" free="0"/>
     </spectrum>
 
   This spectral model component implements the power law function
@@ -202,11 +202,11 @@ Super exponentially cut-off power law
   .. code-block:: xml
 
     <spectrum type="PLSuperExpCutoff">
-      <parameter name="Prefactor"   scale="1e-16" value="1.0" min="1e-07" max="1000.0" free="1"/>
-      <parameter name="Index1"      scale="-1"    value="2.0" min="0.0"   max="+5.0"   free="1"/>
-      <parameter name="Cutoff"      scale="1e6"   value="1.0" min="0.01"  max="1000.0" free="1"/>
-      <parameter name="Index2"      scale="1.0"   value="1.5" min="0.1"   max="5.0"    free="1"/>
-      <parameter name="Scale"       scale="1e6"   value="1.0" min="0.01"  max="1000.0" free="0"/>
+      <parameter name="Prefactor" scale="1e-16" value="1.0" min="1e-07" max="1000.0" free="1"/>
+      <parameter name="Index1"    scale="-1"    value="2.0" min="0.0"   max="+5.0"   free="1"/>
+      <parameter name="Cutoff"    scale="1e6"   value="1.0" min="0.01"  max="1000.0" free="1"/>
+      <parameter name="Index2"    scale="1.0"   value="1.5" min="0.1"   max="5.0"    free="1"/>
+      <parameter name="Scale"     scale="1e6"   value="1.0" min="0.01"  max="1000.0" free="0"/>
     </spectrum>
 
 
@@ -381,7 +381,7 @@ File function
   .. code-block:: xml
 
      <spectrum type="FileFunction" file="data/filefunction.txt">
-       <parameter scale="1.0" name="Normalization" min="0.0" max="1000.0" value="1.0" free="1"/>
+       <parameter name="Normalization" scale="1.0" value="1.0" min="0.0" max="1000.0" free="1"/>
      </spectrum>
 
   This spectral model component implements an arbitrary function
@@ -444,6 +444,146 @@ Node function
      ordering.
 
 
+Bin function
+^^^^^^^^^^^^
+
+  .. code-block:: xml
+
+     <spectrum type="BinFunction">
+       <parameter name="Index" scale="-1" value="2.48" min="0.0" max="+5.0" free="0"/>
+       <bin>
+         <parameter scale="1.0"   name="LowerLimit" min="0.1"   max="1.0e20" value="0.75" free="0"/>
+         <parameter scale="1.0"   name="UpperLimit" min="0.1"   max="1.0e20" value="1.0"  free="0"/>
+         <parameter scale="1e-07" name="Intensity"  min="1e-07" max="1000.0" value="1.0"  free="1"/>
+       </bin>
+       <bin>
+         <parameter scale="1.0"   name="LowerLimit" min="0.1"   max="1.0e20" value="1.0"  free="0"/>
+         <parameter scale="1.0"   name="UpperLimit" min="0.1"   max="1.0e20" value="3.0"  free="0"/>
+         <parameter scale="1e-07" name="Intensity"  min="1e-07" max="1000.0" value="0.5"  free="1"/>
+       </bin>
+     </spectrum>
+
+  This spectral model component implements energy bins defined by ``LowerLimit`` and
+  ``UpperLimit`` values given in units of :math:`{\rm MeV}`. Within an energy bin the
+  intensity follows a power law with spectral index defined by the ``Index`` parameter.
+  Intensities are given in units of
+  :math:`{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}`
+  and are specified for the logarithmic bin centre.
+
+
+Table model
+^^^^^^^^^^^
+
+  An arbitrary spectral model defined on a M-dimensional grid of parameter
+  values. The spectrum is computed using M-dimensional linear interpolation.
+  The model definition is provided by a FITS file that follows the
+  `HEASARC OGIP standard <https://heasarc.gsfc.nasa.gov/docs/heasarc/ofwg/docs/general/ogip_92_009/ogip_92_009.html>`_.
+
+  The structure of the table model FITS file is shown below. The FITS file
+  contains three binary table extensions after an empty image extension.
+
+  .. _fig_model_table:
+
+  .. figure:: model_table.png
+     :align: center
+     :width: 100%
+
+     *Structure of table model FITS file*
+
+  The ``PARAMETERS`` extension contains the definition of the model parameters.
+  Each row defines one model parameter. Each model parameter is defined by a
+  unique ``NAME``. The ``METHOD`` column indicates whether the model should be
+  interpolated linarly (value ``0``) or logarithmically (value ``1``).
+  So far only linear interpolation is supported, hence the field is ignored.
+  The ``INITIAL`` column indicates the initial parameter value, if the value in
+  the ``DELTA`` column is negative the parameter will be fixed, otherwise it will
+  be fitted. The ``MINIMUM`` and ``MAXIMUM`` columns indicate the range of values
+  for a given parameter, the ``BOTTOM`` and ``TOP`` columns are ignored.
+  The``NUMBVALS`` column indicates the number of parameter values for
+  which the table model was computed, the ``VALUE`` column indicates the
+  specific parameter values.
+
+  In the example below there are two parameters named ``Index`` and ``Cutoff``,
+  and spectra were computed for 100 index values and 50 cutoff values, hence
+  a total of 5000 spectra are stored in the table model.
+
+  .. _fig_model_table_parameters:
+
+  .. figure:: model_table_parameters.png
+     :align: center
+     :width: 100%
+
+     *Table model parameters extension*
+
+  The ``ENERGIES`` extension contains the energy boundaries for the spectra in
+  the usual OGIP format:
+
+  .. _fig_model_table_energies:
+
+  .. figure:: model_table_energies.png
+     :align: center
+     :width: 40%
+
+     *Energy boundaries extension*
+
+  The ``SPECTRA`` extension contains the spectra of the table model. It consists
+  of two vector columns. The ``PARAMVAL`` column provides the parameter values
+  for which the spectrum was computed. Since there are two parameters in the
+  example the vector column has two entries. The ``INTPSPEC`` column provides
+  the spectrum :math:`\frac{dN(p)}{dE}` for the specific parameters. Since there
+  are 200 energy bins in this example the vector column has 200 entries.
+
+  .. _fig_model_table_spectra:
+
+  .. figure:: model_table_spectra.png
+     :align: center
+     :width: 40%
+
+     *Spectra extension*
+
+
+  The model is defined using:
+
+  .. math::
+    \frac{dN}{dE} = N_0 \left. \frac{dN(p)}{dE} \right\rvert_{\rm file}
+
+  where the parameters in the XML definition have the following mappings:
+
+  * :math:`N_0` = ``Normalization``
+  * :math:`p` = M model parameters (e.g. ``Index``, ``Cutoff``)
+
+  The XML format for specifying a table model is:
+
+  .. code-block:: xml
+
+     <spectrum type="TableModel" file="model_table.fits">
+       <parameter name="Normalization" scale="1.0" value="1.0" min="0.0" max="1000.0" free="1"/>
+     </spectrum>
+
+  .. warning::
+     If the file name is given without a path it is expected that the file
+     resides in the same directory than the XML file.
+     If the file resides in a different directory, an absolute path name should
+     be specified.
+     Any environment variable present in the path name will be expanded.
+
+  Note that the default parameters of the table model are provided in the FITS
+  file, according to the
+  `HEASARC OGIP standard <https://heasarc.gsfc.nasa.gov/docs/heasarc/ofwg/docs/general/ogip_92_009/ogip_92_009.html>`_.
+  However, table model parameters may also be specified in the XML file, and
+  these parameters will then overwrite the parameters in the FITS file. For
+  example, for a 2-dimensional table model with an ``Index`` and a ``Cutoff``
+  parameter, the XML file may look like
+
+  .. code-block:: xml
+
+     <spectrum type="TableModel" file="model_table.fits">
+       <parameter name="Normalization" scale="1e-16" value="5.8"  min="1e-07" max="1000" free="1"/>
+       <parameter name="Index"         scale="-1"    value="2.4"  min="1.0"   max="3.0"  free="1"/>
+       <parameter name="Cutoff"        scale="1e6"   value="0.89" min="0.1"   max="28.2" free="1"/>
+     </spectrum>
+
+
 Composite model
 ^^^^^^^^^^^^^^^
 
@@ -451,14 +591,14 @@ Composite model
 
      <spectrum type="Composite">
        <spectrum type="PowerLaw" component="SoftComponent">
-         <parameter name="Prefactor"   scale="1e-17" value="3"  min="1e-07" max="1000.0" free="1"/>
+         <parameter name="Prefactor"   scale="1e-17" value="3"   min="1e-07" max="1000.0" free="1"/>
          <parameter name="Index"       scale="-1"    value="3.5" min="0.0"   max="+5.0"   free="1"/>
-         <parameter name="PivotEnergy" scale="1e6"   value="1"  min="0.01"  max="1000.0" free="0"/>
+         <parameter name="PivotEnergy" scale="1e6"   value="1"   min="0.01"  max="1000.0" free="0"/>
        </spectrum>
        <spectrum type="PowerLaw" component="HardComponent">
-         <parameter name="Prefactor"   scale="1e-17" value="5"  min="1e-07" max="1000.0" free="1"/>
+         <parameter name="Prefactor"   scale="1e-17" value="5"   min="1e-07" max="1000.0" free="1"/>
          <parameter name="Index"       scale="-1"    value="2.0" min="0.0"   max="+5.0"   free="1"/>
-         <parameter name="PivotEnergy" scale="1e6"   value="1"  min="0.01"  max="1000.0" free="0"/>
+         <parameter name="PivotEnergy" scale="1e6"   value="1"   min="0.01"  max="1000.0" free="0"/>
        </spectrum>
      </spectrum>
 
@@ -510,7 +650,7 @@ Exponential model
 
     <spectrum type="Exponential">
       <spectrum type="FileFunction" file="opacity.txt">
-	    <parameter scale="-1.0" name="Normalization" min="0.0" max="100.0" value="1.0" free="1"/>
+        <parameter name="Normalization" scale="-1.0" value="1.0" min="0.0" max="100.0" free="1"/>
       </spectrum>
     </spectrum>
 
@@ -518,9 +658,12 @@ Exponential model
   spectral model and computes
 
   .. math::
-     M_{\rm spectral}(E) = \exp \left( M_{\rm spectral}(E) \right)
+     M_{\rm spectral}(E) = \exp \left( \alpha M_{\rm spectral}(E) \right)
 
-  where :math:`M_{\rm spectral}(E)` is any spectral model component.
+  where
+
+  * :math:`M_{\rm spectral}(E)` is any spectral model component
+  * :math:`\alpha` = ``Normalization``
 
   The model can be used to describe a spectrum with EBL absorption based on a
   tabulated model of opacity as a function of photon energy. The corresponding
@@ -536,7 +679,7 @@ Exponential model
       </spectrum>
       <spectrum type="Exponential">
         <spectrum type="FileFunction" file="opacity.txt">
-          <parameter scale="-1.0" name="Normalization" min="0.0" max="100.0" value="1.0" free="1"/>
+          <parameter name="Normalization" scale="-1.0" value="1.0" min="0.0" max="100.0" free="1"/>
         </spectrum>
       </spectrum>
     </spectrum>

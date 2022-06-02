@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generate IRFs in CALDB format from a ROOT offaxis performance file
 #
-# Copyright (C) 2016-2018 Juergen Knoedlseder
+# Copyright (C) 2016-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -405,6 +405,9 @@ class csroot2caldb(ctools.cscript):
             key = 'HDUCLAS%d' % (i+1)
             hdu.card(key, item, 'HDU class')
         hdu.card('HDUVERS', '0.2', 'HDU version')
+
+        # Stamp HDU
+        self._stamp(hdu)
 
         # Return
         return
@@ -1736,9 +1739,9 @@ class csroot2caldb(ctools.cscript):
 
 
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
         """
         # Optional ROOT import
         try:
@@ -1751,10 +1754,6 @@ class csroot2caldb(ctools.cscript):
         if not _has_root:
             gammalib.warning('csroot2caldb', 'ROOT Python module not present, '
                              'script will create empty IRF.')
-
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
 
         # Get parameters
         self._get_parameters()

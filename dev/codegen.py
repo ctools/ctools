@@ -2,7 +2,7 @@
 # ==========================================================================
 # ctools code generator
 #
-# Copyright (C) 2018 Juergen Knoedlseder
+# Copyright (C) 2018-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,13 +18,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+from __future__ import print_function
 import os
 import sys
-import glob
-import commands
 import fileinput
 from datetime import date
 import gammalib
+
+# Fix Python 2.x.
+try:
+    input = raw_input
+except NameError:
+    pass
 
 
 # ================= #
@@ -47,7 +52,7 @@ def confirm(text):
     # Confirmation loop
     waiting = True
     while waiting:
-        confirmation = str(raw_input(text+' (y/n): '))
+        confirmation = str(input(text+' (y/n): '))
         if confirmation == 'q':
             sys.exit()
         elif confirmation == 'y':
@@ -87,7 +92,7 @@ def response(text, confirm_response=False):
         # Get response from input
         waiting = True
         while waiting:
-            response = str(raw_input('%s: ' % text))
+            response = str(input('%s: ' % text))
             if response == 'q':
                 sys.exit()
             else:
@@ -275,13 +280,13 @@ def add_ctool(name, tokens, baseclass):
         if 'libctools_la_LIBADD' in line.replace(' ', ''):
             last = line[-2]
             line = line.replace(line, line+insertline2+last+'\n')
-        print line,
+        print(line,end=''),
 
     # Update Python module
     for line in fileinput.FileInput('pyext/ctools/tools.i',inplace=1):
         if '%include "ctbin.i"' in line:
             print('%%include "%s.i"' % (name))
-        print line,
+        print(line,end=''),
 
     # Update unit test
     for line in fileinput.FileInput('test/test_python_ctools.py',inplace=1):
@@ -289,25 +294,25 @@ def add_ctool(name, tokens, baseclass):
             print('import test_%s' % (name))
         elif 'test_ctbin.Test()' in line:
             print('             test_%s.Test(),' % (name))
-        print line,
+        print(line,end=''),
 
     # Update export of unit test
     for line in fileinput.FileInput('pyext/Makefile.am',inplace=1):
         if '$(top_srcdir)/test/test_ctbin.py' in line:
             print('              $(top_srcdir)/test/test_%s.py \\' % (name))
-        print line,
+        print(line,end=''),
 
     # Update configure.ac
     for line in fileinput.FileInput('configure.ac',inplace=1):
         if 'src/ctbin/Makefile' in line:
             print('                 src/%s/Makefile' % (name))
-        print line,
+        print(line,end=''),
 
     # Update reference manual index file
     for line in fileinput.FileInput('doc/source/users/reference_manual/index.rst',inplace=1):
         if 'ctbin --- Generates counts cube <ctbin>' in line:
             print('   %s --- ToDo: Describe what tool is doing <%s>' % (name, name))
-        print line,
+        print(line,end=''),
 
     # Return
     return
@@ -356,7 +361,7 @@ def add_cscript(name, tokens, baseclass):
             print('    "%s",' % (name))
         elif 'from cscripts.csworkflow    import csworkflow' in line:
             print('from cscripts.%s    import %s' % (name, name))
-        print line,
+        print(line,end=''),
 
     # Update cscripts/Makefile.am file
     for line in fileinput.FileInput('cscripts/Makefile.am',inplace=1):
@@ -368,7 +373,7 @@ def add_cscript(name, tokens, baseclass):
             print('              %s \\' % (name))
         elif '$(top_srcdir)/test/test_csworkflow.py' in line:
             print('              $(top_srcdir)/test/test_%s.py \\' % (name))
-        print line,
+        print(line,end=''),
 
     # Update test/test_python_cscripts.py file
     for line in fileinput.FileInput('test/test_python_cscripts.py',inplace=1):
@@ -376,13 +381,13 @@ def add_cscript(name, tokens, baseclass):
             print('import test_%s' % (name))
         elif 'test_csworkflow.Test()' in line:
             print('             test_%s.Test(),' % (name))
-        print line,
+        print(line,end=''),
 
     # Update reference manual index file
     for line in fileinput.FileInput('doc/source/users/reference_manual/index.rst',inplace=1):
         if 'csbkgmodel --- Generates background model for 3D analysis <csbkgmodel>' in line:
             print('   %s --- ToDo: Describe what script is doing <%s>' % (name, name))
-        print line,
+        print(line,end=''),
 
     # Return
     return
@@ -414,7 +419,7 @@ def ctool_menu():
         waiting = True
         choice  = 1
         while waiting:
-            choice = str(raw_input('Enter your choice: '))
+            choice = str(input('Enter your choice: '))
             if choice == '1' or choice == '2' or choice == '3':
                 waiting = False
         if choice == '1':
@@ -480,7 +485,7 @@ def cscript_menu():
         waiting = True
         choice  = 1
         while waiting:
-            choice = str(raw_input('Enter your choice: '))
+            choice = str(input('Enter your choice: '))
             if choice == '1' or choice == '2' or choice == '3':
                 waiting = False
         if choice == '1':
@@ -535,7 +540,7 @@ def main_menu():
     # Wait for the input
     waiting = True
     while waiting:
-        choice = str(raw_input('Enter your choice: '))
+        choice = str(input('Enter your choice: '))
         if choice == '1' or choice == '2' or choice == 'q':
             waiting = False
 

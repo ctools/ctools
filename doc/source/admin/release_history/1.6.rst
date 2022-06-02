@@ -32,8 +32,8 @@ Bug fixes
 * [`2694 <https://cta-redmine.irap.omp.eu/issues/2694>`_] -
   Compute ``DETX`` and ``DETY`` in :ref:`ctmodel` if they are not available
 * [`2686 <https://cta-redmine.irap.omp.eu/issues/2686>`_] -
-  Do no longer set missing boundaries in ``ctool::get_observations`` and
-  ``ctool::setup_observations``
+  Do no longer set missing boundaries in :doxy:`ctool::get_observations` and
+  :doxy:`ctool::setup_observations`
 * [`2682 <https://cta-redmine.irap.omp.eu/issues/2682>`_] -
   Avoid :ref:`ctselect` error in case that RoI radius is unchanged
 * [`2652 <https://cta-redmine.irap.omp.eu/issues/2652>`_] -
@@ -71,7 +71,7 @@ Improvements
 * [`2711 <https://cta-redmine.irap.omp.eu/issues/2711>`_] -
   :ref:`csphagen` now creates appropriate model for likelihood fitting
 * [`2685 <https://cta-redmine.irap.omp.eu/issues/2685>`_] -
-  Add ``ctbkgcube::cntcube()`` method
+  Add :doxy:`ctbkgcube::cntcube` method
   Account for varying energy thresholds in :ref:`ctbin` weight computation
   Unnormalize background cube values in :ref:`ctbkgcube`
 * Add ``use_model_bkg`` parameter to :ref:`cslightcrv`

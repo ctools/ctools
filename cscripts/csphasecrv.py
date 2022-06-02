@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates spectra as a function of phase
 #
-# Copyright (C) 2017-2019 Rolf Buehler
+# Copyright (C) 2017-2022 Rolf Buehler
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,12 +88,12 @@ class csphasecrv(ctools.csobservation):
         state = {'base'         : ctools.csobservation.__getstate__(self),
                  'srcname'      : self._srcname,
                  'phbins'       : self._phbins,
-                 'stacked'      : self._stacked,
                  'onoff'        : self._onoff,
+                 'stacked'      : self._stacked,
                  'fits'         : self._fits,
+                 'fitmodels'    : self._fitmodels,
                  'nthreads'     : self._nthreads,
-                 'excl_reg_map' : self._excl_reg_map,
-                 'fitmodels'    : self._fitmodels}
+                 'excl_reg_map' : self._excl_reg_map}
 
         # Return pickled dictionary
         return state
@@ -110,12 +110,12 @@ class csphasecrv(ctools.csobservation):
         ctools.csobservation.__setstate__(self, state['base'])
         self._srcname      = state['srcname']
         self._phbins       = state['phbins']
-        self._stacked      = state['stacked']
         self._onoff        = state['onoff']
+        self._stacked      = state['stacked']
         self._fits         = state['fits']
+        self._fitmodels    = state['fitmodels']
         self._nthreads     = state['nthreads']
         self._excl_reg_map = state['excl_reg_map']
-        self._fitmodels    = state['fitmodels']
 
         # Return
         return
@@ -291,7 +291,7 @@ class csphasecrv(ctools.csobservation):
                       'phmax': phmax,
                       'pars': pars,
                       'values': {}}
-            
+
             # Store fit results
             phname = str(phmin)+'-'+str(phmax)
 
@@ -310,14 +310,17 @@ class csphasecrv(ctools.csobservation):
 
             # Append result to list of dictionaries
             results.append(result)
-            
+
         # Create FITS table from results
         table = self._create_fits_table(results)
 
         # Create FITS file and append FITS table to FITS file
         self._fits = gammalib.GFits()
         self._fits.append(table)
-        
+
+        # Stamp FITS file
+        self._stamp(self._fits)
+
         # Return
         return
 
@@ -339,7 +342,7 @@ class csphasecrv(ctools.csobservation):
 
         # Save to fits
         self._fits.saveto(outfile, self._clobber())
-        
+
         # Return
         return
 
@@ -368,25 +371,33 @@ class csphasecrv(ctools.csobservation):
             # Log file name
             name = 'Phase [%s] file' % phname
             self._log_value(gammalib.NORMAL, name, outfile)
-        
+
         # Return
         return
 
-    def _phase_bin(self,phbin):
+    def _phase_bin(self, phbin):
+        """
+        Analyse one phase bin
+
+        Parameters
+        ----------
+        phbin : list of float
+            Phase bin limits
+        """
 
         # Write time bin into header
         self._log_header2(gammalib.TERSE, 'PHASE %f - %f' %
                           (phbin[0], phbin[1]))
 
         # Select events
-        select = ctools.ctselect(self.obs().copy())
+        select = ctools.ctselect(self.obs())
         select['emin'] = self['emin'].real()
         select['emax'] = self['emax'].real()
         select['tmin'] = 'UNDEFINED'
         select['tmax'] = 'UNDEFINED'
-        select['rad'] = 'UNDEFINED'
-        select['ra'] = 'UNDEFINED'
-        select['dec'] = 'UNDEFINED'
+        select['rad']  = 'UNDEFINED'
+        select['ra']   = 'UNDEFINED'
+        select['dec']  = 'UNDEFINED'
         select['expr'] = 'PHASE>' + str(phbin[0]) + ' && PHASE<' + str(phbin[1])
         select.run()
 
@@ -450,20 +461,16 @@ class csphasecrv(ctools.csobservation):
 
 
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-        
         # Get parameters
         self._get_parameters()
 
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
-        
+
         # Dictionary to save phase fitted models
         self._fitmodels = {}
 
@@ -507,7 +514,7 @@ class csphasecrv(ctools.csobservation):
 
         # Save results to XML files (one per phase bin)
         self._save_xml()
-        
+
         # Return
         return
 
@@ -569,7 +576,7 @@ class csphasecrv(ctools.csobservation):
         # Return
         return self._excl_reg_map
 
-        
+
 # ======================== #
 # Main routine entry point #
 # ======================== #

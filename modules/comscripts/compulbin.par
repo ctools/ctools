@@ -1,0 +1,48 @@
+#############################################################################
+#                                                                           #
+#                     COMPTEL Science Analysis Tools                        #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      compulbin.par                                                 #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the compulbin script                       #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,     f, a, obs.xml,,, "Input observation definition file"
+outfile,   f, a, pulsar.fits,,, "Output pulsar phase bins file"
+
+#
+# Script parameters
+#==================
+psrname,     s, a, PSR B0531+21,,, "Pulsar name"
+ephemerides, f, a, $CTOOLS/share/models/ephem_xte.psrtime,,, "Pulsar ephemerides file"
+emin,        r, a, 0.75,0.05,50.0, "Minimum energy (MeV)"
+emax,        r, a, 30.0,0.05,50.0, "Maximum energy (MeV)"
+pnumbins,    i, a, 33,1,200, "Number of phase bins"
+armmin,      r, h, -3.5,,, "Minimum ARM (deg)"
+armmax,      r, h,  3.5,,, "Maximum ARM (deg)"
+phimin,      r, h, 0.0,,, "Minimum Phibar angle (deg)"
+phimax,      r, h, 50.0,,, "Maximum Phibar angle (deg)"
+psdmin,      i, h, 0,0,110, "Minimum PSD value"
+psdmax,      i, h, 110,0,110, "Maximum PSD value"
+zetamin,     r, h, 5.0,0.0,10.0, "Minimum Earth horizon - Phibar (zeta) angle (deg)"
+fpmtflag,    i, h, 0,0,2, "Handling of D2 modules with failed PMT flag (0: exclude, 1: include, 2: exclude PMT)"
+d1use,       s, h, 1111111,,, "D1 module usage (1: use, 0: don't use)"
+d2use,       s, h, 11111111111111,,, "D2 module usage (1: use, 0: don't use)"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Activate debugging mode?"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, compulbin.log,,, "Log filename"

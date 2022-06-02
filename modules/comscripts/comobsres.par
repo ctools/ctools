@@ -1,0 +1,45 @@
+#############################################################################
+#                                                                           #
+#                     COMPTEL Science Analysis Tools                        #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      comobsres.par                                                 #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the comobsres script                       #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,     f, a, obs.xml,,, "Input observation definition file"
+inmodel,   f, a, models.xml,,, "Input model definition file"
+outfolder, s, h, resmap,,, "Output folder for DRI and PNG files"
+outmap,    f, a, resmap.fits,,,"Output residual map"
+
+#
+# Script parameters
+#==================
+algorithm,  s, a, SIGNIFICANCE,SUB|SUBDIV|SUBDIVSQRT|SIGNIFICANCE,, "Residual map computation algorithm"
+armmin,     r, h, -3.0,,, "Minimum ARM (deg)"
+armmax,     r, h,  3.0,,, "Maximum ARM (deg)"
+coordsys,   s, a, GAL,CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galactic)"
+proj,       s, a, TAN,AIT|AZP|CAR|GLS|MOL|SFL|SIN|STG|TAN,, "Projection method"
+margin,     r, h, 30.0,,, "Sky map margin (deg)"
+binsz,      r, h, 1.0,0.1,10.0, "Bin size (deg)"
+grouping,   i, h, 1,1,80, "Number of Chi/Psi bins to group for residual computation"
+dri,        b, h, no,,, "Compute DRI residuals?"
+png,        b, h, no,,, "Generate residual histogram png files?"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Activate debugging mode?"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, comobsres.log,,, "Log filename"

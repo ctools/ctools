@@ -17,7 +17,7 @@ The procedure for building and installing ctools is modeled on GNU
 software distributions. You will need the following to build the
 software:
 
--  About 25 MB of free disk space.
+-  About 50 MB of free disk space.
 
 -  An ANSI C++ compiler. ctools builds well using GNU g++ or clang.
 
@@ -42,7 +42,7 @@ section and continue with the :ref:`sec_building_ctools` section.
 
 You will need the following to build the GammaLib:
 
--  About 200 MB of free disk space.
+-  About 300 MB of free disk space.
 
 -  An ANSI C++ compiler. We recommend building GammaLib with the GNU g++
    or the clang compilers.
@@ -66,7 +66,7 @@ in an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
 
-  $ tar xvfz gammalib-1.2.0.tar.gz
+   $ tar xvfz gammalib-2.0.0.tar.gz
 
 (the ``$`` symbol indicates the console prompt and is not part of the
 command that you should type in).
@@ -76,25 +76,25 @@ typing
 
 .. code-block:: bash
 
-  $ cd gammalib-1.2.0
-  $ ./configure
-  $ make
-  $ make check
-  $ make install
+   $ cd gammalib-2.0.0
+   $ ./configure
+   $ make
+   $ make check
+   $ make install
 
 The last step may require system administator privileges. In this case,
 use
 
 .. code-block:: bash
 
-  $ sudo make install
+   $ sudo make install
 
 If you do not have system administrator privileges, change the install
 directory by typing for example
 
 .. code-block:: bash
 
-  $ ./configure --prefix=$HOME/gamma
+   $ ./configure --prefix=$HOME/gamma
 
 which then installs GammaLib in the ``gamma`` folder of your home
 directory.
@@ -114,16 +114,16 @@ machine:
 
 .. code-block:: bash
 
-  export GAMMALIB=/usr/local/gamma
-  source $GAMMALIB/bin/gammalib-init.sh
+   export GAMMALIB=/usr/local/gamma
+   source $GAMMALIB/bin/gammalib-init.sh
 
 If you use C shell or a variant then add the following to your 
 ``$HOME/.cshrc`` or ``$HOME/.tcshrc`` script:
 
 .. code-block:: csh
 
-  setenv GAMMALIB /usr/local/gamma
-  source $GAMMALIB/bin/gammalib-init.csh
+   setenv GAMMALIB /usr/local/gamma
+   source $GAMMALIB/bin/gammalib-init.csh
 
 
 .. _sec_building_ctools:
@@ -136,7 +136,7 @@ an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
 
-  $ tar xvfz ctools-1.2.0.tar.gz
+   $ tar xvfz ctools-2.0.0.tar.gz
 
 (the ``$`` symbol indicates the console prompt and is not part of the
 command that you should type in).
@@ -145,9 +145,9 @@ Step in the directory and build the ctools by typing
 
 .. code-block:: bash
 
-  $ cd ctools-1.2.0
-  $ ./configure
-  $ make
+   $ cd ctools-2.0.0
+   $ ./configure
+   $ make
 
 at the operating system prompt. The ``./configure`` command customizes
 the Makefiles for the particular system, the ``make`` command compiles
@@ -159,7 +159,7 @@ You can get the full list of configuration options by typing
 
 .. code-block:: bash
 
-  $ ./configure --help
+   $ ./configure --help
 
 
 Testing ctools
@@ -170,7 +170,7 @@ make sure that ctools have been built correctly. For this, type
 
 .. code-block:: bash
 
-  $ make check
+   $ make check
 
 If you have automake version 1.13 or newer installed, you should see the
 following output at the end of the unit testing:
@@ -180,11 +180,12 @@ following output at the end of the unit testing:
    PASS: test_python_ctools.sh
    PASS: test_python_cscripts.sh
    PASS: test_examples.py
+   PASS: test_python_comscripts.sh
    ============================================================================
-   Testsuite summary for ctools 1.2.0
+   Testsuite summary for ctools 2.0.0
    ============================================================================
-   # TOTAL: 3
-   # PASS:  3
+   # TOTAL: 4
+   # PASS:  4
    # SKIP:  0
    # XFAIL: 0
    # FAIL:  0
@@ -199,38 +200,44 @@ For older automake version, you should see
    ***********************
    * ctools unit testing *
    ***********************
-   Test ctobssim on command line: ..... ok
-   Test ctobssim from Python: ................................................. ok
-   Test ctselect on command line: ....... ok
-   Test ctselect from Python: ..... ok
-   Test ctbin on command line: ..... ok
-   Test ctbin from Python: ............................................. ok
+   Test ctobssim on command line: ...... ok
+   Test ctobssim from Python: ................................................... ok
+   Test ctselect on command line: ........ ok
+   Test ctselect from Python: .............................................................. ok
    ...
    PASS test_python_ctools.sh
 
    *************************
    * cscripts unit testing *
    *************************
-   Test cscaldb on command line: .. ok
-   Test cscaldb from Python: . ok
-   Test cslightcrv on command line: ............... ok
-   Test cslightcrv from Python: ................................................. ok
-   Test csmodelinfo on command line: ..... ok
-   Test csmodelinfo from Python: ..... ok
+   Test cscript base class: ............................................................................................................................... ok
+   Test ctobservation base class: ............................................. ok
+   Test ctlikelihood base class: ... ok
+   Test csbkgmodel on command line: ..... ok
    ...
    PASS test_python_cscripts.sh
 
    ********************
    * Examples testing *
    ********************
-   Test generate_prod3_irfs.py: .. ok
    Test make_pointings.py: ....... ok
-   Test make_spectrum.py: .. ok
-   Test make_ts_distributions.py: .. ok
+   Test show_butterfly.py: ... ok
+   Test show_irf.py: .. ok
+   Test show_lightcurve.py: .. ok
    ...
    PASS test_examples.py
+
+   ***************************
+   * comscripts unit testing *
+   ***************************
+   Test comobsselect on command line: .... ok
+   Test comobsselect from Python: .. ok
+   Test comobsbin on command line: .............................. ok
+   Test comobsbin from Python: ........................... ok
+   ...
+   PASS test_python_comscripts.sh
    ==================
-   All 3 tests passed
+   All 4 tests passed
    ==================
 
 The same detailed information is also available for the newer automake 
@@ -239,9 +246,10 @@ versions, but there it is written in log files that you can find in the
 
 .. code-block:: bash
 
-  test_python_ctools.sh.log
-  test_python_cscripts.sh.log
-  test_examples.py.log
+   test_python_ctools.sh.log
+   test_python_cscripts.sh.log
+   test_examples.py.log
+   test_python_comscripts.sh.log
 
 If you do not see the same output, but a failure message, please check
 first the :ref:`issues` section. If you cannot fix the problem, please
@@ -256,7 +264,7 @@ Now you are ready to install the ctools by typing
 
 .. code-block:: bash
 
-  $ make install
+   $ make install
 
 If the destination directory is owned by ``root`` (which is normally the 
 case when using the default), administrator privileges are needed for
@@ -264,7 +272,7 @@ installation. In this case, type
 
 .. code-block:: bash
 
-  $ sudo make install
+   $ sudo make install
 
 By default, the install directory is set to ``/usr/local/gamma``. To 
 change the install directory (for example in case that you do not
@@ -273,7 +281,7 @@ can be given, for example:
 
 .. code-block:: bash
 
-  $ ./configure --prefix=$HOME/gamma
+   $ ./configure --prefix=$HOME/gamma
 
 
 Setting up the ctools environment
@@ -288,16 +296,16 @@ on a Linux machine:
 
 .. code-block:: bash
 
-  export CTOOLS=/usr/local/gamma
-  source $CTOOLS/bin/ctools-init.sh
+   export CTOOLS=/usr/local/gamma
+   source $CTOOLS/bin/ctools-init.sh
 
 If you use C shell or a variant then add the following to your 
 ``$HOME/.cshrc`` or ``$HOME/.tcshrc`` script:
 
 .. code-block:: csh
 
-  setenv CTOOLS /usr/local/gamma
-  source $CTOOLS/bin/ctools-init.csh
+   setenv CTOOLS /usr/local/gamma
+   source $CTOOLS/bin/ctools-init.csh
 
 
 Checking your setup
@@ -309,17 +317,17 @@ As a quick check that your setup is okay you can run ``csinfo check``:
 
 .. code-block:: bash
 
-  $ csinfo check
+   $ csinfo check
 
-  Gammalib / ctools setup check:
+   Gammalib / ctools setup check:
 
-     GAMMALIB environment variable ... ok
-     CTOOLS   environment variable ... ok
-     gammalib Python import .......... ok
-     ctools   Python import .......... ok
-     cscripts Python import .......... ok
+      GAMMALIB environment variable ... ok
+      CTOOLS   environment variable ... ok
+      gammalib Python import .......... ok
+      ctools   Python import .......... ok
+      cscripts Python import .......... ok
 
-     ===> Your Gammalib / ctools setup is OK.
+      ===> Your Gammalib / ctools setup is OK.
 
 If the setup is not okay, run the ``csinfo info`` command to print
 detailed information about your setup. There's also a ``csinfo list``

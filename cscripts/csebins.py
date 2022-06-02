@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates energy boundaries for stacked analysis
 #
-# Copyright (C) 2017-2018 Juergen Knoedlseder
+# Copyright (C) 2017-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -60,9 +60,11 @@ class csebins(ctools.csobservation):
             if self['inobs'].is_valid():
                 self.obs(gammalib.GObservations(self['inobs'].filename()))
             else:
-                cta   = gammalib.GCTAObservation()
-                caldb = gammalib.GCaldb('cta', self['caldb'].string())
-                rsp   = gammalib.GCTAResponseIrf(self['irf'].string(), caldb)
+                cta     = gammalib.GCTAObservation()
+                mission = gammalib.tolower(self['instrument'].string())
+                caldb   = gammalib.GCaldb(mission, self['caldb'].string())
+                rsp     = gammalib.GCTAResponseIrf(self['irf'].string(), caldb)
+                cta.instrument(mission)
                 cta.response(rsp)
                 self.obs().append(cta)
 
@@ -238,14 +240,10 @@ class csebins(ctools.csobservation):
 
 
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
         # Get parameters
         self._get_parameters()
 
@@ -276,6 +274,9 @@ class csebins(ctools.csobservation):
 
         # Save energy boundaries
         self._ebounds.save(outfile, self._clobber())
+
+        # Stamp energy boundaries
+        self._stamp(outfile)
 
         # Return
         return

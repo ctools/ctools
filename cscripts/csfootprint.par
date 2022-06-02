@@ -1,0 +1,35 @@
+#############################################################################
+#                                                                           #
+#                         Science Analysis Tools                            #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      csfootprint.par                                               #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the csfootprint script                     #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+infile,  f, h, $HOME/.gamma/statistics.xml,,, "Input high-level statistics XML file"
+outfile, f, a, NONE,,, "Output graphics file (NONE if no graphics should be generated)"
+
+#
+# Script parameters
+#==================
+tmin, t, a, NONE,,, "Start time for report (UTC string, JD, MJD or MET in seconds)"
+tmax, t, a, NONE,,, "Stop time for report (UTC string, JD, MJD or MET in seconds)"
+
+#
+# Standard parameters
+#====================
+chatter,  i, h, 2,0,4, "Chattiness of output"
+clobber,  b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,    b, h, no,,, "Activate debugging mode?"
+mode,     s, h, ql,,, "Mode of automatic parameters"
+logfile,  f, h, csfootprint.log,,, "Log filename"

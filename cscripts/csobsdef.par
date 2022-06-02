@@ -22,15 +22,16 @@ outobs, f, a, obs.xml,,, "Output observation definition XML file"
 #
 # Common pointing parameter values
 #=================================
-duration, r, a, 1800.0,,, "Pointing duration (seconds)"
-name,     s, h, None,,, "Observation name"
-caldb,    s, h, ,,, "Calibration database"
-irf,      s, h, ,,, "Instrument response function"
-emin,     r, h, UNDEF,,, "Lower energy limit (TeV)"
-emax,     r, h, UNDEF,,, "Upper energy limit (TeV)"
-rad,      r, h, UNDEF,,, "Radius of ROI (degrees)"
-deadc,    r, h, 0.98,,, "Deadtime correction factor"
-mjdref,   r, h, 51544.5,,, "Reference MJD for observations"
+duration,   r, a, 1800.0,,, "Pointing duration (seconds)"
+name,       s, h, None,,, "Observation name"
+instrument, s, h, CTA,CTA|HESS|MAGIC|VERITAS|ASTRI|FACT,, "Name of Cherenkov telescope"
+caldb,      s, h, ,,, "Calibration database"
+irf,        s, h, ,,, "Instrument response function"
+emin,       r, h, UNDEF,,, "Lower energy limit (TeV)"
+emax,       r, h, UNDEF,,, "Upper energy limit (TeV)"
+rad,        r, h, UNDEF,,, "Radius of ROI (degrees)"
+deadc,      r, h, 0.98,,, "Deadtime correction factor"
+mjdref,     r, h, 51544.5,,, "Reference MJD for observations"
 
 #
 # Standard parameters

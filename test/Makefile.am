@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for ctools unit tests                                         #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2022 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -25,23 +25,25 @@ MACOSX_DEPLOYMENT_TARGET=@CONFIGURE_MACOSX_DEPLOYMENT_TARGET@
 
 # Optional python bindings
 if WITH_PYTHON
-  TEST_PYTHON_CTOOLS   = test_python_ctools.sh
-  TEST_PYTHON_CSCRIPTS = test_python_cscripts.sh
-  TEST_PYTHON_EXAMPLES = test_examples.py
-  TEST_PYTHON_ENV      = PYTHONPATH=$(top_builddir):$(top_builddir)/pyext:$(top_builddir)/pyext/build/ctools/ctools:$(pythondir):$(pyexecdir):$(PYTHONPATH)
+  TEST_PYTHON_CTOOLS     = test_python_ctools.sh
+  TEST_PYTHON_CSCRIPTS   = test_python_cscripts.sh
+  TEST_PYTHON_EXAMPLES   = test_examples.py
+  TEST_PYTHON_COMSCRIPTS = test_python_comscripts.sh
+  TEST_PYTHON_ENV        = PYTHONPATH=$(abs_top_builddir):$(abs_top_builddir)/pyext:$(abs_top_builddir)/cscripts:$(abs_top_builddir)/modules:$(abs_top_builddir)/pyext/build/ctools/ctools:$(pythondir):$(pyexecdir):$(PYTHONPATH)
 endif
 
 # Set test environment
 TESTS_ENVIRONMENT = @RUNSHARED@=$(top_builddir)/src/.libs$(TEST_ENV_DIR):$(LIBDIR_GAMMALIB):$(@RUNSHARED@) \
                     $(TEST_PYTHON_ENV) \
-                    TEST_SRCDIR=$(top_srcdir) \
-                    TEST_BUILDDIR=$(top_builddir) \
-                    TEST_DATA=$(top_srcdir)/test/data
+                    TEST_SRCDIR=$(abs_top_srcdir) \
+                    TEST_BUILDDIR=$(abs_top_builddir) \
+                    TEST_DATA=$(abs_top_srcdir)/test/data
 
 # Tests (these are the tests to be executed)
 TESTS = $(TEST_PYTHON_CTOOLS) \
         $(TEST_PYTHON_CSCRIPTS) \
-        $(TEST_PYTHON_EXAMPLES)
+        $(TEST_PYTHON_EXAMPLES) \
+        $(TEST_PYTHON_COMSCRIPTS)
 
 # Create report directory
 all-local:
@@ -61,8 +63,15 @@ clean-local:
 	rm -rf $(top_builddir)/test/caldb
 	rm -rf $(top_builddir)/test/pfiles
 	rm -rf $(top_builddir)/test/prod3
+	rm -rf $(top_builddir)/test/csadd2caldb_*
 	rm -rf $(top_builddir)/test/csroot2caldb_*
 	rm -rf $(top_builddir)/test/csiactcopy_*
+	rm -rf $(top_builddir)/test/comlixfit_*
+	rm -rf $(top_builddir)/test/comobsadd_*
+	rm -rf $(top_builddir)/test/comobsback_*
+	rm -rf $(top_builddir)/test/comobsbin_*
+	rm -rf $(top_builddir)/test/comobssim_*
+	rm -rf $(top_builddir)/test/comgendb_*
 	rm -rf $(top_builddir)/test/.DS_Store
 
 # Tests to be done on installed version
@@ -78,6 +87,11 @@ installcheck-local:
 	python -c 'import cscripts; cscripts.test()'; \
 	if test "x$$?" != "x0"; then \
 		echo "*** cscripts unit test failure!"; \
+		exit 1; \
+	fi; \
+	python -c 'import comscripts; comscripts.test()'; \
+	if test "x$$?" != "x0"; then \
+		echo "*** comscripts unit test failure!"; \
 		exit 1; \
 	fi
 endif

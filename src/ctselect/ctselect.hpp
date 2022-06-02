@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctselect - Data selection tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -58,7 +58,7 @@ public:
 
     // Methods
     void clear(void);
-    void run(void);
+    void process(void);
     void save(void);
     void publish(const std::string& name = "");
 

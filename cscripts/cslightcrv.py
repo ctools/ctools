@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a lightcurve.
 #
-# Copyright (C) 2014-2019 Michael Mayer
+# Copyright (C) 2014-2022 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -160,8 +160,9 @@ class cslightcrv(ctools.csobservation):
 
         # Query the hidden parameters, just in case
         self['edisp'].boolean()
-        self['calc_ulim'].boolean()
         self['calc_ts'].boolean()
+        self['calc_ulim'].boolean()
+        self['confidence'].real()
         self['fix_bkg'].boolean()
         self['fix_srcs'].boolean()
 
@@ -394,12 +395,13 @@ class cslightcrv(ctools.csobservation):
 
             # Create instance of upper limit tool
             ulimit = ctools.ctulimit(cpy_obs)
-            ulimit['srcname']   = self._srcname
-            ulimit['eref']      = 1.0
-            ulimit['emin']      = self['emin'].real()
-            ulimit['emax']      = self['emax'].real()
-            ulimit['sigma_min'] = 0.0
-            ulimit['sigma_max'] = 3.0
+            ulimit['srcname']    = self._srcname
+            ulimit['eref']       = 1.0
+            ulimit['emin']       = self['emin'].real()
+            ulimit['emax']       = self['emax'].real()
+            ulimit['sigma_min']  = 0.0
+            ulimit['sigma_max']  = 3.0
+            ulimit['confidence'] = self['confidence'].real()
 
             # Try to run upper limit tool and catch any exceptions
             try:
@@ -603,14 +605,10 @@ class cslightcrv(ctools.csobservation):
 
 
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
         # Get parameters
         self._get_parameters()
 
@@ -672,6 +670,9 @@ class cslightcrv(ctools.csobservation):
         # Create FITS file and append FITS table to FITS file
         self._fits = gammalib.GFits()
         self._fits.append(table)
+
+        # Stamp FITS file
+        self._stamp(self._fits)
 
         # Optionally publish light curve
         if self['publish'].boolean():

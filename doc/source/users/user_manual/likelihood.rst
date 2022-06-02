@@ -266,7 +266,7 @@ where :math:`\ln L(M_s+M_b)` is the log-likelihood value obtained when
 fitting the source and the background together to the data, and
 :math:`\ln L(M_b)` is the log-likelihood value obtained when fitting only
 the background model to the data.
-Under the hypothesis that the model :math:`M_s+M_b` provides a satisfactory fit
+Under the hypothesis that the model :math:`M_b` provides a satisfactory fit
 of the data, :math:`\mathrm{TS}` follows a :math:`\chi^2_n` distribution with
 :math:`n` degrees of freedom, where :math:`n` is the number of free parameters
 in the source model component. Therefore

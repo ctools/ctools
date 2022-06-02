@@ -192,15 +192,10 @@ void ctool_base::clear(void)
 
 
 /***********************************************************************//**
- * @brief Run [what] tool
+ * @brief Process [what] tool
  ***************************************************************************/
-void ctool_base::run(void)
+void ctool_base::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 

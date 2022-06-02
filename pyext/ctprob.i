@@ -1,7 +1,7 @@
 /***************************************************************************
  *           ctprob - Computes probability for a given model               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2016 by Leonardo Di Venere                          *
+ *  copyright (C) 2012-2022 by Leonardo Di Venere                          *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -45,7 +45,7 @@ public:
 
     // Methods
     void clear(void);
-    void run(void);
+    void process(void);
     void save(void);
     void publish(const std::string& name = "");
 };

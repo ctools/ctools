@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctfindvar - Time variability search tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2018-2019 by Simon Bonnefoy                              *
+ *  copyright (C) 2018-2022 by Simon Bonnefoy                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -58,7 +58,7 @@ public:
 
     // Methods
     void clear(void);
-    void run(void);
+    void process(void);
     void save(void);
 
 protected:

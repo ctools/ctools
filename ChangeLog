@@ -1,15 +1,94 @@
-2020-02-17
+2022-06-01
+
+        * Version 2.0.0 released
+        ========================
+
+        Add support for ASTRI and FACT instrument (#4058)
+        Allow determination of upper limits on spatial parameters in ctulimit (#4006)
+        Add comgendb script (#3983)
+        Add methods to access ctlike attributes
+        Add csadd2caldb script
+        Add restart of bisection in case of bad convergence in ctulimit
+        Add COMPTEL analysis scripts (#3738)
+        Add confidence parameter to csspec and cslightcrv (#3725)
+        Add source counts constraints to cssens (#3668)
+        Stamp all output FITS files (#3662)
+        Add ASCL shields to "About" page (#3630)
+        Use file function constructor in csspec (#3626)
+        Add BINS method to csspec (#3606)
+        Rename virtual abstract ctool::run() method to ctool::process() and
+          add non-abstract ctool::run() method (#3592)
+        Add hidden "fix_spat" parameter to cttsmap (#3562)
+        Use test source position in cssens (#3555)
+        Add optimizer setter to ctlikelihood base class
+        Add Sphinx tutorials test script (#3510)
+        Add "refit_if_failed" parameter to ctlike
+        Add models() method to ctobssim (#3441)
+        Add ctlike results to XML file (#3431)
+        Fix implementation of fix_spat_for_ts parameter in ctlike (#3426)
+        Replace std::tmpnam() by gammalib::tmpnam() function in ctselect (#3324)
+        Remove implicit conversion warnings (#3324)
+        Add support of rectangular On/Off regions (#3248)
+        Replace ASCII output files by FITS files (#1707)
+
+
+2021-04-28
+
+        * Bug fix version 1.7.4 released
+        ================================
+
+        Add conda activation and deactivation scripts for csh (#3628)
+        Replace spectral model by file function in csspec (#3624)
+        Update csinfo script (#3623)
+
+
+2020-12-02
+
+        * Bug fix version 1.7.3 released
+        ================================
+
+        Import matplotlib first in example scripts (#3423)
+
+
+2020-10-15
+
+        * Bug fix version 1.7.2 released
+        ================================
+
+        Only for compliance with GammaLib 1.7.2
+
+
+2020-09-04
+
+        * Bug fix version 1.7.1 released
+        ================================
+
+        Add Python include path in search for Python.h (#3329)
+        Test for Big Sur in configuration step (#3326)
+        Copy Python module into pyext/ctools folder (#3322)
+        Add units to reference manual of response cube tools (#3321)
+        Speed-up ctbin for stacked event binning (#3275)
+
+
+2020-07-15
 
         * Version 1.7.0 released
         ========================
 
+        Avoid negative squared standard deviations in cssrcdetect (#3261)
+        Add Interface Manual to User documentation (#3163)
         Adapt show_pull_histogram.py to matplotlib > 3.1.0 (#3156)
-        Avoid negative squared standard deviations in cssrcdetect
+        Add On/Off analysis to ctlike reference manual (#3154)
+        Update user manual for latest CTA IRF (#3075)
         Fix log file header repetition in some cscripts (#3066)
         Add Moon constraints to csviscube (#3065)
+        Improve handling of reflected regions with exclusion regions (#2976)
         Remove response cache before source testing in cttsmap (#2973)
+        Add csscs script for spectral component separation (#2961)
         Add support for Castro plots to csspec (#2938)
         Enabling running of example scripts from objects in memory (#2925)
+        Add support for power-law binning to several tools (#2881)
+        Fix numerical glitch in residual computation (#2765)
         Allow using spectral models without "Prefactor" parameter in cssens
           and cstsdist (#1889)
 

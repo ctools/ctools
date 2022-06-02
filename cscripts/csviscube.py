@@ -2,7 +2,7 @@
 # ==========================================================================
 # Compute a visibility cube
 #
-# Copyright (C) 2016-2019 Juergen Knoedlseder
+# Copyright (C) 2016-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -631,14 +631,10 @@ class csviscube(ctools.cscript):
 
 
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
         # Get parameters
         self._get_parameters()
 
@@ -670,6 +666,9 @@ class csviscube(ctools.cscript):
 
         # Save the results in VISIBILITY table extension
         self._save_results(outfile, self['clobber'].boolean())
+
+        # Stamp visibility cube
+        self._stamp(outfile)
 
         # Return
         return

@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for cscripts scripts                                             #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2019 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2022 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -21,9 +21,11 @@
 
 # Scripts to be distributed in $(pyexecdir)/cscripts
 pythonscripts = $(top_builddir)/cscripts/__init__.py \
+                $(srcdir)/csadd2caldb.py \
                 $(srcdir)/csbkgmodel.py \
                 $(srcdir)/cscaldb.py \
                 $(srcdir)/csebins.py \
+                $(srcdir)/csfootprint.py \
                 $(srcdir)/csinfo.py \
                 $(srcdir)/cslightcrv.py \
                 $(srcdir)/csmodelinfo.py \
@@ -47,6 +49,7 @@ pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/cstsmapmerge.py \
                 $(srcdir)/cstsmapsplit.py \
                 $(srcdir)/csviscube.py \
+                $(srcdir)/csscs.py \
                 $(srcdir)/csworkflow.py \
                 $(srcdir)/csfindobs.py \
                 $(srcdir)/csiactcopy.py \
@@ -59,7 +62,8 @@ pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/mputils.py 	
 
 # Parfiles to be distributed in $(prefix)/syspfiles
-parfiles = $(srcdir)/csbkgmodel.par \
+parfiles = $(srcdir)/csadd2caldb.par \
+           $(srcdir)/csbkgmodel.par \
            $(srcdir)/cscaldb.par \
            $(srcdir)/csebins.par \
            $(srcdir)/cslightcrv.par \
@@ -84,6 +88,8 @@ parfiles = $(srcdir)/csbkgmodel.par \
            $(srcdir)/cstsmapmerge.par \
            $(srcdir)/cstsmapsplit.par \
            $(srcdir)/csviscube.par \
+           $(srcdir)/csscs.par \
+           $(srcdir)/csfootprint.par \
            $(srcdir)/csworkflow.par \
            $(srcdir)/csfindobs.par \
            $(srcdir)/csiactcopy.par \
@@ -91,7 +97,8 @@ parfiles = $(srcdir)/csbkgmodel.par \
            $(srcdir)/csiactobs.par
 
 # Scripts for which symbolic links will be created in bindir
-linkscripts = csbkgmodel \
+linkscripts = csadd2caldb \
+              csbkgmodel \
               cscaldb \
               csebins \
               csinfo \
@@ -117,6 +124,8 @@ linkscripts = csbkgmodel \
               cstsmapmerge \
               cstsmapsplit \
               csviscube \
+              csscs \
+              csfootprint \
               csworkflow \
               csfindobs \
               csiactcopy \
@@ -129,6 +138,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_python_cscripts.py \
               $(top_srcdir)/test/test_cscript.py \
               $(top_srcdir)/test/test_cscaldb.py \
+              $(top_srcdir)/test/test_csadd2caldb.py \
               $(top_srcdir)/test/test_csbkgmodel.py \
               $(top_srcdir)/test/test_csebins.py \
               $(top_srcdir)/test/test_csfindobs.py \
@@ -155,6 +165,8 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_cstsmapmerge.py \
               $(top_srcdir)/test/test_cstsmapsplit.py \
               $(top_srcdir)/test/test_csviscube.py \
+              $(top_srcdir)/test/test_csscs.py \
+              $(top_srcdir)/test/test_csfootprint.py \
               $(top_srcdir)/test/test_csworkflow.py \
               $(top_srcdir)/test/test_obsutils.py \
               $(top_srcdir)/test/test_mputils.py \
@@ -178,6 +190,7 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/crab_offaxis1.fits.gz \
            $(top_srcdir)/test/data/crab_offaxis2.fits.gz \
            $(top_srcdir)/test/data/crab_exclusion.fits.gz \
+           $(top_srcdir)/test/data/background_events.fits.gz \
            $(top_srcdir)/test/data/crab_src_reg.reg \
            $(top_srcdir)/test/data/crab_bkg_reg.reg \
            $(top_srcdir)/test/data/tsmap_0.fits \
@@ -194,17 +207,23 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/irf_file.fits.gz \
            $(top_srcdir)/test/data/workflow.xml \
            $(top_srcdir)/test/data/butterfly.txt \
+           $(top_srcdir)/test/data/butterfly.fits \
            $(top_srcdir)/test/data/pha.fits \
            $(top_srcdir)/test/data/pha_channels.fits \
            $(top_srcdir)/test/data/pull.dat \
+           $(top_srcdir)/test/data/pull.fits \
            $(top_srcdir)/test/data/sensitivity.dat \
            $(top_srcdir)/test/data/sensitivity_integral.dat \
+           $(top_srcdir)/test/data/sensitivity.fits \
            $(top_srcdir)/test/data/skymap.fits \
            $(top_srcdir)/test/data/spectrum.fits \
+           $(top_srcdir)/test/data/spectrum_castro.fits \
+           $(top_srcdir)/test/data/statistics.xml \
            $(top_srcdir)/test/data/residual.fits \
            $(top_srcdir)/test/data/residual_onoff.fits \
            $(top_srcdir)/test/data/lightcurve.fits \
            $(top_srcdir)/test/data/ts.dat \
+           $(top_srcdir)/test/data/ts.fits \
            $(top_srcdir)/test/data/models_spatial.xml \
            $(top_srcdir)/test/data/models_spectral.xml \
            $(top_srcdir)/test/data/model_filefunction.txt \
@@ -256,6 +275,9 @@ testiactevents = $(top_srcdir)/test/data/iactdata/events/irf_file.fits.gz \
                  $(top_srcdir)/test/data/iactdata/events/events_7.fits.gz \
                  $(top_srcdir)/test/data/iactdata/events/events_8.fits.gz
 
+# Test data to be distributed in $(pyexecdir)/cscripts/tests/data/prod5-v0.1
+testprod501data = $(top_srcdir)/test/data/prod5-v0.1/CTA-Performance-prod5-v0.1-South-20deg.FITS.tar
+
 # Install scripts, parfiles, test scripts and test data. Note that we don't
 # need to prepend $(DESTDIR) here (not fully clear why, but that's the way
 # it is)
@@ -273,29 +295,32 @@ testiactdatadir     = $(pyexecdir)/cscripts/tests/data/iactdata
 testiactdata_DATA   = $(testiactdata)
 testiacteventsdir   = $(pyexecdir)/cscripts/tests/data/iactdata/events
 testiactevents_DATA = $(testiactevents)
+testprod501dir      = $(pyexecdir)/cscripts/tests/data/prod5-v0.1
+testprod501_DATA    = $(testprod501data)
 
 # Files to be distributed in the tar file
 EXTRA_DIST = $(binscripts) $(pythonscripts) $(parfiles) \
              $(testscripts) $(testdata) $(testiactdata) \
-             $(testiactevents)
+             $(testiactevents) $(testprod501data)
 
-# Add install hook rule to copy cscripts without .py into the bindir
+# Add install hook rule to create symbolic links to cscripts without .py in the bindir
 install-data-hook:
 	@binlist='$(binscripts)';\
 	for p in $$binlist; do \
-	  chmod +x "$(DESTDIR)$(bindir)/$$p"; \
+		chmod +x "$(DESTDIR)$(bindir)/$$p"; \
 	done
-	@linklist='$(linkscripts)';\
-	for p in $$linklist; do \
+
+	@linklist1='$(linkscripts)';\
+	for p in $$linklist1; do \
 		rm -rf "$(DESTDIR)$(bindir)/$$p"; \
-		cp "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py" "$(DESTDIR)$(bindir)/$$p"; \
+		ln -s "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py" "$(DESTDIR)$(bindir)/$$p"; \
 		chmod +x "$(DESTDIR)$(bindir)/$$p"; \
 	done
 
 # Uninstall hook rule to remove the cscripts from the bindir
 uninstall-hook:
-	@linklist='$(linkscripts)';\
-	for p in $$linklist; do \
+	@linklist2='$(linkscripts)';\
+	for p in $$linklist2; do \
 		rm -rf "$(DESTDIR)$(bindir)/$$p"; \
 	done
 
@@ -307,7 +332,7 @@ clean-local:
 		rm -rf $(top_builddir)/cscripts/modutils.py; \
 		rm -rf $(top_builddir)/cscripts/calutils.py; \
 		rm -rf $(top_builddir)/cscripts/ioutils.py; \
-                rm -rf $(top_builddir)/cscripts/mputils.py; \
+		rm -rf $(top_builddir)/cscripts/mputils.py; \
 		rm -rf $(top_builddir)/cscripts/*.par; \
 	fi
 	rm -rf $(top_builddir)/cscripts/*.pyc
@@ -320,3 +345,4 @@ uninstall-local:
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/__pycache__
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/tests/*.pyc
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/tests/__pycache__
+

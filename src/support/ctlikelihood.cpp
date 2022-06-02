@@ -1,7 +1,7 @@
 /***************************************************************************
  *              ctlikelihood - Base class for likelihood tools             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2019 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2021 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -28,9 +28,12 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+#include <string>
+#include <typeinfo>
 #include "ctlikelihood.hpp"
 
 /* __ Method name definitions ____________________________________________ */
+#define G_OPT                                "ctlikelihood::opt(GOptimizer*)"
 #define G_EVALUATE              "ctlikelihood::evaluate(GModelPar&, double&)"
 
 /* __ Debug definitions __________________________________________________ */
@@ -216,6 +219,38 @@ ctlikelihood& ctlikelihood::operator=(const ctlikelihood& app)
  =                            Public methods                               =
  =                                                                         =
  ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Set optimizer
+ *
+ * @param[in] opt Pointer to optimizer.
+ *
+ * @exception GException::invalid_argument
+ *            Specified optimizer is not of type GOptimizerLM.
+ *
+ * Sets the optimizer. So far only optimizers of type GOptimizerLM are
+ * supported. If a different optimizer is specified the method throws an
+ * exception.
+ ***************************************************************************/
+void ctlikelihood::opt(const GOptimizer* opt)
+{
+    // Throw an exception if the optimizer is not a LM optimizer
+    const GOptimizerLM* lm = dynamic_cast<const GOptimizerLM*>(opt);
+    if (lm == NULL) {
+        std::string cls = std::string(typeid(opt).name());
+        std::string msg = "Method requires \"GOptimizerLM\" optimizer yet the "
+                          "provided optimizer is of type \""+cls+"\". Please "
+                          "specify an instance of \"GOptimizerLM\" as "
+                          "argument.";
+        throw GException::invalid_argument(G_OPT, msg);
+    }
+
+    // Set optimizer
+    m_opt = *lm;
+
+    // Return
+    return;
+}
 
 
 /*==========================================================================

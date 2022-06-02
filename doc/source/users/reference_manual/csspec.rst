@@ -19,15 +19,29 @@ significance of the source detection. Optionally, it also computes an upper
 flux limit that is particularly useful in case that the source is not
 significantly detected within a spectral bin (hidden parameter ``calc_ulim``).
 
-There are two fundamental methods to run the script depending on the value of
-the ``method`` parameter. If ``method=SLICE`` the energy interval defined by the
-``emin`` and ``emax`` parameters is divided into a number of energy bins and an
-independent maximum likelihood fit is performed in each of the energy bins,
-while if ``method=NODES`` the spectral model will be replaced by a node function
-that will be fit to all data. The latter is particularly useful if non-CTA data
-should be fitted such as data from Fermi/LAT or COMPTEL. By default, ``method`` is
-set to ``AUTO`` which will automatically select the method based on the input data.
-For CTA-only observations ``SLICE`` will be used, otherwise ``NODES`` will be used.
+There are three fundamental methods to run the script depending on the value of
+the ``method`` parameter, ``SLICE``, ``BINS`` and ``NODES``.
+
+If ``method=SLICE`` the energy interval defined by the ``emin`` and ``emax``
+parameters is divided into a number of energy bins and an independent maximum
+likelihood fit is performed in each of the energy bins. In order to cope with
+all kinds of spectral models, including composite spectra, input spectrum will
+be converted into a file function, with the normalisation of the file function
+being the fit parameter for each energy bin. This implies that spectral
+components are merged into a single function using the model parameters that
+are specified in the input model.
+
+If ``method=BINS`` the spectral model will be replaced by a bin function that
+will be fit to all data, with ``method=NODES`` the spectral model will be replaced
+by a node function. The advantage of ``BINS`` over ``NODES`` is that with ``BINS``
+the spectral flux points are statistically independent, while with ``NODES`` the
+underlying spectral model connects spectral flux points using a piecewise power
+law. Both methods are particularly useful if non-CTA data should be fitted such
+as data from Fermi/LAT, CGRO/COMPTEL or INTEGRAL/SPI.
+
+By default, ``method`` is set to ``AUTO`` which will automatically select the
+method based on the input data. For CTA-only observations ``SLICE`` will be used,
+otherwise ``NODES`` will be used.
 
 The spectral binning is either defined by a FITS file containing the energy
 boundaries of each bin (option ``ebinalg=FILE``) or as ``enumbins`` bins spread
@@ -53,9 +67,6 @@ The columns are the mean as well as the boundaries of the spectral bin,
 the fitted flux and flux error, the Test Statistics value (option
 ``calc_ts=yes``), the upper flux limit (option ``calc_ulim=yes``) and the
 predicted number of events (only for unbinned data).
-
-.. warning::
-   The upper limit computation is not yet implemented for the ``NODES`` method.
 
 
 General parameters
@@ -95,19 +106,25 @@ General parameters
 ``outfile [file]``
     Output spectrum FITS file.
 
-``method <SLICE|NODES|AUTO> [string]``
+``method <SLICE|NODES|BINS|AUTO> [string]``
     Spectrum generation method.
-    ``SLICE`` will slice energy interval into ``enumbins`` independent bins,
-    ``NODES`` will replace spectral model by node function with ``enumbins``
-    nodes, and ``AUTO`` will automatically select the method based on the input
-    data. For CTA-only observations ``SLICE`` will be used, otherwise ``NODES``
-    will be used.
+    ``SLICE`` will slice the energy interval into ``enumbins`` independent
+    bins,
+    ``NODES`` will replace the spectral model by a node function with
+    ``enumbins`` nodes,
+    ``BINS`` will replace the spectral model by a bin function with
+    ``enumbins`` nodes,
+    and ``AUTO`` will automatically select the method based on the input
+    data. If ``AUTO`` is selected and there are only CTA observations
+    then ``SLICE`` will be used, otherwise ``NODES`` will be used.
 
-``ebinalg <FILE|LIN|LOG> [string]``
+``ebinalg <FILE|LIN|LOG|POW> [string]``
     Algorithm for defining energy bins. For ``FILE``, the energy bins are defined
     in a FITS file that is specified by the ``ebinfile`` parameter, for ``LIN``
-    and ``LOG`` there will be ``enumbins`` energy bins spaced linearly or
-    logarithmically between ``emin`` and ``emax``, respectively.
+    ``LOG`` and ``POW`` there will be ``enumbins`` energy bins spaced linearly,
+    logarithmically, or following a power law between ``emin`` and ``emax``,
+    respectively. For ``POW``, the parameter ``ebingamma`` specifies the slope
+    of the power law.
 
 ``emin [real]``
     Lower energy value for first energy bin (in TeV) if ``LIN`` or ``LOG``
@@ -125,6 +142,10 @@ General parameters
     Name of the file containing the energy binning definition if ``ebinalg=FILE``.
     You may use :ref:`csebins` to generate a file with appropriate energy binning.
 
+``ebingamma [real]``
+    Exponent of the power law for ``POW`` energy binning. An exponent of 1.0
+    corresponds to a logarithmic energy binning.
+
 ``(statistic = DEFAULT) <DEFAULT|CSTAT|WSTAT|CHI2> [string]``
     Optimization statistic. ``DEFAULT`` uses the default statistic for all
     observations, which is ``CSTAT`` or the statistic specified in the
@@ -139,11 +160,18 @@ General parameters
 ``(calc_ulim = yes) [boolean]``
     Compute upper limit for each spectral point?
 
+``(confidence = 0.95) [real]``
+    Confidence level for upper limit computation.
+
 ``(fix_srcs = yes) [boolean]``
     Fix other sky model parameters?
 
 ``(fix_bkg = no) [boolean]``
     Fix background model parameters?
+
+``(bingamma = -2.0) [real]``
+    Spectral index for ``BINS`` method. Within each spectral bin a power law
+    will be assumed with the specified spectral index.
 
 ``(dll_sigstep = 0) [real]``
     Step size in standard deviations for log-like profiles. Note this value 
@@ -152,7 +180,7 @@ General parameters
 ``(dll_sigmax = 5.0) [real]``
     Maximum number of standard deviations for log-like profiles. The final number
     of bins generated in the likelihood profile will be:
-       2*(dll_sigmax/dll_sigstep) + 1
+    ``2*(dll_sigmax/dll_sigstep) + 1``
     ensuring that the central flux will always be evaluated.
 
 ``(dll_freenodes = no) [boolean]``

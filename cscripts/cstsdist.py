@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates the TS distribution for a particular model
 #
-# Copyright (C) 2011-2018 Juergen Knoedlseder
+# Copyright (C) 2011-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ class cstsdist(ctools.csobservation):
 
         # Initialise some members
         self._srcname     = ''
+        self._fits        = None
         self._log_clients = False
         self._model       = None
         self._nthreads    = 0
@@ -65,6 +66,7 @@ class cstsdist(ctools.csobservation):
         # Set pickled dictionary
         state = {'base'        : ctools.csobservation.__getstate__(self),
                  'srcname'     : self._srcname,
+                 'fits'        : self._fits,
                  'log_clients' : self._log_clients,
                  'model'       : self._model,
                  'nthreads'    : self._nthreads}
@@ -83,6 +85,7 @@ class cstsdist(ctools.csobservation):
         """
         ctools.csobservation.__setstate__(self, state['base'])
         self._srcname     = state['srcname']
+        self._fits        = state['fits']
         self._log_clients = state['log_clients']
         self._model       = state['model']
         self._nthreads    = state['nthreads']
@@ -113,7 +116,10 @@ class cstsdist(ctools.csobservation):
         self['edisp'].boolean()
         self['ntrials'].integer()
         self['debug'].boolean()
-        self['outfile'].filename()
+
+        # Read ahead output parameters
+        if self._read_ahead():
+            self['outfile'].filename()
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -261,14 +267,14 @@ class cstsdist(ctools.csobservation):
                 if par.is_free():
 
                     # Set parameter name
-                    name = model_name+"_"+par.name()
+                    name = model_name + '_' + par.name()
 
                     # Append value
                     colnames.append(name)
                     values[name] = par.value()
 
                     # Append error
-                    name = 'e_'+name
+                    name = name+'_error'
                     colnames.append(name)
                     values[name] = par.error()
 
@@ -278,16 +284,81 @@ class cstsdist(ctools.csobservation):
         # Return
         return result
 
+    def _create_fits(self, results):
+        """
+        Create FITS file from results
+
+        Parameters
+        ----------
+        results : list of dict
+            List of result dictionaries
+        """
+        # Gather headers for parameter columns
+        headers = []
+        for colname in results[0]['colnames']:
+            if colname != 'TS' and colname != 'Nevents' and \
+               colname != 'Npred':
+                headers.append(colname)
+
+        # Create FITS table columns
+        nrows   = len(results)
+        ts      = gammalib.GFitsTableDoubleCol('TS', nrows)
+        nevents = gammalib.GFitsTableDoubleCol('NEVENTS', nrows)
+        npred   = gammalib.GFitsTableDoubleCol('NPRED', nrows)
+        ts.unit('')
+        nevents.unit('counts')
+        npred.unit('counts')
+        columns = []
+        for header in headers:
+            name   = gammalib.toupper(header)
+            column = gammalib.GFitsTableDoubleCol(name, nrows)
+            column.unit('')
+            columns.append(column)
+
+        # Fill FITS table columns
+        for i, result in enumerate(results):
+            ts[i]      = result['values']['TS']
+            nevents[i] = result['values']['Nevents']
+            npred[i]   = result['values']['Npred']
+            for k, column in enumerate(columns):
+                column[i] = result['values'][headers[k]]
+
+        # Initialise FITS Table with extension "TS_DISTRIBUTION"
+        table = gammalib.GFitsBinTable(nrows)
+        table.extname('TS_DISTRIBUTION')
+
+        # Add keywors for compatibility with gammalib.GMWLSpectrum
+        table.card('INSTRUME', 'CTA', 'Name of Instrument')
+        table.card('TELESCOP', 'CTA', 'Name of Telescope')
+
+        # Stamp header
+        self._stamp(table)
+
+        # Add script keywords
+        table.card('NTRIALS', self['ntrials'].integer(),  'Number of trials')
+        table.card('STAT',    self['statistic'].string(), 'Optimization statistic')
+        table.card('EDISP',   self['edisp'].boolean(),    'Use energy dispersion?')
+
+        # Append filled columns to fits table
+        table.append(ts)
+        table.append(nevents)
+        table.append(npred)
+        for column in columns:
+            table.append(column)
+
+        # Create the FITS file now
+        self._fits = gammalib.GFits()
+        self._fits.append(table)
+
+        # Return
+        return
+
 
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
         # Get parameters
         self._get_parameters()
 
@@ -306,6 +377,9 @@ class cstsdist(ctools.csobservation):
         # Get number of trials
         ntrials = self['ntrials'].integer()
 
+        # Initialise results
+        results  = []
+
         # If more than a single thread is requested then use multiprocessing
         if self._nthreads > 1:
             args        = [(self, '_trial', i) for i in range(ntrials)]
@@ -317,16 +391,20 @@ class cstsdist(ctools.csobservation):
             # If multiprocessing was used then recover results and put them
             # into the log file
             if self._nthreads > 1:
-                result = poolresults[i][0]
+                results.append(poolresults[i][0])
                 self._log_string(gammalib.TERSE, poolresults[i][1]['log'], False)
 
             # ... otherwise make a trial now
             else:
+
+                # Run trial
                 result = self._trial(i)
 
-            # Write out trial result
-            ioutils.write_csv_row(self['outfile'].filename().url(), i,
-                                  result['colnames'], result['values'])
+                # Append results
+                results.append(result)
+
+        # Create FITS file
+        self._create_fits(results)
 
         # Return
         return
@@ -345,6 +423,38 @@ class cstsdist(ctools.csobservation):
 
         # Return
         return
+
+    def save(self):
+        """
+        Save TS distribution FITS file
+        """
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Save TS distribution')
+
+        # Continue only if FITS file is valid
+        if self._fits != None:
+
+            # Get outmap parameter
+            outfile = self['outfile'].filename()
+
+            # Log file name
+            self._log_value(gammalib.NORMAL, 'TS distribution file', outfile.url())
+
+            # Save TS distribution
+            self._fits.saveto(outfile, self['clobber'].boolean())
+
+        # Return
+        return
+
+    def ts_distribution(self):
+        """
+        Return TS distribution FITS file
+
+        Returns:
+            FITS file containing TS distribution
+        """
+        # Return
+        return self._fits
 
 
 # ======================== #

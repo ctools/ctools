@@ -16,17 +16,18 @@
 #
 # General parameters
 #===================
-inobs,    f, a, NONE,,, "Input event list, counts cube or observation definition XML file"
-incube,   f, a, NONE,,, "Input counts cube file to extract model cube definition"
-inmodel,  f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
-expcube,  f, a, NONE,,, "Input exposure cube file"
-psfcube,  f, a, NONE,,, "Input PSF cube file"
-edispcube,f, a, NONE,,, "Input energy dispersion cube file"
-bkgcube,  f, a, NONE,,, "Input background cube file"
-caldb,    s, a, prod2,,, "Calibration database"
-irf,      s, a, South_0.5h,,, "Instrument response function"
-edisp,    b, h, no,,, "Apply energy dispersion?"
-outcube,  f, a, modcube.fits,,, "Output model cube file"
+inobs,      f, a, NONE,,, "Input event list, counts cube or observation definition XML file"
+incube,     f, a, NONE,,, "Input counts cube file to extract model cube definition"
+inmodel,    f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
+expcube,    f, a, NONE,,, "Input exposure cube file"
+psfcube,    f, a, NONE,,, "Input PSF cube file"
+edispcube,  f, a, NONE,,, "Input energy dispersion cube file"
+bkgcube,    f, a, NONE,,, "Input background cube file"
+instrument, s, h, CTA,CTA|HESS|MAGIC|VERITAS|ASTRI|FACT,, "Name of Cherenkov telescope"
+caldb,      s, a, prod2,,, "Calibration database"
+irf,        s, a, South_0.5h,,, "Instrument response function"
+edisp,      b, h, no,,, "Apply energy dispersion?"
+outcube,    f, a, modcube.fits,,, "Output model cube file"
 
 #
 # Observation parameters
@@ -41,11 +42,12 @@ deadc,    r, h, 0.98,0,1, "Average deadtime correction factor"
 #
 # Energy binning parameters
 #==========================
-ebinalg,  s, a, LOG,FILE|LIN|LOG,, "Algorithm for defining energy bins"
-emin,     r, a, 0.1,,, "Lower energy limit (TeV)"
-emax,     r, a, 100.0,,, "Upper energy limit (TeV)"
-enumbins, i, a, 20,1,200, "Number of energy bins"
-ebinfile, f, a, NONE,,, "Name of the file containing the energy bin definition"
+ebinalg,   s, a, LOG,FILE|LIN|LOG|POW,, "Algorithm for defining energy bins"
+emin,      r, a, 0.1,,, "Lower energy limit (TeV)"
+emax,      r, a, 100.0,,, "Upper energy limit (TeV)"
+enumbins,  i, a, 20,1,200, "Number of energy bins"
+ebinfile,  f, a, NONE,,, "Name of the file containing the energy bin definition"
+ebingamma, r, a, 1.0,,, "Exponent for POW energy node definition"
 
 #
 # Spatial binning parameters

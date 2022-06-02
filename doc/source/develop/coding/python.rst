@@ -251,12 +251,12 @@ User Documentation
 
   .. code-block:: python
 
-    Methods
-    -------
-    read(filename)
-        Read a table from a file
-    sort(column, order='ascending')
-        Sort by `column`
+     Methods
+     -------
+     read(filename)
+         Read a table from a file
+     sort(column, order='ascending')
+         Sort by column
 
 
 Naming Conventions

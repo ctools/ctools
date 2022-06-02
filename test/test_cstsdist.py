@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the cstsdist script.
 #
-# Copyright (C) 2016-2018 Juergen Knoedlseder
+# Copyright (C) 2016-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ class Test(test):
                        ' inmodel="'+self._model+'" srcname="Crab"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' ntrials=2 '+ \
-                       ' outfile="cstsdist_cmd1.dat"'+ \
+                       ' outfile="cstsdist_cmd1.fits"'+ \
                        ' logfile="cstsdist_cmd1.log" chatter=2'
 
         # Check if execution was successful
@@ -91,14 +91,14 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check result file
-        self._check_result_file('cstsdist_cmd1.dat')
+        self._check_result_file('cstsdist_cmd1.fits')
 
         # Setup cstsdist command
         cmd = cstsdist+' inobs="event_file_that_does_not_exist.xml"'+ \
                        ' inmodel="'+self._model+'" srcname="Crab"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' ntrials=2 '+ \
-                       ' outfile="cstsdist_cmd2.dat"'+ \
+                       ' outfile="cstsdist_cmd2.fits"'+ \
                        ' logfile="cstsdist_cmd2.log" chatter=2'
 
         # Check if execution failed
@@ -124,7 +124,7 @@ class Test(test):
         tsdist['caldb']   = self._caldb
         tsdist['irf']     = self._irf
         tsdist['ntrials'] = 2
-        tsdist['outfile'] = 'cstsdist_py1.dat'
+        tsdist['outfile'] = 'cstsdist_py1.fits'
         tsdist['logfile'] = 'cstsdist_py1.log'
         tsdist['chatter'] = 3
 
@@ -134,7 +134,7 @@ class Test(test):
         tsdist.save()
 
         # Check TS distribution file
-        self._check_result_file('cstsdist_py1.dat')
+        self._check_result_file('cstsdist_py1.fits')
 
         # Return
         return
@@ -154,7 +154,7 @@ class Test(test):
         tsdist['caldb']   = self._caldb
         tsdist['irf']     = self._irf
         tsdist['ntrials'] = 2
-        tsdist['outfile'] = 'cstsdist_py2.dat'
+        tsdist['outfile'] = 'cstsdist_py2.fits'
         tsdist['logfile'] = 'cstsdist_py2.log'
         tsdist['chatter'] = 4
 
@@ -163,7 +163,7 @@ class Test(test):
         tsdist.execute()
 
         # Check TS distribution file
-        self._check_result_file('cstsdist_py2.dat')
+        self._check_result_file('cstsdist_py2.fits')
 
         # Return
         return
@@ -178,7 +178,7 @@ class Test(test):
         tsdist['inmodel'] = self._stacked_model
         tsdist['srcname'] = 'Crab'
         tsdist['ntrials'] = 2
-        tsdist['outfile'] = 'cstsdist_py3.dat'
+        tsdist['outfile'] = 'cstsdist_py3.fits'
         tsdist['logfile'] = 'cstsdist_py3.log'
         tsdist['chatter'] = 4
 
@@ -187,7 +187,7 @@ class Test(test):
         tsdist.execute()
 
         # Check TS distribution file
-        self._check_result_file('cstsdist_py3.dat')
+        self._check_result_file('cstsdist_py3.fits')
 
         # Return
         return
@@ -209,7 +209,7 @@ class Test(test):
         tsdist['irf']      = self._irf
         tsdist['ntrials']  = 2
         tsdist['nthreads'] = 1 # This tests at the same time no multiprocessing
-        tsdist['outfile']  = 'cstsdist_py1_pickle.dat'
+        tsdist['outfile']  = 'cstsdist_py1_pickle.fits'
         tsdist['logfile']  = 'cstsdist_py1_pickle.log'
         tsdist['chatter']  = 3
 
@@ -222,13 +222,13 @@ class Test(test):
         obj.save()
 
         # Check TS distribution file
-        self._check_result_file('cstsdist_py1_pickle.dat')
+        self._check_result_file('cstsdist_py1_pickle.fits')
 
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename, nrows=3, ncols=9):
+    def _check_result_file(self, filename, nrows=2, ncols=9):
         """
         Check result file
 
@@ -241,12 +241,13 @@ class Test(test):
         ncols : int, optional
             Required number of columns
         """
-        # Open result file as CSV file
-        results = gammalib.GCsv(filename, ',')
+        # Open pull file as FITS file
+        fits  = gammalib.GFits(filename)
+        table = fits.table('TS_DISTRIBUTION')
 
         # Check dimensions
-        self.test_value(results.nrows(), nrows, 'Check rows in TS file')
-        self.test_value(results.ncols(), ncols, 'Check columns in TS file')
+        self.test_value(table.nrows(), nrows, 'Check rows in TS file')
+        self.test_value(table.ncols(), ncols, 'Check columns in TS file')
 
         # Return
         return

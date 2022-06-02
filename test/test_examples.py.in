@@ -2,7 +2,7 @@
 # ==========================================================================
 # Performs unit tests for the ctools example scripts
 #
-# Copyright (C) 2016-2019 Juergen Knoedlseder
+# Copyright (C) 2016-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -158,7 +158,13 @@ class Test(gammalib.GPythonTestSuite):
         Test show_butterfly
         """
         # Set arguments
-        args = '-p example_show_butterfly.eps %s/butterfly.txt' % self._datadir
+        args = '-p example_show_butterfly_csv.eps %s/butterfly.txt' % self._datadir
+
+        # Execute script
+        self._execute_python('show_butterfly', args=args)
+
+        # Set arguments
+        args = '-p example_show_butterfly_fits.eps %s/butterfly.fits' % self._datadir
 
         # Execute script
         self._execute_python('show_butterfly', args=args)
@@ -289,8 +295,15 @@ class Test(gammalib.GPythonTestSuite):
         Test show_pull_evolution
         """
         # Set arguments
-        args = ('-p example_show_pull_evolution.eps %s/pull.dat '
+        args = ('-p example_show_pull_evolution_csv.eps %s/pull.dat '
                 'Pull_Crab_Prefactor' % self._datadir)
+
+        # Execute script
+        self._execute_python('show_pull_evolution', args=args)
+
+        # Set arguments
+        args = ('-p example_show_pull_evolution_fits.eps %s/pull.fits '
+                'CRAB_PREFACTOR_PULL' % self._datadir)
 
         # Execute script
         self._execute_python('show_pull_evolution', args=args)
@@ -304,15 +317,22 @@ class Test(gammalib.GPythonTestSuite):
         Test show_pull_histogram
         """
         # Set arguments
-        args = ('-p example_show_pull_histogram1.eps %s/pull.dat '
+        args = ('-p example_show_pull_histogram_csv1.eps %s/pull.dat '
                 'Pull_Crab_Prefactor' % self._datadir)
 
         # Execute script
         self._execute_python('show_pull_histogram', args=args)
 
         # Set arguments
-        args = ('-n 20 -p example_show_pull_histogram2.eps %s/pull.dat '
+        args = ('-n 20 -p example_show_pull_histogram_csv2.eps %s/pull.dat '
                 'Pull_Crab_Prefactor' % self._datadir)
+
+        # Execute script
+        self._execute_python('show_pull_histogram', args=args)
+
+        # Set arguments
+        args = ('-p example_show_pull_histogram_fits.eps %s/pull.fits '
+                'CRAB_PREFACTOR_PULL' % self._datadir)
 
         # Execute script
         self._execute_python('show_pull_histogram', args=args)
@@ -375,14 +395,21 @@ class Test(gammalib.GPythonTestSuite):
         Test show_sensitivity
         """
         # Set arguments
-        args = ('-p example_show_sensitivity1.eps %s/sensitivity.dat' %
+        args = ('-p example_show_sensitivity_csv_diff.eps %s/sensitivity.dat' %
                 self._datadir)
 
         # Execute script
         self._execute_python('show_sensitivity', args=args)
 
         # Set arguments
-        args = ('-p example_show_sensitivity2.eps %s/sensitivity_integral.dat' %
+        args = ('-p example_show_sensitivity_csv_int.eps %s/sensitivity_integral.dat' %
+                self._datadir)
+
+        # Execute script
+        self._execute_python('show_sensitivity', args=args)
+
+        # Set arguments
+        args = ('-p example_show_sensitivity_fits_diff.eps %s/sensitivity.fits' %
                 self._datadir)
 
         # Execute script
@@ -418,6 +445,12 @@ class Test(gammalib.GPythonTestSuite):
         # Execute script
         self._execute_python('show_spectrum', args=args)
 
+        # Set arguments
+        args = '-p example_show_spectrum_castro.eps %s/spectrum_castro.fits' % self._datadir
+
+        # Execute script
+        self._execute_python('show_spectrum', args=args)
+
         # Return
         return
 
@@ -427,14 +460,21 @@ class Test(gammalib.GPythonTestSuite):
         Test show_ts_distribution
         """
         # Set arguments
-        args = ('-n 100 -p example_show_ts_distribution1.eps %s/ts.dat' %
+        args = ('-n 100 -p example_show_ts_distribution_csv1.eps %s/ts.dat' %
                 self._datadir)
 
         # Execute script
         self._execute_python('show_ts_distribution', args=args)
 
         # Set arguments
-        args = ('-n 100 -t cdf -p example_show_ts_distribution2.eps %s/ts.dat' %
+        args = ('-n 100 -t cdf -p example_show_ts_distribution_csv2.eps %s/ts.dat' %
+                self._datadir)
+
+        # Execute script
+        self._execute_python('show_ts_distribution', args=args)
+
+        # Set arguments
+        args = ('-n 100 -p example_show_ts_distribution_fits.eps %s/ts.fits' %
                 self._datadir)
 
         # Execute script

@@ -1,6 +1,6 @@
-New Features and Important Changes in ctools 1.7.0
+New Features and Important Changes in ctools 2.0.0
 
-17 February 2020
+1 June 2022
 
 
 Introduction
@@ -11,12 +11,15 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-None
+Added support for ASTRI and FACT instruments (#4058).
 
 
 Documentation
 -------------
-None
+Add Astrophysics Source Code Library (ASCL) shields to "About" page (#3630).
+
+Add test/tutorials.py script and check-tutorial target to test the code in the
+Sphinx tutorials (#3510).
 
 
 Python interface
@@ -26,42 +29,44 @@ None
 
 Support model
 -------------
-None
+Added optimizer setter to ctlikelihood base class.
 
 
 Base classes
 ------------
-The headers in the log files created by cscripts that were derived from the
-ctools.cscript base class were repeated. This repetition was not present in
-the other base classes due to a reopening of the log file in those classes.
-The logic was changed so that the cscripts now behave like the ctools. A log
-file is not written by default in Python, the logFileOpen() method needs to
-be called for that. And the header is only written once in the log file (#3066).
+Renamed virtual abstract ctool::run() method to ctool::process() and introduce
+high-level non-abstact class ctool::run() that handles the counting of running
+GApplication instances. In that way a tool knows whether it is a child or a
+parent application (#3592).
 
 
 ctbin - CTA event binning
 -------------------------
-None
+Stamp output counts cube (#3662).
+
+Removed implicit conversion warning during C++ compilation (#3324).
 
 
 ctbkgcube - CTA background cube generation
 ------------------------------------------
-None
+Stamp output background cube (#3662).
 
 
 ctbutterfly - Generate butterfly diagrams
 -----------------------------------------
-None
+The ASCII output file was replaced by a FITS file, and the butterfly() method
+now returns a GFits objects instead of a GCsv object (#1707). The output FITS
+file is also stamped (#3662).
 
 
 ctcubemask - CTA cube filtering
 -------------------------------
-None
+Stamp output masked cube (#3662).
 
 
 ctedispcube - CTA energy dispersion cube generation
 ---------------------------------------------------
-None
+Stamp output energy dispersion cube (#3662).
 
 
 cterror - Likelihood profile error computation
@@ -71,74 +76,109 @@ None
 
 ctexpcube - CTA exposure cube generation
 ----------------------------------------
-None
+Stamp output exposure cube (#3662).
 
 
 ctfindvar - Variability search
 ------------------------------
-None
+Stamp output FITS files (#3662).
 
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
-None
+Added iter(), logL(), nobs() and npred() methods to access class attributes.
+
+Added the "refit_if_failed" parameter that instructs ctlike to do a refit in
+case that the initial fit failed. Failures considered are a stalled fit, an
+exhaustion of the maximum number of fit iterations, or a significant difference
+between the number of observed and predicted events.
+
+Added to the log file the "Total number of iterations" which is the sum of the
+iterations in the initial fit and a potential refit.
+
+The model fitting results, such as log-likelihood value, number of iterations
+etc. are now added to the output XML file (#3431).
+
+A bug was fixed in the implementation of the "fix_spat_for_ts" parameter that
+only fixed the spatial parameters for the first of the sky models but left
+the spatial parameters free for all additional sky models. Now the parameters
+are fixed for all sky models (#3426).
 
 
 ctmapcube - CTA map cube generation
 -----------------------------------
-None
+Stamp output map cube (#3662).
 
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
-None
+Stamp output model cube (#3662).
 
 
 ctobssim - CTA observation simulation
 -------------------------------------
-None
+Stamp output event files (#3662).
+
+Added models() method allowing for a setting of the model container without
+using the "inmodels" parameter (#3441).
 
 
 ctphase - Event phase computation
 ---------------------------------
-None
+Stamp output event files (#3662).
 
 
 ctprob - Event probability computation
 --------------------------------------
-None
+Stamp output event files (#3662).
 
 
 ctpsfcube - CTA point spread function cube generation
 -----------------------------------------------------
-None
+Stamp output point spread function cube (#3662).
 
 
 ctselect - CTA event selection
 ------------------------------
-None
+Stamp output event files (#3662).
+
+Replaced std::tmpnam() by gammalib::tmpnam() function in ctselect (#3324).
 
 
 ctskymap - CTA sky mapping
 --------------------------
-Added ctskymap::fits() method to allow access of FITS file object before
-saving the object to disk. This allows manipulation of ctskymap results without
-writing a FITS file (#2925).
+Stamp output sky map (#3662).
 
 
 cttsmap - Generation of Test Statistic map
 ------------------------------------------
-Remove response cache for test source before fitting the source (#2973).
+Stamp output TS map (#3662).
+
+Added hidden "fix_spat" parameter that instructs the tool to fix all spatial
+model parameters (#3562).
 
 
 ctulimit - Compute upper limit
 ------------------------------
-None
+The tool now accepts also spatial parameters as parname argument so that upper
+limits can be determined on spatial parameters (#4006)
+
+If the bisection results in a result that is incompatible with the previously
+determine best maximum log-likelihood value or if the bisection interval tends
+towards zero then update the best log-likelihood value with the current result
+and restart the bisection algorithm once more. This allows for dealing with
+ill-conditioned fit problems.
 
 
 support - Support classes
 -------------------------
-None
+Add stamping to ctool::save_event_list() method (#3662).
+
+
+csadd2caldb - Adds CTA response function to calibration database
+----------------------------------------------------------------
+New script that was added to support the installation of prod5-v0.1 CTA response
+functions into the calibration database.
 
 
 csbkgmodel - Generate background model for 3D analysis
@@ -153,7 +193,7 @@ None
 
 csebins - Generate energy boundaries
 ------------------------------------
-None
+Stamp output energy boundaries file (#3662).
 
 
 csfindobs - Find IACT observations
@@ -178,7 +218,13 @@ None
 
 cslightcrv - Generate light curve
 ---------------------------------
-None
+Add confidence parameter to allow specifying confidence level for upper limit
+computation (#3725).
+
+Added support for rectangular On/Off regions. The "srcshape" parameter now
+can now be set to "RECT" to use rectangular sky regions. The parameter is now
+automatic. The parameters "width", "height", and "posang" were added to specify
+the width, height and position angle of the rectangular sky regions (#3248).
 
 
 csmodelinfo - Return model information
@@ -198,12 +244,12 @@ None
 
 csmodelsois - Puts selected sources in diffuse model cube
 ---------------------------------------------------------
-None
+Stamp output diffuse model cube (#3662).
 
 
 csobs2caldb - Generate calibration database entry for an IACT observation
 -------------------------------------------------------------------------
-None
+Stamp output IRF files (#3662).
 
 
 csobsdef - Generate observation definition XML file
@@ -223,69 +269,100 @@ None
 
 csphagen - Generate On/Off observations
 ---------------------------------------
-Setting the exclusion map via csphagen.exclusion_map(object=<map>) will now
-actually use the exclusion map even if the "inexclusion" parameter is not set.
-Before, the only exclusion that would be used was the exclusion passed via the
-"inexclusion" "parameter. If re-running csphagen using the "inexclusion"
-parameter after setting the map with csphagen.exclusion_map() you should first
-call csphagen.exclusion_map(object=gammalib.GSkyRegionMap()). This makes the
-map empty and csphagen then checks the "inexclusion" "parameter (#2925).
+Stamp output OGIP files (#3662).
+
+Added support for rectangular On/Off regions. The "srcshape" parameter now
+can now be set to "RECT" to use rectangular sky regions. The parameter is now
+automatic. The parameters "width", "height", and "posang" were added to specify
+the width, height and position angle of the rectangular sky regions (#3248).
 
 
 csphasecrv - Generate phase curve
 ---------------------------------
-None
+Stamp output phase curve file (#3662).
+
+Added support for rectangular On/Off regions. The "srcshape" parameter now
+can now be set to "RECT" to use rectangular sky regions. The parameter is now
+automatic. The parameters "width", "height", and "posang" were added to specify
+the width, height and position angle of the rectangular sky regions (#3248).
 
 
 cspull - Generate pull distributions
 ------------------------------------
-None
+The ASCII output file was replaced by a FITS file (#1707). The output FITS file
+is stamped (#3662).
 
 
 csresmap - Generate residual map
 --------------------------------
-None
+Stamp output residual map (#3662).
 
 
 csresspec - Generate residual spectrum
 --------------------------------------
-None
+Stamp output residual spectrum (#3662).
 
 
 csroot2caldb - Generates calibration database from ROOT file
 ------------------------------------------------------------
-None
+Stamp output IRF files (#3662).
+
+
+csscs - Spectral component separation
+-------------------------------------
+Stamp output FITS file (#3662).
+
+Added support for rectangular On/Off regions. The "srcshape" parameter now
+can now be set to "RECT" to use rectangular sky regions. The parameter is now
+automatic. The parameters "width", "height", and "posang" were added to specify
+the width, height and position angle of the rectangular sky regions (#3248).
 
 
 cssens - Computes sensitivity curve
 -----------------------------------
-Allow using spectral models without "Prefactor" parameter for sensitivity
-computation (#1889).
+Add confidence parameter to allow specifying confidence level for upper limit
+computation (#3725).
+
+Added constraints on the minimum number of source counts in the sensitivity
+computations. The constraints are specified by the new parameters "mincounts",
+"bkgexcess" and "bkgrad". In addition, a "seed" parameter was added allowing
+to specify the seed value for the random number generators. Changes were also
+made to improve the stability of the sensitivity computation (#3668).
+
+The test source position is now used as pointing direction, eventually offset
+in galactic latitude by a number of degrees specified using the "offset"
+parameter (#3555).
+
+The ASCII output file was replaced by a FITS file (#1707). The output FITS file
+is stamped (#3662).
 
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-Support to generate Castro plots was added and the relevant information is
-now sorted in the output FITS file (#2938).
+Stamp output spectrum (#3662).
+
+The GModelSpectralFunc spectral model constructor is now used to convert any
+spectral model into a file function before spectral model fitting (#3626).
+
+Added BINS method that replaces the spectral model by a bin function that is
+implemented by the GammaLib class GModelSpectralBins. Using a bin function
+assures that spectral points are statistically independent (#3606).
 
 
 cssrcdetect - Detects sources in sky map
 ----------------------------------------
-The using of a smoothing kernel in the _map_moments() method can lead to
-negative squared standard deviations that lead to an exception when the
-square root is taken. A filter was introduced that sets all small values
-of mean and std to zero, avoiding thus the exception.
+None
 
 
 cstsdist - Computes Test Statistic distribution
 -----------------------------------------------
-Allow using spectral models without "Prefactor" parameter for computation of
-TS distribution (#1889).
+The ASCII output file was replaced by a FITS file (#1707). The output FITS
+file is stamped (#3662).
 
 
 cstsmapmerge - Merge Test Statistic maps
 ----------------------------------------
-None
+Stamp output TS map (#3662).
 
 
 cstsmapsplit - Prepare split Test Statistic computation
@@ -295,15 +372,7 @@ None
 
 csviscube - Generate visibility cube
 ------------------------------------
-Moon contraints were added to compute a more accurate visibility cube. So far
-there are two constraints:
-- moonzenith, which specifies a minimum allow zenith angle for the Moon. In
-  other words, if the Moon is higher in the sky than the specified zenith
-  angle, the corresponding times are excluded from the visibility cube.
-- maxfli, which specifies the maximum fraction of lunar illumination. If the
-  Moon has an illumination that is equal or larger than this fraction, the
-  corresponding times are excluded from the visibility cube.
-(#3065).
+Stamp output visibility cube (#3662).
 
 
 csworkflow - Execute workflow
@@ -323,9 +392,7 @@ None
 
 modutils - Model utilities
 --------------------------
-Allow using spectral models without "Prefactor" parameter as test source in
-test_source() function. Add normalisation_parameter() function to retrieve
-spectral normalisation parameter from any model (#1889).
+None
 
 
 mputils - Multiprocessing utilities
@@ -335,20 +402,78 @@ None
 
 obsutils - Observation utilities
 --------------------------------
-None
+Added support for rectangular On/Off regions in get_onoff_obs(). The "srcshape"
+parameter now can now be set to "RECT" to use rectangular sky regions. The
+parameter is now automatic. The parameters "width", "height", and "posang" were
+added to specify the width, height and position angle of the rectangular sky
+regions (#3248).
+
+
+comgendb - Generate COMPTEL database
+------------------------------------
+Added script (#3983).
+
+
+comlixfit - COMPTEL maximum likelihood fitting using SRCLIX algorithm
+---------------------------------------------------------------------
+Added script (#3738).
+
+
+comlixmap - Generation of COMPTEL Test Statistic map using SRCLIX algorithm
+---------------------------------------------------------------------------
+Added script (#3738).
+
+
+comobsadd - Combine COMPTEL observations
+----------------------------------------
+Added script (#3738).
+
+
+comobsback - Generate background model for COMPTEL observations
+---------------------------------------------------------------
+Added script (#3738).
+
+
+comobsbin - Bin COMPTEL observations
+------------------------------------
+Added script (#3738).
+
+
+comobsmodel - Generate model for binned COMPTEL observations
+------------------------------------------------------------
+Added script (#3738).
+
+
+comobsres - Generate residuals of COMPTEL observations
+------------------------------------------------------
+Added script (#3738).
+
+
+comobsselect - Select observations from COMPTEL database
+--------------------------------------------------------
+Added script (#3738).
+
+
+comobssim - Simulate COMPTEL observations
+-----------------------------------------
+Added script (#3738).
+
+
+compulbin - Generate pulsar pulse profile
+-----------------------------------------
+Added script (#3973).
+
+
+comsrcdetect - Detect source in Test Statistic map
+--------------------------------------------------
+Added script (#3738).
 
 
 Examples
 --------
-In show_pull_histogram.py relpaced the call to mlab.normpdf() by a direct
-computation of the normalisation, so that the code also works for matplotlib
-> 3.1.0 (#3156).
-
-The show_viscube.py script was added to display a visibility cube (#3065).
-
-The example scripts show_butterfly.py, show_spectrum.py, show_residuals.py
-and show_significance_distribution.py can now be run using objects that only
-exist in memory (#2925).
+The show_butterfly, show_pull_evolution.py, show_pull_histogram.py,
+show_sensitivity.py and show_ts_distribution.py scripts were adapted to deal
+also with FITS output files (#1707).
 
 
 caldb

@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctbin tool.
 #
-# Copyright (C) 2014-2018 Juergen Knoedlseder
+# Copyright (C) 2014-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -254,21 +254,22 @@ class Test(test):
 
         # Set-up ctbin using an observation container
         binning = ctools.ctbin(obs)
-        binning['outobs']   = 'ctbin_py3.fits'
-        binning['ebinalg']  = 'LOG'
-        binning['emin']     = 1.0
-        binning['emax']     = 100.0
-        binning['enumbins'] = 10
-        binning['nxpix']    = 40
-        binning['nypix']    = 40
-        binning['binsz']    = 0.1
-        binning['coordsys'] = 'CEL'
-        binning['proj']     = 'CAR'
-        binning['xref']     = 83.63
-        binning['yref']     = 22.01
-        binning['publish']  = True
-        binning['logfile']  = 'ctbin_py3.log'
-        binning['chatter']  = 3
+        binning['outobs']    = 'ctbin_py3.fits'
+        binning['ebinalg']   = 'POW'
+        binning['emin']      = 1.0
+        binning['emax']      = 100.0
+        binning['enumbins']  = 10
+        binning['ebingamma'] = 1.0
+        binning['nxpix']     = 40
+        binning['nypix']     = 40
+        binning['binsz']     = 0.1
+        binning['coordsys']  = 'CEL'
+        binning['proj']      = 'CAR'
+        binning['xref']      = 83.63
+        binning['yref']      = 22.01
+        binning['publish']   = True
+        binning['logfile']   = 'ctbin_py3.log'
+        binning['chatter']   = 3
 
         # Execute ctbin tool
         binning.logFileOpen()

@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for calibration database                                      #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2022 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -19,7 +19,7 @@
 #                                                                           #
 #############################################################################
 
-# Calibration files to install
+# CTA calibration files to install
 caldb_prod2_indxdir      = $(datadir)/caldb/data/cta/prod2
 caldb_prod2_indx_DATA    = $(srcdir)/data/cta/prod2/caldb.indx
 #

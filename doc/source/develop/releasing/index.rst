@@ -21,4 +21,5 @@ To create a new ctools release you have to go through the following steps:
    * added unit tests for all new code
    * added a page about the software changes to the release history
    * updated the User documentation if necessary
+   * updated the csinfo script if necessary
 

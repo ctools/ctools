@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2019 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -227,18 +227,13 @@ void ctobssim::clear(void)
 
 
 /***********************************************************************//**
- * @brief Run the ctobssim tool.
+ * @brief Process the ctobssim tool.
  *
  * Gets the user parameters, loops over all CTA observations in the
  * observation container, and simulate events for each observation. 
  ***************************************************************************/
-void ctobssim::run(void)
+void ctobssim::process(void)
 {
-    // Switch screen logging on in debug mode
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get parameters
     get_parameters();
 
@@ -551,6 +546,7 @@ void ctobssim::init_members(void)
     m_max_rate    = 1.0e6;
 
     // Initialise protected members
+    m_models.clear();
     m_rans.clear();
     m_save_and_dispose = false;
 
@@ -582,9 +578,10 @@ void ctobssim::copy_members(const ctobssim& app)
     m_max_rate    = app.m_max_rate;
 
     // Copy protected members
+    m_models           = app.m_models;
+    m_save_and_dispose = app.m_save_and_dispose;
     m_max_photons      = app.m_max_photons;
     m_rans             = app.m_rans;
-    m_save_and_dispose = app.m_save_and_dispose;
     m_event_id         = app.m_event_id;
 
     // Return
@@ -632,6 +629,13 @@ void ctobssim::get_parameters(void)
     // that they are missing
     else {
         setup_observations(m_obs);
+    }
+
+    // If models have been specified using the models() method then use
+    // these models instead of any models that may already exist in the
+    // observations.
+    if (m_models.size() > 0) {
+        m_obs.models(m_models);
     }
 
     // Set observation boundaries
@@ -1403,7 +1407,7 @@ double ctobssim::get_model_flux(const GModelSky* model,
         if (cube != NULL) {
 
             // Set MC cone
-            cube->set_mc_cone(centre, radius);
+            cube->mc_cone(GSkyRegionCircle(centre, radius));
 
             // Allocate node function to replace the spectral component
             GModelSpectralNodes* nodes =
@@ -1703,6 +1707,9 @@ void ctobssim::save_fits(void)
         // Save observation into FITS file
         obs->save(m_outevents, clobber());
 
+        // Stamp FITS file
+        stamp(m_outevents);
+
     } // endif: event list has not yet been saved and disposed
 
     // Return
@@ -1754,6 +1761,9 @@ void ctobssim::save_xml(void)
 
                     // Save observation into FITS file
                     obs->save(outfile, clobber());
+
+                    // Stamp FITS file
+                    stamp(outfile);
 
                 }
 

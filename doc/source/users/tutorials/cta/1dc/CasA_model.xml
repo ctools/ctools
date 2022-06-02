@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<source_library title="source library">
+  <source name="Cassiopeia A" type="PointSource">
+    <spectrum type="PowerLaw">
+      <parameter name="Prefactor"   value="1.45" scale="1e-18" min="0"            free="1"/>
+      <parameter name="Index"       value="2.75" scale="-1"    min="-10" max="10" free="1"/>
+      <parameter name="PivotEnergy" value="1"    scale="1e6"                      free="0"/>
+    </spectrum>
+    <spatialModel type="PointSource">
+      <parameter name="RA"  value="350.8500" scale="1" free="0"/>
+      <parameter name="DEC" value="58.8150"  scale="1" free="0"/>
+    </spatialModel>
+  </source>
+  <source name="Background model" type="CTAIrfBackground" instrument="CTA">
+    <spectrum type="PowerLaw">
+      <parameter name="Prefactor" value="1" scale="1"   min="0.001" max="1000" free="1"/>
+      <parameter name="Index"     value="0" scale="1"   min="-5"    max="5"    free="1"/>
+      <parameter name="Scale"     value="1" scale="1e6" min="0.01"  max="1000" free="0"/>
+    </spectrum>
+  </source>
+</source_library>

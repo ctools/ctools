@@ -1,7 +1,7 @@
 /***************************************************************************
  *              ctlikelihood - Base class for likelihood tools             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016-2019 by Juergen Knoedlseder                         *
+ *  copyright (C) 2016-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -63,7 +63,7 @@ public:
 
     // Dummy methods (implementation makes this class non-abstract)
     virtual void clear(void) {}
-    virtual void run(void) {}
+    virtual void process(void) {}
     virtual void save(void) {}
 };
 %}
@@ -71,6 +71,27 @@ public:
 // Include (int ARGC, char **ARGV) typemap to allow passing command line
 // arguments to GApplication constructor
 %include "argcargv.i"
+
+/* __ Include interface classes __________________________________________ */
+%import(module="gammalib.opt") "GOptimizer.i";
+
+/* __ Typemaps ___________________________________________________________ */
+%typemap(out) GOptimizer* {
+    char classname[80];
+    strcpy(classname, "_p_");
+    strcat(classname, result->classname().c_str());
+    swig_type_info *myinfo = SWIGTYPE_p_GOptimizer;
+    swig_cast_info *mycast = 0;
+    mycast = myinfo->cast;
+    while (mycast != 0) {
+        if (strcmp(classname, mycast->type->name) == 0) {
+            myinfo = mycast->type;
+            break;
+        }
+        mycast = mycast->next;
+    }
+    $result = SWIG_NewPointerObj(SWIG_as_voidptr($1), myinfo, 0 |  0);
+}
 
 
 /***********************************************************************//**
@@ -99,10 +120,11 @@ public:
 
     // Pure virtual methods
     virtual void clear(void) = 0;
-    virtual void run(void) = 0;
+    virtual void process(void) = 0;
     virtual void save(void) = 0;
 
     // Methods
+    void              opt(const GOptimizer* opt);
     const GOptimizer* opt(void) const;
 
     // Make methods protected in Python by prepending an underscore
@@ -140,7 +162,7 @@ public:
 
     // Methods
     virtual void clear(void);
-    virtual void run(void);
+    virtual void process(void);
     virtual void save(void);
 };
 
@@ -190,10 +212,23 @@ def _init_cslikelihood(self, name, version, argv):
     self._log.date(True)
 cslikelihood._init_cslikelihood = _init_cslikelihood
 
+# Run the script
+def _run(self):
+    if self._logDebug():
+        self._log.cout(True)
+    self._inc_running()
+    self.process()
+    self._dec_running()
+cslikelihood.run = _run
+
 # Execute the script
 def _execute(self):
+    self._inc_running()
     self._read_ahead(True)
-    self.run()
+    if self._logDebug():
+        self._log.cout(True)
+    self.process()
     self.save()
+    self._dec_running()
 cslikelihood.execute = _execute
 %}

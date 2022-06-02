@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2019 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -67,10 +67,11 @@ public:
 
     // Pure virtual methods
     virtual void clear(void) = 0;
-    virtual void run(void) = 0;
+    virtual void process(void) = 0;
     virtual void save(void) = 0;
 
     // Public methods
+    virtual void run(void);
     virtual void execute(void);
 
 #ifdef SWIG

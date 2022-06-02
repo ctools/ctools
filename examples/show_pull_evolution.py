@@ -2,7 +2,7 @@
 # ==========================================================================
 # Shows the evolution of the mean and rms pull
 #
-# Copyright (C) 2015-2017 Juergen Knoedlseder
+# Copyright (C) 2015-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 #
 # ==========================================================================
 import sys
-import cscripts
 try:
     import matplotlib.pyplot as plt
     plt.figure()
@@ -32,6 +31,78 @@ try:
 except ImportError:
     print('This script needs the "numpy" module')
     sys.exit()
+import gammalib
+import cscripts
+
+
+# ====================== #
+# Read pull distribution #
+# ====================== #
+def read_pull_distribution(filename, parname):
+    """
+    Read pull distribution
+
+    Parameters
+    ----------
+    filename : str
+        Name of FITS or CSV file
+    parname : str
+        Parameter name
+
+    Returns
+    -------
+    pulls : list of floats
+        List with pull distribution
+    """
+    # Read pull distribution dependent on file type
+    fname = gammalib.GFilename(filename)
+    if fname.is_fits():
+        pulls = read_pull_distribution_fits(filename, parname)
+    else:
+        pulls = cscripts.ioutils.read_pull_values(filename, parname)
+
+    # Return pulls
+    return pulls
+
+
+# ===================================== #
+# Read pull distribution from FITS file #
+# ===================================== #
+def read_pull_distribution_fits(filename, parname):
+    """
+    Read pull distribution from FITS file
+
+    Parameters
+    ----------
+    filename : str
+        Name of FITS file
+    parname : str
+        Parameter name
+
+    Returns
+    -------
+    pulls : list of floats
+        List with pull distribution
+    """
+    # Open FITS file
+    fits = gammalib.GFits(filename)
+
+    # Get pull distribution table
+    table = fits.table('PULL_DISTRIBUTION')
+
+    # Get relevant column
+    column = table[parname]
+
+    # Initialise vector
+    pulls = []
+
+    # Fill vectors
+    nrows = table.nrows()
+    for row in range(nrows):
+        pulls.append(column[row])
+
+    # Return
+    return pulls
 
 
 # =================== #
@@ -50,8 +121,11 @@ def plot_pull_evolution(filename, parname, plotfile):
     plotfile : str
         Plot filename
     """
-    # Read values from CSV file
-    values = np.array(cscripts.ioutils.read_pull_values(filename, parname))
+    # Read pull distribution from file
+    pulls = read_pull_distribution(filename, parname)
+    
+    # Create Numpy array
+    values = np.array(pulls)
 
     # Compute mean and rms
     nsamples = len(values)
@@ -97,7 +171,7 @@ def show_pull_evolution():
     usage = 'show_pull_evolution.py [-p plotfile] file parameter'
 
     # Set default options
-    options = [{'option': '-p',   'value': ''}]
+    options = [{'option': '-p', 'value': ''}]
 
     # Get arguments and options from command line arguments
     args, options = cscripts.ioutils.get_args_options(options, usage)

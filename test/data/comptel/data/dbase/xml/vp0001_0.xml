@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<observation_list title="observation list">
+  <observation name="CRAB" id="vp0001_0" instrument="COM">
+    <parameter name="EVP" file="$COMDATA/phase01/vp0001_0/vp0001_evp.fits" />
+    <parameter name="TIM" file="$COMDATA/dbase/tim/vp0001_0_tim.fits" />
+    <parameter name="OAD" file="$COMDATA/phase01/vp0001_0/vp0001_oad.fits" />
+  </observation>
+</observation_list>

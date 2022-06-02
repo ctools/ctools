@@ -3,14 +3,21 @@
 Introduction
 ============
 
-ctools is a software package developed for the scientific analysis of 
-Cherenkov Telescope Array (CTA) data or any other Imaging Air Cherenkov 
-Telescope.
+ctools is a software package developed for the scientific analysis of
+gamma-ray astronomy data with emphasis on data from the Cherenkov Telescope
+Array (CTA) data or any other Imaging Air Cherenkov Telescope.
 
 In this User Manual you will now learn how to use the ctools package.
 If you encounter any problems, please read the :ref:`sec_help` section.
 And you should read the :ref:`sec_develop` section if you would like to
 contribute to the ctools developments.
+
+The ctools software package is based on `GammaLib <http://cta.irap.omp.eu/gammalib/index.html>`_,
+a C++ API and Python module that provides support for the scientific analysis of
+astronomical gamma-ray data. For more information on
+`GammaLib <http://cta.irap.omp.eu/gammalib/index.html>`_
+please read the `GammaLib User documentation <http://cta.irap.omp.eu/gammalib/users/index.html>`_.
+
 
 Running ctools
 --------------
@@ -66,7 +73,7 @@ And here an example for generating a light curve from Python:
 
 .. code-block:: python
 
-   >>> import cslightcrv
+   >>> import cscripts
    >>> lightcrv = cscripts.cslightcrv()
    >>> lightcrv.execute()
 
@@ -145,3 +152,19 @@ method before running the tool, for example
    ...
    >>> sim.logFileOpen()
    >>> sim.run()
+
+
+Additional modules
+------------------
+
+From version 2.0.0 on ctools includes an additional module comprising scripts
+for COMPTEL/CGRO data analysis. All COMPTEL scripts start with ``com`` (for example
+:ref:`comlixfit` for the fitting of data using the SRCLIX algorithm) and are used
+in the same way as the regular ctools or cscripts. All COMPTEL scripts are also
+available from Python through a dedicated ``comscripts`` module:
+
+.. code-block:: python
+
+   >>> import comscripts
+   >>> fit = comscripts.comlixfit()
+

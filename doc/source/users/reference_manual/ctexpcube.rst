@@ -38,10 +38,11 @@ well sampled (in particular at low energies).
 
 :ref:`ctexpcube` generates an exposure cube FITS file comprising three extensions.
 The primary extension contains a 3-dimensional image that contains the 
-exposure values. The next extension named ``ENERGIES`` contains a binary table
-that defines the energies of the exposure cube. The last extension named ``GTI``
-contains a binary table that provides the Good Time Intervals of all
-observations that have been used for the computation of the exposure cube.
+exposure values. The values are in units of cm**2 s. The next extension named
+``ENERGIES`` contains a binary table that defines the energies of the exposure
+cube. The last extension named ``GTI`` contains a binary table that provides the
+Good Time Intervals of all observations that have been used for the computation
+of the exposure cube.
 
 
 General parameters
@@ -62,11 +63,13 @@ General parameters
 ``outcube [file]``
     Output exposure cube file.
 
-``ebinalg <FILE|LIN|LOG> [string]``
+``ebinalg <FILE|LIN|LOG|POW> [string]``
     Algorithm for defining energy bins. For ``FILE``, the energy bins are defined
     in a FITS file that is specified by the ``ebinfile`` parameter, for ``LIN``
-    and ``LOG`` there will be ``enumbins`` energy bins spaced linearly or
-    logarithmically between ``emin`` and ``emax``, respectively.
+    ``LOG`` and ``POW`` there will be ``enumbins`` energy bins spaced linearly,
+    logarithmically, or following a power law between ``emin`` and ``emax``,
+    respectively. For ``POW``, the parameter ``ebingamma`` specifies the slope
+    of the power law.
 
 ``emin [real]``
     Lower energy value for first energy bin (in TeV) if ``LIN`` or ``LOG``
@@ -83,6 +86,10 @@ General parameters
 ``ebinfile [file]``
     Name of the file containing the energy binning definition if ``ebinalg=FILE``.
     You may use :ref:`csebins` to generate a file with appropriate energy binning.
+
+``ebingamma [real]``
+    Exponent of the power law for ``POW`` energy binning. An exponent of 1.0
+    corresponds to a logarithmic energy binning.
 
 ``(addbounds = no) [boolean]``
     Add energies to the exposure cube at the observation energy boundaries?

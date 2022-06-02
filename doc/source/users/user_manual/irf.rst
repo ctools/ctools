@@ -1,7 +1,7 @@
 .. _um_irf:
 
-Instrument Response Functions
------------------------------
+IRFs
+----
 
 .. toctree::
    :maxdepth: 1
@@ -10,3 +10,4 @@ Instrument Response Functions
    irf_cta
    irf_lat
    irf_comptel
+   irf_spi

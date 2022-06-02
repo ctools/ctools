@@ -9,47 +9,58 @@ Perform maximum likelihood model fitting.
 Synopsis
 --------
 
-This tool performs a maximum likelihood fitting of a model to unbinned or 
-binned data. All model parameters marked with the attribute ``free="1"`` 
+This tool performs a maximum likelihood fitting of a model to unbinned, binned
+or On/Off data. All model parameters marked with the attribute ``free="1"``
 in the input model XML file will be adjusted to the value that maximises 
-the probability that the observed data have been drawn from the model.
-The tool can mix the analysis of unbinned and binned data, and is also able
-to perform a joint maximum likelihood analysis of data collected in 
-separate observations or with different instruments.
+the probability that the observed data have been drawn from the model. The tool
+can mix the analysis of unbinned, binned and On/Off data, and is also able to
+perform a joint maximum likelihood analysis of data collected in separate
+observations or with different instruments.
 
-:ref:`ctlike` will automatically switch between unbinned, binned and joint analysis
-on basis of the file provided on input (parameter ``inobs``). Providing an 
-event list will lead to an unbinned analysis while providing a counts cube 
-will lead to a binned analysis. If several observations have been stacked
-into a single counts cube, an exposure cube, a point spread function cube and
-a background cube need also to be provided. :ref:`ctlike` will automatically prompt
+:ref:`ctlike` will automatically switch between unbinned, binned, On/Off and joint
+analysis on basis of the file provided on input (parameter ``inobs``). Providing
+an event list will lead to an unbinned analysis while providing a counts cube
+will lead to a binned analysis. If several observations have been stacked into a
+single counts cube, an exposure cube, a point spread function cube and a
+background cube need also to be provided. :ref:`ctlike` will automatically prompt
 for these parameters in case that a counts cube is given. Answering ``NONE``
 will ignore the exposure cube, point spread function cube and background cube
 and handle the data as a single observation using the specified instrument
 response function (parameters ``caldb`` and ``irf``).
 
-Multiple observations, including data collected with different instruments,
-can be handled by specifying an observation definition file on input. Each of
-the observations will be kept separately and  associated with its appropriate
-instrument response functions, as opposed to a stacked analysis where average
-response functions, computed using :doc:`ctexpcube`, :doc:`ctpsfcube` and :doc:`ctbkgcube`,
-are used. If an observation definition file is provided, :ref:`ctlike` will use the
-joint likelihood of all the observations for parameter optimisation.
+Providing an observation definition XML file containing an On/Off observation
+will trigger an On/Off analysis. Multiple observations, including data collected
+with different instruments, can also be handled by specifying an observation
+definition XML file on input. Each of the observations will be kept separately
+and associated with its appropriate instrument response functions, as opposed to
+a stacked analysis where average response functions, computed using :doc:`ctexpcube`,
+:doc:`ctpsfcube` and :doc:`ctbkgcube`, are used. If an observation definition XML
+file is provided, :ref:`ctlike` will use the joint likelihood of all the
+observations for parameter optimisation.
 
-By default, :ref:`ctlike` will use the Poisson statistics for likelihood computation,
-but for binned analysis also Gaussian statistics can be specified (parameter
-``stat``). Optionally, a refit can be requested after an initial fit (parameter
-``refit``), but normally this is not needed. For all model components that
-have the ``tscalc="1"`` attribute set, :ref:`ctlike` will also compute the Test
-Statistics value that is a measure of the source significance. Optionally,
-the spatial model parameters can be kept fixed during that computation
-(parameter ``fix_spat_for_ts``).
+By default, :ref:`ctlike` will use the Poisson statistic for likelihood computation,
+but for binned analysis also Gaussian statistic can be specified (parameter
+``statistic``). In case of an On/Off analysis, data can be fitted using either the
+``CSTAT`` or the ``WSTAT`` statistic. The former will adjust a background model to
+the On and Off data, while the latter will assume that the background rates per
+solid angle are identical in the On and Off regions, and will marginalise over
+the corresponding background rates. The fit statistic can also be specified in
+the observation definition XML file for each observation using the ``statistic``
+attribute.
+
+For all model components that have the ``tscalc="1"`` attribute set in the input
+model XML file, :ref:`ctlike` will also compute the Test Statistic value that is a
+measure of the source significance. Optionally, the spatial model parameters can
+be kept fixed during that computation (parameter ``fix_spat_for_ts``).
+
+Optionally, a refit can be requested after an initial fit (parameter ``refit``),
+but normally this is not needed.
 
 :ref:`ctlike` generates an output model XML file that contains the values of the
 best fitting model parameters. For all free parameters, an ``error`` attribute
 is added that provides the statistical uncertainty in the parameter estimate.
-If computation of the Test Statistics has been requested for a model component,
-a ``ts`` attribute providing the Test Statistics value is added. The output model
+If computation of the Test Statistic has been requested for a model component,
+a ``ts`` attribute providing the Test Statistic value is added. The output model
 can be used as an input model for other ctools.
 
 In addition, the covariance matrix can be saved into a file by specifying a
@@ -105,11 +116,23 @@ General parameters
 ``(refit = no) [boolean]``
     Perform refitting of solution after initial fit.
 
+``(refit_if_failed = yes) [boolean]``
+    Perform refitting of solution in case that the initial fit failed. Failures
+    considered are a stalled fit, an exhaustion of the maximum number of fit
+    iterations, or a significant difference between the number of observed and
+    predicted events.
+
 ``(like_accuracy = 0.005) [real]``
     Absolute accuracy of maximum likelihood value. Reducing this value will
     increase the number of iterations and provide a more accurate maximum
     log likelihood value. Converserly, decreasing the value will result in less
     iterations at the expense of a less accurate maximum likelihood value.
+
+``(accept_dec = 0.0) [real]``
+    Maximum accepted log-likelihood decrease. Setting this parameter to a positive
+    value with allow some decrease of the log-likelihood. This may help to get the
+    algorithm out of a local minimum. Use this parameter with case since it may
+    lead to a solution that is not the maximum likelihood solution.
 
 ``(max_iter = 50) [integer]``
     Maximum number of fit iterations.

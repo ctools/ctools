@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a residual spectrum.
 #
-# Copyright (C) 2017-2019 Luigi Tibaldo
+# Copyright (C) 2017-2022 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -95,6 +95,8 @@ class csresspec(ctools.csobservation):
                 self['emin'].real()
                 self['emax'].real()
                 self['enumbins'].integer()
+                if self['ebinalg'].string() == 'POW':
+                    self['ebingamma'].real()
             if n_cta > n_unbinned:
                 n_notunbin = n_cta - n_unbinned
 
@@ -218,9 +220,11 @@ class csresspec(ctools.csobservation):
         if self['ebinalg'].string() == 'FILE':
             cntcube['ebinfile'] = self['ebinfile'].filename()
         else:
-            cntcube['enumbins'] = self['enumbins'].integer()
-            cntcube['emin']     = self['emin'].real()
-            cntcube['emax']     = self['emax'].real()
+            cntcube['enumbins']  = self['enumbins'].integer()
+            cntcube['emin']      = self['emin'].real()
+            cntcube['emax']      = self['emax'].real()
+            if self['ebinalg'].string() == 'POW':
+                cntcube['ebingamma'] = self['ebingamma'].real()
         cntcube.run()
 
         # Retrieve the binned observation container
@@ -743,14 +747,10 @@ class csresspec(ctools.csobservation):
         return result
 
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
         # Get parameters
         self._get_parameters()
 
@@ -801,6 +801,9 @@ class csresspec(ctools.csobservation):
             results = self._stack_results(results)
             table   = self._results2table(results[0])
             self._fits.append(table)
+
+        # Stamp FITS file
+        self._stamp(self._fits)
 
         # Return
         return

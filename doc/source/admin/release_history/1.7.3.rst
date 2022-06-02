@@ -1,0 +1,14 @@
+.. _1.7.3:
+
+ctools 1.7.3 release (2 December 2020)
+======================================
+
+Overview
+--------
+
+ctools 1.7.3 is a bug fix release for ctools release 1.7.
+
+The following bugs were fixed:
+
+* [`3423 <https://cta-redmine.irap.omp.eu/issues/3423>`_] -
+  Import matplotlib first in example scripts

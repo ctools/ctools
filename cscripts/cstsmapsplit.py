@@ -2,7 +2,7 @@
 # ==========================================================================
 # Create commands to split TS map computation
 #
-# Copyright (C) 2016-2019 Michael Mayer
+# Copyright (C) 2016-2022 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -121,14 +121,10 @@ class cstsmapsplit(ctools.cslikelihood):
 
 
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
         # Get parameters
         self._get_parameters()
 
@@ -246,6 +242,9 @@ class cstsmapsplit(ctools.cslikelihood):
         # Write commands to file
         for cmd in self._cmd:
             f.write(cmd + '\n')
+
+        # Add wait statement
+        f.write('wait\n')
 
         # Close file
         f.close()

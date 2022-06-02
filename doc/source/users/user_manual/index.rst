@@ -8,7 +8,8 @@ User Manual
 
    introduction
    overview
-   data
+   iact_data
+   comptel_data
    likelihood
    models
    irf

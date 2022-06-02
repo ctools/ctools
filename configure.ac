@@ -1,7 +1,7 @@
 #############################################################################
 # Configuration for ctools - tools for science analysis of CTA data         #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2019 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2021 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -28,10 +28,9 @@
 #############################################################################
 # Initialisation                                                            #
 #############################################################################
-AC_INIT([ctools], [1.7.0.dev], [jurgen.knodlseder@irap.omp.eu], [ctools])
+AC_INIT([ctools], [2.0.0.dev], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
-#AM_INIT_AUTOMAKE([gnu no-dependencies foreign])
 AM_INIT_AUTOMAKE([gnu -Wno-portability foreign])
 #AM_INIT_AUTOMAKE([gnu -Wno-portability foreign serial-tests])
 AC_CONFIG_HEADER([config.h])
@@ -54,7 +53,7 @@ AC_CONFIG_HEADER([config.h])
 # 5. If any interfaces have been removed or changed since the last public   #
 #    release, then set age to 0.                                            #
 #############################################################################
-CTOOLS_LT_VERSION="6:0:0"
+CTOOLS_LT_VERSION="7:1:0"
 AC_SUBST(CTOOLS_LT_VERSION)
 
 
@@ -132,6 +131,9 @@ if test `uname -s` = "Darwin"; then
     osx_mavericks=yes
   fi
   if [ test $version -ge 1011 ]; then
+    osx_el_capitan=yes
+  fi
+  if [ test $version -ge 110 ]; then
     osx_el_capitan=yes
   fi
 fi
@@ -355,6 +357,13 @@ esac
 AC_MSG_RESULT($RUNSHARED)
 AC_SUBST(SHAREDSUFFIX)
 AC_SUBST(RUNSHARED)
+
+
+#############################################################################
+# Determine values of RTLD_GLOBAL and RTLD_NOW                              #
+#############################################################################
+AX_DLFLAGS(RTLD_GLOBAL)
+AX_DLFLAGS(RTLD_NOW)
 
 
 #############################################################################
@@ -683,7 +692,10 @@ else
       python_path=`$PYTHON -c "import distutils.sysconfig; \
                                print(distutils.sysconfig.get_python_inc());"`
       if test -n "${python_path}"; then
-        AC_CHECK_HEADERS($python_path/Python.h, [has_python_h="yes"], [has_python_h="no"]) 
+        SAVED_CPPFLAGS="$CPPFLAGS"
+        CPPFLAGS="$CPPFLAGS -I$python_path"
+        AC_CHECK_HEADERS($python_path/Python.h, [has_python_h="yes"], [has_python_h="no"])
+        CPPFLAGS=$SAVED_CPPFLAGS
         python_path="-I$python_path"
       fi
       PYTHON_CPPFLAGS=$python_path
@@ -724,8 +736,11 @@ else
       PY_INCLUDE="$PY_INCLUDE$PYTHON_VERSION"
   
       # Check if we have Python.h
+      SAVED_CPPFLAGS="$CPPFLAGS"
+      CPPFLAGS="$CPPFLAGS -I$PY_INCLUDE"
       AC_CHECK_HEADERS($PY_INCLUDE/Python.h, [has_python_h="yes"], [has_python_h="no"])
-  
+      CPPFLAGS=$SAVED_CPPFLAGS
+
       # Signal any problem
       if test "x$has_python_h" = "xno"; then
         AC_MSG_WARN([No Python header file "$PY_INCLUDE/Python.h" found. Please install appropriate Python development package.])
@@ -1044,6 +1059,7 @@ AC_CONFIG_FILES([Makefile
                  test/Makefile
                  test/test_python_ctools.sh
                  test/test_python_cscripts.sh
+                 test/test_python_comscripts.sh
                  test/test_examples.py
                  test/testing.py
                  pyext/Makefile
@@ -1052,6 +1068,9 @@ AC_CONFIG_FILES([Makefile
                  dev/conda.recipe/meta.yaml
                  cscripts/__init__.py
                  cscripts/Makefile
+                 modules/Makefile
+                 modules/comscripts/__init__.py
+                 modules/comscripts/Makefile
                  caldb/Makefile
                  models/Makefile
                  examples/Makefile
@@ -1060,6 +1079,7 @@ AC_CONFIG_FILES([Makefile
                 [if test -f test/test_python_ctools.sh; then chmod +x test/test_python_ctools.sh; fi;
                  if test -f test/test_python_cscripts.sh; then chmod +x test/test_python_cscripts.sh; fi;
                  if test -f test/test_examples.py; then chmod +x test/test_examples.py; fi;
+                 if test -f test/test_python_comscripts.sh; then chmod +x test/test_python_comscripts.sh; fi;
                  if test -f testconf.sh; then chmod +x testconf.sh; fi])
 AC_OUTPUT
 

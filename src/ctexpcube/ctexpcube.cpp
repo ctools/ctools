@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctexpcube - Exposure cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -205,13 +205,8 @@ void ctexpcube::clear(void)
  * observation container, loops over all CTA observations in the container
  * and generates an exposure cube from the CTA observations.
  ***************************************************************************/
-void ctexpcube::run(void)
+void ctexpcube::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 
@@ -265,6 +260,9 @@ void ctexpcube::save(void)
 
         // Save exposure cube
         m_expcube.save(m_outcube, clobber());
+
+        // Stamp exposure cube
+        stamp(m_outcube);
 
     }
 

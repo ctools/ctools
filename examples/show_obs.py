@@ -2,7 +2,7 @@
 # ==========================================================================
 # Display summary of observation definition XML file
 #
-# Copyright (C) 2016 Michael Mayer
+# Copyright (C) 2016-2020 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@
 #
 # ==========================================================================
 import sys
-import gammalib
-import cscripts
 try:
     import matplotlib.pyplot as plt
     plt.figure()
@@ -28,6 +26,8 @@ try:
 except (ImportError, RuntimeError):
     print('This script needs the "matplotlib" module')
     sys.exit()
+import gammalib
+import cscripts
 
 
 # ==================== #

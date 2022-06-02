@@ -1,0 +1,12 @@
+.. _1.7.2:
+
+ctools 1.7.2 release (15 October 2020)
+======================================
+
+Overview
+--------
+
+ctools 1.7.2 is a bug fix release for ctools release 1.7.
+
+No changes were made to the code base. The bug fix release is made for
+compliance reasons with the GammaLib 1.7.2 bug fix release.

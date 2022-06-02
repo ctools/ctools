@@ -23,11 +23,12 @@ ptsrcsig, r, h, 1.0,0,60, "Point source Gaussian sigma in arcmin"
 #
 # Energy binning parameters
 #==========================
-ebinalg,  s, a, LOG,FILE|LIN|LOG,, "Algorithm for defining energy bins"
-emin,     r, a, 0.1,,, "Lower energy limit (TeV)"
-emax,     r, a, 100.0,,, "Upper energy limit (TeV)"
-enumbins, i, a, 20,1,200, "Number of energy bins"
-ebinfile, f, a, NONE,,, "Name of the file containing the energy bin definition"
+ebinalg,   s, a, LOG,FILE|LIN|LOG|POW,, "Algorithm for defining energy bins"
+emin,      r, a, 0.1,,, "Lower energy limit (TeV)"
+emax,      r, a, 100.0,,, "Upper energy limit (TeV)"
+enumbins,  i, a, 20,1,200, "Number of energy bins"
+ebinfile,  f, a, NONE,,, "Name of the file containing the energy bin definition"
+ebingamma, r, a, 1.0,,, "Exponent for POW energy node definition"
 
 #
 # Spatial binning parameters

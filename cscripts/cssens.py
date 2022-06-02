@@ -2,7 +2,7 @@
 # ==========================================================================
 # Computes the array sensitivity using the Test Statistic for a test source
 #
-# Copyright (C) 2011-2019 Juergen Knoedlseder
+# Copyright (C) 2011-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ import gammalib
 import ctools
 from cscripts import obsutils
 from cscripts import modutils
-from cscripts import ioutils
 from cscripts import mputils
 
 
@@ -46,7 +45,7 @@ class cssens(ctools.csobservation):
     # Constructor
     def __init__(self, *argv):
         """
-        Constructor.
+        Constructor
         """
         # Initialise application by calling the appropriate class constructor
         self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
@@ -54,11 +53,13 @@ class cssens(ctools.csobservation):
         # Initialise class members
         self._ebounds     = gammalib.GEbounds()
         self._obs_ebounds = []
+        self._fits        = None
         self._srcname     = ''
         self._ra          = None
         self._dec         = None
         self._log_clients = False
         self._models      = gammalib.GModels()
+        self._seed        = 1
         self._nthreads    = 0
 
         # Return
@@ -78,11 +79,13 @@ class cssens(ctools.csobservation):
         state = {'base'         : ctools.csobservation.__getstate__(self),
                  'ebounds'      : self._ebounds,
                  'obs_ebounds'  : self._obs_ebounds,
+                 'fits'         : self._fits,
                  'srcname'      : self._srcname,
                  'ra'           : self._ra,
                  'dec'          : self._dec,
                  'log_clients'  : self._log_clients,
                  'models'       : self._models,
+                 'seed'         : self._seed,
                  'nthreads'     : self._nthreads}
 
         # Return pickled dictionary
@@ -100,15 +103,18 @@ class cssens(ctools.csobservation):
         ctools.csobservation.__setstate__(self, state['base'])
         self._ebounds     = state['ebounds']
         self._obs_ebounds = state['obs_ebounds']
+        self._fits        = state['fits']
         self._srcname     = state['srcname']
         self._ra          = state['ra']
         self._dec         = state['dec']
         self._log_clients = state['log_clients']
         self._models      = state['models']
+        self._seed        = state['seed']
         self._nthreads    = state['nthreads']
 
         # Return
         return
+
 
     # Private methods
     def _get_parameters(self):
@@ -125,9 +131,9 @@ class cssens(ctools.csobservation):
         # Set models if we have none
         if self.obs().models().size() == 0:
             self.obs().models(self['inmodel'].filename())
-        
-        # Get source name
-        self._srcname = self['srcname'].string()
+
+        # Set source name and position
+        self._set_source()
 
         # Read further parameters
         emin = self['emin'].real()
@@ -144,18 +150,24 @@ class cssens(ctools.csobservation):
         self['sigma'].real()
         self['max_iter'].integer()
         self['type'].string()
-        self['outfile'].filename()
         self['edisp'].boolean()
         self['debug'].boolean()
-        
+        self['mincounts'].integer()
+
+        # Read seed
+        self._seed = self['seed'].integer()
+
         # Derive some parameters
         self._ebounds = gammalib.GEbounds(bins,
                                           gammalib.GEnergy(emin, 'TeV'),
                                           gammalib.GEnergy(emax, 'TeV'))
 
+        # Read ahead output parameters
+        if self._read_ahead():
+            self['outfile'].filename()
+
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
-
 
         # Set number of processes for multiprocessing
         self._nthreads = mputils.nthreads(self)
@@ -163,7 +175,69 @@ class cssens(ctools.csobservation):
         # Return
         return
 
-    def _set_obs(self, emin, emax, lpnt=0.0, bpnt=0.0):
+    def _median(self, array):
+        """
+        Compute median value for an array
+
+        Parameters
+        ----------
+        array : list of floats
+            Array
+
+        Returns
+        -------
+        median : float
+            Median value of array
+        """
+        # Initialise median
+        median = 0.0
+
+        # Get number of elements in array
+        n = len(array)
+
+        # Continue only if there are elements in the array
+        if n > 0:
+
+            # Sort the array
+            array.sort()
+
+            # Get median
+            if n % 2 != 0:
+                median = array[int(n/2)]
+            else:
+                median = (array[int((n-1)/2)] + array[int(n/2)]) / 2.0
+
+        # Return median
+        return median
+
+    def _set_source(self):
+        """
+        Set source name and position
+        """
+        # Set source name
+        self._srcname = self['srcname'].string()
+
+        # Set source position. If the test source has no position then set the
+        # source position to (RA,Dec)=(0,0)
+        source = self.obs().models()[self._srcname]
+        if source.has_par('RA') and source.has_par('DEC'):
+            self._ra  = source['RA'].value()
+            self._dec = source['DEC'].value()
+        elif source.has_par('GLON') and source.has_par('GLAT'):
+            glon      = source['GLON'].value()
+            glat      = source['GLAT'].value()
+            srcdir    = gammalib.GSkyDir()
+            srcdir.lb_deg(glon, glat)
+            self._ra  = srcdir.ra_deg()
+            self._dec = srcdir.dec_deg()
+        else:
+            self._ra  = 0.0
+            self._dec = 0.0
+
+        # Return
+        return
+
+    def _set_obs(self, emin, emax):
         """
         Set an observation container
 
@@ -173,10 +247,6 @@ class cssens(ctools.csobservation):
             Minimum energy (TeV)
         emax : float
             Maximum energy (TeV)
-        lpnt : float, optional
-            Galactic longitude of pointing (deg)
-        bpnt : float, optional
-            Galactic latitude of pointing (deg)
 
         Returns
         -------
@@ -187,36 +257,49 @@ class cssens(ctools.csobservation):
         if self['inobs'].is_valid():
             obs = self._get_observations()
 
-        # ... otherwise allocate a single observation
+        # ... otherwise allocate a single observation using the test source
+        # position as pointing direction, optionally offset by a certain
+        # amount
         else:
 
-            # Read relevant user parameters
-            caldb    = self['caldb'].string()
-            irf      = self['irf'].string()
-            deadc    = self['deadc'].real()
-            duration = self['duration'].real()
-            rad      = self['rad'].real()
+            # Load models
+            models = gammalib.GModels(self['inmodel'].filename())
+
+            # Get test source
+            source = models[self['srcname'].string()]
+
+            # Set pointing direction to test source position. If test source
+            # has no position then set the pointing to (RA,Dec)=(0,0)
+            pntdir = gammalib.GSkyDir()
+            if source.has_par('RA') and source.has_par('DEC'):
+                pntdir.radec_deg(source['RA'].value(), source['DEC'].value())
+            elif source.has_par('GLON') and source.has_par('GLAT'):
+                pntdir.lb_deg(source['GLON'].value(), source['GLAT'].value())
+            else:
+                pntdir.radec_deg(0.0, 0.0)
+
+            # Read other relevant user parameters
+            instrument = self['instrument'].string()
+            caldb      = self['caldb'].string()
+            irf        = self['irf'].string()
+            deadc      = self['deadc'].real()
+            duration   = self['duration'].real()
+            rad        = self['rad'].real()
+            offset     = self['offset'].real()
+
+            # Add offset to pointing direction
+            pntdir.rotate_deg(0.0, offset)
 
             # Allocate observation container
             obs = gammalib.GObservations()
 
-            # Set single pointing
-            pntdir = gammalib.GSkyDir()
-            pntdir.lb_deg(lpnt, bpnt)
-
             # Create CTA observation
-            run = obsutils.set_obs(pntdir, caldb=caldb, irf=irf,
+            run = obsutils.set_obs(pntdir, instrument=instrument, caldb=caldb, irf=irf,
                                    duration=duration, deadc=deadc,
                                    emin=emin, emax=emax, rad=rad)
 
             # Append observation to container
             obs.append(run)
-
-            # Set source position
-            offset    = self['offset'].real()
-            pntdir.lb_deg(lpnt, bpnt+offset)
-            self._ra  = pntdir.ra_deg()
-            self._dec = pntdir.dec_deg()
 
         # Return observation container
         return obs
@@ -329,13 +412,18 @@ class cssens(ctools.csobservation):
             npix  = 200
             binsz = 0.05
 
+        # Keep track of the original value of edisp and switch-off energy
+        # dispersion for the first iterations to speed-up the computations
+        edisp_orig    = self['edisp'].boolean()
+        self['edisp'] = False
+
         # Set flux ratio precision required for convergence to 5%
         ratio_precision = 0.05
-        
+
         # Write header for energy bin
         self._log_string(gammalib.TERSE, '')
         self._log_header2(gammalib.TERSE, 'Energies: '+str(emin)+' - '+str(emax))
-        
+
         # Set energy boundaries
         self._set_obs_ebounds(emin, emax)
 
@@ -344,23 +432,23 @@ class cssens(ctools.csobservation):
         loge     = math.log10(e_mean)
         erg_mean = e_mean * tev2erg
         energy   = gammalib.GEnergy(e_mean, 'TeV')
-        
+
         # If spatial model is a map cube, make sure map cube spectrum
         # was computed already and set flag
-        mapcube=False
+        mapcube = False
         if test_model[self._srcname].spatial().classname() == 'GModelSpatialDiffuseCube':
-            mapcube=True
+            mapcube = True
             if test_model[self._srcname].spatial().spectrum().nodes() == 0:
                 test_model[self._srcname].spatial().set_mc_cone(gammalib.GSkyDir(),180.0)
-        
+
         # Compute initial source flux in that bin. If spatial model is a map cube, 
         # specific calculation is needed (intensity in map scaled by spectral model)
         if mapcube:
-            src_flux = test_model[self._srcname].spectral().eval(energy) \
-                       *test_model[self._srcname].spatial().spectrum().flux(emin, emax)
+            src_flux = test_model[self._srcname].spectral().eval(energy) * \
+                       test_model[self._srcname].spatial().spectrum().flux(emin, emax)
         else:
             src_flux = test_model[self._srcname].spectral().flux(emin, emax)
-        
+
         # Compute Crab unit. This is the factor with which the Prefactor needs
         # to be multiplied to get 1 Crab.
         crab_flux = self._get_crab_flux(emin, emax)
@@ -372,15 +460,15 @@ class cssens(ctools.csobservation):
         self._log_value(gammalib.TERSE, 'Crab flux', str(crab_flux)+' ph/cm2/s')
         self._log_value(gammalib.TERSE, 'Source model flux', str(src_flux)+' ph/cm2/s')
         self._log_value(gammalib.TERSE, 'Crab unit factor', crab_unit)
-        
+
         # Initialise regression coefficient
         regcoeff = 0.0
-        
+
         # Initialise loop
         results        = []
         iterations     = 0
         test_crab_flux = 0.1 # Initial test flux in Crab units (100 mCrab)
-        
+
         # Write header for iterations for terse chatter level
         if self._logTerse():
             self._log_header3(gammalib.TERSE, 'Iterations')
@@ -391,40 +479,26 @@ class cssens(ctools.csobservation):
             # Update iteration counter
             iterations += 1
 
+            # Increment the seed value
+            self._seed += 1
+
             # Write header for iteration into logger
             self._log_header2(gammalib.EXPLICIT, 'Iteration '+str(iterations))
 
-            # Create a copy of the test models, set the normalisation parameter
-            # of the test source in the models, and append the models to the
-            # observation. "crab_prefactor" is the prefactor that corresponds
-            # to a flux of 1 Crab.
-            models         = test_model.copy()
-            prefactor      = modutils.normalisation_parameter(models[self._srcname])
-            crab_prefactor = prefactor.value() * crab_unit
-            new_norm       = crab_prefactor*test_crab_flux
-            if new_norm <= prefactor.min():
-                test_crab_flux = 1.01*prefactor.min()/crab_prefactor
-                new_norm       = crab_prefactor*test_crab_flux
-            elif new_norm >= prefactor.max():
-                test_crab_flux = 0.99*prefactor.max()/crab_prefactor
-                new_norm       = crab_prefactor*test_crab_flux
-            prefactor.value(new_norm)
-            self.obs().models(models)
+            # Set Crab prefactor
+            crab_prefactor = self._set_src_prefactor(test_model, crab_unit, test_crab_flux)
 
             # Simulate events for the models. "sim" holds an observation
             # container with observations containing the simulated events.
-            sim = obsutils.sim(self.obs(), nbins=enumbins, seed=iterations,
+            sim = obsutils.sim(self.obs(), nbins=enumbins, seed=self._seed,
                                binsz=binsz, npix=npix,
                                log=self._log_clients,
                                debug=self['debug'].boolean(),
                                edisp=self['edisp'].boolean(),
                                nthreads=1)
-            
-            # Determine number of events in simulation by summing the events
-            # over all observations in the observation container
-            nevents = 0.0
-            for run in sim:
-                nevents += run.events().number()
+
+            # Determine number of events in simulation
+            nevents = sim.nobserved()
 
             # Write simulation results into logger
             self._log_header3(gammalib.EXPLICIT, 'Simulation')
@@ -447,14 +521,14 @@ class cssens(ctools.csobservation):
             ts     = source.ts()
 
             # Get fitted Crab flux
-            prefactor   = modutils.normalisation_parameter(source)
-            crab_flux   = prefactor.value() / crab_prefactor
-            
+            prefactor = modutils.normalisation_parameter(source)
+            crab_flux = prefactor.value() / crab_prefactor
+
             # Compute best-fit spectrum value at central energy
             # That is a differential flux for non-map cube models
             # ...and a scaling factor otherwise
             diff_flux = source.spectral().eval(energy)
-            
+
             # Compute photon and energy fluxes. If spatial model is a map cube, 
             # specific calculation is needed (flux in map scaled by spectral model)
             if mapcube:
@@ -474,7 +548,7 @@ class cssens(ctools.csobservation):
             sensitivity = diff_flux*e_mean*erg_mean*1.0e6
             if mapcube:
                 sensitivity *= source.spatial().spectrum().eval(energy)
-                              
+
             # Write fit results into logger
             name  = 'Iteration %d' % iterations
             value = ('TS=%10.4f  Sim=%9.4f mCrab  Fit=%9.4f mCrab  '
@@ -509,13 +583,16 @@ class cssens(ctools.csobservation):
 
             # Predict Crab flux at threshold TS using a linear regression of
             # the log(TS) and log(crab_flux) values that have so far been
-            # computed. If not enough results are available than use a simple
+            # computed. If not enough results are available then use a simple
             # TS scaling relation.
+            correct = math.sqrt(ts_thres / ts)
             if len(results) > 1:
-                pred_crab_flux, regcoeff = self._predict_flux(results, ts_thres)
-                correct                  = pred_crab_flux / crab_flux
-            else:
-                correct = math.sqrt(ts_thres/ts)
+                try:
+                    pred_crab_flux, regcoeff = self._predict_flux(results, ts_thres)
+                    correct                  = pred_crab_flux / crab_flux
+                except:
+                    self._log_value(gammalib.TERSE, 'Skipping failed regression',
+                                    'Retain simple TS scaling relation')
 
             # Compute extrapolated fluxes based on the flux correction factor
             crab_flux   = correct * crab_flux
@@ -543,7 +620,25 @@ class cssens(ctools.csobservation):
                         self._log_value(gammalib.TERSE, 'Converged flux ratio', ratio)
                         self._log_value(gammalib.TERSE, 'Regression coefficient',
                                         regcoeff)
-                        break
+
+                        # If the flux has converged then check if the original
+                        # value of edisp was set, and is not what has fo far
+                        # been used
+                        if edisp_orig and not self['edisp'].boolean():
+
+                            # Set edisp on and continue the calculation
+                            self['edisp'] = True
+
+                            # Log action
+                            self._log_value(gammalib.TERSE, 'Converged result',
+                                            'Now use energy dispersion after '
+                                            'initial convergence without it')
+
+                        # ... otherwise finish the calculation after convergence
+                        else:
+                            break
+
+                # ... otherwise break with a zero flux
                 else:
                     self._log_value(gammalib.TERSE, 'Not converged', 'Flux is zero')
                     break
@@ -556,6 +651,42 @@ class cssens(ctools.csobservation):
                 self._log_string(gammalib.TERSE,
                                  ' Test ended after %d iterations.' % max_iter)
                 break
+
+        # Write header for iterations for terse chatter level
+        if self._logTerse():
+            self._log_header3(gammalib.TERSE, 'Iterations for source counts cuts')
+
+        # Recover original energy dispersion setting
+        self['edisp'] = edisp_orig
+
+        # Take into account the excess event cuts
+        n_bck_evts = None
+        for iterations in range(max_iter):
+
+            # Simulate event excess
+            pass_evt_cut, n_bck_evts = self._sim_evt_excess(enumbins=enumbins,
+                                                            binsz=binsz,
+                                                            npix=npix,
+                                                            n_bck_evts=n_bck_evts)
+
+            # Write results into logger
+            name  = 'Iteration %d' % iterations
+            value = 'Fit=%9.4f mCrab  Sens=%e erg/cm2/s' % (crab_flux*1000.0, sensitivity)
+            self._log_value(gammalib.TERSE, name, value)
+
+            # If event excess cuts are passed then break now
+            if pass_evt_cut:
+                break
+
+            # ... otherwise increase the test flux
+            correct     = 1.0 + ratio_precision
+            crab_flux   = correct * crab_flux
+            photon_flux = correct * photon_flux
+            energy_flux = correct * energy_flux
+            sensitivity = correct * sensitivity
+
+            # ...
+            _ = self._set_src_prefactor(test_model, crab_unit, crab_flux)
 
         # Write fit results into logger
         self._log_header3(gammalib.TERSE, 'Fit results')
@@ -589,6 +720,201 @@ class cssens(ctools.csobservation):
 
         # Return result
         return result
+
+    def _set_src_prefactor(self, test_model, crab_unit, test_crab_flux):
+        """
+        Create a copy of the test models, set the normalisation parameter
+        of the test source in the models, and append the models to the observation.
+
+        Parameters
+        ----------
+        test_model : `~gammalib.GModels`
+            Test source model
+        crab_unit : float
+            Crab unit factor
+        test_crab_flux : float
+            Test flux in Crab units (100 mCrab)
+
+        Returns
+        -------
+        crab_prefactor : float
+            the prefactor that corresponds to a flux of 1 Crab.
+        """
+        # Initialise variables
+        models         = test_model.copy()
+        prefactor      = modutils.normalisation_parameter(models[self._srcname])
+        crab_prefactor = prefactor.value() * crab_unit
+        val_margin     = 0.01
+        min_pref       = prefactor.min() * (1.0 + val_margin)
+        max_pref       = prefactor.max() * (1.0 - val_margin)
+        val_now        = crab_prefactor * test_crab_flux
+
+        # Check whether prefactor is in valid range
+        if val_now < min_pref or val_now > max_pref:
+
+            # Store old prefactor value for logging
+            val_old = val_now
+
+            # Set new prefactor value
+            val_now        = max(val_now, min_pref)
+            val_now        = min(val_now, max_pref)
+            crab_prefactor = val_now / test_crab_flux
+
+            # Log prefactor modification
+            self._log_value(gammalib.EXPLICIT, 'Prefactor range',
+                            '['+str(min_pref)+','+str(max_pref)+']')
+            self._log_value(gammalib.EXPLICIT, 'Initial Prefactor', val_old)
+            self._log_value(gammalib.EXPLICIT, 'Updated Prefactor', val_now)
+
+        # Store prefactor value
+        prefactor.value(val_now)
+
+        # Update the models
+        self.obs().models(models)
+
+        # Return Prefactor
+        return crab_prefactor
+
+    def _simulate_events(self, obs, rad, enumbins, binsz, npix):
+        """
+        Simulate events
+
+        Parameters
+        ----------
+        obs : `~gammalib.GObservations`
+            Observation container
+        rad : float
+            Simulation selection radius (degrees)
+        enumbins : integer
+            Number of energy bins
+        binsz : float
+            Pixel size
+        npix : integer
+            Number of pixels
+        """
+        # Initialise list of number of simulated events
+        n_sim_evts = []
+
+        # Simulate events
+        for n_sim in range(15):
+
+            # Increment the seed value
+            self._seed += 1
+
+            # Simulate observations
+            sim = obsutils.sim(obs, nbins=enumbins, seed=self._seed, binsz=binsz,
+                               npix=npix, log=self._log_clients,
+                               debug=self['debug'].boolean(),
+                               edisp=self['edisp'].boolean(), nthreads=1)
+
+            # If a selection radius is given then select only the events within
+            # that selection radius
+            if rad > 0.0:
+
+                # Run event selection tool
+                select = ctools.ctselect(sim)
+                select['rad']  = rad
+                select['emin'] = 'INDEF'
+                select['tmin'] = 'INDEF'
+                select.run()
+
+                # Store number of events
+                n_sim_evts.append(select.obs().nobserved())
+
+            # ... otherwise we simply store the number of simulated events
+            else:
+                n_sim_evts.append(sim.nobserved())
+
+        # Determine median number of events
+        median = self._median(n_sim_evts)
+
+        # Log results
+        if rad > 0.0:
+            name = 'Median source events'
+        else:
+            name = 'Median background events'
+        self._log_value(gammalib.EXPLICIT, name, median)
+
+        # Return
+        return median
+
+    def _sim_evt_excess(self, enumbins, binsz, npix, n_bck_evts):
+        """
+        Return the number of excess events for the source model, compared
+        to all other models
+
+        Parameters
+        ----------
+        enumbins : int
+            Number of bins for the observation simulation
+        binsz : float
+            Bin size for the observation simulation
+        npix : int
+            Pixel size for the observation simulation
+        n_bck_evts : int
+            Number of background counts from previous call
+
+        Returns
+        -------
+        pass_evt_cut : bool
+            Signals that the source passes the minimal excess criteria
+        n_bck_evts : int
+            Number of background counts
+        """
+        # Initialise results
+        pass_evt_cut = True
+        n_bck_evts   = 0
+
+        # Get user parameters
+        mincounts = self['mincounts'].integer()
+        bkgexcess = self['bkgexcess'].real()
+        bkgrad    = self['bkgrad'].real()
+
+        # Continue only if cuts were specified
+        if mincounts > 0 or bkgexcess > 0.0:
+
+            # Get models and split them into source and background
+            models     = self.obs().models()
+            src_model  = gammalib.GModels()
+            bck_models = gammalib.GModels()
+            for model in models:
+                if model.name() == self._srcname:
+                    src_model.append(model)
+                else:
+                    bck_models.append(model)
+
+            # Create observations for source and background
+            src_obs = self.obs().copy()
+            bck_obs = self.obs().copy()
+            src_obs.models(src_model)
+            bck_obs.models(bck_models)
+
+            # Simulate source events
+            n_src_evts = self._simulate_events(src_obs, 0.0, enumbins, binsz, npix)
+
+            # Simulate background events in case that a background fraction cut
+            # is applied and if the number of background events was not yet
+            # estimated
+            if bkgexcess > 0.0 and n_bck_evts == None:
+                n_bck_evts = self._simulate_events(bck_obs, bkgrad, enumbins, binsz, npix)
+
+            # Set cut results
+            min_bkg_events = n_bck_evts * bkgexcess
+            has_min_evts   = n_src_evts >= mincounts
+            is_above_bck   = n_src_evts >= min_bkg_events
+            pass_evt_cut   = has_min_evts and is_above_bck
+
+            # Log results
+            self._log_value(gammalib.EXPLICIT, 'Pass minimum counts cut', has_min_evts)
+            self._log_value(gammalib.EXPLICIT, 'Pass background cut', is_above_bck)
+            self._log_value(gammalib.EXPLICIT, 'Pass event cut', pass_evt_cut)
+            self._log_value(gammalib.EXPLICIT, 'Minimum counts threshold', mincounts)
+            self._log_value(gammalib.EXPLICIT, 'Background threshold', min_bkg_events)
+            self._log_value(gammalib.EXPLICIT, 'Source events', n_src_evts)
+            self._log_value(gammalib.EXPLICIT, 'Background events', n_bck_evts)
+
+        # Return passing flag and number of background events
+        return pass_evt_cut, n_bck_evts
 
     def _predict_flux(self, results, ts):
         """
@@ -632,9 +958,14 @@ class cssens(ctools.csobservation):
         mean_xy *= norm
         mean_xx *= norm
         mean_yy *= norm
-        rxy      = (mean_xy - mean_x * mean_y) / \
-                   math.sqrt((mean_xx - mean_x*mean_x) *
-                             (mean_yy - mean_y*mean_y))
+
+        # Compute regression coefficient
+        rxy_norm = (mean_xx - mean_x * mean_x) * (mean_yy - mean_y * mean_y)
+        if rxy_norm < 1e-10:
+            rxy_norm = 1
+        else:
+            rxy_norm = math.sqrt(rxy_norm)
+        rxy      = (mean_xy - mean_x * mean_y) / rxy_norm
         regcoeff = rxy*rxy
 
         # Compute regression line slope
@@ -660,7 +991,7 @@ class cssens(ctools.csobservation):
     def _e_bin(self, ieng):
         """
         Determines sensivity in energy bin
-        
+
         Parameters
         ----------
         ieng : int
@@ -693,16 +1024,98 @@ class cssens(ctools.csobservation):
         # Return results
         return result
 
+    def _create_fits(self, results):
+        """
+        Create FITS file from results
+
+        Parameters
+        ----------
+        results : list of dict
+            List of result dictionaries
+        """
+        # Create FITS table columns
+        nrows        = len(results)
+        e_mean       = gammalib.GFitsTableDoubleCol('E_MEAN', nrows)
+        e_min        = gammalib.GFitsTableDoubleCol('E_MIN', nrows)
+        e_max        = gammalib.GFitsTableDoubleCol('E_MAX', nrows)
+        flux_crab    = gammalib.GFitsTableDoubleCol('FLUX_CRAB', nrows)
+        flux_photon  = gammalib.GFitsTableDoubleCol('FLUX_PHOTON', nrows)
+        flux_energy  = gammalib.GFitsTableDoubleCol('FLUX_ENERGY', nrows)
+        sensitivity  = gammalib.GFitsTableDoubleCol('SENSITIVITY', nrows)
+        regcoeff     = gammalib.GFitsTableDoubleCol('REGRESSION_COEFF', nrows)
+        nevents      = gammalib.GFitsTableDoubleCol('NEVENTS', nrows)
+        npred        = gammalib.GFitsTableDoubleCol('NPRED', nrows)
+        e_mean.unit('TeV')
+        e_min.unit('TeV')
+        e_max.unit('TeV')
+        flux_crab.unit('')
+        flux_photon.unit('ph/cm2/s')
+        flux_energy.unit('erg/cm2/s')
+        sensitivity.unit('erg/cm2/s')
+        regcoeff.unit('')
+        nevents.unit('counts')
+        npred.unit('counts')
+
+        # Fill FITS table columns
+        for i, result in enumerate(results):
+            e_mean[i]      = math.pow(10.0, result['loge'])
+            e_min[i]       = result['emin']
+            e_max[i]       = result['emax']
+            flux_crab[i]   = result['crab_flux']
+            flux_photon[i] = result['photon_flux']
+            flux_energy[i] = result['energy_flux']
+            sensitivity[i] = result['sensitivity']
+            regcoeff[i]    = result['regcoeff']
+            nevents[i]     = result['nevents']
+            npred[i]       = result['npred']
+
+        # Initialise FITS Table with extension "SENSITIVITY"
+        table = gammalib.GFitsBinTable(nrows)
+        table.extname('SENSITIVITY')
+
+        # Add keywors for compatibility with gammalib.GMWLSpectrum
+        table.card('INSTRUME', 'CTA', 'Name of Instrument')
+        table.card('TELESCOP', 'CTA', 'Name of Telescope')
+
+        # Stamp header
+        self._stamp(table)
+
+        # Add script keywords
+        table.card('OBJECT',   self._srcname, 'Source for which sensitivity was estimated')
+        table.card('TYPE',     self['type'].string(), 'Sensitivity type')
+        table.card('SIGMA',    self['sigma'].real(), '[sigma] Sensitivity threshold')
+        table.card('MAX_ITER', self['max_iter'].integer(), 'Maximum number of iterations')
+        table.card('STAT',     self['statistic'].string(), 'Optimization statistic')
+        table.card('MINCOUNT', self['mincounts'].integer(), 'Minimum number of source counts')
+        table.card('BKGEXCES', self['bkgexcess'].real(), 'Background uncertainty fraction')
+        table.card('BKGRAD',   self['bkgrad'].real(), '[deg] Background radius')
+        table.card('SEED',     self['seed'].integer(), 'Seed value for random numbers')
+
+        # Append filled columns to fits table
+        table.append(e_mean)
+        table.append(e_min)
+        table.append(e_max)
+        table.append(flux_crab)
+        table.append(flux_photon)
+        table.append(flux_energy)
+        table.append(sensitivity)
+        table.append(regcoeff)
+        table.append(nevents)
+        table.append(npred)
+
+        # Create the FITS file now
+        self._fits = gammalib.GFits()
+        self._fits.append(table)
+
+        # Return
+        return
+
 
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
         # Get parameters
         self._get_parameters()
 
@@ -711,20 +1124,17 @@ class cssens(ctools.csobservation):
         for obs in self.obs():
             self._obs_ebounds.append(obs.events().ebounds().copy())
 
-        # Initialise script
-        colnames = ['loge', 'emin', 'emax', 'crab_flux', 'photon_flux',
-                    'energy_flux', 'sensitivity', 'regcoeff', 'nevents',
-                    'npred']
+        # Initialise results
         results  = []
 
         # Set test source model for this observation
         self._models = modutils.test_source(self.obs().models(), self._srcname,
                                             ra=self._ra, dec=self._dec)
-        
+
         # If test source spatial model is a map cube, compute intensity in each map
         if self._models[self._srcname].spatial().classname() == 'GModelSpatialDiffuseCube':
             self._models[self._srcname].spatial().set_mc_cone(gammalib.GSkyDir(),180.0)
-        
+
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
@@ -752,19 +1162,49 @@ class cssens(ctools.csobservation):
         else:
             for ieng in range(self._ebounds.size()):
 
-                #Run analysis in energy bin
+                # Run analysis in energy bin
                 result = self._e_bin(ieng)
 
                 # Append results
                 results.append(result)
 
-        # Write out trial result
-        for ieng, result in enumerate(results):
-            ioutils.write_csv_row(self['outfile'].filename().url(), ieng,
-                                  colnames, result)
+        # Create FITS file
+        self._create_fits(results)
 
         # Return
         return
+
+    def save(self):
+        """
+        Save sensitivity FITS file
+        """
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Save sensitivity curve')
+
+        # Continue only if FITS file is valid
+        if self._fits != None:
+
+            # Get outmap parameter
+            outfile = self['outfile'].filename()
+
+            # Log file name
+            self._log_value(gammalib.NORMAL, 'Sensitivity file', outfile.url())
+
+            # Save sensitivity
+            self._fits.saveto(outfile, self['clobber'].boolean())
+
+        # Return
+        return
+
+    def sensitivity(self):
+        """
+        Return sensitivity FITS file
+
+        Returns:
+            FITS file containing sensitivity curve
+        """
+        # Return
+        return self._fits
 
 
 # ======================== #

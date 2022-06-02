@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2018 by Michael Mayer                               *
+ *  copyright (C) 2015-2022 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -62,7 +62,7 @@ public:
 
     // Methods
     void          clear(void);
-    void          run(void);
+    void          process(void);
     void          save(void);
     const double& diff_ulimit(void) const;
     const double& flux_ulimit(void) const;
@@ -95,12 +95,15 @@ protected:
 
     // Protected members
     double        m_dlogL;        //!< Likelihood difference for upper limit computation
-    GModelSky*    m_skymodel;     //!< Pointer to sky model
-    GModelPar*    m_model_par;    //!< Pointer to model parameter
     double        m_best_logL;    //!< Best fit log likelihood of given model
+    double        m_best_value;   //!< Best parameter value factor
+    double        m_best_error;   //!< Best parameter value error
     double        m_diff_ulimit;  //!< Differential upper limit value
     double        m_flux_ulimit;  //!< Flux upper limit value
     double        m_eflux_ulimit; //!< Energy flux upper limits
+    GModelSky*    m_skymodel;     //!< Pointer to sky model
+    GModelPar*    m_model_par;    //!< Pointer to model parameter
+    bool          m_is_spatial;   //!< Signal that model parameter is spatial parameter
 };
 
 

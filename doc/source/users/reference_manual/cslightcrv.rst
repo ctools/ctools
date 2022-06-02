@@ -62,9 +62,11 @@ General parameters
     Instrumental response function.
 
 ``(inexclusion = NONE) [file]``
-    Optional FITS file containing a WCS map in the first hdu that defines sky
-    regions not to be used for background estimation in On/Off analysis (where
-    map value != 0).
+    Optional FITS file containing a WCS map that defines sky regions
+    not to be used for background estimation (where map value !=
+    0). If the file contains multiple extensions the user may specify
+    which one to use. Otherwise, the extention ``EXCLUSION`` will be
+    used if available, or else the primary extension will be used.  
 
 ``(edisp = no) [boolean]``
     Applies energy dispersion to response computation (for ``3D`` analysis only,
@@ -127,12 +129,22 @@ General parameters
 ``binsz [real]``
     Pixel size for ``3D`` analysis (in degrees/pixel).
 
-``(srcshape = CIRCLE) [string]``
-    Shape of the source region for On/Off analysis.
-    ``CIRCLE``: circular region around given position.
+``srcshape <CIRCLE|RECT> [string]``
+    Shape of the source region. ``CIRCLE`` defines a circular region around given
+    position, ``RECT`` defines a rectangle centred on a given position.
 
 ``rad [real]``
     Radius of source region circle for On/Off analysis (deg)
+
+``width [real]``
+    Width of source region rectangle for On/Off analysis (deg).
+
+``height [real]``
+    Height of source region rectangle for On/Off analysis (deg).
+
+``posang [real]``
+    Position angle of source region rectangle for On/Off analysis, counted
+    counterclockwise from celestial North (deg).
 
 ``(bkgmethod = REFLECTED) [string]``
     Method for background estimation in On/Off analysis.
@@ -186,6 +198,9 @@ General parameters
 
 ``(calc_ulim = yes) [boolean]``
     Compute upper limit for each time bin?
+
+``(confidence = 0.95) [real]``
+    Confidence level for upper limit computation.
 
 ``(fix_srcs = yes) [boolean]``
     Fix other sky model parameters?

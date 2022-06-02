@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctpsfcube tool.
 #
-# Copyright (C) 2014-2018 Juergen Knoedlseder
+# Copyright (C) 2014-2020 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -128,26 +128,27 @@ class Test(test):
         psfcube.clear()
 
         # Now set ctpsfcube parameters
-        psfcube['inobs']    = self._events
-        psfcube['incube']   = 'NONE'
-        psfcube['caldb']    = self._caldb
-        psfcube['irf']      = self._irf
-        psfcube['ebinalg']  = 'LOG'
-        psfcube['emin']     = 1.0
-        psfcube['emax']     = 100
-        psfcube['enumbins'] = 5
-        psfcube['nxpix']    = 10
-        psfcube['nypix']    = 10
-        psfcube['binsz']    = 0.4
-        psfcube['coordsys'] = 'CEL'
-        psfcube['proj']     = 'CAR'
-        psfcube['xref']     = 83.63
-        psfcube['yref']     = 22.01
-        psfcube['amax']     = 0.3
-        psfcube['anumbins'] = 10
-        psfcube['outcube']  = 'ctpsfcube_py1.fits'
-        psfcube['logfile']  = 'ctpsfcube_py1.log'
-        psfcube['chatter']  = 2
+        psfcube['inobs']     = self._events
+        psfcube['incube']    = 'NONE'
+        psfcube['caldb']     = self._caldb
+        psfcube['irf']       = self._irf
+        psfcube['ebinalg']   = 'POW'
+        psfcube['emin']      = 1.0
+        psfcube['emax']      = 100
+        psfcube['enumbins']  = 5
+        psfcube['ebingamma'] = 1.0
+        psfcube['nxpix']     = 10
+        psfcube['nypix']     = 10
+        psfcube['binsz']     = 0.4
+        psfcube['coordsys']  = 'CEL'
+        psfcube['proj']      = 'CAR'
+        psfcube['xref']      = 83.63
+        psfcube['yref']      = 22.01
+        psfcube['amax']      = 0.3
+        psfcube['anumbins']  = 10
+        psfcube['outcube']   = 'ctpsfcube_py1.fits'
+        psfcube['logfile']   = 'ctpsfcube_py1.log'
+        psfcube['chatter']   = 2
 
         # Run ctpsfcube tool
         psfcube.logFileOpen()   # Make sure we get a log file

@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for models                                                       #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016-2019 Juergen Knoedlseder                               #
+# Copyright (C) 2016-2022 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -38,7 +38,10 @@ models = 1dc_howto.xml \
          disk.xml \
          gauss.xml \
          shell.xml \
-         hess_bkg_lookup.fits
+         hess1825_26.xml \
+         hess_bkg_lookup.fits \
+         ephem_xte.psrtime \
+         README.md
 
 # Install models
 modelsdir   = $(datadir)/models

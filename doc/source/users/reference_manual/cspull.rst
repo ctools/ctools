@@ -34,12 +34,10 @@ be performed in parallel over as many processes as the number of CPUs available 
 machine. The maximum number of parallel processes can be set by the user through the
 ``nthreads`` hidden parameter.
 
-:ref:`cspull` will generate an ASCII file in comma-separated value (CSV) format,
-containing one row per pull. The first row is a header row providing the 
-column names. The following rows give the pull results, one row per pull. 
-This includes for each parameter the parameter value, error and pull. The 
-maximum likelihood value and the observed and the estimated number of counts 
-are also given.
+:ref:`cspull` will generate a FITS file containing a binary table with one row per
+pull. FITS table columns include the maximum log-likelihood value of the pull,
+the number of simulated and fitted events, and for each parameter the parameter
+value, error and pull.
 
 From the output file, pull distribution plots can be generated using for
 example the ``show_pull_histogram.py`` script in the examples folder. The
@@ -63,6 +61,9 @@ General parameters
 ``onrad [real]``
     Radius of On region (deg).
 
+``(instrument = CTA) [string]``
+    Name of Cherenkov telescope.
+
 ``caldb [string]``
     Calibration database.
 
@@ -76,7 +77,7 @@ General parameters
     Average deadtime correction factor.
 
 ``outfile [file]``
-    ASCII file containing the individual pull values.
+    Output pull distribution FITS ASCII file.
 
 ``ntrials [integer]``
     Number of samples for generating the pull distribution.

@@ -80,6 +80,47 @@ In total, the following six instrument response functions are available:
 ``North_0.5h``, ``North_5h``, ``North_50h``, ``South_0.5h``,
 ``South_5h``, and ``South_50h``.
 
+The latest CTA reponse functions (``prod5-v0.1``) can be downloaded from
+`this link <https://zenodo.org/record/5499840#.YVV1di0itZo>`_.
+
+To download and install the ``prod5-v0.1`` response functions you should execute
+the following commands in a terminal:
+
+.. code-block:: bash
+
+   $ mkdir temp
+   $ cd temp
+   $ wget https://zenodo.org/record/5499840/files/cta-prod5-zenodo-fitsonly-v0.1.zip
+   $ unzip cta-prod5-zenodo-fitsonly-v0.1.zip
+   $ csadd2caldb
+   Input IRF folder [fits]
+   Output caldb folder [$CALDB]
+
+This will download the file ``cta-prod5-zenodo-fitsonly-v0.1.zip`` in a
+temporary working directory, unzip the file to get, among others, the folder ``fits``
+with the CTA response in FITS format, and install the response in your calibration
+database.
+
+Use ``sudo`` to run ``csadd2caldb.py`` if the installation of the IRFs requires
+root privileges.
+
+To use the ``prod5-v0.1`` response functions, specify ``prod5-v0.1`` if a ctool
+or cscript queries for the calibration database.
+
+If you want to install the older ``prod3b-v2`` response functions you should use
+the following procedure:
+
+.. code-block:: bash
+
+   $ mkdir temp
+   $ cd temp
+   $ wget https://zenodo.org/record/5163273/files/CTA-Performance-IRFs-prod3b-v2-v1.0.0.zip
+   $ unzip CTA-Performance-IRFs-prod3b-v2-v1.0.0.zip
+   $ tar xvfz CTA-Prod3-Zenodo-main/fits/CTA-Performance-prod3b-v2-FITS.tar.gz -C $CTOOLS/share
+
+To use the ``prod3b-v2`` response functions, specify ``prod3b-v2`` if a ctool
+or cscript queries for the calibration database.
+
 .. note::
    If you use the CTA instrument response functions for a research project
    and specifically for a presentation or publication, we ask to add the
@@ -87,23 +128,6 @@ In total, the following six instrument response functions are available:
 
    *This research has made use of the CTA instrument response functions
    provided by the CTA Consortium and Observatory.*
-
-   The latest CTA reponse function (prod3b-v1) can be downloaded from
-   `this link <http://www.cta-observatory.org/wp-content/uploads/2017/12/CTA-Performance-prod3b-v1-FITS1.tar.gz>`_. To install the response function, type
-
-   .. code-block:: bash
-
-      $ tar xvfz CTA-Performance-prod3b-v1-FITS1.tar.gz -C $CTOOLS/share
-
-   or
-
-   .. code-block:: bash
-
-      $ sudo tar xvfz CTA-Performance-prod3b-v1-FITS1.tar.gz -C $CTOOLS/share
-
-   if you need root priviledges to install in your ``$CTOOLS`` directory.
-   To use the prod3b-v1 response functions, specify ``prod3b-v1`` if a tool
-   or script queries for the calibration database.
 
 
 Specifying CTA response functions

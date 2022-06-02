@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates an IACT observation definition XML file
 #
-# Copyright (C) 2015-2018 Michael Mayer
+# Copyright (C) 2015-2022 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -316,7 +316,7 @@ class csiactobs(ctools.cscript):
                 # Create logarithmic energy nodes
                 bounds = gammalib.GEbounds(self._bkgpars,
                                            gammalib.GEnergy(emin,'TeV'),
-                                           gammalib.GEnergy(emax,'TeV'), True)
+                                           gammalib.GEnergy(emax,'TeV'))
                 
                 # Loop over bounds and set intensity value
                 for i in range(bounds.size()):     
@@ -563,14 +563,10 @@ class csiactobs(ctools.cscript):
 
 
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
         # Get parameters
         self._get_parameters()
 

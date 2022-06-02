@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2019 by Michael Mayer                               *
+ *  copyright (C) 2015-2022 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -219,13 +219,8 @@ void ctulimit::clear(void)
  *
  * Computes the upper limit depending on the given algorithm
  ***************************************************************************/
-void ctulimit::run(void)
+void ctulimit::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 
@@ -250,7 +245,7 @@ void ctulimit::run(void)
         // Write header into logger
         log_header1(TERSE, "Compute best-fit likelihood");
 
-        // Make sure that requested model parameters is free
+        // Make sure that requested model parameter is free
         m_model_par->free();
 
         // Optimize and save best log-likelihood
@@ -268,6 +263,18 @@ void ctulimit::run(void)
 
     } // endif: likelihood was zero
 
+    // ... otherwise use original log-likelihood
+    else {
+
+        // Write header into logger
+        log_header1(TERSE, "Extract best-fit likelihood");
+
+        // Write optimised model into logger
+        log_value(NORMAL,"Maximum log likelihood",gammalib::str(m_best_logL,3));
+        log_string(NORMAL, m_obs.models().print(m_chatter));
+
+    }
+
     // Get parameter brackets
     double parmin;
     double parmax;
@@ -279,16 +286,19 @@ void ctulimit::run(void)
     // Write some parameters into logger
     log_value(NORMAL, "Model name", m_skymodel->name());
     log_value(NORMAL, "Parameter name", m_model_par->name());
+    log_value(NORMAL, "Best factor value", m_best_value);
     log_value(NORMAL, "Confidence level", gammalib::str(m_confidence*100.0)+"%");
+    log_value(NORMAL, "Maximum log likelihood",gammalib::str(m_best_logL,3));
     log_value(NORMAL, "Log-likelihood difference", m_dlogL);
-    log_value(NORMAL, "Initial parameter range",
+    log_value(NORMAL, "Initial factor value range",
               "["+gammalib::str(parmin)+", "+gammalib::str(parmax)+"]");
 
     // Compute upper limit
     ulimit_bisection(parmin, parmax);
 
     // Write final parameter into logger
-    log_value(NORMAL, "Final parameter", m_model_par->value());
+    log_value(NORMAL, "Upper limit factor value", m_model_par->factor_value());
+    log_value(NORMAL, "Upper limit param. value", m_model_par->value());
 
     // Compute upper limit intensity and fluxes
     compute_ulimit();
@@ -365,12 +375,15 @@ void ctulimit::init_members(void)
 
     // Initialise protected members
     m_dlogL        = 0.0;
-    m_skymodel     = NULL;
-    m_model_par    = NULL;
     m_best_logL    = 0.0;
+    m_best_value   = 0.0;
+    m_best_error   = 0.0;
     m_flux_ulimit  = 0.0;
     m_diff_ulimit  = 0.0;
     m_eflux_ulimit = 0.0;
+    m_skymodel     = NULL;
+    m_model_par    = NULL;
+    m_is_spatial   = false;
 
     // Return
     return;
@@ -401,6 +414,8 @@ void ctulimit::copy_members(const ctulimit& app)
     // Copy protected members
     m_dlogL        = app.m_dlogL;
     m_best_logL    = app.m_best_logL;
+    m_best_value   = app.m_best_value;
+    m_best_error   = app.m_best_error;
     m_diff_ulimit  = app.m_diff_ulimit;
     m_flux_ulimit  = app.m_flux_ulimit;
     m_eflux_ulimit = app.m_eflux_ulimit;
@@ -483,13 +498,14 @@ void ctulimit::get_parameters(void)
 
 
 /***********************************************************************//**
- * @brief Get application parameters
+ * @brief Get model parameter
  *
  * @exception GException::invalid_value
  *            Did not find a valid model or model parameter
  *
  * Extracts a pointer to the sky model (m_skymodel) and a pointer to the
- * relevant model parameter (m_model_par) from the model container. If no
+ * model parameter (m_model_par) that should be varied for the upper limit
+ * determination from the model container.
  ***************************************************************************/
 void ctulimit::get_model_parameter(void)
 {
@@ -500,8 +516,9 @@ void ctulimit::get_model_parameter(void)
                           NULL};
 
     // Initialises sky model and model parameters pointers
-    m_skymodel  = NULL;
-    m_model_par = NULL;
+    m_skymodel   = NULL;
+    m_model_par  = NULL;
+    m_is_spatial = false;
 
     // If the model container does not container the specified source then
     // throw an exception
@@ -526,15 +543,20 @@ void ctulimit::get_model_parameter(void)
 
     // If a parameter name was specified then use that parameter
     if (!m_parname.empty()) {
-        if (m_skymodel->spectral()->has_par(m_parname)) {
+        if (m_skymodel->spatial()->has_par(m_parname)) {
+            m_model_par  = &(m_skymodel->spatial()->operator[](m_parname));
+            m_is_spatial = true;
+        }
+        else if (m_skymodel->spectral()->has_par(m_parname)) {
             m_model_par = &(m_skymodel->spectral()->operator[](m_parname));
         }
         else {
-            std::string msg = "Spectral model of source \""+m_srcname+"\" has "
-                              "no parameter \""+m_parname+"\". Please specify "
-                              "a value parameter name of leave the parameter "
-                              "name blank for autodetermination of an "
-                              "intensity- or flux-like parameter.";
+            std::string msg = "Spatial or spectral model of source \""+
+                              m_srcname+"\" has no parameter \""+m_parname+
+                              "\". Please specify a valid parameter name "
+                              "or leave the parameter name blank for "
+                              "autodetermination of an intensity- or "
+                              "flux-like parameter.";
             throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
         }
     }
@@ -601,17 +623,17 @@ void ctulimit::get_parameter_brackets(double& parmin, double& parmax)
     log_header1(TERSE, "Find parameter brackets");
 
     // Extract current value and error
-    double value = m_model_par->factor_value();
-    double error = m_model_par->factor_error();
+    m_best_value = m_model_par->factor_value();
+    m_best_error = m_model_par->factor_error();
 
     // If parameter error is zero then take parameter value as error
-    if (error == 0.0) {
-        error = value;
+    if (m_best_error == 0.0) {
+        m_best_error = m_best_value;
     }
 
     // Compute parameter bracketing
-    parmin = value - m_sigma_min * error;
-    parmax = value + m_sigma_max * error;
+    parmin = m_best_value - m_sigma_min * m_best_error;
+    parmax = m_best_value + m_sigma_max * m_best_error;
     if (m_model_par->has_min() && m_model_par->factor_min() > parmin) {
         parmin = m_model_par->factor_min();
     }
@@ -631,6 +653,12 @@ void ctulimit::get_parameter_brackets(double& parmin, double& parmax)
                               " has been reached. You may consider to increase"
                               " the \"max_iter\" parameter and re-run ctulimit.";
             throw GException::invalid_value(G_GET_PARAMETER_BRACKETS, msg);
+        }
+
+        // If model parameter is spatial parameter then make sure that no
+        // values are cached for source
+        if (m_is_spatial) {
+            m_obs.remove_response_cache(m_srcname);
         }
 
         // Evaluate logL at upper boundary
@@ -671,7 +699,12 @@ void ctulimit::get_parameter_brackets(double& parmin, double& parmax)
  *            Exceeded maximum number of iterations in the upper limit
  *            search.
  *
- * Calculates the upper limit using a bisection method.
+ * Calculates the upper limit using a bisection method. The bisection is
+ * stopped if the log-likelihood value is within the tolerance of the target
+ * value. The bisection is also stopped putting a warning in the log file if
+ * the parameter interval becomes smaller than a tolerance of 1.0e-6. The
+ * method stops with an exception if the maximum number of iterations is
+ * exhausted.
  ***************************************************************************/
 void ctulimit::ulimit_bisection(const double& parmin, const double& parmax)
 {
@@ -679,8 +712,9 @@ void ctulimit::ulimit_bisection(const double& parmin, const double& parmax)
     double wrk_min = parmin;
     double wrk_max = parmax;
 
-    // Initialise iteration counter
-    int iter = 0;
+    // Initialise iteration counter and restart flag
+    int  iter    = 0;
+    bool restart = false;
 
     // Loop until breaking condition is reached
     while (true) {
@@ -693,6 +727,12 @@ void ctulimit::ulimit_bisection(const double& parmin, const double& parmax)
             throw GException::invalid_value(G_UL_BISECTION, msg);
         }
 
+        // If model parameter is spatial parameter then make sure that no
+        // values are cached for source
+        if (m_is_spatial) {
+            m_obs.remove_response_cache(m_srcname);
+        }
+
         // Compute center of boundary
         double mid = (wrk_min + wrk_max) / 2.0;
 
@@ -701,19 +741,70 @@ void ctulimit::ulimit_bisection(const double& parmin, const double& parmax)
         double eval_mid = logL - (m_best_logL + m_dlogL);
 
         // Log information
-        log_value(EXPLICIT, "Iteration "+gammalib::str(iter),
+        log_value(NORMAL, "Iteration "+gammalib::str(iter),
                   "["+gammalib::str(wrk_min)+", "+gammalib::str(wrk_max)+"] "
-                  "dlogL("+gammalib::str(mid)+")="+gammalib::str(eval_mid));
+                  "logL("+gammalib::str(mid)+")="+gammalib::str(logL)+" "
+                  "dlogL="+gammalib::str(eval_mid));
 
         // Check for convergence inside tolerance
         if (std::abs(eval_mid) < m_tol) {
             break;
         }
-        /*
-        if (std::abs(wrk_max-wrk_min) < m_tol) {
-            break;
+
+        // Assess status
+        int status = 0;
+
+        // Check whether mid-point is close to best parameter value
+        double eps = (mid != 0.0) ? (mid - m_best_value)/mid : mid - m_best_value;
+        if (std::abs(eps) < 1.0e-6) {
+            std::string msg =
+            " *** WARNING: Parameter range mid-point "+gammalib::str(mid)+" is "
+            "close to best factor\n"
+            "              value "+gammalib::str(m_best_value)+" yet the "
+            "log-likelihood value "+gammalib::str(logL)+"\n"
+            "              at the mid-point differs significantly from the "
+            "log-likelihood value\n"
+            "              "+gammalib::str(m_best_logL)+" for the best factor "
+            "value.";
+            log_string(TERSE, msg);
+            status = 1;
         }
-        */
+
+        // Check for vanishing parameter range
+        eps = (mid != 0.0) ? (wrk_min - wrk_max)/mid : wrk_min - wrk_max;
+        if (std::abs(eps) < 1.0e-6) {
+            std::string msg =
+            " *** WARNING: Parameter range ["+gammalib::str(wrk_min)+", "+
+            gammalib::str(wrk_max)+"] has reduced\n"
+            "              to a narrow interval without reaching convergence! "
+            "The best\n"
+            "              log-likelihood value is probably not an absolute "
+            "but only a local\n"
+            "              minimum.";
+            log_string(TERSE, msg);
+            status = 2;
+        }
+
+        // Restart bisection if a restart is required
+        if (!restart && status != 0) {
+
+            // Adopt current logL as best log-likelihood
+            restart     = true;
+            iter        = 0;
+            wrk_min     = parmin;
+            wrk_max     = parmax;
+            m_best_logL = logL;
+
+            // Signal restart
+            std::string msg =
+            " Adopt "+gammalib::str(logL)+" as best log-likelihood and restart "
+            "bisection";
+            log_string(TERSE, msg);
+
+            // Restart
+            continue;
+
+        } // endif: restart bisection if required
 
         // Change boundaries for further iteration
         if (eval_mid > 0.0) {
@@ -766,10 +857,9 @@ void ctulimit::compute_ulimit(void)
         dynamic_cast<GModelSpatialDiffuseCube*>(m_skymodel->spatial());
     if (cube != NULL) {
 
-
         // Set MC cone to the entire sky. This method call is needed to
         // set-up the cube spectrum
-        cube->set_mc_cone(GSkyDir(), 180.0);
+        cube->mc_cone(GSkyRegionCircle(0.0, 0.0, 180.0));
 
         // Allocate node function to replace the spectral component
         nodes = new GModelSpectralNodes(cube->spectrum());

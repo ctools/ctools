@@ -2,7 +2,7 @@
 # ==========================================================================
 # Detects sources in a sky map
 #
-# Copyright (C) 2016-2019 Juergen Knoedlseder
+# Copyright (C) 2016-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -237,16 +237,17 @@ class cssrcdetect(ctools.cscript):
         # Compute the squared of the standard deviation for each pixel
         std = std - (mean*mean)
 
-        # Set all pixels with small number of events or small number of
-        # squared standard deviation to zero. Such pixels may occur due to
-        # the smoothing operation that uses a fast fourrier transform.
-        for iy in range(std.ny()):
-            offset = iy * std.nx()
-            for ix in range(std.nx()):
-                index = ix + offset
-                if mean[index] < 1.0 or std[index] < 1.0:
-                    mean[index] = 0.0
-                    std[index]  = 0.0
+        # Compute minimum value of standard deviation
+        std_offset = 0.0
+        for index in range(std.npix()):
+            if std[index] < std_offset:
+                std_offset = std[index]
+
+        # If minimum value is negative then subtract minimum value to guarantee
+        # a non-negative map of standard deviations
+        if std_offset < 0.0:
+            for index in range(std.npix()):
+                std[index] -= std_offset
 
         # Compute standard deviation
         std = std.sqrt()
@@ -421,16 +422,12 @@ class cssrcdetect(ctools.cscript):
 
 
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
         """
         # Clear model container
         self._models.clear()
-
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
 
         # Get parameters
         self._get_parameters()

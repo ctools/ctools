@@ -1,7 +1,7 @@
 # ==========================================================================
 # ctools Python module
 #
-# Copyright (C) 2015-2016 Juergen Knoedlseder
+# Copyright (C) 2015-2021 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,20 +20,30 @@
 # import gammalib first
 import gammalib
 
+# Make sur that library symbols are exported by setting the dynamic library
+# loading flag to RTLD_GLOBAL | RTLD_NOW. This is necessary on some systems.
+import sys
+flags = sys.getdlopenflags()
+sys.setdlopenflags(@DLFLAGS_RTLD_GLOBAL@ | @DLFLAGS_RTLD_NOW@)
+
 # Import sub modules
 from @PYTHON_RELATIVE_IMPORT@tools import *
+
+# Reset original flags
+sys.setdlopenflags(flags)
 
 # Remove swig register stuff
 bad_entries = [entry for entry in list(locals())
                if entry.endswith('_swigregister')]
-for entry in bad_entries:
-    del locals()[entry]
+if len(bad_entries) > 0:
+    for entry in bad_entries:
+        del locals()[entry]
 
 # Clean-up
 del tools
 del gammalib
 del bad_entries
-del entry
+#del entry
 
 # Add version
 __version__ = '@PACKAGE_VERSION@'

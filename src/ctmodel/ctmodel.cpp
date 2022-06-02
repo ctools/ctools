@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmodel - Model cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2019 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -214,13 +214,8 @@ void ctmodel::clear(void)
  * observation container, loops over all CTA observations in the container
  * and generates a model map for each CTA observation.
  ***************************************************************************/
-void ctmodel::run(void)
+void ctmodel::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 
@@ -326,6 +321,10 @@ void ctmodel::save(void)
 
         // Save cube
         m_cube.save(m_outcube, clobber());
+
+        // Stamp model cube
+        stamp(m_outcube);
+
     }
 
     // Write into logger what has been done
@@ -673,6 +672,9 @@ void ctmodel::get_obs(void)
             // Create CTA observation
             GCTAObservation cta;
             cta.events(cube);
+
+            // Set name of Cherenkov telescope
+            cta.instrument((*this)["instrument"].string());
 
             // If querying of energy dispersion cube is requested then
             // query it now

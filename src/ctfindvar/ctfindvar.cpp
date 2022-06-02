@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctfindvar - Time variability search tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2018-2019 by Simon Bonnefoy                              *
+ *  copyright (C) 2018-2022 by Simon Bonnefoy                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -221,15 +221,10 @@ void ctfindvar::clear(void)
 
 
 /***********************************************************************//**
- * @brief Run time variability search tool
+ * @brief Process time variability search tool
  ***************************************************************************/
-void ctfindvar::run(void)
+void ctfindvar::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 
@@ -273,6 +268,7 @@ void ctfindvar::save(void)
         // counts cube was saved.
         if (!m_counts.is_empty()) {
             m_counts.save(outcube, (*this)["clobber"].boolean());
+            stamp(outcube);
             log_value(TERSE, "Counts cube file", outcube.url());
         }
         else {
@@ -297,6 +293,9 @@ void ctfindvar::save(void)
 
         // Write source histograms
         write_source_histograms(fits);
+
+        // Stamp FITS file
+        stamp(fits);
 
         // Save significance map
         fits.saveto(outmap, (*this)["clobber"].boolean());
@@ -817,9 +816,9 @@ std::vector<int> ctfindvar::get_pixels(void)
             if (model != NULL) {
 
                 // Get the source position
-                GModelSpatial*    spatial = model->spatial();
-                GSkyRegion*       region  = spatial->region();
-                GSkyRegionCircle* circle  = dynamic_cast<GSkyRegionCircle*>(region);
+                const GModelSpatial*    spatial = model->spatial();
+                const GSkyRegion*       region  = spatial->region();
+                const GSkyRegionCircle* circle  = dynamic_cast<const GSkyRegionCircle*>(region);
 
                 // If region circle is valid then
                 if (circle != NULL) {
@@ -1338,9 +1337,9 @@ void ctfindvar::write_source_histograms(GFits& fits)
             if (model != NULL) {
 
                 // Get the source position
-                GModelSpatial*    spatial = model->spatial();
-                GSkyRegion*       region  = spatial->region();
-                GSkyRegionCircle* circle  = dynamic_cast<GSkyRegionCircle*>(region);
+                const GModelSpatial*    spatial = model->spatial();
+                const GSkyRegion*       region  = spatial->region();
+                const GSkyRegionCircle* circle  = dynamic_cast<const GSkyRegionCircle*>(region);
 
                 // If region circle is valid then extract source name and
                 // sky direction

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2018 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -44,8 +44,8 @@
  * FITS files, and on observation definition XML files.
  *
  * If multiple event lists are specified in the observation container or the
- * XML definition file, the class will merge these events into a single
- * counts cube.
+ * XML definition file, the class will upon request stack these events into a
+ * single counts cube.
  *
  * If the hidden parameter stack=no is used, one counts cube is generated for
  * each individual observation. These cubes are saved to a path that can be
@@ -80,7 +80,7 @@ public:
 
     // Methods
     void                 clear(void);
-    void                 run(void);
+    void                 process(void);
     int                  cubes(void) const;
     const GCTAEventCube& cube(const int& index = 0) const;
     void                 save(void);
@@ -94,8 +94,8 @@ protected:
     void    get_parameters(void);
     void    init_sky_dir_cache(void);
     GSkyMap create_cube(const GCTAObservation* obs);
-    GSkyMap fill_cube(const GCTAObservation* obs);
-    GSkyMap set_weights(const GCTAObservation* obs);
+    void    fill_cube(const GCTAObservation* obs, GSkyMap& counts);
+    void    set_weights(const GCTAObservation* obs, GSkyMap& weights);
     void    obs_cube_stacked(void);
 
     // User parameters
@@ -129,7 +129,7 @@ protected:
 inline
 int ctbin::cubes(void) const
 {
-    return m_cubes.size();
+    return ((int)m_cubes.size());
 }
 
 #endif /* CTBIN_HPP */

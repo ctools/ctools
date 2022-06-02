@@ -105,6 +105,12 @@ def process(nthreads, function, args):
     pool.close()
     pool.join()
 
+    # Add CPU times of child processes to CPU time of parent
+    nchilds = len(args)
+    for i in range(nchilds):
+        celapse = results[i][1]['celapse']
+        args[i][0]._add_celapse(celapse)
+
     # Return results
     return results
 

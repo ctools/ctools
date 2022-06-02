@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctulimit tool.
 #
-# Copyright (C) 2015-2018 Michael Mayer
+# Copyright (C) 2015-2021 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -162,14 +162,6 @@ class Test(test):
         cpy_ulimit = ulimit.copy()
 
         # Check results of copy
-        self.test_value(cpy_ulimit.diff_ulimit(), ref_diff, 1.0e-21,
-                        'Check differential upper limit')
-        self.test_value(cpy_ulimit.flux_ulimit(), ref_flux, 1.0e-16,
-                        'Check upper limit on photon flux')
-        self.test_value(cpy_ulimit.eflux_ulimit(), ref_eflux, 1.0e-16,
-                        'Check upper limit on energy flux')
-
-        # Check results
         self.test_value(cpy_ulimit.diff_ulimit(), ref_diff, 1.0e-21,
                         'Check differential upper limit')
         self.test_value(cpy_ulimit.flux_ulimit(), ref_flux, 1.0e-16,

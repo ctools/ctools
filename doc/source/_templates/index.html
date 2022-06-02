@@ -1,34 +1,59 @@
 {% extends "layout.html" %} {% set title = _('Overview') %} {% block
 body %}
-<h1>{{ _('ctools') }}</h1>
 
-<p>{%trans%} ctools is a software package developed for the scientific
-analysis of Cherenkov Telescope Array (CTA) data, as well as data from
-existing Imaging Air Cherenkov Telescopes (such as H.E.S.S., MAGIC or VERITAS).
+<p>{%trans%} ctools is a software package for the scientific analysis of
+astronomical gamma-ray data. The package comprises an extensive set of tools
+for the analysis of data from existing and future Cherenkov telescopes,
+including H.E.S.S., VERITAS, MAGIC and CTA. ctools supports also the analysis
+of data from CGRO/COMPTEL, Fermi/LAT and INTEGRAL/SPI, enabling the exploration
+of the full gamma-ray energy band, spanning from hundreds of keV to hundreds of
+TeV. {%endtrans%}</p>
+
+<p>{%trans%} The ctools philosophy is inherited from ftools and consists of providing
+building blocks that perform well-defined science data analysis tasks, including
+observation and event selection, binning, sky map creation, source detection,
+model fitting, spectra, phase curve and light curve generation, and observation
+simulations. The building blocks are then combined by the user to create flexible
+analysis workflows that can fit the needs of any scientist. {%endtrans%}</p>
+
+<p>{%trans%} ctools can be used as command-line executables alike ftools to carry
+out simple analyses even for users without any programming skills. Furthermore,
+the tools are accessible through dedicated Python modules providing an alternative
+user interface to the software, as well as the possibility to provide tutorials
+in the form of Jupyter notebooks. Shell or Python scripts can be used by more
+advanced users to build analysis pipelines to any degrees of complexity.
 {%endtrans%}</p>
-
-<p>{%trans%} ctools comprises a set of ftools-like binary executables and
-Python scripts with a command-line interface allowing for interactive step-wise
-data analysis. ctools includes also Python modules to control all tools and
-scripts from within Python. Creation of shell or Python scripts and pipelines
-is supported as well. {%endtrans%}</p>
 
 <p>{%trans%} ctools are based on <a href="http://cta.irap.omp.eu/gammalib">GammaLib</a>,
 a versatile toolbox for the scientific analysis of astronomical gamma-ray data.
-Besides CTA, GammaLib supports also the analysis of Fermi/LAT and COMPTEL data, 
-and extensions to support further gamma-ray instruments are planned. An
-interface to virtual observatory ressources does also exist. By making use of
-the GammaLib multi-instrument capabilities, ctools supports the joint analysis
-of CTA, H.E.S.S., MAGIC, VERITAS, Fermi/LAT and COMPTEL data.
 {%endtrans%}</p>
 
-<p>{%trans%} ctools are developed by a team of enthousiastic gamma-ray
-astronomers with support from engineers. We regularily organise
-<a href=https://cta-redmine.irap.omp.eu/projects/ctools/wiki/Coding_sprints>coding sprints</a>
-where key developers but also newcomers meet to discuss the developments 
-and next steps, and advance with the coding of the software. {%endtrans%}</p>
+<p>{%trans%} ctools are developed by a community of enthousiastic gamma-ray
+astronomers with support from engineers. The lead institute is
+{%endtrans%}</p>
+
+<table cellpadding="0" cellspacing="0" border="0">
+   <tr>
+     <td><img src="_static/logo-irap.png" alt="IRAP" height="50"></td>
+   </tr>
+</table>
+
+<p>{%trans%} As of today there have been contributions by the following institutions:
+{%endtrans%}</p>
+
+<table cellpadding="0" cellspacing="0" border="0">
+   <tr>
+     <td><img src="_static/logo-desy.png" alt="DESY" height="50"></td>
+     <td><img src="_static/logo-ecap.jpg" alt="ECAP" height="50"></td>
+     <td><img src="_static/logo-mpik.png" alt="MPIK" height="50"></td>
+     <td><img src="_static/logo-cyfronet.png" alt="Cyfronet" height="50"></td>
+     <td><img src="_static/logo-lapp.png" alt="LAPP" height="50"></td>
+     <td><img src="_static/logo-lupm.png" alt="LUPM" height="50"></td>
+   </tr>
+</table>
 
 <p>{%trans%} ctools is free software distributed under the
-<a href="http://www.gnu.org/licenses/gpl.html">GNU GPL license version 3</a> {%endtrans%}</p>
+<a href="http://www.gnu.org/licenses/gpl.html">GNU GPL license version 3</a>
+{%endtrans%}</p>
 
 {% endblock %}

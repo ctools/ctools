@@ -1,0 +1,49 @@
+#############################################################################
+#                                                                           #
+#                     COMPTEL Science Analysis Tools                        #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      comlixfit.par                                                 #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the comlixfit script                       #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,     f, a, obs.xml,,, "Input observation definition file"
+inmodel,   f, a, models.xml,,, "Input model definition file"
+suffix,    s, h, srclix,,, "Suffix for DRB files"
+outfolder, s, h, dri,,, "Output folder for DRG files"
+outobs,    f, a, outobs.xml,,, "Output observation definition file"
+outmodel,  f, a, results.xml,,, "Output model definition file"
+
+#
+# Script parameters
+#==================
+max_iter,            i, h, 50,1,1000, "Maximum number of SRCLIX iterations"
+like_accuracy,       r, h, 0.05,1.0e-30,1.0, "Absolute accuracy of maximum likelihood value"
+accept_dec,          r, h, 0.0,0.0,10.0, "Maximum accepted log-likelihood decrease"
+fix_spat_for_ts,     b, h, no,,, "Fix spatial parameters for TS computation?"
+fix_ext_for_initial, b, h, no,,, "Fix extension parameters for initial fit iteration?"
+bkgmethod,           s, a, BGDLIXE,PHINOR|BGDLIXA|BGDLIXE,, "Method for background computation"
+nrunav,              i, h, 3,,, "Number of Chi/Psi bins used for running average"
+navgr,               i, h, 5,,, "Number of Chi/Psi bins used for averaging"
+nincl,               i, h, 15,,, "Number of Phibar layers to include"
+nexcl,               i, h, 0,,, "Number of Phibar layers to exclude"
+phi_first,           i, h, -1,,, "First Phibar layer for fitting (starting from 0; -1: no selection)"
+phi_last,            i, h, -1,,, "Last Phibar layer for fitting (starting from 0;-1: no selection)"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Activate debugging mode?"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, comlixfit.log,,, "Log filename"

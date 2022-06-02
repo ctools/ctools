@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2018 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2022 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -33,7 +33,7 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_RUN                                              "ctbkgcube::run()"
+#define G_PROCESS                                       "ctbkgcube::process()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -206,13 +206,8 @@ void ctbkgcube::clear(void)
  * observation container, loops over all CTA observations in the container
  * and generates a background cube from the CTA observations.
  ***************************************************************************/
-void ctbkgcube::run(void)
+void ctbkgcube::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 
@@ -281,7 +276,7 @@ void ctbkgcube::run(void)
         std::string msg = "No background model found in model container. "
                           "At least one background model is required in the "
                           "model container to generate a background cube.";
-        throw GException::invalid_value(G_RUN, msg);
+        throw GException::invalid_value(G_PROCESS, msg);
     }
 
     // Write header
@@ -322,7 +317,7 @@ void ctbkgcube::run(void)
 
     // Set model instruments
     //model.instruments(instruments);
-    model.instruments("CTA,HESS,MAGIC,VERITAS"); // Temporary fix for #2140
+    model.instruments("CTA,HESS,MAGIC,VERITAS,ASTRI"); // Temporary fix for #2140
 
     // Append model to output container
     m_outmdl.append(model);
@@ -365,11 +360,13 @@ void ctbkgcube::save(void)
     if ((*this)["outcube"].is_valid() && !m_background.cube().is_empty()) {
 
         // Get background cube file name
-        m_outcube  = (*this)["outcube"].filename();
+        m_outcube = (*this)["outcube"].filename();
 
         // Save background cube
         m_background.save(m_outcube, clobber());
 
+        // Stamp background cube
+        stamp(m_outcube);
     }
 
     // Save model definition file if requested

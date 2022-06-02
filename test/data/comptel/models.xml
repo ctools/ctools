@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<source_library title="source library">
+  <source name="Crab" type="PointSource" tscalc="1">
+    <spectrum type="PowerLaw">
+      <parameter name="Prefactor" value="1" error="0" scale="0.002" min="5e-23" free="1" />
+      <parameter name="Index" value="1" error="-0" scale="-2" min="-5" max="5" free="1" />
+      <parameter name="PivotEnergy" value="1" scale="1" free="0" />
+    </spectrum>
+    <spatialModel type="PointSource">
+      <parameter name="RA" value="83.6331" error="0" scale="1" free="1" />
+      <parameter name="DEC" value="22.0145" error="0" scale="1" free="1" />
+    </spatialModel>
+  </source>
+  <source name="Background_vp0001_0_000750-001000keV" type="DRBPhibarNodes" instrument="COM" id="vp0001_0_000750-001000keV">
+    <node>
+      <parameter name="Phibar" value="15" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="17" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="19" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="21" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="23" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="25" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="27" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="29" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="31" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="33" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="35" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="37" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="39" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="41" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="43" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+  </source>
+  <source name="Background_vp0001_0_001000-003000keV" type="DRBPhibarNodes" instrument="COM" id="vp0001_0_001000-003000keV">
+    <node>
+      <parameter name="Phibar" value="5" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="7" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="9" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="11" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="13" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="15" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="17" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="19" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="21" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="23" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="25" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="27" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="29" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="31" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="33" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="35" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="37" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="39" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="41" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="43" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="45" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="47" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="49" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+  </source>
+  <source name="Background_vp0001_0_003000-010000keV" type="DRBPhibarNodes" instrument="COM" id="vp0001_0_003000-010000keV">
+    <node>
+      <parameter name="Phibar" value="1" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="3" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="5" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="7" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="9" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="11" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="13" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="15" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="17" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="19" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="21" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="23" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="25" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="27" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="29" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="31" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="33" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="35" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="37" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="39" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="41" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="43" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="45" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="47" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="49" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+  </source>
+  <source name="Background_vp0001_0_010000-030000keV" type="DRBPhibarNodes" instrument="COM" id="vp0001_0_010000-030000keV">
+    <node>
+      <parameter name="Phibar" value="1" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="3" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="5" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="7" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="9" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="11" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="13" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="15" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="17" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="19" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="21" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="23" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="25" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="27" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="29" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="31" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="33" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="35" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="37" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="39" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="41" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="43" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="45" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="47" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+    <node>
+      <parameter name="Phibar" value="49" scale="1" min="0" max="50" free="0" />
+      <parameter name="Normalization" value="1" error="0" scale="1" min="0" max="1000" free="1" />
+    </node>
+  </source>
+</source_library>

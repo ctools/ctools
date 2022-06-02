@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script generates the pull distribution for all model parameters.
 #
-# Copyright (C) 2011-2018 Juergen Knoedlseder
+# Copyright (C) 2011-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,7 +41,8 @@ class cspull(ctools.csobservation):
         # Initialise application by calling the appropriate class constructor
         self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
-        # Initialise some members
+        # Initialise class members
+        self._fits     = None
         self._nthreads = 0
 
         # Return
@@ -59,6 +60,7 @@ class cspull(ctools.csobservation):
         """
         # Set pickled dictionary
         state = {'base'     : ctools.csobservation.__getstate__(self),
+                 'fits'     : self._fits,
                  'nthreads' : self._nthreads}
 
         # Return pickled dictionary
@@ -74,10 +76,12 @@ class cspull(ctools.csobservation):
             Pickled instance
         """
         ctools.csobservation.__setstate__(self, state['base'])
+        self._fits     = state['fits']
         self._nthreads = state['nthreads']
 
         # Return
         return
+
 
     # Private methods
     def _get_parameters(self):
@@ -121,8 +125,11 @@ class cspull(ctools.csobservation):
         self['chatter'].integer()
 
         # Query some parameters
-        self['outfile'].filename()
         self['profile'].boolean()
+
+        # Read ahead output parameters
+        if self._read_ahead():
+            self['outfile'].filename()
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -297,13 +304,18 @@ class cspull(ctools.csobservation):
                     # Set name as a combination of model name and parameter
                     # name separated by an underscore. In that way each
                     # parameter has a unique name.
-                    name = model.name()+'_'+par.name()
+                    name = model.name() + '_' + par.name()
 
-                    # Append parameter, Pull_parameter and e_parameter column
-                    # names
-                    colnames.append(name)
-                    colnames.append('Pull_'+name)
-                    colnames.append('e_'+name)
+                    # Set "Parameter", "Parameter_error" and "Parameter_Pull"
+                    # column names
+                    col_par       = name
+                    col_par_error = name+'_error'
+                    col_par_pull  = name+'_pull'
+
+                    # Append column names
+                    colnames.append(col_par)
+                    colnames.append(col_par_error)
+                    colnames.append(col_par_pull)
 
                     # Compute pull for this parameter as the difference
                     #               (fitted - true) / error
@@ -317,9 +329,9 @@ class cspull(ctools.csobservation):
                         pull = 99.0
 
                     # Store results in dictionary
-                    values[name]         = fitted_value
-                    values['Pull_'+name] = pull
-                    values['e_'+name]    = error
+                    values[col_par]       = fitted_value
+                    values[col_par_error] = error
+                    values[col_par_pull]  = pull
 
                     # Write results into logger
                     value = '%.4f (%e +/- %e)' % (pull, fitted_value, error)
@@ -331,16 +343,106 @@ class cspull(ctools.csobservation):
         # Return
         return result
 
+    def _create_fits(self, results):
+        """
+        Create FITS file from results
+
+        Parameters
+        ----------
+        results : list of dict
+            List of result dictionaries
+        """
+        # Gather headers for parameter columns
+        headers = []
+        for colname in results[0]['colnames']:
+            if colname != 'LogL' and colname != 'Sim_Events' and \
+               colname != 'Npred_Events':
+                headers.append(colname)
+
+        # Create FITS table columns
+        nrows   = len(results)
+        logl    = gammalib.GFitsTableDoubleCol('LOGL', nrows)
+        nevents = gammalib.GFitsTableDoubleCol('NEVENTS', nrows)
+        npred   = gammalib.GFitsTableDoubleCol('NPRED', nrows)
+        logl.unit('')
+        nevents.unit('counts')
+        npred.unit('counts')
+        columns = []
+        for header in headers:
+            name   = gammalib.toupper(header)
+            column = gammalib.GFitsTableDoubleCol(name, nrows)
+            column.unit('')
+            columns.append(column)
+
+        # Fill FITS table columns
+        for i, result in enumerate(results):
+            logl[i]    = result['values']['LogL']
+            nevents[i] = result['values']['Sim_Events']
+            npred[i]   = result['values']['Npred_Events']
+            for k, column in enumerate(columns):
+                column[i] = result['values'][headers[k]]
+
+        # Initialise FITS Table with extension "PULL_DISTRIBUTION"
+        table = gammalib.GFitsBinTable(nrows)
+        table.extname('PULL_DISTRIBUTION')
+
+        # Add keywords for compatibility with gammalib.GMWLSpectrum
+        table.card('INSTRUME', 'CTA', 'Name of Instrument')
+        table.card('TELESCOP', 'CTA', 'Name of Telescope')
+
+        # Stamp header
+        self._stamp(table)
+
+        # Set optional keyword values
+        if gammalib.toupper(self['onsrc'].string()) != 'NONE':
+            onrad = self['onrad'].real()
+        else:
+            onrad = 0.0
+        if self['enumbins'].integer() > 0:
+            npix     = self['npix'].integer()
+            binsz    = self['binsz'].real()
+            coordsys = self['coordsys'].string()
+            proj     = self['proj'].string()
+        else:
+            npix     = 0
+            binsz    = 0.0
+            coordsys = ''
+            proj     = ''
+
+        # Add script keywords
+        table.card('NPULLS',   self['ntrials'].integer(),  'Number of pulls')
+        table.card('SEED',     self['seed'].integer(),     'Seed value for pulls')
+        table.card('ONSRC',    self['onsrc'].string(),     'Name of On surce for On/Off analysis')
+        table.card('ONRAD',    onrad,                      '[deg] Radius of On region')
+        table.card('ENUMBINS', self['enumbins'].integer(), 'Number of energy bins')
+        table.card('NPIX',     npix,                       'Number of pixels for binned analysis')
+        table.card('BINSZ',    binsz,                      'Pixel size for binned analysis')
+        table.card('COORDSYS', coordsys,                   'Coordinate system for binned analysis')
+        table.card('PROJ',     proj,                       'Projection for binned analysis')
+        table.card('STAT',     self['statistic'].string(), 'Optimization statistic')
+        table.card('EDISP',    self['edisp'].boolean(),    'Use energy dispersion?')
+        table.card('PROFILE',  self['profile'].boolean(),  'Use likelihood profile method for errors?')
+
+        # Append filled columns to fits table
+        table.append(logl)
+        table.append(nevents)
+        table.append(npred)
+        for column in columns:
+            table.append(column)
+
+        # Create the FITS file now
+        self._fits = gammalib.GFits()
+        self._fits.append(table)
+
+        # Return
+        return
+
 
     # Public methods
-    def run(self):
+    def process(self):
         """
-        Run the script
+        Process the script
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
         # Get parameters
         self._get_parameters()
 
@@ -356,6 +458,9 @@ class cspull(ctools.csobservation):
         # Get seed value
         seed = self['seed'].integer()
 
+        # Initialise results
+        results  = []
+
         # If more than a single thread is requested then use multiprocessing
         if self._nthreads > 1:
             args        = [(self, '_trial', i + seed) for i in range(ntrials)]
@@ -367,16 +472,20 @@ class cspull(ctools.csobservation):
             # If multiprocessing was used then recover results and put them
             # into the log file
             if self._nthreads > 1:
-                result = poolresults[i][0]
+                results.append(poolresults[i][0])
                 self._log_string(gammalib.TERSE, poolresults[i][1]['log'], False)
 
             # ... otherwise make a trial now
             else:
+
+                # Run trial
                 result = self._trial(i + seed)
 
-            # Write out trial result
-            ioutils.write_csv_row(self['outfile'].filename().url(), i,
-                                  result['colnames'], result['values'])
+                # Append results
+                results.append(result)
+
+        # Create FITS file
+        self._create_fits(results)
 
         # Return
         return
@@ -395,6 +504,38 @@ class cspull(ctools.csobservation):
 
         # Return
         return
+
+    def save(self):
+        """
+        Save pull FITS file
+        """
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Save pull distribution')
+
+        # Continue only if FITS file is valid
+        if self._fits != None:
+
+            # Get outmap parameter
+            outfile = self['outfile'].filename()
+
+            # Log file name
+            self._log_value(gammalib.NORMAL, 'Pull distribution file', outfile.url())
+
+            # Save pull distribution
+            self._fits.saveto(outfile, self['clobber'].boolean())
+
+        # Return
+        return
+
+    def pull_distribution(self):
+        """
+        Return pull distribution FITS file
+
+        Returns:
+            FITS file containing pull distribution
+        """
+        # Return
+        return self._fits
 
 
 # ======================== #

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2019 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2022 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -62,11 +62,12 @@ public:
 
     // Methods
     void          clear(void);
-    void          run(void);
+    void          process(void);
     void          save(void);
     void          publish(const std::string& name = "");
     const double& max_rate(void) const;
     void          max_rate(const double& max_rate);
+    void          models(const GModels& models);
 
 protected:
     // Protected methods
@@ -144,13 +145,14 @@ protected:
     int         m_seed;        //!< Random number generator seed
     int         m_eslices;     //!< Number of energy slices
     bool        m_apply_edisp; //!< Apply energy dispersion?
+    double      m_max_rate;    //!< Maximum photon rate
 
     // Protected members
-    mutable bool          m_save_and_dispose; //!< Save and dispose immediately
-    int                   m_max_photons;      //!< Maximum number of photons/slice
-    double                m_max_rate;         //!< Maximum photon rate
-    std::vector<GRan>     m_rans;             //!< Random number generators
-    int                   m_event_id;         //!< Event identifier
+    GModels           m_models;           //!< Optionally provided models
+    mutable bool      m_save_and_dispose; //!< Save and dispose immediately
+    int               m_max_photons;      //!< Maximum number of photons/slice
+    std::vector<GRan> m_rans;             //!< Random number generators
+    int               m_event_id;         //!< Event identifier
 };
 
 
@@ -175,6 +177,24 @@ inline
 void ctobssim::max_rate(const double& max_rate)
 {
     m_max_rate = max_rate;
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Set models for simulation
+ *
+ * @param[in] models Model container.
+ *
+ * Sets the model container that should be used for simulations. If a
+ * model container exists already in the input observations the model
+ * container will be overwritten. The models will not be queried, and
+ * any model specified using the "inmodel" parameter will be ignored.
+ ***************************************************************************/
+inline
+void ctobssim::models(const GModels& models)
+{
+    m_models = models;
     return;
 }
 

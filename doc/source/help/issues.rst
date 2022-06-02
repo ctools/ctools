@@ -14,6 +14,7 @@ list of
 - :ref:`Python module does not work <issue_python>`
 - :ref:`Installing on Solaris <issue_solaris>`
 - :ref:`Installing on OpenSolaris <issue_opensolaris>`
+- :ref:`Conda installation on Ubuntu 18.04 <issue_ubuntu1804>`
 
 **Analysis issues**
 
@@ -45,7 +46,7 @@ Installation issues
 
       export GIT_SSL_NO_VERIFY=true
 
- .. _conda_python:
+.. _conda_python:
 
 .. topic:: ctools does not compile against conda Python
 
@@ -114,6 +115,16 @@ Installation issues
       $ ln -s /usr/bin/g++4.3.2 /usr/bin/g++
 
    which are not there by default. This avoids warnings during compilation.
+
+.. _issue_ubuntu1804:
+
+.. topic:: Conda installation on Ubuntu 18.04
+
+   According to `this thread <https://github.com/ContinuumIO/anaconda-issues/issues/11371>`_
+   conda does not successfully work on Ubuntu 18.04 and consequently you will
+   also encounter problems when installing ctools on Ubuntu 18.04 via conda.
+   If you want to use conda on Ubuntu you need to upgrade to a newer version.
+   Successful operations were reported, for example, for Ubuntu 20.04.
 
 
 Analysis issues

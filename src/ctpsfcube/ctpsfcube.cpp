@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctpsfcube - PSF cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2018 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2022 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -204,13 +204,8 @@ void ctpsfcube::clear(void)
  * observation container, loops over all CTA observations in the container
  * and generates a PSF cube from the CTA observations.
  ***************************************************************************/
-void ctpsfcube::run(void)
+void ctpsfcube::process(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
-    if (logDebug()) {
-        log.cout(true);
-    }
-
     // Get task parameters
     get_parameters();
 
@@ -256,6 +251,9 @@ void ctpsfcube::save(void)
 
         // Save PSF cube
         m_psfcube.save(m_outcube, clobber());
+
+        // Stamp PSF cube
+        stamp(m_outcube);
 
     }
 

@@ -2,7 +2,7 @@
 # ==========================================================================
 # Puts subset of sources in diffuse model cube
 #
-# Copyright (C) 2017-2018 Josh Cardenzana
+# Copyright (C) 2017-2022 Josh Cardenzana
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,11 +40,11 @@ class csmodelsois(ctools.cscript):
     def __init__(self, *argv):
         """
         Constructor
-        
+
         Parameters
         ----------
         argv : list of parameters
-        
+
         Raises
         ------
         TypeError
@@ -52,12 +52,12 @@ class csmodelsois(ctools.cscript):
         """
         # Initialise application by calling the base class constructor
         self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
-        
+
         # Initialize parameters
         self._cubegen    = ctools.ctmapcube()
         self._models     = gammalib.GModels()
         self._cubemodels = gammalib.GModels()
-        
+
         # Return
         return
 
@@ -146,14 +146,10 @@ class csmodelsois(ctools.cscript):
 
 
     # Public methods
-    def run(self):
+    def process(self):
         """
         Implements the actual bulk of the script's tasks
         """
-        # Switch screen logging on in debug mode
-        if self._logDebug():
-            self._log.cout(True)
-
         # Get parameters
         self._get_parameters()
 
@@ -186,15 +182,20 @@ class csmodelsois(ctools.cscript):
         # Save the generated cube if the cube and filename are not empty
         if ((not self._cubegen.mapcube().cube().is_empty()) and
             self['outcube'].is_valid()):
+
+            # Save cube
             self._cubegen.mapcube().save(self['outcube'].filename(),
                                          self['clobber'].boolean())
-        
+
+            # Stamp cube
+            self._stamp(self['outcube'].filename())
+
         # If requested, save the updated list of models
         if self['outmodel'].is_valid():
 
             # Generate a list of models that will be output to file
             outmodels = gammalib.GModels(self._models)
-            
+
             # Remove all models used in the generated cube
             for model in self._cubemodels:
                 outmodels.remove(model.name())
@@ -250,9 +251,9 @@ class csmodelsois(ctools.cscript):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    
+
     # Create instance of application
     app = csmodelsois(sys.argv)
-    
+
     # Execute application
     app.execute()

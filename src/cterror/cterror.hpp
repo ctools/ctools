@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 cterror - Parameter error calculation tool              *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2016 by Florent Forest                              *
+ *  copyright (C) 2015-2022 by Florent Forest                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -54,7 +54,7 @@ public:
 
     // Methods
     void clear(void);
-    void run(void);
+    void process(void);
     void save(void);
 
 protected:
