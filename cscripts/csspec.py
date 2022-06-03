@@ -1265,6 +1265,9 @@ class csspec(ctools.csobservation):
         # Write input observation container into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
+        # Write input models into logger
+        self._log_models(gammalib.VERBOSE, self.obs().models(), 'Input model')
+
         # Write spectral binning into logger
         self._log_spectral_binning()
 
@@ -1283,6 +1286,9 @@ class csspec(ctools.csobservation):
             # Replace source spectrum by nodes function
             self._set_replace_src_spectrum_by_nodes()
 
+            # Write replaced models into logger
+            self._log_models(gammalib.VERBOSE, self.obs().models(), 'Model for fitting')
+
             # Fit model
             results = self._fit_model()
 
@@ -1291,6 +1297,9 @@ class csspec(ctools.csobservation):
 
             # Replace source spectrum by bins function
             self._set_replace_src_spectrum_by_bins()
+
+            # Write replaced models into logger
+            self._log_models(gammalib.VERBOSE, self.obs().models(), 'Model for fitting')
 
             # Fit model
             results = self._fit_model()
