@@ -1287,7 +1287,8 @@ class csspec(ctools.csobservation):
             self._set_replace_src_spectrum_by_nodes()
 
             # Write replaced models into logger
-            self._log_models(gammalib.VERBOSE, self.obs().models(), 'Model for fitting')
+            self._log_models(gammalib.VERBOSE, self.obs().models(),
+                             '"NODES" spectrum generation model')
 
             # Fit model
             results = self._fit_model()
@@ -1299,7 +1300,8 @@ class csspec(ctools.csobservation):
             self._set_replace_src_spectrum_by_bins()
 
             # Write replaced models into logger
-            self._log_models(gammalib.VERBOSE, self.obs().models(), 'Model for fitting')
+            self._log_models(gammalib.VERBOSE, self.obs().models(),
+                             '"BINS" spectrum generation model')
 
             # Fit model
             results = self._fit_model()
