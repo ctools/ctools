@@ -322,6 +322,14 @@ void ctmodel::save(void)
         // Save cube
         m_cube.save(m_outcube, clobber());
 
+        // Write mandatory keywords
+        GFits fits(m_outcube);
+        for (int i = 0; i < fits.size(); ++i) {
+            fits[i]->card("RA_PNT",  m_ra_pnt,  "[deg] Pointing Right Ascension");
+            fits[i]->card("DEC_PNT", m_dec_pnt, "[deg] Pointing Declination");
+        }
+        fits.save(true);
+
         // Stamp model cube
         stamp(m_outcube);
 
@@ -419,6 +427,8 @@ void ctmodel::init_members(void)
     m_energy.clear();
     m_ewidth.clear();
     m_time.clear();
+    m_ra_pnt  = 0.0;
+    m_dec_pnt = 0.0;
 
     // Return
     return;
@@ -449,6 +459,8 @@ void ctmodel::copy_members(const ctmodel& app)
     m_energy      = app.m_energy;
     m_ewidth      = app.m_ewidth;
     m_time        = app.m_time;
+    m_ra_pnt      = app.m_ra_pnt;
+    m_dec_pnt     = app.m_dec_pnt;
 
     // Return
     return;
@@ -858,6 +870,10 @@ void ctmodel::fill_cube(const GCTAObservation* obs, GModels& models)
     // Get reference to the pointing for DETX and DETY computation, if
     // required
     const GCTAPointing& pnt = obs->pointing();
+
+    // Store Right Ascension and Declination for output model
+    m_ra_pnt  = pnt.dir().ra_deg();
+    m_dec_pnt = pnt.dir().dec_deg();
 
     // Get references to GTI and energy boundaries for the event list
     const GGti&     gti         = obs->events()->gti();

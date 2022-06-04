@@ -101,6 +101,8 @@ protected:
     std::vector<GEnergy>     m_energy;      //!< Cube energies
     std::vector<GEnergy>     m_ewidth;      //!< Cube energy widths
     GTime                    m_time;        //!< Cube time
+    double                   m_ra_pnt;      //!< Right Ascension of pointing
+    double                   m_dec_pnt;     //!< Declination Ascension of pointing
 };
 
 

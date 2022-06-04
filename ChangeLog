@@ -1,4 +1,4 @@
-2022-06-01
+2022-06-04
 
         * Version 2.0.0 released
         ========================
@@ -6,6 +6,7 @@
         Add support for ASTRI and FACT instrument (#4058)
         Allow determination of upper limits on spatial parameters in ctulimit (#4006)
         Add comgendb script (#3983)
+        Store RA_PNT and DEC_PNT in ctmodel cube (#3915)
         Add methods to access ctlike attributes
         Add csadd2caldb script
         Add restart of bisection in case of bad convergence in ctulimit

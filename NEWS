@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.0.0
 
-1 June 2022
+4 June 2022
 
 
 Introduction
@@ -112,6 +112,9 @@ Stamp output map cube (#3662).
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
+The tool now stores the keyword RA_PNT and DEC_PNT in the output model cube
+so that these cubes can be read by ctcubemask and other tools (#3915).
+
 Stamp output model cube (#3662).
 
 

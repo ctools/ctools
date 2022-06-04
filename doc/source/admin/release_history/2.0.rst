@@ -18,6 +18,8 @@ In particular, this release provides:
 Bug fixes
 ---------
 
+* [`3915 <https://cta-redmine.irap.omp.eu/issues/3915>`_] -
+  Store ``RA_PNT`` and ``DEC_PNT`` in :ref:`ctmodel` cube
 * [`3426 <https://cta-redmine.irap.omp.eu/issues/3426>`_] -
   Fix implementation of ``fix_spat_for_ts`` parameter in :ref:`ctlike`
 
