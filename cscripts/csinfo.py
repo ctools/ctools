@@ -2,7 +2,7 @@
 # ==========================================================================
 # Print info about Gammalib / ctools to the console
 #
-# Copyright (C) 2015-2021 Christoph Deil
+# Copyright (C) 2015-2022 Christoph Deil
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ CSCRIPT_LIST = """
    csbkgmodel    Generates background model for 3D analysis
    cscaldb       Lists available instrument response functions
    csebins       Generates energy boundaries for stacked analysis
+   csfootprint   Generates carbon footprint report
    cslightcrv    Computes lightcurve
    csinfo        Checks ctools and GammaLib installations
    csmodelinfo   Shows model container content
@@ -75,12 +76,31 @@ CSCRIPT_LIST = """
    cstsmapmerge  Merges slices from Test Statistic map computations
    cstsmapsplit  Creates commands to split the Test Statistic map computations
    csviscube     Computes visibility cube\n
+   csadd2caldb   Adds CTA response function to calibration database
    csobs2caldb   Creates a caldb entry from an input observation
    csroot2caldb  Creates a caldb entry from a ROOT performance file
    csiactdata    Shows information about IACT data available on the user machine
    csiactobs     Generates observation definition file for IACT data from observation IDs
    csfindobs     Generates a list of IACT observation IDs
    csiactcopy    Copies IACT data from one location to another
+"""
+
+# List of available comscripts. The list was copied from
+# `doc/source/users/reference_manual/index.rst`
+# and needs to be manually updated and kept in sync
+COMSCRIPT_LIST = """
+   comgendb      Generate COMPTEL database
+   comlixfit     Fit model to data using SRCLIX algorithm
+   comlixmap     Create TS map using SRCLIX algorithm
+   comobsadd     Combine observations
+   comobsback    Generate background model for COMPTEL observations
+   comobsbin     Bin COMPTEL observations
+   comobsmodel   Generate model for binned COMPTEL observations
+   comobsres     Generate residuals of COMPTEL observations
+   comobsselect  Select observations from COMPTEL database
+   comobssim     Simulate COMPTEL observations
+   compulbin     Generate pulse profiles for pulsars
+   comsrcdetect  Detect source in TS map
 """
 
 
@@ -126,6 +146,10 @@ def csinfo_list_tools():
     # Print list of available cscripts
     print('Available cscripts:')
     print(CSCRIPT_LIST)
+
+    # Print list of available comscripts
+    print('Available comscripts:')
+    print(COMSCRIPT_LIST)
 
     # Return
     return
