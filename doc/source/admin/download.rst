@@ -3,7 +3,7 @@
 Download
 ========
 
-The latest ctools release is ``ctools-1.7.4`` (28 April 2021).
+The latest ctools release is ``ctools-2.0.0`` (6 June 2022).
 
 Below a table of ctools releases. Please read the :ref:`sec_release` to
 learn more about new features and corrected bugs in a given release.
@@ -23,6 +23,9 @@ learn more about new features and corrected bugs in a given release.
     * - ctools
       - gammalib
       - Mac OS (10.7+) binary disk image
+    * - `2.0.0 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-2.0.0.tar.gz>`_
+      - `2.0.0 <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-2.0.0.tar.gz>`_
+      - `ctools-2.0.0-macosx10.7.dmg <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-2.0.0-macosx10.7.dmg>`_
     * - `1.7.4 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.7.4.tar.gz>`_
       - `1.7.4 <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.7.4.tar.gz>`_
       - `ctools-1.7.4-macosx10.7.dmg <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.7.4-macosx10.7.dmg>`_

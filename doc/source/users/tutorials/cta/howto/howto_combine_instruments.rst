@@ -16,7 +16,7 @@ Prepare Fermi-LAT data
 
 The preparation of Fermi-LAT data will follow the description provided
 on
-:ref:`howto_fermi_prepare`.
+:ref:`fermi_prepare`.
 
 Prepare CTA data
 ^^^^^^^^^^^^^^^^

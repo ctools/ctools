@@ -7,7 +7,7 @@ Alternatively to stable releases you can also install the development version
 of the code which includes the latest features that will become available
 with the next stable release. Installing the development version is recommended if
 you want to use latest code features and if you cannot wait for the next
-stable release. The current ctools development release is ``ctools-2.0.0.dev``.
+stable release. The current ctools development release is ``ctools-2.1.0.dev``.
 
 Installing the development version is also necessary **if you want to contribute
 to code development. In that case please follow the instructions on**
@@ -28,8 +28,8 @@ Getting the source tarball
 
 Download the source tarballs from the following links
 
-- `ctools <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-2.0.0.dev.tar.gz>`_
-- `GammaLib <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-2.0.0.dev.tar.gz>`_
+- `ctools <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-2.1.0.dev.tar.gz>`_
+- `GammaLib <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-2.1.0.dev.tar.gz>`_
 
 Cloning the Git repository
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,7 +75,7 @@ Downloading Mac OS binary packages
 
 You can download the Mac OS installer image from the following link
 
-- `Mac OS (10.7+) <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-2.0.0.dev-macosx10.7.dmg>`_
+- `Mac OS (10.7+) <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-2.1.0.dev-macosx10.7.dmg>`_
 
 and follow the instructions on :ref:`sec_install_binary`.
 
