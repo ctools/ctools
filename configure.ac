@@ -28,7 +28,7 @@
 #############################################################################
 # Initialisation                                                            #
 #############################################################################
-AC_INIT([ctools], [2.0.0.dev], [jurgen.knodlseder@irap.omp.eu], [ctools])
+AC_INIT([ctools], [2.0.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([gnu -Wno-portability foreign])
@@ -53,7 +53,7 @@ AC_CONFIG_HEADER([config.h])
 # 5. If any interfaces have been removed or changed since the last public   #
 #    release, then set age to 0.                                            #
 #############################################################################
-CTOOLS_LT_VERSION="7:1:0"
+CTOOLS_LT_VERSION="8:0:0"
 AC_SUBST(CTOOLS_LT_VERSION)
 
 
