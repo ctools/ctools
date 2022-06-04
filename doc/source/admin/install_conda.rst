@@ -36,7 +36,7 @@ Installing
 
   .. code-block:: bash
 
-     $ conda create -n myenv python=3.5  # or one of the following Python versions: 2.7, 3.5, 3.6, 3.7, 3.8, 3.9
+     $ conda create -n myenv python=3.8  # or one of the following Python versions: 2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10
      $ conda activate myenv
      (myenv) $
 
@@ -48,12 +48,6 @@ Installing
 
   This will also install the required dependencies, and in particular GammaLib
   and cfitsio.
-
-- Re-activate your environment to initialise the ctools environment variables
-
-  .. code-block:: bash
-
-     (myenv) $ conda activate myenv
 
 
 Testing
