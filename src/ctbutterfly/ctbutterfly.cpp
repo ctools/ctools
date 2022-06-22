@@ -755,8 +755,10 @@ void ctbutterfly::gaussian_error_propagation(GModels& models)
         // Multiply covariance to the gradient vector
         GVector vector = m_covariance * grad;
 
-        // Get the error from the scalar product
-        double error = std::sqrt(grad * vector);
+        // Get the error from the scalar product. Make sure that square
+        // root does never get negative.
+        double arg   = grad * vector;
+        double error = (arg > 0.0) ? std::sqrt(arg) : 0.0;
 
         // Multiply with confidence scaling
         error *= scale;

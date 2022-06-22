@@ -1,0 +1,29 @@
+.. _2.1:
+
+ctools 2.1 release
+==================
+
+Overview
+--------
+
+ctools 2.1 is a major release that adds significant functionality.
+
+In particular, this release provides:
+
+*
+
+
+Bug fixes
+---------
+
+* [`4096 <https://cta-redmine.irap.omp.eu/issues/4096>`_] -
+  Avoid Nan in :ref:`ctbutterfly`
+
+
+Improvements
+------------
+
+
+New features
+------------
+
