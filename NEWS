@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.1.0
 
-23 June 2022
+9 November 2022
 
 
 Introduction
@@ -121,7 +121,7 @@ None
 
 cttsmap - Generation of Test Statistic map
 ------------------------------------------
-None
+Optionally write fitted null hypothesis model into log file.
 
 
 ctulimit - Compute upper limit

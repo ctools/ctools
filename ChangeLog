@@ -1,8 +1,9 @@
-2022-06-23
+2022-11-09
 
         * Version 2.1.0 released
         ========================
 
+        Optionally write fitted null hypothesis model in cttsmap
         Avoid NaN in ctbutterfly (#4069)
 
 

@@ -276,7 +276,10 @@ void cttsmap::process(void)
         m_obs.optimize(m_opt);
         m_logL0 = -(m_opt.value());
 
-	}
+        // Write input model container into logger
+        log_models(VERBOSE, m_obs.models(), "Fitted model");
+
+    }
 
     // Write header
     log_header1(TERSE, "Generate TS map");
