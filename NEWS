@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.1.0
 
-9 November 2022
+18 November 2022
 
 
 Introduction
@@ -347,6 +347,11 @@ None
 comobsbin - Bin COMPTEL observations
 ------------------------------------
 None
+
+
+comobsconv - Convolve models with COMPTEL response
+--------------------------------------------------
+New script that convolves celestial model with the COMPTEL response (#4159).
 
 
 comobsmodel - Generate model for binned COMPTEL observations

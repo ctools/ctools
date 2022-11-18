@@ -88,6 +88,7 @@ test/csroot2caldb_*
 test/csiactcopy_*
 test/comobsbin_*
 test/comobsback_*
+test/comobsconv_*
 test/comobsadd_*
 test/comobssim_*
 test/comlixfit_*

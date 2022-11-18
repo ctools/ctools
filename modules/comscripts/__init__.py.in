@@ -24,6 +24,7 @@ __all__ = ['comgendb',
            'comobsselect',
            'comobsback',
            'comobsbin',
+           'comobsconv',
            'comobsmodel',
            'comobsres',
            'comobssim',
@@ -38,6 +39,7 @@ from comscripts.comobsadd    import comobsadd
 from comscripts.comobsselect import comobsselect
 from comscripts.comobsback   import comobsback
 from comscripts.comobsbin    import comobsbin
+from comscripts.comobsconv   import comobsconv
 from comscripts.comobsmodel  import comobsmodel
 from comscripts.comobsres    import comobsres
 from comscripts.comobssim    import comobssim

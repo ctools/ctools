@@ -1,8 +1,9 @@
-2022-11-09
+2022-11-18
 
         * Version 2.1.0 released
         ========================
 
+        Add comobsconv script (#4159)
         Optionally write fitted null hypothesis model in cttsmap
         Avoid NaN in ctbutterfly (#4069)
 

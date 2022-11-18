@@ -16,6 +16,9 @@ In particular, this release provides:
 Bug fixes
 ---------
 
+* [`4159 <https://cta-redmine.irap.omp.eu/issues/4159>`_] -
+  Add :ref:`comobsconv` script
+* Optionally write fitted null hypothesis model in cttsmap
 * [`4096 <https://cta-redmine.irap.omp.eu/issues/4096>`_] -
   Avoid Nan in :ref:`ctbutterfly`
 

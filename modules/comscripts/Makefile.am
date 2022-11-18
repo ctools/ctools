@@ -27,6 +27,7 @@ pythonscripts = $(top_builddir)/modules/comscripts/__init__.py \
                 $(srcdir)/comobsadd.py \
                 $(srcdir)/comobsback.py \
                 $(srcdir)/comobsbin.py \
+                $(srcdir)/comobsconv.py \
                 $(srcdir)/comobsmodel.py \
                 $(srcdir)/comobsres.py \
                 $(srcdir)/comobsselect.py \
@@ -41,6 +42,7 @@ parfiles = $(srcdir)/comgendb.par \
            $(srcdir)/comobsadd.par \
            $(srcdir)/comobsback.par \
            $(srcdir)/comobsbin.par \
+           $(srcdir)/comobsconv.par \
            $(srcdir)/comobsmodel.par \
            $(srcdir)/comobsres.par \
            $(srcdir)/comobsselect.par \
@@ -55,6 +57,7 @@ linkscripts = comgendb \
               comobsadd \
               comobsback \
               comobsbin \
+              comobsconv \
               comobsmodel \
               comobsres \
               comobsselect \
@@ -71,6 +74,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_comobsadd.py \
               $(top_srcdir)/test/test_comobsback.py \
               $(top_srcdir)/test/test_comobsbin.py \
+              $(top_srcdir)/test/test_comobsconv.py \
               $(top_srcdir)/test/test_comobsmodel.py \
               $(top_srcdir)/test/test_comobsres.py \
               $(top_srcdir)/test/test_comobsselect.py \
@@ -82,6 +86,7 @@ testscripts = $(srcdir)/tests/__init__.py \
 testdata = $(top_srcdir)/test/data/comptel/ebounds_std.fits.gz \
            $(top_srcdir)/test/data/comptel/ebounds_std1.fits.gz \
            $(top_srcdir)/test/data/comptel/models.xml \
+           $(top_srcdir)/test/data/comptel/models_fix.xml \
            $(top_srcdir)/test/data/comptel/obs_binned.xml \
            $(top_srcdir)/test/data/comptel/obs_binned1.xml \
            $(top_srcdir)/test/data/comptel/obs_selected.xml \

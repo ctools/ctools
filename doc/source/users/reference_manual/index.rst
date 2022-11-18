@@ -104,6 +104,7 @@ COMPTEL analysis scripts
    comobsadd --- Combine observations <comobsadd>
    comobsback --- Generate background model for COMPTEL observations <comobsback>
    comobsbin --- Bin COMPTEL observations <comobsbin>
+   comobsconv --- Convolve models with COMPTEL response <comobsconv>
    comobsmodel --- Generate model for binned COMPTEL observations <comobsmodel>
    comobsres --- Generate residuals of COMPTEL observations <comobsres>
    comobsselect --- Select observations from COMPTEL database <comobsselect>

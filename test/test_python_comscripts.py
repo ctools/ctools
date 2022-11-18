@@ -27,6 +27,7 @@ import test_comgendb
 import test_comobsselect
 import test_comobsbin
 import test_comobsback
+import test_comobsconv
 import test_comobsmodel
 import test_comobsadd
 import test_comobsres
@@ -106,6 +107,7 @@ def test(installed=False, debug=False):
              test_comobsback.Test(),
              test_comobsmodel.Test(),
              test_comobsadd.Test(),
+             test_comobsconv.Test(),
              test_comobsres.Test(),
              test_comobssim.Test(),
              test_comlixfit.Test(),
