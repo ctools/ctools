@@ -19,7 +19,7 @@
 inobs,     f, a, obs.xml,,, "Input observation definition file"
 inmodel,   f, a, models.xml,,, "Input model definition file"
 outfolder, s, h, dri,,, "Output folder for convolved response files"
-outobs,    f, a, outobs,,, "Output observation definition file"
+outobs,    f, a, outobs.xml,,, "Output observation definition file"
 filetype,  s, h, rsp,,, "File type"
 
 #
