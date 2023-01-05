@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the comlixmap script.
 #
-# Copyright (C) 2021 Juergen Knoedlseder
+# Copyright (C) 2021-2022 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -191,6 +191,31 @@ class Test(test):
         # Check result
         self._check_result('comlixmap_py3.fits', 1, 2)
 
+        # Test loading of input map
+        lix = comscripts.comlixmap()
+        lix['inobs']     = self._obs
+        lix['inmodel']   = self._model
+        lix['inmap']     = 'comlixmap_py3.fits'
+        lix['srcname']   = 'Crab'
+        lix['bkgmethod'] = 'BGDLIXE'
+        lix['coordsys']  = 'CEL'
+        lix['proj']      = 'TAN'
+        lix['xref']      = 83.6331
+        lix['yref']      = 22.0145
+        lix['nxpix']     = 1
+        lix['nypix']     = 2
+        lix['binsz']     = 1.0
+        lix['outmap']    = 'comlixmap_py4.fits'
+        lix['logfile']   = 'comlixmap_py4.log'
+        lix['chatter']   = 4
+
+        # Run script and save result
+        lix.logFileOpen()   # Make sure we get a log file
+        lix.execute()
+
+        # Check result
+        self._check_result('comlixmap_py4.fits', 1, 2)
+
         # Return
         return
 
@@ -199,10 +224,19 @@ class Test(test):
         """
         Check result file
         """
-        # Load residual map file
+        # Load TS map as FITS file and check extension names
+        fits = gammalib.GFits(filename)
+        self.test_value(fits.size(), 5, 'Check number of maps in FITS file')
+        self.test_value(fits[0].extname(), 'Crab', 'Check TS map extension name')
+        self.test_value(fits[1].extname(), 'Crab_Prefactor_val', 'Check Prefactor value extension name')
+        self.test_value(fits[2].extname(), 'Crab_Prefactor_unc', 'Check Prefactor error extension name')
+        self.test_value(fits[3].extname(), 'Crab_Index_val', 'Check Index value extension name')
+        self.test_value(fits[4].extname(), 'Crab_Index_unc', 'Check Index error extension name')
+
+        # Load TS map as sky map
         map = gammalib.GSkyMap(filename)
 
-        # Check that there is one observation
+        # Check the map dimensions
         self.test_value(map.nx(), nx, 'Check for number of X pixels in sky map')
         self.test_value(map.ny(), ny, 'Check for number of Y pixels in sky map')
 

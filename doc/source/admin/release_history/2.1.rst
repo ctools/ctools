@@ -16,6 +16,8 @@ In particular, this release provides:
 Bug fixes
 ---------
 
+* [`4187 <https://cta-redmine.irap.omp.eu/issues/4187>`_] -
+  Add ``inmap`` parameter to :ref:`comlixmap` to allow restart from an existing TS map
 * [`4159 <https://cta-redmine.irap.omp.eu/issues/4159>`_] -
   Add :ref:`comobsconv` script
 * Optionally write fitted null hypothesis model in cttsmap

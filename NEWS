@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.1.0
 
-18 November 2022
+5 January 2023
 
 
 Introduction
@@ -331,7 +331,9 @@ None
 
 comlixmap - Generation of COMPTEL Test Statistic map using SRCLIX algorithm
 ---------------------------------------------------------------------------
-None
+Added an "inmap" parameter to allow restart the computations from an existing
+TS map without recomputation of values that exist. The script now also writes
+parameter uncertainties in the resulting TS map FITS file (#4187).
 
 
 comobsadd - Combine COMPTEL observations

@@ -1,8 +1,9 @@
-2022-11-18
+2023-01-05
 
         * Version 2.1.0 released
         ========================
 
+        Add inmap parameter to comlixmap (#4187)
         Add comobsconv script (#4159)
         Optionally write fitted null hypothesis model in cttsmap
         Avoid NaN in ctbutterfly (#4069)

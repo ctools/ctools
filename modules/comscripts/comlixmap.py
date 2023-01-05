@@ -39,10 +39,11 @@ class comlixmap(ctools.cslikelihood):
         self._init_cslikelihood(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise members
-        self._inmap     = None
-        self._maps      = []
-        self._map_names = []
-        self._srcnames  = []
+        self._inmaps      = []
+        self._inmap_names = []
+        self._maps        = []
+        self._map_names   = []
+        self._srcnames    = []
 
         # Return
         return
@@ -67,9 +68,9 @@ class comlixmap(ctools.cslikelihood):
                 msg = 'Source "%s" not found in models.' % srcname
                 raise RuntimeError(msg)
 
-        # Get optional input TS map filename
+        # Query optional input TS map filename
         if self['inmap'].is_valid():
-            self._inmap = self['inmap'].filename()
+            self['inmap'].filename()
 
         # Query parameters
         self['like_accuracy'].real()
@@ -158,6 +159,62 @@ class comlixmap(ctools.cslikelihood):
         # Return
         return
 
+    def _load_inmaps(self, filename):
+        """
+        Load input TS maps
+
+        Loads input TS maps from a FITS files and checks that number
+        of extensions and extension names are consistent with the
+        expectations.
+
+        Parameters
+        ----------
+        filename : `~gammalib/GFilename`
+            Input filename
+        """
+        # Log header
+        self._log_header1(gammalib.NORMAL, 'Load input TS map(s)')
+        self._log_value(gammalib.NORMAL, 'Input filename', filename.url())
+
+        # Initialise list of input maps and map names
+        self._inmaps      = []
+        self._inmap_names = []
+
+        # Open FITS file
+        fits = gammalib.GFits(filename)
+
+        # Raise an exception if the number of extensions does not
+        # match the expectations
+        if fits.size() != len(self._map_names):
+            msg = 'There are %d extensions in the input TS map but %d '\
+                  'extensions are expected. Please provide a compatible '\
+                  'input TS map.' % (fits.size(), len(self._map_names))
+            raise RuntimeError(msg)
+
+        # Loop over extensions and extract all images
+        for i, hdu in enumerate(fits):
+
+            # Get extension name
+            name = hdu.extname()
+
+            # Raise exception if the extension name is conform to
+            # expectation
+            if name != self._map_names[i]:
+                msg = 'Encountered extension name "%s" of map %d '\
+                      'does not correspond to expected extension '\
+                      'name "%s". Please provide a compatible '\
+                      'input TS map.' % (name, i, self._map_names[i])
+                raise RuntimeError(msg)
+
+            # Append extension name and map
+            map = gammalib.GSkyMap(hdu)
+            self._inmap_names.append(name)
+            self._inmaps.append(map)
+            self._log_value(gammalib.NORMAL, 'Loaded', name)
+
+        # Return
+        return
+
     def _create_maps(self):
         """
         Create sky maps based on user parameters
@@ -180,6 +237,10 @@ class comlixmap(ctools.cslikelihood):
 
         # Initialise number of free parameters
         nfree = 0
+
+        # Append TS map names
+        for srcname in self._srcnames:
+            self._map_names.append(srcname)
 
         # Compute number of free model parameters for all test sources,
         # excluding 'RA', 'DEC', 'GLON' and 'GLAT' and add map names
@@ -325,6 +386,68 @@ class comlixmap(ctools.cslikelihood):
         # Return TS
         return ts
 
+    def _extract_from_inmaps(self, dir, ipix):
+        """
+        Extract information from input maps
+
+        Parameters
+        ----------
+        dir : `~gammalib.GSkyDir`
+            Position of test source
+        ipix : int
+            TS map pixel
+
+        Returns
+        -------
+        extracted : boolean
+            True if extraction was successful
+        """
+        # Initialise extraction flag
+        extracted = False
+
+        # If there are input TS maps then check if the direction is
+        # contained in the maps
+        if len(self._inmaps) == len(self._maps):
+
+            # Get first input TS map
+            map = self._inmaps[0]
+
+            # If position of test source is contained in input TS map
+            # then check whether the corresponding pixel distance is
+            # sufficiently small
+            if map.contains(dir):
+
+                # If distance between the position of the test source
+                # to input TS map pixel is smaller than 0.1 degrees
+                # then recover information
+                inx     = map.dir2inx(dir)
+                map_dir = map.inx2dir(inx)
+                dist    = map_dir.dist_deg(dir)
+                if dist < 0.1:
+
+                    # Recover information
+                    for i in range(len(self._inmaps)):
+                        self._maps[i][ipix] = self._inmaps[i][inx]
+
+                    # Log that information was extraced
+                    key   = 'Input map pixel'
+                    value = '%d (offset: %f deg)' % (inx, dist)
+                    self._log_value(gammalib.NORMAL, key, value)
+                    for i in range(len(self._maps)):
+                        if i < len(self._srcnames):
+                            key   = 'TS %s' % (self._map_names[i])
+                            value = '%.3f'  % (self._maps[i][ipix])
+                        else:
+                            key   = '%s' % (self._map_names[i])
+                            value = '%e' % (self._maps[i][ipix])
+                        self._log_value(gammalib.NORMAL, key, value)
+
+                    # Signal that information was extracted
+                    extracted = True
+
+        # Return
+        return extracted
+
     def _final_model_fit(self):
         """
         Perform final model fit using ctlike
@@ -391,6 +514,11 @@ class comlixmap(ctools.cslikelihood):
         # Log sky map
         self._log_string(gammalib.NORMAL, str(self._maps[0]))
 
+        # Optionally load input TS map(s)
+        if self['inmap'].is_valid():
+            self._load_inmaps(self['inmap'].filename())
+            self._log_string(gammalib.NORMAL, str(self._inmaps[0]))
+
         # Log header
         self._log_header1(gammalib.NORMAL, 'Generate TS map')
 
@@ -417,24 +545,28 @@ class comlixmap(ctools.cslikelihood):
                      (ipix, self._maps[0].npix(), str(dir))
             self._log_header3(gammalib.NORMAL, header)
 
-            # Compute TS
-            ts = self._compute_ts(dir)
+            # Compute TS if information could not be recovered from input
+            # maps
+            if not self._extract_from_inmaps(dir, ipix):
 
-            # Store TS values in sky map
-            for i, value in enumerate(ts):
-                self._maps[i][ipix] = value
+                # Compute TS
+                ts = self._compute_ts(dir)
 
-            # Store fitted model parameters and uncertainties in sky maps
-            ipar = len(ts)
-            for srcname in self._srcnames:
-                source = self.obs().models()[srcname]
-                for par in source:
-                    if par.name() != 'RA'   and par.name() != 'DEC'  and \
-                       par.name() != 'GLON' and par.name() != 'GLAT' and \
-                       par.is_free():
-                        self._maps[ipar][ipix]   = par.value()
-                        self._maps[ipar+1][ipix] = par.error()
-                        ipar += 2
+                # Store TS values in sky map
+                for i, value in enumerate(ts):
+                    self._maps[i][ipix] = value
+
+                # Store fitted model parameters and uncertainties in sky maps
+                ipar = len(ts)
+                for srcname in self._srcnames:
+                    source = self.obs().models()[srcname]
+                    for par in source:
+                        if par.name() != 'RA'   and par.name() != 'DEC'  and \
+                           par.name() != 'GLON' and par.name() != 'GLAT' and \
+                            par.is_free():
+                            self._maps[ipar][ipix]   = par.value()
+                            self._maps[ipar+1][ipix] = par.error()
+                            ipar += 2
 
         # Return
         return
@@ -469,10 +601,8 @@ class comlixmap(ctools.cslikelihood):
                 map.write(fits)
 
             # Set extension name for all maps
-            for i, srcname in enumerate(self._srcnames):
-                fits[i].extname(srcname)
             for i, name in enumerate(self._map_names):
-                fits[i+len(self._srcnames)].extname(name)
+                fits[i].extname(name)
 
             # Save FITS file
             fits.saveto(outmap, self['clobber'].boolean())

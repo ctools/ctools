@@ -21,6 +21,12 @@ General parameters
 ``inmodel [file]``
     Input model definition XML file.
 
+``(inmap = NONE) [file]``
+    Input Test Statistic map file. If a TS map FITS file is specified, information
+    will be extracted from the file for pixels that are contained in that map,
+    avoiding recomputation. This allows for example to enlarge an existing TS map
+    for which the computations will be done on the enlarged section.
+
 ``srcname [string]``
     Test source name.
 
