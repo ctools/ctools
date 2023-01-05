@@ -39,6 +39,7 @@ class comlixmap(ctools.cslikelihood):
         self._init_cslikelihood(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise members
+        self._inmap     = None
         self._maps      = []
         self._map_names = []
         self._srcnames  = []
@@ -65,6 +66,10 @@ class comlixmap(ctools.cslikelihood):
             if not self.obs().models().contains(srcname):
                 msg = 'Source "%s" not found in models.' % srcname
                 raise RuntimeError(msg)
+
+        # Get optional input TS map filename
+        if self['inmap'].is_valid():
+            self._inmap = self['inmap'].filename()
 
         # Query parameters
         self['like_accuracy'].real()
@@ -177,18 +182,21 @@ class comlixmap(ctools.cslikelihood):
         nfree = 0
 
         # Compute number of free model parameters for all test sources,
-        # excluding 'RA', 'DEC', 'GLON' and 'GLAT'
+        # excluding 'RA', 'DEC', 'GLON' and 'GLAT' and add map names
+        # composed of 'srcname_parname_val' and 'srcname_parname_unc'
+        # for values and uncertainties
         for srcname in self._srcnames:
             source = self.obs().models()[srcname]
             for par in source:
                 if par.name() != 'RA'   and par.name() != 'DEC'  and \
                    par.name() != 'GLON' and par.name() != 'GLAT' and \
                    par.is_free():
-                    self._map_names.append(par.name())
+                    self._map_names.append('%s_%s_val' % (srcname, par.name()))
+                    self._map_names.append('%s_%s_unc' % (srcname, par.name()))
                     nfree += 1
 
         # Initialise sky maps
-        for i in range(nfree+len(self._srcnames)):
+        for i in range(2*nfree+len(self._srcnames)):
             self._maps.append(gammalib.GSkyMap(proj, coordsys, xref, yref,
                                                -binsz, binsz, nxpix, nypix))
 
@@ -416,16 +424,17 @@ class comlixmap(ctools.cslikelihood):
             for i, value in enumerate(ts):
                 self._maps[i][ipix] = value
 
-            # Store fitted model parameters in sky maps
-            ipar   = len(ts)
+            # Store fitted model parameters and uncertainties in sky maps
+            ipar = len(ts)
             for srcname in self._srcnames:
                 source = self.obs().models()[srcname]
                 for par in source:
                     if par.name() != 'RA'   and par.name() != 'DEC'  and \
                        par.name() != 'GLON' and par.name() != 'GLAT' and \
                        par.is_free():
-                        self._maps[ipar][ipix] = par.value()
-                        ipar += 1
+                        self._maps[ipar][ipix]   = par.value()
+                        self._maps[ipar+1][ipix] = par.error()
+                        ipar += 2
 
         # Return
         return

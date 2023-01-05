@@ -18,6 +18,7 @@
 #============================
 inobs,   f, a, obs.xml,,, "Input observation definition file"
 inmodel, f, a, models.xml,,, "Input model definition file"
+inmap,   f, h, NONE,,, "Input Test Statistic map file"
 srcname, s, a, Crab,,, "Test source name"
 outmap,  f, a, tsmap.fits,,, "Output Test Statistic map file"
 
