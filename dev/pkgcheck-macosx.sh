@@ -91,9 +91,12 @@ source $CTOOLS/bin/ctools-init.sh
 # ============ #
 # Test package #
 # ============ #
-python -c 'import gammalib; gammalib.test()' | tee -a $LOGFILE
-python -c 'import ctools; ctools.test()' | tee -a $LOGFILE
-python -c 'import cscripts; cscripts.test()' | tee -a $LOGFILE
+#python -c 'import gammalib; gammalib.test()' | tee -a $LOGFILE
+#python -c 'import ctools; ctools.test()' | tee -a $LOGFILE
+#python -c 'import cscripts; cscripts.test()' | tee -a $LOGFILE
+python -c 'import gammalib; gammalib.test()'
+python -c 'import ctools; ctools.test()'
+python -c 'import cscripts; cscripts.test()'
 
 
 # ======================= #
