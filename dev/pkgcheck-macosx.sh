@@ -2,7 +2,7 @@
 # ==========================================================================
 # ctools Mac OS X package validation
 #
-# Copyright (C) 2017 Juergen Knoedlseder
+# Copyright (C) 2017-2023 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ CTOOLS=ctools-$VERSION
 INSTALLDIR=/usr/local/gamma
 WRKDIR=$PWD/pkg_check
 PKGDIR=$PWD/pkg_build
-DMGFILE=$PKGDIR/$CTOOLS-macosx10.7.dmg
+DMGFILE=$PKGDIR/$CTOOLS-macosx10.9.dmg
 LOGFILE=$PWD/pkg_check.log
 
 

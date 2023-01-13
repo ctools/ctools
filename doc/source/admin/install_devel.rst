@@ -75,7 +75,7 @@ Downloading Mac OS binary packages
 
 You can download the Mac OS installer image from the following link
 
-- `Mac OS (10.7+) <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-2.1.0.dev-macosx10.7.dmg>`_
+- `Mac OS (10.9+) <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-2.1.0.dev-macosx10.9.dmg>`_
 
 and follow the instructions on :ref:`sec_install_binary`.
 

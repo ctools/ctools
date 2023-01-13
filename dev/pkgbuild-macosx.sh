@@ -2,7 +2,7 @@
 # ==========================================================================
 # ctools Mac OS X package creation
 #
-# Copyright (C) 2017-2019 Sylvie Brau-Nogué
+# Copyright (C) 2017-2023 Sylvie Brau-Nogué
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ PKGDIR=$WRKDIR/pkg
 PRODDIR=$WRKDIR/prod
 PLISTFILE=$PKGDIR/$CTOOLS-components.plist
 DISTFILE=$PRODDIR/$CTOOLS.dist
-DMGFILE=$WRKDIR/$CTOOLS-macosx10.7.dmg
+DMGFILE=$WRKDIR/$CTOOLS-macosx10.9.dmg
 LOGFILE=$PWD/pkg_build.log
 
 
@@ -359,7 +359,7 @@ This package will install
 
                    ctools-$VERSION and gammalib-$VERSION
 
-for Mac OS X 10.7 or later.
+for Mac OS X 10.9 or later.
 
 Installation requires approximately 260 MB of disk space. The package
 will be installed in the directory /usr/local/gamma, hence you need
