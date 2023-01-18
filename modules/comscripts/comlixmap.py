@@ -2,7 +2,7 @@
 # ==========================================================================
 # Create SRCLIX TS map
 #
-# Copyright (C) 2021-2022 Juergen Knoedlseder
+# Copyright (C) 2021-2023 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -215,6 +215,79 @@ class comlixmap(ctools.cslikelihood):
         # Return
         return
 
+    def _prefit_models(self):
+        """
+        Prefits models
+
+        The method prefits models to the data.
+        """
+        # Get parameters and initialise some variables
+        niter = self['max_iter'].integer()
+        eps   = self['like_accuracy'].real()
+        delta = 0.0
+
+        # Loop over iterations
+        for iter in range(niter):
+
+            # Update observations
+            self._update_obs()
+
+            # If first iteration then initialise best observation
+            if iter == 0:
+                best_obs = self.obs().copy()
+
+            # Fit model
+            self.obs().optimize(self.opt())
+
+            # Compute log-likelihood difference or initialise
+            # log-likelihood value
+            if iter > 0:
+                delta = logL - self.opt().value()
+            else:
+                logL = self.opt().value()
+
+            # If log-likelihood improved then update best observations and
+            # last log-likelihood value
+            if delta >= 0.0:
+                best_obs = self.obs().copy()
+                logL     = self.opt().value()
+
+            # Log maximum likelihood
+            if iter == 0:
+                result = '%.5f' % (self.opt().value())
+            else:
+                result = '%.5f (%.5f)' % (self.opt().value(), delta)
+            self._log_value(gammalib.NORMAL, 'logL after iteration %d' % (iter+1),
+                            result)
+
+            # Check for convergence
+            if iter > 0:
+                if delta < eps:
+                    break
+
+        # Use best observations for maximum likelihood fitting. This avoids
+        # that observations that have a worse log-likelihood than the best
+        # value are used for final model fitting.
+        self.obs(best_obs)
+
+        # Compute log-likelihood and TS for best observations
+        value, opt = self._final_model_fit()
+
+        # Compute log-likelihood difference
+        delta = logL - value
+
+        # Log final maximum likelihood
+        result = '%.5f (%.5f)' % (value, delta)
+        self._log_value(gammalib.NORMAL, 'logL after final iteration',
+                        result)
+
+        # Log optimiser
+        self._log_string(gammalib.NORMAL, str(opt))
+
+        # Return
+        return
+
+
     def _create_maps(self):
         """
         Create sky maps based on user parameters
@@ -357,7 +430,7 @@ class comlixmap(ctools.cslikelihood):
         self.obs(best_obs)
 
         # Compute log-likelihood and TS for best observations
-        value = self._final_model_fit()
+        value, _ = self._final_model_fit()
 
         # Compute log-likelihood difference
         delta = logL - value
@@ -456,6 +529,8 @@ class comlixmap(ctools.cslikelihood):
         -------
         logL : float
             Log-likelihood of final model fit
+        opt : `~gammalib.GOptimizer`
+            Optimizer
         """
         # Create instance of model fitting tool
         like = ctools.ctlike(self.obs())
@@ -467,8 +542,8 @@ class comlixmap(ctools.cslikelihood):
         # Recover results
         self.obs(like.obs())
 
-        # Return log-likelihood value
-        return (like.opt().value())
+        # Return log-likelihood value and optimiser
+        return (like.opt().value(), like.opt().copy())
 
 
     # Public methods
@@ -504,6 +579,30 @@ class comlixmap(ctools.cslikelihood):
 
         # Log models
         self._log_string(gammalib.NORMAL, str(self.obs().models()))
+
+        # Log header
+        self._log_header1(gammalib.NORMAL, 'Prefit models without test source')
+
+        # Store initial models
+        models_orig = self.obs().models().copy()
+
+        # Remove test sources from models
+        models = self.obs().models().copy()
+        for srcname in self._srcnames:
+            models.remove(srcname)
+        self.obs().models(models)
+
+        # Prefit models
+        self._prefit_models()
+
+        # Log prefitted models
+        self._log_string(gammalib.NORMAL, str(self.obs().models()))
+
+        # Append removed test sources to prefitted model
+        models = self.obs().models().copy()
+        for srcname in self._srcnames:
+            models.append(models_orig[srcname])
+        self.obs().models(models)
 
         # Log header
         self._log_header1(gammalib.NORMAL, 'Initialise TS map')

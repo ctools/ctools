@@ -28,6 +28,9 @@ Bug fixes
 Improvements
 ------------
 
+* [`4201 <https://cta-redmine.irap.omp.eu/issues/4201>`_] -
+  Prefit models without test source in :ref:`comlixmap`
+
 
 New features
 ------------

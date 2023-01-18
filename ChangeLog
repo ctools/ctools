@@ -1,8 +1,9 @@
-2023-01-05
+2023-01-18
 
         * Version 2.1.0 released
         ========================
 
+        Prefit models without test source in comlixmap (#4201)
         Add inmap parameter to comlixmap (#4187)
         Add comobsconv script (#4159)
         Optionally write fitted null hypothesis model in cttsmap
