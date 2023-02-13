@@ -2,7 +2,7 @@
 # ==========================================================================
 # Bin COMPTEL observations
 #
-# Copyright (C) 2019-2022 Juergen Knoedlseder
+# Copyright (C) 2019-2023 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@ class comobsbin(ctools.csobservation):
         self._select           = gammalib.GCOMSelection()
         self._drx_suffix       = ''
         self._drg_suffix       = ''
+        self._drw_suffix       = ''
         self._dre_suffix       = ''
         self._global_datastore = '$COMDATA/datastore'
 
@@ -335,8 +336,8 @@ class comobsbin(ctools.csobservation):
 
         Returns
         -------
-        drxname, drgname, drenames : tuple of str
-            Names of DRX, DRG and DREs
+        drxname, drgname, drwnames, drenames : tuple of str
+            Names of DRX, DRG, DRWs and DREs
         """
         # Get pointing direction
         pnt = self._get_pointing_direction(obs)
@@ -390,12 +391,17 @@ class comobsbin(ctools.csobservation):
         # Create sky map for DRX
         expo = gammalib.GSkyMap('CAR', 'GAL', 0.0, 0.0, 1.0, 1.0, 360, 180)
 
-        # Allocate DRE, DRG and DRX
+        # Allocate DRE, DRW, DRG and DRX
         dre = gammalib.GCOMDri(cube, 0.0, dphibar, nphibar)
+        drw = gammalib.GCOMDri(cube, 0.0, dphibar, nphibar)
         drg = gammalib.GCOMDri(cube, 0.0, dphibar, nphibar)
         drx = gammalib.GCOMDri(expo)
 
-        # Set DRG and DRX filenames
+        # Allocate container for DRWs and initialise filename list
+        drws     = gammalib.GCOMDris()
+        drwfiles = []
+
+        # Set DRG and DRX filenames in output folder
         drxname = '%s/%s_drx%s.fits'   % (self['outfolder'].string(), obs.id(), self._drx_suffix)
         drgname = '%s/%s%s_drg%s.fits' % (self['outfolder'].string(), obs.id(), dri_prefix, self._drg_suffix)
         drxfile = gammalib.GFilename(drxname)
@@ -439,7 +445,7 @@ class comobsbin(ctools.csobservation):
         # Generate one DRE for each energy boundary
         for i in range(ebounds.size()):
 
-            # Set DRE filename
+            # Set DRE filename in output folder
             drename = '%s/%s%s_dre%s_%6.6d-%6.6dkeV.fits' % \
                       (self['outfolder'].string(), obs.id(), dri_prefix, self._dre_suffix,
                        ebounds.emin(i).keV(), ebounds.emax(i).keV())
@@ -460,7 +466,7 @@ class comobsbin(ctools.csobservation):
                 drename = drename_global
                 self._log_value(gammalib.NORMAL, 'Global DRE file exists', drefile_global.url())
 
-            # If DRE file exists then do nothing
+            # If DRE file exists in output folder then do nothing
             elif drefile.exists():
                 self._log_value(gammalib.NORMAL, 'Local DRE file exists', drefile.url())
 
@@ -482,11 +488,104 @@ class comobsbin(ctools.csobservation):
                 # Log DRE
                 self._log_string(gammalib.NORMAL, str(dre))
 
-            # Append DRE filename
+            # Append DRE filename in output folder
             drenames.append(drename)
 
+        # Initialse list of DRW names
+        drwnames = []
+
+        # Generate one DRW for each energy boundary
+        for i in range(ebounds.size()):
+
+            # Set DRW filename in output folder
+            drwname = '%s/%s%s_drw%s_%6.6d-%6.6dkeV.fits' % \
+                       (self['outfolder'].string(), obs.id(), dri_prefix, self._drw_suffix,
+                        ebounds.emin(i).keV(), ebounds.emax(i).keV())
+            drwfile = gammalib.GFilename(drwname)
+
+            # Set DRW filename in global data store
+            drwname_global = '%s/%s%s_drw%s_%6.6d-%6.6dkeV.fits' % \
+                              (self._global_datastore, obs.id(), dri_prefix, self._drw_suffix,
+                               ebounds.emin(i).keV(), ebounds.emax(i).keV())
+            drwfile_global = gammalib.GFilename(drwname_global)
+
+            # Write header
+            self._log_header3(gammalib.NORMAL, 'Compute DRW for %.3f - %.3f MeV' % \
+                                      (ebounds.emin(i).MeV(), ebounds.emax(i).MeV()))
+
+            # If DRW file exists in global datastore then do nothing
+            if drwfile_global.exists():
+                drwname = drwname_global
+                self._log_value(gammalib.NORMAL, 'Global DRW file exists', drwfile_global.url())
+
+            # If DRW file exists in output folder then do nothing
+            elif drwfile.exists():
+                self._log_value(gammalib.NORMAL, 'Local DRW file exists', drwfile.url())
+
+            # ... otherwise append DRW to container
+            else:
+
+                # Set DRW energy range
+                drw.ebounds(gammalib.GEbounds(ebounds.emin(i), ebounds.emax(i)))
+
+                # Append DRW to container
+                drws.append(drw)
+
+                # Append filename to list
+                drwfiles.append(drwfile)
+
+            # Append DRW filename in output folder
+            drwnames.append(drwname)
+
+        # If there are DRW files to compute then compute and save them now
+        if len(drwfiles) > 0:
+
+            # Compute DRWs
+            drws.compute_drws(obs, self._select, self['zetamin'].real())
+
+            # Phibar normalise DRWs to DREs
+            for i in range(ebounds.size()):
+
+                # Load DRE
+                dre = gammalib.GCOMDri(drenames[i])
+
+                # Get dataspace dimensions
+                nchi    = dre.nchi()
+                npsi    = dre.npsi()
+                nphibar = dre.nphibar()
+                npix    = nchi * npsi
+
+                # Phibar normalise DRW
+                for iphibar in range(nphibar):
+                    sum_dre = 0.0
+                    sum_drw = 0.0
+                    for ipix in range(npix):
+                        index    = ipix + iphibar*npix
+                        sum_dre += dre[index]
+                        sum_drw += drws[i][index]
+                    if sum_drw > 0:
+                        for ipix in range(npix):
+                            index           = ipix + iphibar*npix
+                            drws[i][index] *= sum_dre / sum_drw
+
+            # Save DRWs
+            for i, drwfile in enumerate(drwfiles):
+
+                # Write header
+                self._log_header3(gammalib.NORMAL, 'Created DRW for %.3f - %.3f MeV' % \
+                                  (ebounds.emin(i).MeV(), ebounds.emax(i).MeV()))
+
+                # Save DRW
+                drws[i].save(drwfile, True)
+
+                # Log creation
+                self._log_value(gammalib.NORMAL, 'Local DRW file created', drwfile.url())
+
+                # Log DRW
+                self._log_string(gammalib.NORMAL, str(drw))
+
         # Return
-        return drxname, drgname, drenames
+        return drxname, drgname, drwnames, drenames
 
     def _generate_drb(self, drename, drgname):
         """
@@ -743,7 +842,7 @@ class comobsbin(ctools.csobservation):
             self._log_string(gammalib.NORMAL, str(obs))
 
             # Generate DRIs
-            drxname, drgname, drenames = self._generate_dri(obs, ebounds)
+            drxname, drgname, drwnames, drenames = self._generate_dri(obs, ebounds)
 
             # Skip observation if no superpackets were used
             drx = gammalib.GCOMDri(drxname)
@@ -773,9 +872,10 @@ class comobsbin(ctools.csobservation):
                 xml_obs = xml_list.append('observation name="%s" id="%s" instrument="COM"' % \
                                           (name, id))
 
-                # Append DRE, DRB, DRG and DRX files
+                # Append DRE, DRB, DRW, DRG and DRX files
                 xml_obs.append('parameter name="DRE" file="%s"' % (drename))
                 xml_obs.append('parameter name="DRB" file="%s"' % (drbname))
+                xml_obs.append('parameter name="DRW" file="%s"' % (drwnames[i]))
                 xml_obs.append('parameter name="DRG" file="%s"' % (drgname))
                 xml_obs.append('parameter name="DRX" file="%s"' % (drxname))
 
