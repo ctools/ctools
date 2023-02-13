@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generate background model for COMPTEL observations
 #
-# Copyright (C) 2021-2022 Juergen Knoedlseder
+# Copyright (C) 2021-2023 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -716,6 +716,195 @@ class comobsback(ctools.csobservation):
         # Return
         return drbname
 
+    def _generate_drb_bgdlixF(self, drename, drwname, drm, debug=False):
+        """
+        Generate DRB from DRW and DRE file with BGDLIX method F
+
+        The method generates a background model using the BGDLIX method F,
+        taking into account a source model DRM so that the method can be
+        used for an iterative SRCLIX approach.
+
+        Parameters
+        ----------
+        drename : str
+            DRE filename
+        drwname : str
+            DRW filename
+        drm : `~gammalib.GCOMDri`
+            Source DRM
+        debug : bool
+            Write some files for debugging (default: False)
+
+        Returns
+        -------
+        drbname : str
+            DRB filename
+        """
+        # Get suffix and outfolder
+        suffix    = self['suffix'].string()
+        outfolder = self['outfolder'].string()
+
+        # Get task parameters
+        navgr = self['navgr'].integer()
+        nincl = self['nincl'].integer()
+        nexcl = self['nexcl'].integer()
+
+        # Set DRB filename
+        drbname = '%s/%s' % (outfolder, os.path.basename(drename.replace('dre',
+                             'drb-bgdlixF-na%d-ni%d-ne%d%s' %
+                             (navgr, nincl, nexcl, suffix))))
+        drbfile = gammalib.GFilename(drbname)
+
+        # Write header
+        self._log_header3(gammalib.NORMAL, 'Compute DRB using BGDLIX method F')
+        self._log_value(gammalib.NORMAL, 'Bins used for averaging', navgr)
+        self._log_value(gammalib.NORMAL, 'Phibar layers to include', nincl)
+        self._log_value(gammalib.NORMAL, 'Phibar layers to exclude', nexcl)
+
+        # If DRB file exists then do nothing
+        if drbfile.exists():
+            self._log_value(gammalib.NORMAL, 'DRB file exists', drbfile.url())
+
+        # ... otherwise compute and save it
+        else:
+
+            # Set DRE and DRW filenames
+            drefile = gammalib.GFilename(drename)
+            drwfile = gammalib.GFilename(drwname)
+
+            # Load DRE and DRW
+            dre = gammalib.GCOMDri(drefile)
+            drw = gammalib.GCOMDri(drwfile)
+
+            # Get dataspace dimensions
+            nchi    = dre.nchi()
+            npsi    = dre.npsi()
+            nphibar = dre.nphibar()
+            npix    = nchi * npsi
+
+            # Precompute half running average lengths
+            navgr2 = int(navgr/2)
+            nexcl2 = int(nexcl/2)
+            nincl2 = int(nincl/2)
+
+            # Initialise SCRAT and DRB
+            scrat = drw.copy()
+            drb   = drw.copy()
+
+            # Do Phibar normalization of DRW and store result in SCRAT.
+            for i3 in range(nphibar):
+                sum_dre = 0.0
+                sum_drw = 0.0
+                sum_drm = 0.0
+                for i2 in range(npsi):
+                    for i1 in range(nchi):
+                        ipix     = i3*npix + i2*nchi + i1
+                        sum_dre += dre[ipix]
+                        sum_drw += drw[ipix]
+                        sum_drm += drm[ipix]
+                if sum_drw > 0.0:
+                    scale = (sum_dre-sum_drm) / sum_drw
+                    for i2 in range(npsi):
+                        for i1 in range(nchi):
+                            ipix        = i3*npix + i2*nchi + i1
+                            scrat[ipix] = drw[ipix] * scale
+
+            # Debug: save B^0_L
+            if debug:
+                srcatname = drbname.replace('drb', 'scrat1')
+                srcatfile = gammalib.GFilename(srcatname)
+                scrat.save(srcatfile, self['clobber'].boolean())
+
+            # Make background model
+            for i1 in range(nchi):
+                for i2 in range(npsi):
+
+                    # Loop over Phibar
+                    for i3 in range(nphibar):
+
+                        # Determine index range for sum. There are two sums that
+                        # go over [isel1, iex1[ and [ixe2, isel2[
+                        iex1 = i3 - nexcl2
+                        iex2 = i3 + nexcl2 + 1
+                        if nexcl == 0:
+                            iex2 -= 1
+                        isel1 = max((i3 - nincl2), 0)
+                        isel2 = min((i3 + nincl2 + 1), nphibar)
+                        if isel1 == 0:
+                            isel2 = min(nincl, nphibar)
+                        if isel2 == nphibar:
+                            isel1 = max(nphibar - nincl, 0)
+
+                        # Initialise sums
+                        sum_dre   = 0.0
+                        sum_drm   = 0.0
+                        sum_scrat = 0.0
+
+                        # Compute average over small patch in Chi/Psi
+                        for j1 in range(max(0, i1 - navgr2), min(nchi, i1 + navgr2 + 1)):
+                            for j2 in range(max(0, i2 - navgr2), min(npsi, i2 + navgr2 + 1)):
+
+                                # Take sum over [isel1, iex1[
+                                if iex1 >= 1:
+                                    for j3 in range(isel1, iex1):
+                                        jpix       = j1 + j2*nchi + j3*npix
+                                        sum_dre   += dre[jpix]
+                                        sum_drm   += drm[jpix]
+                                        sum_scrat += scrat[jpix]
+
+                                # Take sum over [iex2, isel2[
+                                if iex2 < nphibar:
+                                    for j3 in range(iex2, isel2):
+                                        jpix       = j1 + j2*nchi + j3*npix
+                                        sum_dre   += dre[jpix]
+                                        sum_drm   += drm[jpix]
+                                        sum_scrat += scrat[jpix]
+
+                        # Re-normalise SCRAT to derive DRB
+                        ipix = i1 + i2*nchi + i3*npix
+                        if sum_scrat > 0.0:
+                            drb[ipix] = scrat[ipix] * (sum_dre-sum_drm)/sum_scrat
+                        else:
+                            drb[ipix] = 0.0
+
+            # Optionally Phibar normalise DRB
+            if self['phinor'].boolean():
+                for i3 in range(nphibar):
+                    sum_dre = 0.0
+                    sum_drb = 0.0
+                    sum_drm = 0.0
+                    for i in range(npix):
+                        ipix     = i3*npix + i
+                        sum_dre += dre[ipix]
+                        sum_drb += drb[ipix]
+                        sum_drm += drm[ipix]
+                    if sum_drb > 0.0:
+                        norm = (sum_dre-sum_drm) / sum_drb
+                        for i in range(npix):
+                            ipix       = i3*npix + i
+                            drb[ipix] *= norm
+
+            # Get statistics
+            sum_dre = 0.0
+            sum_drm = 0.0
+            sum_drb = 0.0
+            for i in range(dre.size()):
+                sum_dre += dre[i]
+                sum_drm += drm[i]
+                sum_drb += drb[i]
+            self._log_value(gammalib.NORMAL, 'Events in DRE', sum_dre)
+            self._log_value(gammalib.NORMAL, 'Events in DRM', sum_drm)
+            self._log_value(gammalib.NORMAL, 'Events in DRB', sum_drb)
+
+            # Save DRB
+            drb.save(drbfile, self['clobber'].boolean())
+
+            # Log creation
+            self._log_value(gammalib.NORMAL, 'DRB file created', drbfile.url())
+
+        # Return
+        return drbname
+
 
     # Public methods
     def process(self):
@@ -766,20 +955,25 @@ class comobsback(ctools.csobservation):
             # Write header
             self._log_header2(gammalib.NORMAL, self._get_obs_header(obs))
 
-            # Get DRE and DRG names
+            # Get DRE name
             drename = obs.drename().url()
-            drgname = obs.drgname().url()
 
             # Compute DRM
             drm = obs.drm(models)
 
             # Generate background
             if method == 'PHINOR':
+                drgname = obs.drgname().url()
                 drbname = self._generate_drb_phinor(drename, drgname, drm)
             elif method == 'BGDLIXA':
+                drgname = obs.drgname().url()
                 drbname = self._generate_drb_bgdlixA(drename, drgname, drm)
             elif method == 'BGDLIXE':
+                drgname = obs.drgname().url()
                 drbname = self._generate_drb_bgdlixE(drename, drgname, drm)
+            elif method == 'BGDLIXF':
+                drwname = obs.drwname().url()
+                drbname = self._generate_drb_bgdlixF(drename, drwname, drm)
 
             # Set DRB name
             obs.drbname(drbname)

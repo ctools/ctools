@@ -25,7 +25,7 @@ outobs,    f, a, obs_back.xml,,, "Output observation definition file"
 #
 # Script parameters
 #==================
-bkgmethod, s, a, BGDLIXE,PHINOR|BGDLIXA|BGDLIXE,, "Method for background computation"
+bkgmethod, s, a, BGDLIXE,PHINOR|BGDLIXA|BGDLIXE|BGDLIXF,, "Method for background computation"
 nrunav,    i, h, 3,,, "Number of Chi/Psi bins used for running average"
 navgr,     i, h, 5,,, "Number of Chi/Psi bins used for averaging"
 nincl,     i, h, 15,,, "Number of Phibar layers to include"
