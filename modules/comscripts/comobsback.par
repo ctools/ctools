@@ -19,7 +19,7 @@
 inobs,     f, a, obs.xml,,, "Input observation definition file"
 inmodel,   f, a, models.xml,,, "Input model definition file"
 suffix,    s, h, ,,, "Suffix for DRB files"
-outfolder, s, h, dri,,, "Output folder for DRB files"
+outfolder, s, a, dri,,, "Output folder for DRB files"
 outobs,    f, a, obs_back.xml,,, "Output observation definition file"
 
 #

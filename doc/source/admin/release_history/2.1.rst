@@ -10,7 +10,7 @@ ctools 2.1 is a major release that adds significant functionality.
 
 In particular, this release provides:
 
-*
+* support for COMPTEL DRW weighting cubes for improved background modelling
 
 
 Bug fixes
@@ -28,6 +28,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`4209 <https://cta-redmine.irap.omp.eu/issues/4209>`_] -
+  Add support for DRW weighting cubes
 * [`4201 <https://cta-redmine.irap.omp.eu/issues/4201>`_] -
   Prefit models without test source in :ref:`comlixmap`
 

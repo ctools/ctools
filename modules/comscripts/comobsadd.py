@@ -2,7 +2,7 @@
 # ==========================================================================
 # Add COMPTEL observations
 #
-# Copyright (C) 2021-2022 Juergen Knoedlseder
+# Copyright (C) 2021-2023 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ class comobsadd(ctools.csobservation):
         self._xml    = gammalib.GXml()
         self._dres   = []
         self._drbs   = []
+        self._drws   = []
         self._drg    = []
         self._drx    = []
         self._nspuse = 0
@@ -144,6 +145,7 @@ class comobsadd(ctools.csobservation):
                     if ebin['emin'] == emin and ebin['emax'] == emax:
                         ebin['dres'].append(o.drename())
                         ebin['drbs'].append(o.drbname())
+                        ebin['drws'].append(o.drwname())
                         ebin['drgs'].append(o.drgname())
                         ebin['drxs'].append(o.drxname())
                         ebin['gti'].extend(o.events().dre().gti())
@@ -157,6 +159,7 @@ class comobsadd(ctools.csobservation):
                                   'emax'     : emax,
                                   'dres'     : [o.drename()],
                                   'drbs'     : [o.drbname()],
+                                  'drws'     : [o.drwname()],
                                   'drgs'     : [o.drgname()],
                                   'drxs'     : [o.drxname()],
                                   'iaq'      : o.response().rspname(),
@@ -185,22 +188,24 @@ class comobsadd(ctools.csobservation):
                 self._log_value(gammalib.NORMAL, ' Phase correction', ebin['phasecor'])
                 self._log_value(gammalib.NORMAL, ' Response', ebin['iaq'])
 
-            # Create sky map for DRE, DRG and DRB
+            # Create sky map for DRE, DRB, DRW and DRG
             cube = gammalib.GSkyMap(self['proj'].string(), coordsys,
                                     chi0, psi0, -dchi, dpsi, nchi, npsi)
 
             # Create sky map for DRX
             expo = gammalib.GSkyMap('CAR', 'GAL', 0.0, 0.0, -1.0, 1.0, 360, 180)
 
-            # Allocate DRE, DRG, DRB and DRX
+            # Allocate DRE, DRB, DRW, DRG and DRX
             dre       = gammalib.GCOMDri(cube, 0.0, dphibar, nphibar)
             drb       = gammalib.GCOMDri(cube, 0.0, dphibar, nphibar)
+            drw       = gammalib.GCOMDri(cube, 0.0, dphibar, nphibar)
             self._drg = gammalib.GCOMDri(cube, 0.0, dphibar, nphibar)
             self._drx = gammalib.GCOMDri(expo)
 
-            # Set GTIs of DRE, DRB, DRG and DRX
+            # Set GTIs of DRE, DRB, DRW, DRG and DRX
             dre.gti(ebin['gti'])
             drb.gti(ebin['gti'])
+            drw.gti(ebin['gti'])
             self._drg.gti(ebin['gti'])
             self._drx.gti(ebin['gti'])
 
@@ -218,7 +223,7 @@ class comobsadd(ctools.csobservation):
                 self._drx.num_used_superpackets(ebins[0]['nspuse'])
                 self._drx.num_skipped_superpackets(ebins[0]['nspskp'])
 
-            # Create DRE and DRB for each energy bin and append an XML entry
+            # Create DRE, DRB and DRW for each energy bin and append an XML entry
             for ebin in ebins:
 
                 # Set observation name and id
@@ -230,6 +235,7 @@ class comobsadd(ctools.csobservation):
                 ebounds.append(ebin['emin'], ebin['emax'])
                 dre.ebounds(ebounds)
                 drb.ebounds(ebounds)
+                drw.ebounds(ebounds)
 
                 # Set ToF correction
                 dre.tof_correction(ebin['tofcor'])
@@ -244,22 +250,28 @@ class comobsadd(ctools.csobservation):
                 drb.num_superpackets(ebin['nspinp'])
                 drb.num_used_superpackets(ebin['nspuse'])
                 drb.num_skipped_superpackets(ebin['nspskp'])
+                drw.num_superpackets(ebin['nspinp'])
+                drw.num_used_superpackets(ebin['nspuse'])
+                drw.num_skipped_superpackets(ebin['nspskp'])
 
-                # Set DRE and DRB filenames
+                # Set DRE, DRB and DRW filenames
                 dre.name('%s/%s_%s_dre.fits' % (self['outfolder'].string(), prefix, id))
                 drb.name('%s/%s_%s_drb.fits' % (self['outfolder'].string(), prefix, id))
+                drw.name('%s/%s_%s_drw.fits' % (self['outfolder'].string(), prefix, id))
 
-                # Put DRE and DRB in lists
+                # Put DRE, DRB and DRW in lists
                 self._dres.append(dre.copy())
                 self._drbs.append(drb.copy())
+                self._drws.append(drw.copy())
 
                 # Append observation
                 xml_obs = xml_list.append('observation name="%s" id="%s" instrument="COM"' % \
                                           (name, id))
 
-                # Append DRE, DRB, DRG and DRX files
+                # Append DRE, DRB, DRW, DRG and DRX files
                 xml_obs.append('parameter name="DRE" file="%s"' % (dre.name()))
                 xml_obs.append('parameter name="DRB" file="%s"' % (drb.name()))
+                xml_obs.append('parameter name="DRW" file="%s"' % (drw.name()))
                 xml_obs.append('parameter name="DRG" file="%s"' % (self._drg.name()))
                 xml_obs.append('parameter name="DRX" file="%s"' % (self._drx.name()))
 
@@ -286,6 +298,9 @@ class comobsadd(ctools.csobservation):
 
         # Combine DRBs
         self._combine_drbs(ebins)
+
+        # Combine DRWs
+        self._combine_drws(ebins)
 
         # Combine DRGs
         self._combine_drgs(ebins)
@@ -453,6 +468,82 @@ class comobsadd(ctools.csobservation):
                             # Loop over combined data space Phibar layers
                             for iphibar in range(nphibar):
                                 map[ipix, iphibar] += drb.map()(dir, iphibar) * omega
+
+                    except RuntimeError:
+                        pass
+
+        # Return
+        return
+
+    def _combine_drws(self, ebins):
+        """
+        Combine DRWs
+
+        The DRWs are combined by dividing the original pixels by their solid
+        angles and multipliying with the solid angle of the combined DRW. In
+        that way the solid angle changes due to different projections are
+        correctly taken into account.
+
+        Parameters
+        ----------
+        ebins : list of dict
+            List with input DRIs
+        """
+        # Write header
+        self._log_header2(gammalib.NORMAL, 'Combine DRWs')
+
+        # Loop over all energy bins
+        for iebin, ebin in enumerate(ebins):
+
+            # Write header
+            self._log_header3(gammalib.NORMAL, 'Energy bin %s - %s' %
+                              (str(ebin['emin']), str(ebin['emax'])))
+
+            # Get dimensions of combined data space
+            npix    = self._drws[iebin].nchi() * self._drws[iebin].npsi()
+            nphibar = self._drws[iebin].nphibar()
+
+            # Set combined data space map
+            map = self._drws[iebin].map()
+
+            # Loop over DRWs
+            for drwname in ebin['drws']:
+
+                # Log DRW file name
+                self._log_value(gammalib.NORMAL, 'Filename', drwname.url())
+
+                # Load DRW
+                drw = gammalib.GCOMDri(drwname)
+
+                # Divide pixels by solid angle so that the DRW returns the
+                # number of background counts per steradian
+                nmaps   = drw.map().nmaps()
+                npixels = drw.map().npix()
+                for ipixel in range(npixels):
+                    omega = drw.map().solidangle(ipixel)
+                    for imap in range(nmaps):
+                        drw.map()[ipixel,imap] /= omega
+
+                # Loop over combined data space Chi/Psi pixels
+                for ipix in range(npix):
+
+                    # Get Chi/Psi direction of pixel
+                    dir = map.inx2dir(ipix)
+
+                    # If Chi/Psi is contained in DRW then extract value.
+                    # Put the check in a try-except block since there
+                    # may be coordinate transformation issues at this
+                    # point
+                    try:
+                        if drw.map().contains(dir):
+
+                            # Get solid angle of target map to convert the
+                            # DRB values into absolute counts
+                            omega = map.solidangle(ipix)
+
+                            # Loop over combined data space Phibar layers
+                            for iphibar in range(nphibar):
+                                map[ipix, iphibar] += drw.map()(dir, iphibar) * omega
 
                     except RuntimeError:
                         pass
@@ -629,6 +720,11 @@ class comobsadd(ctools.csobservation):
             for drb in self._drbs:
                 drb.save(drb.name(), self['clobber'].boolean())
                 self._log_value(gammalib.NORMAL, 'DRB file', drb.name())
+
+            # Save DRWs
+            for drw in self._drws:
+                drw.save(drw.name(), self['clobber'].boolean())
+                self._log_value(gammalib.NORMAL, 'DRW file', drw.name())
 
             # Save DRG
             self._drg.save(self._drg.name(), self['clobber'].boolean())

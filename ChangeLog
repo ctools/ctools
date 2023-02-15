@@ -1,8 +1,9 @@
-2023-01-18
+2023-02-15
 
         * Version 2.1.0 released
         ========================
 
+        Add support for DRW weighting cubes (#4209)
         Prefit models without test source in comlixmap (#4201)
         Add inmap parameter to comlixmap (#4187)
         Add comobsconv script (#4159)

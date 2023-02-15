@@ -86,6 +86,7 @@ class comobsbin(ctools.csobservation):
         self['psdmax'].integer()
         self['zetamin'].real()
         self['fpmtflag'].integer()
+        self['timebin'].real()
 
         # Get D1 and D2 module usage strings
         d1use = self['d1use'].string()
@@ -510,7 +511,7 @@ class comobsbin(ctools.csobservation):
             drwfile_global = gammalib.GFilename(drwname_global)
 
             # Write header
-            self._log_header3(gammalib.NORMAL, 'Compute DRW for %.3f - %.3f MeV' % \
+            self._log_header3(gammalib.NORMAL, 'Check DRW for %.3f - %.3f MeV' % \
                                       (ebounds.emin(i).MeV(), ebounds.emax(i).MeV()))
 
             # If DRW file exists in global datastore then do nothing
@@ -534,14 +535,21 @@ class comobsbin(ctools.csobservation):
                 # Append filename to list
                 drwfiles.append(drwfile)
 
+                # Log appending
+                self._log_value(gammalib.NORMAL, 'Append DRW for computation', drwfile.url())
+
             # Append DRW filename in output folder
             drwnames.append(drwname)
 
         # If there are DRW files to compute then compute and save them now
         if len(drwfiles) > 0:
 
+            # Write header
+            self._log_header3(gammalib.NORMAL, 'Compute DRWs')
+
             # Compute DRWs
-            drws.compute_drws(obs, self._select, self['zetamin'].real())
+            drws.compute_drws(obs, self._select, self['zetamin'].real(),
+                                                 self['timebin'].real())
 
             # Phibar normalise DRWs to DREs
             for i in range(ebounds.size()):
@@ -572,7 +580,7 @@ class comobsbin(ctools.csobservation):
             for i, drwfile in enumerate(drwfiles):
 
                 # Write header
-                self._log_header3(gammalib.NORMAL, 'Created DRW for %.3f - %.3f MeV' % \
+                self._log_header3(gammalib.NORMAL, 'Save DRW for %.3f - %.3f MeV' % \
                                   (ebounds.emin(i).MeV(), ebounds.emax(i).MeV()))
 
                 # Save DRW

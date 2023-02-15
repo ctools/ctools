@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.1.0
 
-18 January 2023
+15 February 2023
 
 
 Introduction
@@ -342,17 +342,22 @@ parameter uncertainties in the resulting TS map FITS file (#4187).
 
 comobsadd - Combine COMPTEL observations
 ----------------------------------------
-None
+Added DRW to the cubes that will be combined by the script. The combination
+will be done using a simple addition, alike the combination of the DRB cubes
+(#4209).
 
 
 comobsback - Generate background model for COMPTEL observations
 ---------------------------------------------------------------
-None
+Added BGDLIXF background generation method that makes use of the DRW instead
+a DRG for background modelling. Set "outfolder" parameter to automatic (#4209).
 
 
 comobsbin - Bin COMPTEL observations
 ------------------------------------
-None
+Implement computation of weighting cubes (DRW) for improved background modelling.
+Added "timebin" parameter to provide control over the time binning used for
+DRW computation (#4209).
 
 
 comobsconv - Convolve models with COMPTEL response
