@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the comobsbin script.
 #
-# Copyright (C) 2021-2022 Juergen Knoedlseder
+# Copyright (C) 2021-2023 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -193,6 +193,17 @@ class Test(test):
             self.test_value(drb.nchi(), 80, 'Check DRB Chi size')
             self.test_value(drb.npsi(), 80, 'Check DRB Psi size')
             self.test_value(drb.nphibar(), 25, 'Check DRB Phibar size')
+
+        # Check DRW file
+        fname = '%s/vp0001_0_drw_000750-001000keV.fits' % foldername
+        exists  = os.path.isfile(fname)
+        self.test_assert(exists, 'Check that DRW file "%s" exists' % fname)
+        if exists:
+            drw = gammalib.GCOMDri(fname)
+            self.test_value(drw.size(), 160000, 'Check DRW size')
+            self.test_value(drw.nchi(), 80, 'Check DRW Chi size')
+            self.test_value(drw.npsi(), 80, 'Check DRW Psi size')
+            self.test_value(drw.nphibar(), 25, 'Check DRW Phibar size')
 
         # Check IAQ file
         fname = '%s/iaq_000750-001000keV.fits' % foldername
