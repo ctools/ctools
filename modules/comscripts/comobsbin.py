@@ -494,6 +494,7 @@ class comobsbin(ctools.csobservation):
 
         # Initialse list of DRW names
         drwnames = []
+        engindex = []
 
         # Generate one DRW for each energy boundary
         for i in range(ebounds.size()):
@@ -532,6 +533,9 @@ class comobsbin(ctools.csobservation):
                 # Append DRW to container
                 drws.append(drw)
 
+                # Append energy index to container
+                engindex.append(i)
+
                 # Append filename to list
                 drwfiles.append(drwfile)
 
@@ -552,10 +556,10 @@ class comobsbin(ctools.csobservation):
                                                  self['timebin'].real())
 
             # Phibar normalise DRWs to DREs
-            for i in range(ebounds.size()):
+            for i in range(drws.size()):
 
                 # Load DRE
-                dre = gammalib.GCOMDri(drenames[i])
+                dre = gammalib.GCOMDri(drenames[engindex[i]])
 
                 # Get dataspace dimensions
                 nchi    = dre.nchi()
