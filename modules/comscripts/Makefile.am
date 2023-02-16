@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for comscripts Python scripts                                    #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2021-2022 Juergen Knoedlseder                               #
+# Copyright (C) 2021-2023 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -105,6 +105,7 @@ testdatastore = $(top_srcdir)/test/data/comptel/datastore/iaq_000750-001000keV.f
                 $(top_srcdir)/test/data/comptel/datastore/vp0001_0_dre_psd0-110_001000-003000keV.fits.gz \
                 $(top_srcdir)/test/data/comptel/datastore/vp0001_0_dre_psd0-110_003000-010000keV.fits.gz \
                 $(top_srcdir)/test/data/comptel/datastore/vp0001_0_dre_psd0-110_010000-030000keV.fits.gz \
+                $(top_srcdir)/test/data/comptel/datastore/vp0001_0_drw_psd0-110_000750-001000keV.fits.gz \
                 $(top_srcdir)/test/data/comptel/datastore/vp0001_0_drg.fits.gz \
                 $(top_srcdir)/test/data/comptel/datastore/vp0001_0_drx.fits.gz
 
