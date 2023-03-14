@@ -712,12 +712,13 @@ else
     if test -z "$ac_sysconfig_result" || test -z "$ac_distutils_result"; then
 
       # Get Python path
-      if test -z "$ac_sysconfig_result"; then
-        python_path=`$PYTHON -c "import sysconfig; \
-                                 print(sysconfig.get_paths()[['include']]);"`
-      else
+      if test -z "$ac_distutils_result"; then
         python_path=`$PYTHON -c "import distutils.sysconfig; \
                                  print(distutils.sysconfig.get_python_inc());"`
+
+      else
+        python_path=`$PYTHON -c "import sysconfig; \
+                                 print(sysconfig.get_paths()[['include']]);"`
       fi
       if test -n "${python_path}"; then
         SAVED_CPPFLAGS="$CPPFLAGS"
@@ -734,11 +735,11 @@ else
       # to this value as otherwise we get trouble with name mangling (that changed)
       if [test "x$osx_mavericks" = "xyes"]; then
         AC_MSG_CHECKING([Python MACOSX_DEPLOYMENT_TARGET])
-        if test -z "$ac_sysconfig_result"; then
-          python_target=`$PYTHON -c "import sysconfig; \
+        if test -z "$ac_distutils_result"; then
+          python_target=`$PYTHON -c "from distutils import sysconfig; \
                                      print(sysconfig.get_config_vars()[['MACOSX_DEPLOYMENT_TARGET']]);" 2> /dev/null`
         else
-          python_target=`$PYTHON -c "from distutils import sysconfig; \
+          python_target=`$PYTHON -c "import sysconfig; \
                                      print(sysconfig.get_config_vars()[['MACOSX_DEPLOYMENT_TARGET']]);" 2> /dev/null`
         fi
         python_compact_target=`echo $python_target | sed 's/\(10\.[[0-9]]*\).*/\1/' | sed -e 's/\.//g'`
