@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools Python extension module                               #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2020 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2023 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -174,7 +174,7 @@ if IS_ELCAPITAN
 		install_name_tool -rpath $(abs_top_builddir)/src/.libs $(libdir) $$f; \
 	done
 endif
-	$(PYTHON) setup.py install --prefix=$(DESTDIR)$(prefix)
+	$(PYTHON) setup.py install --prefix=$(DESTDIR)$(prefix) --single-version-externally-managed --root=/ 
 
 # Uninstall the ctools Python module
 uninstall-local:

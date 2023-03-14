@@ -1,7 +1,7 @@
 #############################################################################
-# Disutils setup file for ctools Python extension module                    #
+# Setup file for ctools Python extension module                             #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2021 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2023 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -18,8 +18,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
 #                                                                           #
 #############################################################################
-from distutils.core import setup, Extension
-from distutils import sysconfig
+from setuptools import setup, Extension
+import sysconfig
 import glob
 import os
 import sys
@@ -47,7 +47,7 @@ if (len(sys.argv) >= 3):
 # Darwin MacPorts kluge: Remove -L/opt/local/lib path from LDSHARED as this
 # overrides the GammaLib settings. Otherwise, MacPorts libraries would be
 # used instead of the libraries selected by GammaLib
-if sys.platform.lower().startswith("darwin"):
+if sys.platform.lower().startswith('darwin'):
     
     # Get configuration variables
     cvars = sysconfig.get_config_vars()
