@@ -52,6 +52,7 @@ doc/man
 src/ctools-setup
 pyext/build/
 pyext/setup.py
+pyext/ctools.egg-info
 pyext/ctools/__init__.py
 pyext/ctools/tools.py
 pyext/ctools/_tools.so
