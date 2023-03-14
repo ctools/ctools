@@ -813,6 +813,7 @@ fi
 AM_CONDITIONAL(WITH_PYTHON, test "x$enable_python" = "xyes")
 AM_CONDITIONAL(HAVE_SWIG, test "x$has_swig" = "xyes")
 AM_CONDITIONAL(HAVE_WRAPPERS, test "x$has_wrappers" = "xyes")
+AM_CONDITIONAL(HAVE_SETUPTOOLS, test "x$has_setuptools" = "xyes")
 AM_CONDITIONAL(BUILD_WRAPPERS, test "x$build_wrappers" = "xyes")
 
 # Set Python environment
