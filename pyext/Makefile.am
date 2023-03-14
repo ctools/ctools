@@ -174,7 +174,11 @@ if IS_ELCAPITAN
 		install_name_tool -rpath $(abs_top_builddir)/src/.libs $(libdir) $$f; \
 	done
 endif
-	$(PYTHON) setup.py install --prefix=$(DESTDIR)$(prefix) --single-version-externally-managed --root=/ 
+if HAVE_SETUPTOOLS
+	$(PYTHON) setup.py install --prefix=$(DESTDIR)$(prefix) --single-version-externally-managed --root=/
+else
+	$(PYTHON) setup.py install --prefix=$(DESTDIR)$(prefix)
+endif
 
 # Uninstall the ctools Python module
 uninstall-local:

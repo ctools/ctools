@@ -702,7 +702,7 @@ else
     AC_MSG_CHECKING([for the setuptools Python package])
     ac_setuptools_result=`$PYTHON -c "import setuptools" 2>&1`
     if test -z "$ac_setuptools_result"; then
-    AC_MSG_RESULT([yes])
+      AC_MSG_RESULT([yes])
       has_setuptools="yes"
     else
       AC_MSG_RESULT([no])
@@ -710,7 +710,7 @@ else
 
     # If we have sysconfig or distutils then get python path
     if test -z "$ac_sysconfig_result" || test -z "$ac_distutils_result"; then
-      
+
       # Get Python path
       if test -z "$ac_sysconfig_result"; then
         python_path=`$PYTHON -c "import sysconfig; \
