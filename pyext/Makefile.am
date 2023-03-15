@@ -203,5 +203,6 @@ clean-local:
 	rm -rf $(top_builddir)/pyext/ctools/*_wrap.cpp
 	rm -rf $(top_builddir)/pyext/ctools/_tools*.so
 	rm -rf $(top_builddir)/pyext/ctools/__pycache__
+	rm -rf $(top_builddir)/pyext/ctools.egg-info
 
 endif # WITH_PYTHON
