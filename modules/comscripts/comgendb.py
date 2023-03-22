@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generate COMPTEL database from HEASARC archive
 #
-# Copyright (C) 2022 Juergen Knoedlseder
+# Copyright (C) 2022-2023 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ class comgendb(ctools.cscript):
         # Initialise members
         self._evp_list = []
         self._oad_list = []
+        self._hkd_list = []
         self._tim_list = []
         self._xml_list = []
 
@@ -573,7 +574,7 @@ class comgendb(ctools.cscript):
             tics_stop  = tics[nrecords-1]
         except:
             self._log_string(gammalib.NORMAL, '*** Corrupt OAD file "%s" encountered. '
-                             'Set OAD quality to -200.' % (evpname))
+                             'Set OAD quality to -200.' % (oadname))
             tjd_start  = records.integer('VISDAY')
             tics_start = records.integer('VISTIM')
             tjd_stop   = records.integer('VIEDAY')
@@ -611,6 +612,193 @@ class comgendb(ctools.cscript):
 
         # Return information
         return oad_dict
+
+    def _get_hkd_list(self):
+        """
+        Get HKD list
+
+        Returns
+        -------
+        hkd_list : list of dict
+            HKD database
+        """
+        # Initialse HKD list
+        hkd_list = []
+
+        # Get available phases
+        phases = self._get_phases()
+
+        # Loop over phases
+        for phase in phases:
+
+            # Get available VPs
+            vps = glob.glob('%s/vp*' % phase)
+            vps.sort()
+
+            # Loop over VPs
+            for vp in vps:
+
+                # Get HKDs for VP
+                hkds = self._get_hkds_for_vp(vp)
+
+                # Append HKDs to list
+                hkd_list.extend(hkds)
+
+        # Sort HK list by start day
+        hkd_list = self._sorted(hkd_list)
+
+        # Return HKD list
+        return hkd_list
+
+    def _get_hkds_for_vp(self, vp):
+        """
+        Build HKD database entries for Viewing Period
+
+        Parameters
+        ----------
+        vp : str
+            VP path
+
+        Returns
+        -------
+        hkd_list : list of dict
+            HKD database entries
+        """
+        # Get archive name and expanded path
+        archive      = self['archive'].string()
+        archive_path = gammalib.expand_env(archive)
+
+        # Get VP name
+        vpname = os.path.basename(vp)
+
+        # Initialse HKD list
+        hkd_list = []
+
+        # Get HKD files
+        hkds = glob.glob('%s/*hkd.fits*' % vp)
+
+        # Loop over all HKD files
+        for hkd in hkds:
+
+            # Set HKD filename
+            hkdname = archive+'/'+self._get_relpath(hkd, archive_path).strip('.gz')
+
+            # Try opening file
+            try:
+                fits = gammalib.GFits(hkdname)
+            except:
+                self._log_string(gammalib.NORMAL, '*** Unable to open HKD file "%s". '
+                                 'Skip file.' % (hkdname))
+                continue
+
+            # Get information from HKD file
+            hkd_dict = self._get_hkd_info(hkdname)
+
+            # Skip file if it has a negative quality
+            if hkd_dict['quality'] < 0:
+                self._log_string(gammalib.NORMAL, '*** HKD file "%s" has quality %d. '
+                                 'Skip file.' % (hkdname, hkd_dict['quality']))
+                continue
+
+            # Set VP
+            hkd_dict['vp'] = vpname
+
+            # Append dictionary
+            hkd_list.append(hkd_dict)
+
+        # Sort HKD list by start day
+        hkd_list = self._sorted(hkd_list)
+
+        # Return HKD list
+        return hkd_list
+
+    def _get_hkd_info(self, hkdname):
+        """
+        Build HKD database entry from HKD file
+
+        Parameters
+        ----------
+        hkdname : str
+            HKD filename
+
+        Returns
+        -------
+        hkd_dict : dict
+            HKD database entry
+        """
+        # Open OAD file
+        fits = gammalib.GFits(hkdname)
+
+        # Get superpacket table
+        records  = fits.table(1)
+        nrecords = records.nrows()
+
+        # Extract attributes for HKD file
+        obs_id   = records.real('OBS_ID')
+        object   = records.string('OBJECT')
+        if records.has_card('GLON_SCZ'):
+            glon_scz = records.real('GLON_SCZ')
+        else:
+            glon_scz = -1000.0
+        if records.has_card('GLAT_SCZ'):
+            glat_scz = records.real('GLAT_SCZ')
+        else:
+            glat_scz = -1000.0
+        quality = records.integer('DSD_QUA')
+        dsd_id  = '%s-%s-%d' % (records.string('DSD_SB'), records.string('DSTID'),
+                                records.integer('DSD_NO'))
+
+        # Get time columns
+        tjd  = records['TJD']
+        tics = records['TICS']
+
+        # Get start and end time. Catch any errors since files may be corrupt.
+        # In case of errors, use times from file header.
+        try:
+            tjd_start  = tjd[0]
+            tics_start = tics[0]
+            tjd_stop   = tjd[nrecords-1]
+            tics_stop  = tics[nrecords-1]
+        except:
+            self._log_string(gammalib.NORMAL, '*** Corrupt HKD file "%s" encountered. '
+                             'Set HKD quality to -200.' % (hkdname))
+            tjd_start  = records.integer('VISDAY')
+            tics_start = records.integer('VISTIM')
+            tjd_stop   = records.integer('VIEDAY')
+            tics_stop  = records.integer('VIETIM')
+            quality    = -200
+
+        # Compute GTime of first and last entry
+        tstart = gammalib.com_time(tjd_start, tics_start)
+        tstop  = gammalib.com_time(tjd_stop,  tics_stop)
+
+        # Set GTI for HKD
+        gti = gammalib.GGti(tstart, tstop)
+
+        # Build dictionary
+        hkd_dict = {'filename':   hkdname,
+                    'records':    nrecords,
+                    'obs_id':     obs_id,
+                    'dsd_id':     dsd_id,
+                    'object':     object,
+                    'glon_scz':   glon_scz,
+                    'glat_scz':   glat_scz,
+                    'date_start': tstart.utc(),
+                    'date_stop':  tstop.utc(),
+                    'tjd_start':  tjd_start,
+                    'tics_start': tics_start,
+                    'tjd_stop':   tjd_stop,
+                    'tics_stop':  tics_stop,
+                    'tstart':     tstart,
+                    'tstop':      tstop,
+                    'gti':        gti,
+                    'quality':    quality}
+
+        # Close FITS file
+        fits.close()
+
+        # Return information
+        return hkd_dict
 
     def _get_tim_list(self):
         """
@@ -810,9 +998,9 @@ class comgendb(ctools.cscript):
         # Return information
         return tim_dict
 
-    def _get_xml_list(self, evp_list, tim_list, oad_list):
+    def _get_xml_list(self, evp_list, tim_list, oad_list, hkd_list):
         """
-        Build XML database from EVP, TIM and OAD database
+        Build XML database from EVP, TIM, OAD and HKD database
 
         Parameters
         ----------
@@ -822,6 +1010,8 @@ class comgendb(ctools.cscript):
             TIM database
         oad_list : list of dict
             OAD database
+        hkd_list : list of dict
+            HKD database
 
         Returns
         -------
@@ -848,7 +1038,7 @@ class comgendb(ctools.cscript):
             for vp in vps:
 
                 # Get XML for VP
-                xml = self._get_xml_for_vp(vp, evp_list, filtered_tim_list, oad_list)
+                xml = self._get_xml_for_vp(vp, evp_list, filtered_tim_list, oad_list, hkd_list)
 
                 # Append XML to list
                 if xml is not None:
@@ -918,7 +1108,7 @@ class comgendb(ctools.cscript):
         # Return
         return filtered_tim_list
 
-    def _get_xml_for_vp(self, vp, evp_list, tim_list, oad_list):
+    def _get_xml_for_vp(self, vp, evp_list, tim_list, oad_list, hkd_list):
         """
         Build XML database entry for Viewing Period
 
@@ -932,6 +1122,8 @@ class comgendb(ctools.cscript):
             TIM database
         oad_list : list of dict
             OAD database
+        hkd_list : list of dict
+            HKD database
 
         Returns
         -------
@@ -982,15 +1174,46 @@ class comgendb(ctools.cscript):
                              'Skip VP.' % (vp))
             return None
 
+        # Get HKDs for EVP
+        hkds = self._get_hkds(evp, hkd_list)
+        if len(hkds) == 0:
+            self._log_string(gammalib.NORMAL, '*** No HKD files found for "%s". '
+                             'Skip VP.' % (vp))
+            return None
+
+        # Remove OADs that are not covered by HKDs
+        oads_selected = []
+        for oad in oads:
+            tjd_start = oad['tjd_start']
+            tjd_stop  = oad['tjd_stop']
+            match     = False
+            for hkd in hkds:
+                if tjd_start == hkd['tjd_start'] and \
+                   tjd_stop  == hkd['tjd_stop']:
+                   match = True
+                   break
+            if not match:
+                self._log_string(gammalib.NORMAL, '*** No HKD file found for TJD '
+                                 '%d for "%s". Remove corresponding OAD.' %
+                                 (tjd_start, vp))
+            else:
+                oads_selected.append(oad)
+        oads = oads_selected
+
         # Get oadnames and oad qualities
         oadnames     = [oad['filename'] for oad in oads]
         oadqualities = [oad['quality']  for oad in oads]
+
+        # Get hkdnames and hkd qualities
+        hkdnames     = [hkd['filename'] for hkd in hkds]
+        hkdqualities = [hkd['quality']  for hkd in hkds]
 
         # Build dictionary
         xml_dict = {'vp':          vpname,
                     'evpname':     evp['filename'],
                     'timname':     tim['filename'],
                     'oadnames':    oadnames,
+                    'hkdnames':    hkdnames,
                     'xmlname':     '%s/xml/%s.xml' % (path, vpname),
                     'nevents':     evp['nevents'],
                     'obs_id':      evp['obs_id'],
@@ -1014,7 +1237,8 @@ class comgendb(ctools.cscript):
                     'evp_verno':   evp['verno'],
                     'evp_quality': evp['quality'],
                     'tim_quality': tim['quality'],
-                    'oad_quality': oadqualities}
+                    'oad_quality': oadqualities,
+                    'hkd_quality': hkdqualities}
 
         # Return XML list
         return xml_dict
@@ -1226,7 +1450,8 @@ class comgendb(ctools.cscript):
                 # First check if OAD is already in OAD list. If this is the case,
                 # and the current OAD corresponds to the VP of the EVP, then replace
                 # the existing OAD by the current OAD since we prefer having the
-                # OAD in the same folder as the EVP. Otherwise we keep the
+                # OAD in the same folder as the EVP. Otherwise we keep the exiting
+                # OAD
                 exists = False
                 for i, oad_exist in enumerate(oads):
                     if oad_exist['dsd_id'] == oad['dsd_id']:
@@ -1246,6 +1471,59 @@ class comgendb(ctools.cscript):
 
         # Return OADs
         return oads
+
+    def _get_hkds(self, evp, hkd_list):
+        """
+        Get HKD database entry for EVP database entry
+
+        Parameters
+        ----------
+        evp : dict
+            EVP dictionary
+        hkd_list : list of dict
+            HKD database
+
+        Returns
+        -------
+        hkds : list of dict
+            HKD database entries for EVP database entry
+        """
+        # Initialise list of HKDs
+        hkds = []
+
+        # Loop over all HKDs
+        for hkd in hkd_list:
+
+            # Compute overlap between EVP and HKD
+            overlap = evp['gti'].overlap(hkd['tstart'], hkd['tstop'])
+
+            # If we have overlap then check if the file already exists
+            if overlap > 0.0:
+
+                # First check if HKD is already in HKD list. If this is the case,
+                # and the current HKD corresponds to the VP of the EVP, then replace
+                # the existing HKD by the current HKD since we prefer having the
+                # HKD in the same folder as the EVP. Otherwise we keep the existing
+                # HKD
+                exists = False
+                for i, hkd_exist in enumerate(hkds):
+                    if hkd_exist['dsd_id'] == hkd['dsd_id']:
+                        exists = True
+                        if hkd['vp'] == evp['vp']:
+                            hkds[i] = hkd
+                            break
+                        else:
+                            break
+
+                # If the HKD does not yet exist then append it now
+                if not exists:
+                    hkds.append(hkd)
+
+        # Sort HKD list by start day
+        hkds = self._sorted(hkds)
+
+        # Return HKDs
+        return hkds
 
     def _check_xml_list(self, xml_list):
         """
@@ -1488,6 +1766,10 @@ class comgendb(ctools.cscript):
         for oadname in xml_dict['oadnames']:
             obs.append('parameter name="OAD" file="%s"' % (oadname))
 
+        # Append HKD files
+        for hkdname in xml_dict['hkdnames']:
+            obs.append('parameter name="HKD" file="%s"' % (hkdname))
+
         # Save XML file
         xml.save(xml_dict['xmlname'])
 
@@ -1537,7 +1819,7 @@ class comgendb(ctools.cscript):
         # Return
         return
 
-    def _build_database_file(self, evp_list, oad_list, tim_list, xml_list):
+    def _build_database_file(self, evp_list, oad_list, hkd_list, tim_list, xml_list):
         """
         Build database file
 
@@ -1547,6 +1829,8 @@ class comgendb(ctools.cscript):
             EVP database
         oad_list : list of dict
             OAD database
+        hkd_list : list of dict
+            HKD database
         tim_list : list of dict
             TIM database
         xml_list : list of dict
@@ -1561,12 +1845,14 @@ class comgendb(ctools.cscript):
         # Get tables
         evp_table = self._build_evp_table(evp_list)
         oad_table = self._build_oad_table(oad_list)
+        hkd_table = self._build_hkd_table(hkd_list)
         tim_table = self._build_tim_table(tim_list)
         xml_table = self._build_xml_table(xml_list)
 
         # Append tables
         fits.append(evp_table)
         fits.append(oad_table)
+        fits.append(hkd_table)
         fits.append(tim_table)
         fits.append(xml_table)
 
@@ -1770,6 +2056,92 @@ class comgendb(ctools.cscript):
         # Return table
         return table
 
+    def _build_hkd_table(self, hkd_list):
+        """
+        Build HKD FITS table
+
+        Parameters
+        ----------
+        hkd_list : list of dict
+            HKD database
+
+        Returns
+        -------
+        table : `~gammalib.GFitsBinTable`
+            HKD FITS table
+        """
+        # Determine number of rows in table
+        nrows = len(hkd_list)
+
+        # Create FITS table columns
+        col_vp         = gammalib.GFitsTableStringCol('VP',         nrows, 9)
+        col_object     = gammalib.GFitsTableStringCol('OBJECT',     nrows, 20)
+        col_obs_id     = gammalib.GFitsTableStringCol('OBS_ID',     nrows, 9)
+        col_dsd_id     = gammalib.GFitsTableStringCol('DSD_ID',     nrows, 15)
+        col_glon_scz   = gammalib.GFitsTableFloatCol('GLON_SCZ',    nrows)
+        col_glat_scz   = gammalib.GFitsTableFloatCol('GLAT_SCZ',    nrows)
+        col_date_start = gammalib.GFitsTableStringCol('DATE_START', nrows, 20)
+        col_date_stop  = gammalib.GFitsTableStringCol('DATE_STOP',  nrows, 20)
+        col_tjd_start  = gammalib.GFitsTableShortCol('TJD_START',   nrows)
+        col_tics_start = gammalib.GFitsTableLongCol('TICS_START',   nrows)
+        col_tjd_stop   = gammalib.GFitsTableShortCol('TJD_STOP',    nrows)
+        col_tics_stop  = gammalib.GFitsTableLongCol('TICS_STOP',    nrows)
+        col_quality    = gammalib.GFitsTableShortCol('QUALITY',     nrows)
+        col_hkd        = gammalib.GFitsTableStringCol('HKD',        nrows, 60)
+        col_records    = gammalib.GFitsTableLongCol('RECORDS',      nrows)
+
+        # Set column units
+        col_glon_scz.unit('deg')
+        col_glat_scz.unit('deg')
+        col_tjd_start.unit('days')
+        col_tics_start.unit('0.000125 s')
+        col_tjd_stop.unit('days')
+        col_tics_stop.unit('0.000125 s')
+
+        # Fill columns
+        for i, hkd_record in enumerate(hkd_list):
+            col_vp[i]         = hkd_record['vp']
+            col_object[i]     = hkd_record['object']
+            col_obs_id[i]     = '%.1f' % hkd_record['obs_id']
+            col_dsd_id[i]     = hkd_record['dsd_id']
+            col_glon_scz[i]   = hkd_record['glon_scz']
+            col_glat_scz[i]   = hkd_record['glat_scz']
+            col_date_start[i] = hkd_record['date_start']
+            col_date_stop[i]  = hkd_record['date_stop']
+            col_tjd_start[i]  = hkd_record['tjd_start']
+            col_tics_start[i] = hkd_record['tics_start']
+            col_tjd_stop[i]   = hkd_record['tjd_stop']
+            col_tics_stop[i]  = hkd_record['tics_stop']
+            col_quality[i]    = hkd_record['quality']
+            col_hkd[i]        = hkd_record['filename']
+            col_records[i]    = hkd_record['records']
+
+        # Create FITS table
+        table = gammalib.GFitsBinTable()
+
+        # Append columns to table
+        table.append(col_vp)
+        table.append(col_object)
+        table.append(col_obs_id)
+        table.append(col_dsd_id)
+        table.append(col_glon_scz)
+        table.append(col_glat_scz)
+        table.append(col_date_start)
+        table.append(col_date_stop)
+        table.append(col_tjd_start)
+        table.append(col_tics_start)
+        table.append(col_tjd_stop)
+        table.append(col_tics_stop)
+        table.append(col_quality)
+        table.append(col_hkd)
+        table.append(col_records)
+
+        # Set extension name
+        table.extname('HKD')
+
+        # Return table
+        return table
+
     def _build_tim_table(self, tim_list):
         """
         Build TIM FITS table
@@ -1903,10 +2275,12 @@ class comgendb(ctools.cscript):
         col_evp_quality = gammalib.GFitsTableShortCol('EVP_QUALITY', nrows)
         col_tim_quality = gammalib.GFitsTableShortCol('TIM_QUALITY', nrows)
         col_oad_quality = gammalib.GFitsTableShortCol('OAD_QUALITY', nrows, 43)
+        col_hkd_quality = gammalib.GFitsTableShortCol('HKD_QUALITY', nrows, 43)
         col_xml         = gammalib.GFitsTableStringCol('XML',        nrows, 60)
         col_evp         = gammalib.GFitsTableStringCol('EVP',        nrows, 60)
         col_tim         = gammalib.GFitsTableStringCol('TIM',        nrows, 60)
         col_oad         = gammalib.GFitsTableStringCol('OAD',        nrows, 60, 43)
+        col_hkd         = gammalib.GFitsTableStringCol('HKD',        nrows, 60, 43)
         col_nevents     = gammalib.GFitsTableLongCol('NEVENTS',      nrows)
         col_model       = gammalib.GFitsTableStringCol('MODE',       nrows, 8)
 
@@ -1954,6 +2328,10 @@ class comgendb(ctools.cscript):
                 col_oad_quality[i,k] = oad_quality
             for k, oadname in enumerate(xml_record['oadnames']):
                 col_oad[i,k] = oadname
+            for k, hkd_quality in enumerate(xml_record['hkd_quality']):
+                col_hkd_quality[i,k] = hkd_quality
+            for k, hkdname in enumerate(xml_record['hkdnames']):
+                col_hkd[i,k] = hkdname
             mode = 'UNKNOWN'
             if xml_record['mode'] == 'STD':
                 mode = 'STANDARD'
@@ -1987,10 +2365,12 @@ class comgendb(ctools.cscript):
         table.append(col_evp_quality)
         table.append(col_tim_quality)
         table.append(col_oad_quality)
+        table.append(col_hkd_quality)
         table.append(col_xml)
         table.append(col_evp)
         table.append(col_tim)
         table.append(col_oad)
+        table.append(col_hkd)
 
         # Set extension name
         table.extname('XML')
@@ -2024,6 +2404,12 @@ class comgendb(ctools.cscript):
         self._oad_list = self._get_oad_list()
 
         # Log header
+        self._log_header1(gammalib.TERSE, 'Get list of HKD files')
+
+        # Get HKD list
+        self._hkd_list = self._get_hkd_list()
+
+        # Log header
         self._log_header1(gammalib.TERSE, 'Get list of TIM files')
 
         # Get TIM list
@@ -2033,7 +2419,7 @@ class comgendb(ctools.cscript):
         self._log_header1(gammalib.TERSE, 'Generate list of XML files')
 
         # Get XML list
-        xml_list = self._get_xml_list(self._evp_list, self._tim_list, self._oad_list)
+        xml_list = self._get_xml_list(self._evp_list, self._tim_list, self._oad_list, self._hkd_list)
 
         # Log header
         self._log_header1(gammalib.TERSE, 'Compare with COMPASS database')
@@ -2064,7 +2450,8 @@ class comgendb(ctools.cscript):
 
         # Build database file
         self._build_database_file(self._evp_list, self._oad_list,
-                                  self._tim_list, self._xml_list)
+                                  self._hkd_list, self._tim_list,
+                                  self._xml_list)
 
         # Return
         return

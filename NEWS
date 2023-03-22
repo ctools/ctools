@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.1.0
 
-15 March 2023
+22 March 2023
 
 
 Introduction
@@ -324,7 +324,9 @@ None
 
 comgendb - Generate COMPTEL database
 ------------------------------------
-None
+Add collection of HKD datasets to script and assure that each HKD datasets
+is covered by an OAD dataset. OAD datasets for which no HKD dataset exists
+will be removed in the XML file (#4209).
 
 
 comlixfit - COMPTEL maximum likelihood fitting using SRCLIX algorithm

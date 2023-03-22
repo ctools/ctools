@@ -31,7 +31,7 @@ Improvements
 ------------
 
 * [`4209 <https://cta-redmine.irap.omp.eu/issues/4209>`_] -
-  Add support for DRW weighting cubes
+  Add support for DRW weighting cubes. Add collection of HKD datasets to :ref:`comgendb`.
 * [`4201 <https://cta-redmine.irap.omp.eu/issues/4201>`_] -
   Prefit models without test source in :ref:`comlixmap`
 
