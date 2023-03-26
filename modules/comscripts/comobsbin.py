@@ -505,6 +505,8 @@ class comobsbin(ctools.csobservation):
 
         # Get DRW method in lower case
         drwmethod = gammalib.tolower(self['drwmethod'].string())
+        if drwmethod == 'phibar':
+            drwmethod += '%d' % (self['timebin'].real())
 
         # Generate one DRW for each energy boundary
         for i in range(ebounds.size()):
