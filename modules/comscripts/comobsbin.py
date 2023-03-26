@@ -86,6 +86,7 @@ class comobsbin(ctools.csobservation):
         self['psdmax'].integer()
         self['zetamin'].real()
         self['fpmtflag'].integer()
+        self['drwmethod'].string()
         self['timebin'].real()
 
         # Get D1 and D2 module usage strings
@@ -217,6 +218,7 @@ class comobsbin(ctools.csobservation):
                 phases           = self['phase'].string()
                 self._dre_suffix = suffix+phases.replace(';', '_')
                 self._drg_suffix = suffix
+                self._drw_suffix = suffix
                 self._drx_suffix = suffix
 
             # ... otherwise handle orbital phase selection
@@ -245,6 +247,7 @@ class comobsbin(ctools.csobservation):
                 phases           = self['phase'].string()
                 self._dre_suffix = suffix+phases.replace(';', '_')
                 self._drg_suffix = suffix+phases.replace(';', '_')
+                self._drw_suffix = suffix+phases.replace(';', '_')
                 self._drx_suffix = suffix+phases.replace(';', '_')
 
         # If PSD interval differs from standard interval then set the interval
@@ -260,10 +263,11 @@ class comobsbin(ctools.csobservation):
                                                self['psdmax'].integer())
 
         # If zeta angle differs from standard value then append zeta angle to DRE
-        # and DRG suffix
+        # DRG and DRW suffix
         if self['zetamin'].real() != 5.0:
             self._dre_suffix += '_zeta%.1f' % (self['zetamin'].real())
             self._drg_suffix += '_zeta%.1f' % (self['zetamin'].real())
+            self._drw_suffix += '_zeta%.1f' % (self['zetamin'].real())
 
         # If handling of D2 modules with failed PMT flag differs from standard then
         # set the flag and append flag to suffix
@@ -272,9 +276,10 @@ class comobsbin(ctools.csobservation):
             # Set handling of D2 modules with failed PMT flag
             self._select.fpmtflag(self['fpmtflag'].integer())
 
-            # Set DRE and DRG suffix
+            # Set DRE, DRG and DRW suffix
             self._dre_suffix += '_fpmt%1d' % (self['fpmtflag'].integer())
             self._drg_suffix += '_fpmt%1d' % (self['fpmtflag'].integer())
+            self._drw_suffix += '_fpmt%1d' % (self['fpmtflag'].integer())
 
         # If D1 module usage differs from standard value then set module usage
         # and append usage to DRE and DRG suffix
@@ -288,9 +293,10 @@ class comobsbin(ctools.csobservation):
                 else:
                     self._select.use_d1(i,False)
 
-            # Set DRE and DRG suffix
+            # Set DRE, DRG and DRW suffix
             self._dre_suffix += '_%s' % (d1use)
             self._drg_suffix += '_%s' % (d1use)
+            self._drw_suffix += '_%s' % (d1use)
 
         # If D2 module usage differs from standard value then set module usage
         # and append usage to DRE and DRG suffix
@@ -304,9 +310,10 @@ class comobsbin(ctools.csobservation):
                 else:
                     self._select.use_d2(i,False)
 
-            # Set DRE and DRG suffix
+            # Set DRE, DRG and DRW suffix
             self._dre_suffix += '_%s' % (d2use)
             self._drg_suffix += '_%s' % (d2use)
+            self._drw_suffix += '_%s' % (d2use)
 
         # Log selection set
         self._log_string(gammalib.NORMAL, str(self._select))
@@ -496,19 +503,22 @@ class comobsbin(ctools.csobservation):
         drwnames = []
         engindex = []
 
+        # Get DRW method in lower case
+        drwmethod = gammalib.tolower(self['drwmethod'].string())
+
         # Generate one DRW for each energy boundary
         for i in range(ebounds.size()):
 
             # Set DRW filename in output folder
-            drwname = '%s/%s%s_drw%s_%6.6d-%6.6dkeV.fits' % \
-                       (self['outfolder'].string(), obs.id(), dri_prefix, self._drw_suffix,
-                        ebounds.emin(i).keV(), ebounds.emax(i).keV())
+            drwname = '%s/%s%s_drw-%s%s_%6.6d-%6.6dkeV.fits' % \
+                       (self['outfolder'].string(), obs.id(), dri_prefix, drwmethod,
+                        self._drw_suffix, ebounds.emin(i).keV(), ebounds.emax(i).keV())
             drwfile = gammalib.GFilename(drwname)
 
             # Set DRW filename in global data store
-            drwname_global = '%s/%s%s_drw%s_%6.6d-%6.6dkeV.fits' % \
-                              (self._global_datastore, obs.id(), dri_prefix, self._drw_suffix,
-                               ebounds.emin(i).keV(), ebounds.emax(i).keV())
+            drwname_global = '%s/%s%s_drw-%s%s_%6.6d-%6.6dkeV.fits' % \
+                              (self._global_datastore, obs.id(), dri_prefix, drwmethod,
+                               self._drw_suffix, ebounds.emin(i).keV(), ebounds.emax(i).keV())
             drwfile_global = gammalib.GFilename(drwname_global)
 
             # Write header
@@ -553,7 +563,8 @@ class comobsbin(ctools.csobservation):
 
             # Compute DRWs
             drws.compute_drws(obs, self._select, self['zetamin'].real(),
-                                                 self['timebin'].real())
+                                                 self['timebin'].real(),
+                                                 drwmethod)
 
             # Phibar normalise DRWs to DREs
             for i in range(drws.size()):
