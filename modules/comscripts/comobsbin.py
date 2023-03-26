@@ -503,23 +503,24 @@ class comobsbin(ctools.csobservation):
         drwnames = []
         engindex = []
 
-        # Get DRW method in lower case
+        # Get DRW method and suffix in lower case
         drwmethod = gammalib.tolower(self['drwmethod'].string())
-        if drwmethod == 'phibar':
-            drwmethod += '%d' % (self['timebin'].real())
+        drwsuffix = drwmethod
+        if drwsuffix == 'phibar':
+            drwsuffix += '%d' % (self['timebin'].real())
 
         # Generate one DRW for each energy boundary
         for i in range(ebounds.size()):
 
             # Set DRW filename in output folder
             drwname = '%s/%s%s_drw-%s%s_%6.6d-%6.6dkeV.fits' % \
-                       (self['outfolder'].string(), obs.id(), dri_prefix, drwmethod,
+                       (self['outfolder'].string(), obs.id(), dri_prefix, drwsuffix,
                         self._drw_suffix, ebounds.emin(i).keV(), ebounds.emax(i).keV())
             drwfile = gammalib.GFilename(drwname)
 
             # Set DRW filename in global data store
             drwname_global = '%s/%s%s_drw-%s%s_%6.6d-%6.6dkeV.fits' % \
-                              (self._global_datastore, obs.id(), dri_prefix, drwmethod,
+                              (self._global_datastore, obs.id(), dri_prefix, drwsuffix,
                                self._drw_suffix, ebounds.emin(i).keV(), ebounds.emax(i).keV())
             drwfile_global = gammalib.GFilename(drwname_global)
 
