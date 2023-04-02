@@ -21,6 +21,7 @@
 import sys
 import glob
 import os
+import re
 import gammalib
 import ctools
 
@@ -254,10 +255,35 @@ class comobsadd(ctools.csobservation):
                 drw.num_used_superpackets(ebin['nspuse'])
                 drw.num_skipped_superpackets(ebin['nspskp'])
 
-                # Set DRE, DRB and DRW filenames
+                # Set DRE and DRB filenames
                 dre.name('%s/%s_%s_dre.fits' % (self['outfolder'].string(), prefix, id))
                 drb.name('%s/%s_%s_drb.fits' % (self['outfolder'].string(), prefix, id))
-                drw.name('%s/%s_%s_drw.fits' % (self['outfolder'].string(), prefix, id))
+
+                # Determine DRW method
+                drwmethod = None
+                for drwname in ebin['drws']:
+
+                    # Extract method
+                    suffix = re.findall('drw-(.*)_', drwname.url())
+                    if len(suffix) > 0:
+                        method = suffix[0]
+                    else:
+                        method = ''
+
+                    # Check DRW method
+                    if drwmethod == None:
+                        drwmethod = method
+                    else:
+                        if drwmethod != method:
+                            msg = ('Inconsistent DRW method "'+method+'" encountered, '
+                                   'expected "'+drwmethod+'".')
+                            raise RuntimeError(msg)
+
+                # Set DRW filename
+                if drwmethod == None or drwmethod == '':
+                    drw.name('%s/%s_%s_drw.fits' % (self['outfolder'].string(), prefix, id))
+                else:
+                    drw.name('%s/%s_%s_drw-%s.fits' % (self['outfolder'].string(), prefix, id, drwmethod))
 
                 # Put DRE, DRB and DRW in lists
                 self._dres.append(dre.copy())
