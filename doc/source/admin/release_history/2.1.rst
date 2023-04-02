@@ -30,8 +30,12 @@ Bug fixes
 Improvements
 ------------
 
+* [`4254 <https://cta-redmine.irap.omp.eu/issues/4254>`_] -
+  Add CONST method to :ref:`comobsbin`
 * [`4209 <https://cta-redmine.irap.omp.eu/issues/4209>`_] -
-  Add support for DRW weighting cubes. Add collection of HKD datasets to :ref:`comgendb`.
+  Add support for DRW weighting cubes.
+  Add PHIBAR and VETORATE methods to :ref:`comobsbin`.
+  Add collection of HKD datasets to :ref:`comgendb`.
 * [`4201 <https://cta-redmine.irap.omp.eu/issues/4201>`_] -
   Prefit models without test source in :ref:`comlixmap`
 

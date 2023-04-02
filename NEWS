@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.1.0
 
-22 March 2023
+4 April 2023
 
 
 Introduction
@@ -360,6 +360,9 @@ a DRG for background modelling. Set "outfolder" parameter to automatic (#4209).
 
 comobsbin - Bin COMPTEL observations
 ------------------------------------
+Add CONST method for DRW computation that generates solid angle multiplied and
+DRE normalised DRW datasets from the DRG data (#4254)
+
 Implement computation of weighting cubes (DRW) for improved background modelling.
 Added "timebin" parameter to provide control over the time binning used for
 DRW computation (#4209).

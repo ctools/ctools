@@ -1,8 +1,9 @@
-2023-03-22
+2023-04-22
 
         * Version 2.1.0 released
         ========================
 
+        Add CONST method to comobsbin (#4254)
         Add collection of HKD datasets to comgendb (#4209)
         Replace distutils by setuptools for Python setup (#4223)
         Add support for DRW weighting cubes (#4209)

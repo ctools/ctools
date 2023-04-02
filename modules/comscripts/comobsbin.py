@@ -569,9 +569,28 @@ class comobsbin(ctools.csobservation):
             self._log_header3(gammalib.NORMAL, 'Compute DRWs')
 
             # Compute DRWs
-            drws.compute_drws(obs, self._select, self['zetamin'].real(),
-                                                 self['timebin'].real(),
-                                                 drwmethod)
+            if drwmethod == 'const':
+
+                # Load DRG
+                drg = gammalib.GCOMDri(drgname)
+
+                # Get dataspace dimensions
+                nphibar = drg.nphibar()
+                npix    = drg.nchi() * drg.npsi()
+
+                # Set DRWs by multiplying DRG with solid angle
+                for ipix in range(npix):
+                    omega = drg.map().solidangle(ipix)
+                    for iphibar in range(nphibar):
+                        index = ipix + iphibar*npix
+                        drw   = drg[index] * omega
+                        for i in range(drws.size()):
+                            drws[i][index] = drw
+
+            else:
+                drws.compute_drws(obs, self._select, self['zetamin'].real(),
+                                                     self['timebin'].real(),
+                                                     drwmethod)
 
             # Phibar normalise DRWs to DREs
             for i in range(drws.size()):
@@ -580,10 +599,8 @@ class comobsbin(ctools.csobservation):
                 dre = gammalib.GCOMDri(drenames[engindex[i]])
 
                 # Get dataspace dimensions
-                nchi    = dre.nchi()
-                npsi    = dre.npsi()
                 nphibar = dre.nphibar()
-                npix    = nchi * npsi
+                npix    = dre.nchi() * dre.npsi()
 
                 # Phibar normalise DRW
                 for iphibar in range(nphibar):
