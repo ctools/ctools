@@ -629,7 +629,7 @@ class comobsbin(ctools.csobservation):
                 self._log_value(gammalib.NORMAL, 'Local DRW file created', drwfile.url())
 
                 # Log DRW
-                self._log_string(gammalib.NORMAL, str(drw))
+                self._log_string(gammalib.NORMAL, str(drws[i]))
 
         # Return
         return drxname, drgname, drwnames, drenames
