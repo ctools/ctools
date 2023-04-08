@@ -79,7 +79,7 @@ class Test(test):
         comobsadd = self._comscript('comobsadd')
 
         # Setup command
-        cmd = comobsadd+' inobs="'+self._obs+'" inmodel="'+self._model+'" '+ \
+        cmd = comobsadd+' inobs="'+self._obs+'" inmodel="NONE" '+ \
                         'coordsys="CEL" proj="TAN" ra="83.6331" dec="22.0145" '+ \
                         'nchi="20" npsi="20" '+ \
                         'outfolder="comobsadd_cmd1" outobs="comobsadd_cmd1.xml" '+ \
@@ -93,7 +93,7 @@ class Test(test):
         self._check_result('comobsadd_cmd1.xml', 'comobsadd_cmd1')
 
         # Setup command
-        cmd = comobsadd+' inobs="file_that_does_not_exist.xml" inmodel="'+self._model+'" '+ \
+        cmd = comobsadd+' inobs="file_that_does_not_exist.xml" inmodel="NONE" '+ \
                         'coordsys="CEL" proj="TAN" ra="83.6331" dec="22.0145" '+ \
                         'nchi="20" npsi="20" '+ \
                         'outfolder="comobsadd_cmd2" outobs="comobsadd_cmd2.xml" '+ \
@@ -117,7 +117,7 @@ class Test(test):
         # Set-up script
         add = comscripts.comobsadd()
         add['inobs']     = self._obs
-        add['inmodel']   = self._model
+        add['inmodel']   = 'NONE'
         add['coordsys']  = 'CEL'
         add['proj']      = 'TAN'
         add['ra']        = 83.6331
@@ -136,6 +136,29 @@ class Test(test):
 
         # Check result
         self._check_result('comobsadd_py1.xml', 'comobsadd_py1')
+
+        # Set-up script
+        add = comscripts.comobsadd()
+        add['inobs']     = self._obs
+        add['inmodel']   = self._model
+        add['coordsys']  = 'CEL'
+        add['proj']      = 'TAN'
+        add['ra']        = 83.6331
+        add['dec']       = 22.0145
+        add['nchi']      = 20
+        add['npsi']      = 20
+        add['outfolder'] = 'comobsadd_py2'
+        add['outobs']    = 'comobsadd_py2.xml'
+        add['logfile']   = 'comobsadd_py2.log'
+        add['chatter']   = 3
+
+        # Run script and save result
+        add.logFileOpen()   # Make sure we get a log file
+        add.run()
+        add.save()
+
+        # Check result
+        self._check_result('comobsadd_py2.xml', 'comobsadd_py2')
 
         # Return
         return

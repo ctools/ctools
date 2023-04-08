@@ -41,13 +41,14 @@ class comobsadd(ctools.csobservation):
         self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise members
-        self._xml    = gammalib.GXml()
-        self._dres   = []
-        self._drbs   = []
-        self._drws   = []
-        self._drg    = []
-        self._drx    = []
-        self._nspuse = 0
+        self._xml     = gammalib.GXml()
+        self._dres    = []
+        self._drbs    = []
+        self._drws    = []
+        self._drg     = []
+        self._drx     = []
+        self._nspuse  = 0
+        self._sky     = gammalib.GModels()
 
         # Return
         return
@@ -61,9 +62,16 @@ class comobsadd(ctools.csobservation):
         if self.obs().is_empty():
             self.obs().load(self['inobs'].filename())
 
-        # Set models if we have none
+        # Set models if we have none and if an input model was specified
         if self.obs().models().is_empty():
-            self.obs().models(self['inmodel'].filename())
+            if self['inmodel'].is_valid():
+                self.obs().models(self['inmodel'].filename())
+
+        # Extract sky models
+        self._sky = gammalib.GModels()
+        for model in self.obs().models():
+            if model.classname() == 'GModelSky':
+                self._sky.append(model)
 
         # Query parameters
         self['prefix'].string()
@@ -149,6 +157,7 @@ class comobsadd(ctools.csobservation):
                         ebin['drws'].append(o.drwname())
                         ebin['drgs'].append(o.drgname())
                         ebin['drxs'].append(o.drxname())
+                        ebin['obs'].append(o)
                         ebin['gti'].extend(o.events().dre().gti())
                         ebin['nspinp'] += o.events().dre().num_superpackets()
                         ebin['nspuse'] += o.events().dre().num_used_superpackets()
@@ -163,6 +172,7 @@ class comobsadd(ctools.csobservation):
                                   'drws'     : [o.drwname()],
                                   'drgs'     : [o.drgname()],
                                   'drxs'     : [o.drxname()],
+                                  'obs'      : [o],
                                   'iaq'      : o.response().rspname(),
                                   'gti'      : o.events().dre().gti(),
                                   'tofcor'   : o.events().dre().tof_correction(),
@@ -533,13 +543,18 @@ class comobsadd(ctools.csobservation):
             map = self._drws[iebin].map()
 
             # Loop over DRWs
-            for drwname in ebin['drws']:
+            for idri, drwname in enumerate(ebin['drws']):
 
                 # Log DRW file name
                 self._log_value(gammalib.NORMAL, 'Filename', drwname.url())
 
                 # Load DRW
                 drw = gammalib.GCOMDri(drwname)
+
+                # Phibar normalise DRW
+                drename = ebin['dres'][idri]
+                obs     = ebin['obs'][idri]
+                drw     = self._normalise_drw(drw, drename, obs)
 
                 # Divide pixels by solid angle so that the DRW returns the
                 # number of background counts per steradian
@@ -684,6 +699,93 @@ class comobsadd(ctools.csobservation):
         # Return
         return
 
+    def _normalise_drw(self, drw, drename, obs):
+        """
+        Phibar normalise DRW to DRE - DRM
+
+        Phibar normalises the DRW cube to the number of events in the DRE
+        corrected by the predicted number of sky model events in case that
+        a sky model was provided
+
+        Parameters
+        ----------
+        drw : ~gammalib.GCOMDri
+            DRW cube
+        drename : ~gammalib.GFilename
+            File name of corrsponding DRE
+        obs : ~gammalib.GCOMObservation
+            Corresponding observation
+
+        Returns
+        -------
+        drw : ~gammalib.GCOMDri
+            Normalised DRW cube
+        """
+        # Log DRE file name
+        self._log_value(gammalib.NORMAL, 'DRE filename', drename.url())
+
+        # Load DRE
+        dre = gammalib.GCOMDri(drename)
+
+        # Compute number of events in DRE and DRW
+        sum_dre = 0.0
+        sum_drw = 0.0
+        for i in range(dre.size()):
+            sum_dre += dre[i]
+            sum_drw += drw[i]
+
+        # Log number of events in DRE and DRW
+        self._log_value(gammalib.NORMAL, 'Events in DRE', sum_dre)
+        self._log_value(gammalib.NORMAL, 'Events in DRW', sum_drw)
+
+        # If sky models were defined then compute DRM and subtract DRM from DRE
+        if not self._sky.is_empty():
+
+            # Log observation name and ID
+            self._log_value(gammalib.NORMAL, 'Observation', '"%s" (%s)' % (obs.name(), obs.id()))
+
+            # Compute DRM
+            drm = obs.drm(self._sky)
+
+            # Subtract DRM
+            sum_drm = 0.0
+            for i in range(dre.size()):
+                sum_drm += drm[i]
+                dre[i]  -= drm[i]
+            self._log_value(gammalib.NORMAL, 'Events in DRM', sum_drm)
+
+        # Get dataspace dimensions
+        nphibar = dre.nphibar()
+        npix    = dre.nchi() * dre.npsi()
+
+        # Phibar normalise DRW
+        for iphibar in range(nphibar):
+            sum_dre = 0.0
+            sum_drw = 0.0
+            ioffset = iphibar * npix
+            for i in range(npix):
+                index    = i + ioffset
+                sum_dre += dre[index]
+                sum_drw += drw[index]
+            if sum_drw > 0:
+                for i in range(npix):
+                    index       = i + ioffset
+                    drw[index] *= sum_dre / sum_drw
+
+        # Recompute number of events in DRE and DRW
+        sum_dre = 0.0
+        sum_drw = 0.0
+        for i in range(dre.size()):
+            sum_dre += dre[i]
+            sum_drw += drw[i]
+
+        # Log number of events in DRE and DRW after normalisation
+        self._log_value(gammalib.NORMAL, 'Normalised events in DRE', sum_dre)
+        self._log_value(gammalib.NORMAL, 'Normalised events in DRW', sum_drw)
+
+        # Return DRW
+        return drw
+
 
     # Public methods
     def process(self):
@@ -698,6 +800,12 @@ class comobsadd(ctools.csobservation):
 
         # Log input observations
         self._log_string(gammalib.NORMAL, str(self.obs()))
+
+        # Log header
+        self._log_header1(gammalib.NORMAL, 'Input sky models')
+
+        # Log input models
+        self._log_string(gammalib.NORMAL, str(self._sky))
 
         # Create combined observation
         ebins = self._create_obs(self.obs())

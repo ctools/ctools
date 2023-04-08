@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.1.0
 
-4 April 2023
+8 April 2023
 
 
 Introduction
@@ -347,6 +347,9 @@ parameter uncertainties in the resulting TS map FITS file (#4187).
 
 comobsadd - Combine COMPTEL observations
 ----------------------------------------
+Added DRW Phibar normalisation step by taking into account the sky model
+components of the input model definition file (#4263).
+
 Added DRW to the cubes that will be combined by the script. The combination
 will be done using a simple addition, alike the combination of the DRB cubes
 (#4209).

@@ -17,7 +17,7 @@
 # Input and output parameters
 #============================
 inobs,     f, a, obs.xml,,, "Input observation definition file"
-inmodel,   f, a, models.xml,,, "Input model definition file"
+inmodel,   f, a, NONE,,, "Optional input model definition file"
 outfolder, s, h, dri,,, "Output folder for files"
 outobs,    f, a, outobs,,, "Output observation definition file"
 prefix,    s, h, com,,, "Filename prefix"

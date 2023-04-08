@@ -30,6 +30,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`4263 <https://cta-redmine.irap.omp.eu/issues/4263>`_] -
+  Add DRW normalisation to :ref:`comobsadd`
 * [`4254 <https://cta-redmine.irap.omp.eu/issues/4254>`_] -
   Add CONST method to :ref:`comobsbin`
 * [`4209 <https://cta-redmine.irap.omp.eu/issues/4209>`_] -
