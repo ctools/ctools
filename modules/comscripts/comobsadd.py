@@ -430,7 +430,7 @@ class comobsadd(ctools.csobservation):
         Combine DRBs
 
         The DRBs are combined by dividing the original pixels by their solid
-        angles and multipliying with the solid angle of the combined DRB. In
+        angles and multiplying with the solid angle of the combined DRB. In
         that way the solid angle changes due to different projections are
         correctly taken into account.
 
@@ -506,7 +506,7 @@ class comobsadd(ctools.csobservation):
         Combine DRWs
 
         The DRWs are combined by dividing the original pixels by their solid
-        angles and multipliying with the solid angle of the combined DRW. In
+        angles and multiplying with the solid angle of the combined DRW. In
         that way the solid angle changes due to different projections are
         correctly taken into account.
 
