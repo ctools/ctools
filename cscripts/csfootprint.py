@@ -2,7 +2,7 @@
 # ==========================================================================
 # Carbon footprint report script
 #
-# Copyright (C) 2022 Juergen Knoedlseder
+# Copyright (C) 2022-2023 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -627,7 +627,11 @@ class csfootprint(ctools.cscript):
                              title='ctools calls', ylabel='calls')
 
             # Kludge to adapt pie plotting to matplotlib version
-            args, _, _, _ = inspect.getargspec(plt.pie)
+            ver = sys.version.split()[0]
+            if ver >= '3.0.0':
+                args, _, _, _, _, _, _ = inspect.getfullargspec(plt.pie)
+            else:
+                args, _, _, _ = inspect.getargspec(plt.pie)
 
             # Plot pie figures
             self._plot_pie(ax10, statistics, quantity='gCO2e', title='Footprint', args=args)
