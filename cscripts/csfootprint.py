@@ -422,7 +422,7 @@ class csfootprint(ctools.cscript):
         self._log_value(gammalib.NORMAL, ' due to infrastructure', info['gCO2e_infra'])
         self._log_value(gammalib.NORMAL, 'Average carbon intensity', info['ci_cpu'])
         self._log_value(gammalib.NORMAL, 'Average daily footprint', info['fp_dur'])
-        self._log_value(gammalib.NORMAL, 'Expected annual footprint', info['fp_yr'])
+        self._log_value(gammalib.NORMAL, 'Estimated annual footprint', info['fp_yr'])
 
         # Return
         return
@@ -664,7 +664,7 @@ class csfootprint(ctools.cscript):
             fig.text(x0,    y0, 'Average daily footprint: ', fontsize=fontsize, ha='left')
             fig.text(x0+dx, y0, info['fp_dur'], fontsize=fontsize, ha='left')
             y0 -= dy
-            fig.text(x0,    y0, 'Expected annual footprint: ', fontsize=fontsize, ha='left')
+            fig.text(x0,    y0, 'Estimated annual footprint: ', fontsize=fontsize, ha='left')
             fig.text(x0+dx, y0, info['fp_yr'], fontsize=fontsize, ha='left')
 
             # Optionally display figure for debugging
@@ -707,8 +707,12 @@ class csfootprint(ctools.cscript):
         yscale : float, optional
             Y axis scale
         """
+        # Import modules for handling of dates
+        from matplotlib import dates    as mdates
+        from datetime   import datetime as dt
+
         # Create bar data
-        days = [i                      for i, _  in enumerate(statistics['daily'])]
+        days = [dt.strptime(entry['date'], '%Y-%m-%d').date() for entry in statistics['daily']]
         data = [entry[quantity]*yscale for entry in statistics['daily']]
 
         # Plot bar data
@@ -716,7 +720,7 @@ class csfootprint(ctools.cscript):
 
         # Set labels
         ax.set_title(title)
-        ax.set_xlabel('Days since %s' % statistics['use_start'][0:10])
+        ax.set_xlabel('Date')
         ax.set_ylabel(ylabel)
 
         # Return

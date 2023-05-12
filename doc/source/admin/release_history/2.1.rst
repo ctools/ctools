@@ -16,6 +16,8 @@ In particular, this release provides:
 Bug fixes
 ---------
 
+* [`4299 <https://cta-redmine.irap.omp.eu/issues/4299>`_] -
+  Fix date display in :ref:`csfootprint`
 * [`4223 <https://cta-redmine.irap.omp.eu/issues/4223>`_] -
   Replace ``distutils`` by ``setuptools`` for Python setup
 * [`4187 <https://cta-redmine.irap.omp.eu/issues/4187>`_] -

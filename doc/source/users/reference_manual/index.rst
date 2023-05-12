@@ -34,6 +34,7 @@ Generic analysis tools and scripts
    cstsdist --- Generates Test Statistic distribution <cstsdist>
    cstsmapmerge --- Merges slices from Test Statistic map computations <cstsmapmerge>
    cstsmapsplit --- Creates commands to split the Test Statistic map computations <cstsmapsplit>
+   csfootprint --- Generates carbon footprint report <csfootprint>
 
 
 CTA and IACT analysis tools and scripts
@@ -57,7 +58,6 @@ CTA and IACT analysis tools and scripts
    ctskymap --- Generates sky map <ctskymap>
    csbkgmodel --- Generates background model for 3D analysis <csbkgmodel>
    csebins --- Generates energy boundaries for stacked analysis <csebins>
-   csfootprint --- Generates carbon footprint report <csfootprint>
    csobsdef --- Generates observation definition file <csobsdef>
    csobsselect --- Select observations from observation definition file <csobsselect>
    csphagen --- Generates PHA, ARF, RMF files based on source/background regions <csphagen>

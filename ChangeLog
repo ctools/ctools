@@ -1,8 +1,9 @@
-2023-04-08
+2023-05-12
 
         * Version 2.1.0 released
         ========================
 
+        Fix date display in csfootprint (#4299)
         Add DRW normalisation to comobsadd (#4263)
         Add CONST method to comobsbin (#4254)
         Add collection of HKD datasets to comgendb (#4209)

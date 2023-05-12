@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 2.1.0
 
-8 April 2023
+12 May 2023
 
 
 Introduction
@@ -160,6 +160,11 @@ None
 csfindobs - Find IACT observations
 ----------------------------------
 None
+
+
+csfootprint - Generates carbon footprint report
+-----------------------------------------------
+Display now dates instead of days since start for daily statistic (#4299).
 
 
 csiactcopy - Copy IACT observations
