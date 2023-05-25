@@ -948,7 +948,7 @@ class comgendb(ctools.cscript):
             tics_stop  = end_tic[nrecords-1]
         except:
             self._log_string(gammalib.NORMAL, '*** Corrupt TIM file "%s" encountered. '
-                             'Set TIM quality to -200.' % (evpname))
+                             'Set TIM quality to -200.' % (timname))
             tjd_start  = visday
             tics_start = vistim
             tjd_stop   = vieday
